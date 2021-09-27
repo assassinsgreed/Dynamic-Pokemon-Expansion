@@ -9376,18 +9376,18 @@ const struct PokedexEntry gPokedexEntries[NATIONAL_DEX_COUNT] =
 	// 	.trainerScale = 0,
 	// 	.trainerOffset = 0,
 	// },
-	// [NATIONAL_DEX_DHELMISE] =
-	// {
-	// 	.categoryName = {_S, _e, _a, _SPACE, _C, _r, _e, _e, _p, _e, _r, _END},
-	// 	.height = 39,
-	// 	.weight = 2100,
-	// 	.description = DEX_ENTRY_DHELMISE,
-	// 	.unusedDescription = (const u8*) 0x8444cb1,
-	// 	.pokemonScale = 0,
-	// 	.pokemonOffset = 0,
-	// 	.trainerScale = 0,
-	// 	.trainerOffset = 0,
-	// },
+	[NATIONAL_DEX_DHELMISE] =
+	{
+		.categoryName = {_S, _e, _a, _SPACE, _C, _r, _e, _e, _p, _e, _r, _END},
+		.height = 39,
+		.weight = 2100,
+		.description = DEX_ENTRY_DHELMISE,
+		.unusedDescription = (const u8*) 0x8444cb1,
+		.pokemonScale = 0,
+		.pokemonOffset = 0,
+		.trainerScale = 0,
+		.trainerOffset = 0,
+	},
 	[NATIONAL_DEX_JANGMO_O] =
 	{
 		.categoryName = {_S, _c, _a, _l, _y, _END, _SPACE, _SPACE, _SPACE, _SPACE, _SPACE, _SPACE},
