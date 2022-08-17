@@ -105,33 +105,33 @@ const u16 gGrasslandPage14[] =
 	SPECIES_FLORGES,	// 70
 };
 
-const u16 gGrasslandPage15[] =
-{
-	SPECIES_FLABEBE_BLUE,	// 68
-	SPECIES_FLOETTE_BLUE,	// 69
-	SPECIES_FLORGES_BLUE,	// 70
-};
+// const u16 gGrasslandPage15[] =
+// {
+// 	SPECIES_FLABEBE_BLUE,	// 68
+// 	SPECIES_FLOETTE_BLUE,	// 69
+// 	SPECIES_FLORGES_BLUE,	// 70
+// };
 
-const u16 gGrasslandPage16[] =
-{
-	SPECIES_FLABEBE_ORANGE,	// 68
-	SPECIES_FLOETTE_ORANGE,	// 69
-	SPECIES_FLORGES_ORANGE,	// 70
-};
+// const u16 gGrasslandPage16[] =
+// {
+// 	SPECIES_FLABEBE_ORANGE,	// 68
+// 	SPECIES_FLOETTE_ORANGE,	// 69
+// 	SPECIES_FLORGES_ORANGE,	// 70
+// };
 
-const u16 gGrasslandPage17[] =
-{
-	SPECIES_FLABEBE_YELLOW,	// 68
-	SPECIES_FLOETTE_YELLOW,	// 69
-	SPECIES_FLORGES_YELLOW,	// 70
-};
+// const u16 gGrasslandPage17[] =
+// {
+// 	SPECIES_FLABEBE_YELLOW,	// 68
+// 	SPECIES_FLOETTE_YELLOW,	// 69
+// 	SPECIES_FLORGES_YELLOW,	// 70
+// };
 
-const u16 gGrasslandPage18[] =
-{
-	SPECIES_FLABEBE_WHITE,	// 68
-	SPECIES_FLOETTE_WHITE,	// 69
-	SPECIES_FLORGES_WHITE,	// 70
-};
+// const u16 gGrasslandPage18[] =
+// {
+// 	SPECIES_FLABEBE_WHITE,	// 68
+// 	SPECIES_FLOETTE_WHITE,	// 69
+// 	SPECIES_FLORGES_WHITE,	// 70
+// };
 
 const u16 gGrasslandPage19[] =
 {
@@ -161,7 +161,7 @@ const u16 gGrasslandPage23[] =
 {
 	SPECIES_PACHIRISU,		// 211
 	SPECIES_MORPEKO,		// 238
-	SPECIES_MORPEKO_HANGRY,	// 238
+	// SPECIES_MORPEKO_HANGRY,	// 238
 };
 
 const u16 gGrasslandPage24[] =
@@ -231,7 +231,7 @@ const u16 gForestPage3[] =
 	SPECIES_PICHU,		// 33
 	SPECIES_PIKACHU,	// 34
 	SPECIES_RAICHU,		// 35
-	SPECIES_PIKACHU_CAP_ORIGINAL,	// 34
+	// SPECIES_PIKACHU_CAP_ORIGINAL,	// 34
 };
 
 const u16 gForestPage4[] =
@@ -346,7 +346,7 @@ const u16 gForestPage20[] =
 const u16 gForestPage21[] =
 {
 	SPECIES_SHAYMIN,		// 292
-	SPECIES_SHAYMIN_SKY,	// 292
+	// SPECIES_SHAYMIN_SKY,	// 292
 };
 
 const u16 gForestPage22[] =
@@ -415,8 +415,8 @@ const u16 gWatersEdgePage5[] =
 {
 	SPECIES_SHELLOS,		// 223
 	SPECIES_GASTRODON,		// 224
-	SPECIES_SHELLOS_EAST,	// 223
-	SPECIES_GASTRODON_EAST,	// 224
+	// SPECIES_SHELLOS_EAST,	// 223
+	// SPECIES_GASTRODON_EAST,	// 224
 };
 
 const u16 gWatersEdgePage6[] =
@@ -484,7 +484,7 @@ const u16 gWatersEdgePage15[] =
 	SPECIES_FROAKIE,		// 352
 	SPECIES_FROGADIER,		// 353
 	SPECIES_GRENINJA,		// 354
-	SPECIES_ASHGRENINJA,	// 354
+	// SPECIES_ASHGRENINJA,	// 354
 };
 
 const u16 gWatersEdgePage16[] =
@@ -691,8 +691,8 @@ const u16 gMountainPage1[] =
 {
 	SPECIES_ROCKRUFF,		// 16
 	SPECIES_LYCANROC,		// 17
-	SPECIES_LYCANROC_N,		// 17
-	SPECIES_LYCANROC_DUSK,	// 17
+	// SPECIES_LYCANROC_N,		// 17
+	// SPECIES_LYCANROC_DUSK,	// 17
 };
 
 const u16 gMountainPage2[] =
@@ -729,17 +729,17 @@ const u16 gMountainPage6[] =
 const u16 gMountainPage7[]=
 {
 	SPECIES_MINIOR_SHIELD,	// 143
-	SPECIES_MINIOR_RED,		// 143
-	SPECIES_MINIOR_BLUE,	// 143
-	SPECIES_MINIOR_ORANGE,	// 143
+	// SPECIES_MINIOR_RED,		// 143
+	// SPECIES_MINIOR_BLUE,	// 143
+	// SPECIES_MINIOR_ORANGE,	// 143
 };
 
-const u16 gMountainPage8[]=
-{
-	SPECIES_MINIOR_YELLOW,	// 143
-	SPECIES_MINIOR_INDIGO,	// 143
-	SPECIES_MINIOR_GREEN,	// 143
-};
+// const u16 gMountainPage8[]=
+// {
+// 	SPECIES_MINIOR_YELLOW,	// 143
+// 	SPECIES_MINIOR_INDIGO,	// 143
+// 	SPECIES_MINIOR_GREEN,	// 143
+// };
 
 const u16 gMountainPage9[] =
 {
@@ -877,7 +877,7 @@ const u16 gRoughTerrainPage8[] =
 {
 	SPECIES_DARUMAKA_G,			// 137
 	SPECIES_DARMANITAN_G,		// 138
-	SPECIES_DARMANITAN_G_ZEN,	// 138
+	// SPECIES_DARMANITAN_G_ZEN,	// 138
 };
 
 const u16 gRoughTerrainPage9[] =
@@ -901,7 +901,7 @@ const u16 gRoughTerrainPage12[] =
 {
 	SPECIES_YAMASK,		// 233
 	SPECIES_COFAGRIGUS,	// 234
-	SPECIES_YAMASK_G,	// 233
+	// SPECIES_YAMASK_G,	// 233
 	SPECIES_RUNERIGUS,	// 235
 };
 
@@ -939,7 +939,7 @@ const u16 gUrbanPage2[] =
 
 const u16 gUrbanPage3[] =
 {
-	SPECIES_MIME_JR_G,	// 162
+	SPECIES_MIME_JR,	// 162
 	SPECIES_MR_MIME_G,	// 163
 	SPECIES_MR_RIME,	// 164
 };
@@ -980,28 +980,28 @@ const u16 gUrbanPage8[] =
 const u16 gUrbanPage9[] =
 {
 	SPECIES_ROTOM,		// 212
-	SPECIES_ROTOM_HEAT,	// 212
-	SPECIES_ROTOM_WASH,	// 212
+	// SPECIES_ROTOM_HEAT,	// 212
+	// SPECIES_ROTOM_WASH,	// 212
 };
 
-const u16 gUrbanPage10[] =
-{
-	SPECIES_ROTOM_FROST,	// 212
-	SPECIES_ROTOM_FAN,		// 212
-	SPECIES_ROTOM_MOW,		// 212
-};
+// const u16 gUrbanPage10[] =
+// {
+// 	SPECIES_ROTOM_FROST,	// 212
+// 	SPECIES_ROTOM_FAN,		// 212
+// 	SPECIES_ROTOM_MOW,		// 212
+// };
 
 const u16 gUrbanPage11[] =
 {
 	SPECIES_TOXEL,				// 213
 	SPECIES_TOXTRICITY,			// 214
-	SPECIES_TOXTRICITY_LOW_KEY,	// 215
+	// SPECIES_TOXTRICITY_LOW_KEY,	// 214
 };
 
 const u16 gUrbanPage12[] =
 {
 	SPECIES_MIMIKYU,		// 225
-	SPECIES_MIMIKYU_BUSTED,	// 225
+	// SPECIES_MIMIKYU_BUSTED,	// 225
 };
 
 const u16 gUrbanPage13[] =
@@ -1094,9 +1094,9 @@ const u16 gRarePage7[] =
 const u16 gRarePage8[] =
 {
 	SPECIES_NECROZMA,				// 384
-	SPECIES_NECROZMA_DUSK_MANE,		// 384
-	SPECIES_NECROZMA_DAWN_WINGS,	// 384
-	SPECIES_NECROZMA_ULTRA,			// 384
+	// SPECIES_NECROZMA_DUSK_MANE,		// 384
+	// SPECIES_NECROZMA_DAWN_WINGS,	// 384
+	// SPECIES_NECROZMA_ULTRA,			// 384
 };
 
 const u16 gRarePage9[] =
@@ -1123,10 +1123,10 @@ const struct HabitatPage gGrasslandPages[] =
 	{gGrasslandPage12, ARRAY_COUNT(gGrasslandPage12)}, 
 	{gGrasslandPage13, ARRAY_COUNT(gGrasslandPage13)}, 
 	{gGrasslandPage14, ARRAY_COUNT(gGrasslandPage14)}, 
-	{gGrasslandPage15, ARRAY_COUNT(gGrasslandPage15)}, 
-	{gGrasslandPage16, ARRAY_COUNT(gGrasslandPage16)}, 
-	{gGrasslandPage17, ARRAY_COUNT(gGrasslandPage17)}, 
-	{gGrasslandPage18, ARRAY_COUNT(gGrasslandPage18)}, 
+	// {gGrasslandPage15, ARRAY_COUNT(gGrasslandPage15)}, 
+	// {gGrasslandPage16, ARRAY_COUNT(gGrasslandPage16)}, 
+	// {gGrasslandPage17, ARRAY_COUNT(gGrasslandPage17)}, 
+	// {gGrasslandPage18, ARRAY_COUNT(gGrasslandPage18)}, 
 	{gGrasslandPage19, ARRAY_COUNT(gGrasslandPage19)}, 
 	{gGrasslandPage20, ARRAY_COUNT(gGrasslandPage20)}, 
 	{gGrasslandPage21, ARRAY_COUNT(gGrasslandPage21)}, 
@@ -1238,7 +1238,7 @@ const struct HabitatPage gMountainPages[] =
 	{gMountainPage5, ARRAY_COUNT(gMountainPage5)}, 
 	{gMountainPage6, ARRAY_COUNT(gMountainPage6)}, 
 	{gMountainPage7, ARRAY_COUNT(gMountainPage7)}, 
-	{gMountainPage8, ARRAY_COUNT(gMountainPage8)}, 
+	// {gMountainPage8, ARRAY_COUNT(gMountainPage8)}, 
 	{gMountainPage9, ARRAY_COUNT(gMountainPage9)}, 
 	{gMountainPage10, ARRAY_COUNT(gMountainPage10)}, 
 	{gMountainPage11, ARRAY_COUNT(gMountainPage11)}, 
@@ -1284,7 +1284,7 @@ const struct HabitatPage gUrbanPages[] =
 	{gUrbanPage7, ARRAY_COUNT(gUrbanPage7)}, 
 	{gUrbanPage8, ARRAY_COUNT(gUrbanPage8)}, 
 	{gUrbanPage9, ARRAY_COUNT(gUrbanPage9)}, 
-	{gUrbanPage10, ARRAY_COUNT(gUrbanPage10)}, 
+	// {gUrbanPage10, ARRAY_COUNT(gUrbanPage10)}, 
 	{gUrbanPage11, ARRAY_COUNT(gUrbanPage11)}, 
 	{gUrbanPage12, ARRAY_COUNT(gUrbanPage12)}, 
 	{gUrbanPage13, ARRAY_COUNT(gUrbanPage13)}, 
