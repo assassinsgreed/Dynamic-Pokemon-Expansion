@@ -3,8 +3,8 @@ import sys
 from glob import glob
 
 # Data
-TM_HM_COUNT = 128
-TUTOR_COUNT = 128
+TM_HM_COUNT = 106
+TUTOR_COUNT = 64
 SPECIES_COUNT = 0x4F3 + 1
 
 TM_OUTPUT = "assembly/generated/tm_compatibility.s"
@@ -64,7 +64,6 @@ def DataBuilder(directory: str, numEntries: int, outputFile: str, dataType: str)
                             compatibilityTable[lineContents][tmId] = 1
                         except KeyError:  # Species name was not found
                             try:
-
                                 lineContents = int(ReverseSpeciesDict["SPECIES_" + line.strip()])
                                 compatibilityTable[lineContents][tmId] = 1
                             except KeyError:
