@@ -3,7 +3,7 @@ import sys
 from glob import glob
 
 # Data
-TM_HM_COUNT = 106
+TM_HM_COUNT = 128
 TUTOR_COUNT = 64
 SPECIES_COUNT = 0x4F3 + 1
 

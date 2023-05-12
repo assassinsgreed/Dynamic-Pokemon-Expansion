@@ -68,15 +68,15 @@ enum MoveTutors
 	TUTOR63_PSYCHIC_TERRAIN,
 
 //Special Move Tutors - Not in Table
-	TUTOR_SPECIAL_DRACO_METEOR,			//128 - Dragon Pokemon
-	TUTOR_SPECIAL_SECRET_SWORD,			//129 - Keldeo only
-	TUTOR_SPECIAL_RELIC_SONG,			//130 - Meloetta only
-	TUTOR_SPECIAL_VOLT_TACKLE,			//131 - Pikachu only
-	TUTOR_SPECIAL_DRAGON_ASCENT,		//132 - Rayquaza only
-	TUTOR_SPECIAL_THOUSAND_ARROWS,		//133 - Zygarde only
-	TUTOR_SPECIAL_THOUSAND_WAVES,		//134 - Zygarde only
-	TUTOR_SPECIAL_CORE_ENFORCER,		//135 - Zygarde only
-	TUTOR_SPECIAL_STEEL_BEAM,			//136 - Steel Pokemon
+	TUTOR_SPECIAL_DRACO_METEOR,			//64 - Dragon Pokemon
+	TUTOR_SPECIAL_SECRET_SWORD,			//65 - Keldeo only
+	TUTOR_SPECIAL_RELIC_SONG,			//66 - Meloetta only
+	TUTOR_SPECIAL_VOLT_TACKLE,			//67 - Pikachu only
+	TUTOR_SPECIAL_DRAGON_ASCENT,		//68 - Rayquaza only
+	TUTOR_SPECIAL_THOUSAND_ARROWS,		//69 - Zygarde only
+	TUTOR_SPECIAL_THOUSAND_WAVES,		//70 - Zygarde only
+	TUTOR_SPECIAL_CORE_ENFORCER,		//71- Zygarde only
+	TUTOR_SPECIAL_STEEL_BEAM,			//72 - Steel Pokemon
 };
 
-#define LAST_TOTAL_TUTOR_NUM 136
+#define LAST_TOTAL_TUTOR_NUM 72
