@@ -89,6 +89,7 @@ const u16 gGrasslandPage12[] =
 {
 	SPECIES_FARFETCHD_G,	// 63
 	SPECIES_SIRFETCHD,		// 64
+	SPECIES_FARFETCHD,      // 63
 };
 
 const u16 gGrasslandPage13[] =
@@ -231,6 +232,7 @@ const u16 gForestPage3[] =
 	SPECIES_PICHU,		// 33
 	SPECIES_PIKACHU,	// 34
 	SPECIES_RAICHU,		// 35
+	SPECIES_RAICHU_A,   // 35
 	// SPECIES_PIKACHU_CAP_ORIGINAL,	// 34
 };
 
@@ -415,14 +417,15 @@ const u16 gWatersEdgePage5[] =
 {
 	SPECIES_SHELLOS,		// 223
 	SPECIES_GASTRODON,		// 224
-	// SPECIES_SHELLOS_EAST,	// 223
-	// SPECIES_GASTRODON_EAST,	// 224
+	SPECIES_SHELLOS_EAST,	// 223
+	SPECIES_GASTRODON_EAST,	// 224
 };
 
 const u16 gWatersEdgePage6[] =
 {
 	SPECIES_PINCURCHIN,	// 237
 	SPECIES_STUNFISK_G,	// 239
+	SPECIES_STUNFISK,	// 239
 };
 
 const u16 gWatersEdgePage7[] =
@@ -446,40 +449,47 @@ const u16 gWatersEdgePage9[] =
 
 const u16 gWatersEdgePage10[] =
 {
+	SPECIES_SLOWPOKE_G,	// 262
+	SPECIES_SLOWBRO_G,	// 263
+	SPECIES_SLOWKING_G,	// 264
+};
+
+const u16 gWatersEdgePage11[] =
+{
 	SPECIES_SQUIRTLE,	// 307
 	SPECIES_WARTORTLE,	// 308
 	SPECIES_BLASTOISE,	// 309
 };
 
-const u16 gWatersEdgePage11[] =
+const u16 gWatersEdgePage12[] =
 {
 	SPECIES_TOTODILE,	// 316
 	SPECIES_CROCONAW,	// 317
 	SPECIES_FERALIGATR,	// 318
 };
 
-const u16 gWatersEdgePage12[] =
+const u16 gWatersEdgePage13[] =
 {
 	SPECIES_MUDKIP,		// 325
 	SPECIES_MARSHTOMP,	// 326
 	SPECIES_SWAMPERT,	// 327
 };
 
-const u16 gWatersEdgePage13[] =
+const u16 gWatersEdgePage14[] =
 {
 	SPECIES_PIPLUP,		// 334
 	SPECIES_PRINPLUP,	// 335
 	SPECIES_EMPOLEON,	// 336
 };
 
-const u16 gWatersEdgePage14[] =
+const u16 gWatersEdgePage15[] =
 {
 	SPECIES_OSHAWOTT,	// 343
 	SPECIES_DEWOTT,		// 344
 	SPECIES_SAMUROTT,	// 345
 };
 
-const u16 gWatersEdgePage15[] =
+const u16 gWatersEdgePage16[] =
 {
 	SPECIES_FROAKIE,		// 352
 	SPECIES_FROGADIER,		// 353
@@ -487,14 +497,14 @@ const u16 gWatersEdgePage15[] =
 	// SPECIES_ASHGRENINJA,	// 354
 };
 
-const u16 gWatersEdgePage16[] =
+const u16 gWatersEdgePage17[] =
 {
 	SPECIES_POPPLIO,	// 361
 	SPECIES_BRIONNE,	// 362
 	SPECIES_PRIMARINA,	// 363
 };
 
-const u16 gWatersEdgePage17[] =
+const u16 gWatersEdgePage18[] =
 {
 	SPECIES_SOBBLE,		// 370
 	SPECIES_DRIZZILE,	// 371
@@ -561,6 +571,7 @@ const u16 gSeaPage10[] =
 {
 	SPECIES_CORSOLA_G,	// 265
 	SPECIES_CURSOLA,	// 266
+	SPECIES_CORSOLA,	// 265
 };
 
 const u16 gSeaPage11[] =
@@ -878,6 +889,8 @@ const u16 gRoughTerrainPage8[] =
 	SPECIES_DARUMAKA_G,			// 137
 	SPECIES_DARMANITAN_G,		// 138
 	// SPECIES_DARMANITAN_G_ZEN,	// 138
+	SPECIES_DARUMAKA,			// 137
+	SPECIES_DARMANITAN,	     	// 138
 };
 
 const u16 gRoughTerrainPage9[] =
@@ -927,6 +940,8 @@ const u16 gUrbanPage1[] =
 {
 	SPECIES_RATTATA_A,	// 61
 	SPECIES_RATICATE_A,	// 62
+	SPECIES_RATTATA,	// 61
+	SPECIES_RATICATE,	// 62
 };
 
 const u16 gUrbanPage2[] =
@@ -939,13 +954,15 @@ const u16 gUrbanPage2[] =
 
 const u16 gUrbanPage3[] =
 {
-	SPECIES_MIME_JR,	// 162
+	SPECIES_MIME_JR_G,	// 162
 	SPECIES_MR_MIME_G,	// 163
 	SPECIES_MR_RIME,	// 164
 };
 
 const u16 gUrbanPage4[] =
 {
+	SPECIES_MIME_JR,	// 162
+	SPECIES_MR_MIME,	// 163
 	SPECIES_DITTO,		// 181
 };
 
@@ -1008,38 +1025,46 @@ const u16 gUrbanPage13[] =
 {
 	SPECIES_GRIMER_A,	// 242
 	SPECIES_MUK_A,		// 243
-	SPECIES_KOFFING_G,	// 251
-	SPECIES_WEEZING_G,	// 252
+	SPECIES_GRIMER,     // 242
+	SPECIES_MUK,        // 243
 };
 
-const u16 gUrbanPage14[] =
+const u16 gUrbanPage14[] = 
+{
+	SPECIES_KOFFING_G,	// 251
+	SPECIES_WEEZING_G,	// 252
+	SPECIES_KOFFING,	// 251
+	SPECIES_WEEZING,	// 252
+};
+
+const u16 gUrbanPage15[] =
 {
 	SPECIES_ELGYEM,		// 270
 	SPECIES_BEHEEYEM,	// 271
 };
 
-const u16 gUrbanPage15[] =
+const u16 gUrbanPage16[] =
 {
 	SPECIES_TEPIG,		// 340
 	SPECIES_PIGNITE,	// 341
 	SPECIES_EMBOAR,		// 342
 };
 
-const u16 gUrbanPage16[] =
+const u16 gUrbanPage17[] =
 {
 	SPECIES_FENNEKIN,	// 349
 	SPECIES_BRAIXEN,	// 350
 	SPECIES_DELPHOX,	// 351
 };
 
-const u16 gUrbanPage17[] =
+const u16 gUrbanPage18[] =
 {
 	SPECIES_LITTEN,		// 358
 	SPECIES_TORRACAT,	// 359
 	SPECIES_INCINEROAR,	// 360
 };
 
-const u16 gUrbanPage18[] =
+const u16 gUrbanPage19[] =
 {
 	SPECIES_SCORBUNNY,	// 367
 	SPECIES_RABOOT,		// 368
@@ -1189,7 +1214,8 @@ const struct HabitatPage gWatersEdgePages[] =
 	{gWatersEdgePage14, ARRAY_COUNT(gWatersEdgePage14)}, 
 	{gWatersEdgePage15, ARRAY_COUNT(gWatersEdgePage15)}, 
 	{gWatersEdgePage16, ARRAY_COUNT(gWatersEdgePage16)}, 
-	{gWatersEdgePage17, ARRAY_COUNT(gWatersEdgePage17)}, 
+	{gWatersEdgePage17, ARRAY_COUNT(gWatersEdgePage17)},
+	{gWatersEdgePage18, ARRAY_COUNT(gWatersEdgePage18)}, 
 };
 
 const struct HabitatPage gSeaPages[] =
@@ -1293,6 +1319,7 @@ const struct HabitatPage gUrbanPages[] =
 	{gUrbanPage16, ARRAY_COUNT(gUrbanPage16)}, 
 	{gUrbanPage17, ARRAY_COUNT(gUrbanPage17)}, 
 	{gUrbanPage18, ARRAY_COUNT(gUrbanPage18)},
+	{gUrbanPage19, ARRAY_COUNT(gUrbanPage19)},
 };
 
 const struct HabitatPage gRarePages[] =
