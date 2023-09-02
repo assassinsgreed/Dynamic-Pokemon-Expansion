@@ -106,33 +106,33 @@ const u16 gGrasslandPage14[] =
 	SPECIES_FLORGES,	// 70
 };
 
-// const u16 gGrasslandPage15[] =
-// {
-// 	SPECIES_FLABEBE_BLUE,	// 68
-// 	SPECIES_FLOETTE_BLUE,	// 69
-// 	SPECIES_FLORGES_BLUE,	// 70
-// };
+const u16 gGrasslandPage15[] =
+{
+	SPECIES_FLABEBE_BLUE,	// 68
+	SPECIES_FLOETTE_BLUE,	// 69
+	SPECIES_FLORGES_BLUE,	// 70
+};
 
-// const u16 gGrasslandPage16[] =
-// {
-// 	SPECIES_FLABEBE_ORANGE,	// 68
-// 	SPECIES_FLOETTE_ORANGE,	// 69
-// 	SPECIES_FLORGES_ORANGE,	// 70
-// };
+const u16 gGrasslandPage16[] =
+{
+	SPECIES_FLABEBE_ORANGE,	// 68
+	SPECIES_FLOETTE_ORANGE,	// 69
+	SPECIES_FLORGES_ORANGE,	// 70
+};
 
-// const u16 gGrasslandPage17[] =
-// {
-// 	SPECIES_FLABEBE_YELLOW,	// 68
-// 	SPECIES_FLOETTE_YELLOW,	// 69
-// 	SPECIES_FLORGES_YELLOW,	// 70
-// };
+const u16 gGrasslandPage17[] =
+{
+	SPECIES_FLABEBE_YELLOW,	// 68
+	SPECIES_FLOETTE_YELLOW,	// 69
+	SPECIES_FLORGES_YELLOW,	// 70
+};
 
-// const u16 gGrasslandPage18[] =
-// {
-// 	SPECIES_FLABEBE_WHITE,	// 68
-// 	SPECIES_FLOETTE_WHITE,	// 69
-// 	SPECIES_FLORGES_WHITE,	// 70
-// };
+const u16 gGrasslandPage18[] =
+{
+	SPECIES_FLABEBE_WHITE,	// 68
+	SPECIES_FLOETTE_WHITE,	// 69
+	SPECIES_FLORGES_WHITE,	// 70
+};
 
 const u16 gGrasslandPage19[] =
 {
@@ -1148,10 +1148,10 @@ const struct HabitatPage gGrasslandPages[] =
 	{gGrasslandPage12, ARRAY_COUNT(gGrasslandPage12)}, 
 	{gGrasslandPage13, ARRAY_COUNT(gGrasslandPage13)}, 
 	{gGrasslandPage14, ARRAY_COUNT(gGrasslandPage14)}, 
-	// {gGrasslandPage15, ARRAY_COUNT(gGrasslandPage15)}, 
-	// {gGrasslandPage16, ARRAY_COUNT(gGrasslandPage16)}, 
-	// {gGrasslandPage17, ARRAY_COUNT(gGrasslandPage17)}, 
-	// {gGrasslandPage18, ARRAY_COUNT(gGrasslandPage18)}, 
+	{gGrasslandPage15, ARRAY_COUNT(gGrasslandPage15)}, 
+	{gGrasslandPage16, ARRAY_COUNT(gGrasslandPage16)}, 
+	{gGrasslandPage17, ARRAY_COUNT(gGrasslandPage17)}, 
+	{gGrasslandPage18, ARRAY_COUNT(gGrasslandPage18)}, 
 	{gGrasslandPage19, ARRAY_COUNT(gGrasslandPage19)}, 
 	{gGrasslandPage20, ARRAY_COUNT(gGrasslandPage20)}, 
 	{gGrasslandPage21, ARRAY_COUNT(gGrasslandPage21)}, 
