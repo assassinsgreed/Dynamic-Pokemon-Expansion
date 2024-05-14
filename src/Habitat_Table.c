@@ -914,7 +914,7 @@ const u16 gRoughTerrainPage12[] =
 {
 	SPECIES_YAMASK,		// 233
 	SPECIES_COFAGRIGUS,	// 234
-	// SPECIES_YAMASK_G,	// 233
+	SPECIES_YAMASK_G,	// 233
 	SPECIES_RUNERIGUS,	// 235
 };
 
@@ -1074,7 +1074,7 @@ const u16 gUrbanPage19[] =
 // Rare
 const u16 gRarePage1[] =
 {
-	SPECIES_ZARUDE,	// 296
+	SPECIES_ZERAORA,	// 296
 };
 
 const u16 gRarePage2[] =

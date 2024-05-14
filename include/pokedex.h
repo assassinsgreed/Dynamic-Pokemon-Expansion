@@ -390,7 +390,7 @@ enum
 #define NATIONAL_DEX_KYOGRE 293
 #define NATIONAL_DEX_GROUDON 294
 #define NATIONAL_DEX_VOLCANION 295
-#define NATIONAL_DEX_ZARUDE 296
+#define NATIONAL_DEX_ZERAORA 296
 #define NATIONAL_DEX_GLASTRIER 297
 #define NATIONAL_DEX_MELTAN 298
 #define NATIONAL_DEX_MELMETAL 299
@@ -692,6 +692,7 @@ extern const u8 DEX_ENTRY_POIPOLE[];
 extern const u8 DEX_ENTRY_NAGANADEL[];
 extern const u8 DEX_ENTRY_STAKATAKA[];
 extern const u8 DEX_ENTRY_BLACEPHALON[];
+extern const u8 DEX_ENTRY_ZERAORA[];
 extern const u8 DEX_ENTRY_MELTAN[];
 extern const u8 DEX_ENTRY_MELMETAL[];
 extern const u8 DEX_ENTRY_GROOKEY[];
@@ -736,7 +737,6 @@ extern const u8 DEX_ENTRY_MORPEKO[];
 extern const u8 DEX_ENTRY_CUFANT[];
 extern const u8 DEX_ENTRY_COPPERAJAH[];
 extern const u8 DEX_ENTRY_DURALUDON[];
-extern const u8 DEX_ENTRY_ZARUDE[];
 extern const u8 DEX_ENTRY_GLASTRIER[];
 
 extern const u8 DEX_ENTRY_RATTATA_A[];

@@ -9688,18 +9688,18 @@ const struct PokedexEntry gPokedexEntries[NATIONAL_DEX_COUNT] =
 		.trainerScale = 0,
 		.trainerOffset = 0,
 	},
-	// [NATIONAL_DEX_ZERAORA] =
-	// {
-	// 	.categoryName = {_T, _h, _u, _n, _d, _e, _r, _c, _l, _a, _p, _END},
-	// 	.height = 15,
-	// 	.weight = 445,
-	// 	.description = DEX_ENTRY_ZERAORA,
-	// 	.unusedDescription = (const u8*) 0x8444cb1,
-	// 	.pokemonScale = 0,
-	// 	.pokemonOffset = 0,
-	// 	.trainerScale = 0,
-	// 	.trainerOffset = 0,
-	// },
+	[NATIONAL_DEX_ZERAORA] =
+	{
+		.categoryName = {_T, _h, _u, _n, _d, _e, _r, _c, _l, _a, _p, _END},
+		.height = 15,
+		.weight = 445,
+		.description = DEX_ENTRY_ZERAORA,
+		.unusedDescription = (const u8*) 0x8444cb1,
+		.pokemonScale = 0,
+		.pokemonOffset = 0,
+		.trainerScale = 0,
+		.trainerOffset = 0,
+	},
 	[NATIONAL_DEX_MELTAN] =
 	{
 		.categoryName = {_H, _e, _x, _SPACE, _N, _u, _t, _END, _SPACE, _SPACE, _SPACE, _SPACE},
@@ -10720,19 +10720,18 @@ const struct PokedexEntry gPokedexEntries[NATIONAL_DEX_COUNT] =
 	// 	.trainerScale = 0,
 	// 	.trainerOffset = 0,
 	// },
-	[NATIONAL_DEX_ZARUDE] =
-	{
-		.categoryName = {_R, _o, _g, _u, _e, _M, _o, _n, _k, _e, _y, _END},
-		.height = 1543,
-		.weight = 700,
-		.description = DEX_ENTRY_ZARUDE,
-		.unusedDescription = (const u8*) 0x8444cb1,
-		.pokemonScale = 0,
-		.pokemonOffset = 0,
-		.trainerScale = 0,
-		.trainerOffset = 0,
-	},
-	
+	// [NATIONAL_DEX_ZARUDE] =
+	// {
+	// 	.categoryName = {_R, _o, _g, _u, _e, _M, _o, _n, _k, _e, _y, _END},
+	// 	.height = 1543,
+	// 	.weight = 700,
+	// 	.description = DEX_ENTRY_ZARUDE,
+	// 	.unusedDescription = (const u8*) 0x8444cb1,
+	// 	.pokemonScale = 0,
+	// 	.pokemonOffset = 0,
+	// 	.trainerScale = 0,
+	// 	.trainerOffset = 0,
+	// },	
 	// [NATIONAL_DEX_REGIELEKI] =
 	// {
 	// 	.categoryName = {_E, _l, _e, _c, _t, _r, _o, _n, _END, _SPACE, _SPACE, _SPACE},
