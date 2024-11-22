@@ -127,7 +127,7 @@ enum MoveTutors
 	TUTOR_SPECIAL_PURSUIT,				//120 - Dark Pokemon
 	TUTOR_SPECIAL_AUTOMIZE,				//121 - Steel Pokemon
 	TUTOR_SPECIAL_METALBURST,			//122 - Steel Pokemon
-	TUTOR_SPECIAL_GYROBALL,				//123 - Steel Pokemon
+	TUTOR_SPECIAL_HEAVYSLAM,			//123 - Steel Pokemon
 	TUTOR_SPECIAL_CRAFTYSHIELD,			//124 - Fairy Pokemon
 	TUTOR_SPECIAL_DRAININGKISS,			//125 - Fairy Pokemon
 	TUTOR_SPECIAL_SPIRITBREAK,			//126 - Fairy Pokemon
