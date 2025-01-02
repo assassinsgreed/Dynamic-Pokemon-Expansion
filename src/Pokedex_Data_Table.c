@@ -9268,30 +9268,30 @@ const struct PokedexEntry gPokedexEntries[NATIONAL_DEX_COUNT] =
 	// 	.trainerScale = 0,
 	// 	.trainerOffset = 0,
 	// },
-	// [NATIONAL_DEX_TYPE_NULL] =
-	// {
-	// 	.categoryName = {_S, _y, _n, _t, _h, _e, _t, _i, _c, _END, _SPACE, _SPACE},
-	// 	.height = 19,
-	// 	.weight = 1205,
-	// 	.description = DEX_ENTRY_TYPE_NULL,
-	// 	.unusedDescription = (const u8*) 0x8444cb1,
-	// 	.pokemonScale = 0,
-	// 	.pokemonOffset = 0,
-	// 	.trainerScale = 0,
-	// 	.trainerOffset = 0,
-	// },
-	// [NATIONAL_DEX_SILVALLY] =
-	// {
-	// 	.categoryName = {_S, _y, _n, _t, _h, _e, _t, _i, _c, _END, _SPACE, _SPACE},
-	// 	.height = 23,
-	// 	.weight = 1005,
-	// 	.description = DEX_ENTRY_SILVALLY,
-	// 	.unusedDescription = (const u8*) 0x8444cb1,
-	// 	.pokemonScale = 0,
-	// 	.pokemonOffset = 0,
-	// 	.trainerScale = 0,
-	// 	.trainerOffset = 0,
-	// },
+	[NATIONAL_DEX_TYPE_NULL] =
+	{
+		.categoryName = {_S, _y, _n, _t, _h, _e, _t, _i, _c, _END, _SPACE, _SPACE},
+		.height = 19,
+		.weight = 1205,
+		.description = DEX_ENTRY_TYPE_NULL,
+		.unusedDescription = (const u8*) 0x8444cb1,
+		.pokemonScale = 0,
+		.pokemonOffset = 0,
+		.trainerScale = 0,
+		.trainerOffset = 0,
+	},
+	[NATIONAL_DEX_SILVALLY] =
+	{
+		.categoryName = {_S, _y, _n, _t, _h, _e, _t, _i, _c, _END, _SPACE, _SPACE},
+		.height = 23,
+		.weight = 1005,
+		.description = DEX_ENTRY_SILVALLY,
+		.unusedDescription = (const u8*) 0x8444cb1,
+		.pokemonScale = 0,
+		.pokemonOffset = 0,
+		.trainerScale = 0,
+		.trainerOffset = 0,
+	},
 	[NATIONAL_DEX_MINIOR] =
 	{
 		.categoryName = {_M, _e, _t, _e, _o, _r, _END, _SPACE, _SPACE, _SPACE, _SPACE, _SPACE},

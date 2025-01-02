@@ -1132,6 +1132,12 @@ const u16 gRarePage9[] =
 	SPECIES_BLACEPHALON,	// 388
 };
 
+const u16 gRarePage10[] =
+{
+	SPECIES_TYPE_NULL,		// 389
+	SPECIES_SILVALLY,		// 390
+};
+
 const struct HabitatPage gGrasslandPages[] =
 {
 	{gGrasslandPage1, ARRAY_COUNT(gGrasslandPage1)}, 
@@ -1333,6 +1339,7 @@ const struct HabitatPage gRarePages[] =
 	{gRarePage7, ARRAY_COUNT(gRarePage7)}, 
 	{gRarePage8, ARRAY_COUNT(gRarePage8)}, 
 	{gRarePage9, ARRAY_COUNT(gRarePage9)},
+	{gRarePage10, ARRAY_COUNT(gRarePage10)},
 };
 
 const struct Habitat gHabitatPtrsTable[9] =

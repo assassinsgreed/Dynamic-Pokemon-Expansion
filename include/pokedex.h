@@ -485,8 +485,10 @@ enum
 #define NATIONAL_DEX_NAGANADEL 386
 #define NATIONAL_DEX_STAKATAKA 387
 #define NATIONAL_DEX_BLACEPHALON 388
+#define NATIONAL_DEX_TYPE_NULL 389
+#define NATIONAL_DEX_SILVALLY 390
 
-#define FINAL_DEX_ENTRY NATIONAL_DEX_BLACEPHALON //Not +1 b/c used like this for some asm
+#define FINAL_DEX_ENTRY NATIONAL_DEX_SILVALLY //Not +1 b/c used like this for some asm
 #define NATIONAL_DEX_COUNT FINAL_DEX_ENTRY + 1
 
 extern const u8 DEX_ENTRY_TURTWIG[];
@@ -669,6 +671,8 @@ extern const u8 DEX_ENTRY_ORANGURU[];
 extern const u8 DEX_ENTRY_PASSIMIAN[];
 extern const u8 DEX_ENTRY_SANDYGAST[];
 extern const u8 DEX_ENTRY_PALOSSAND[];
+extern const u8 DEX_ENTRY_TYPE_NULL[];
+extern const u8 DEX_ENTRY_SILVALLY[];
 extern const u8 DEX_ENTRY_MINIOR[];
 extern const u8 DEX_ENTRY_TURTONATOR[];
 extern const u8 DEX_ENTRY_MIMIKYU[];
