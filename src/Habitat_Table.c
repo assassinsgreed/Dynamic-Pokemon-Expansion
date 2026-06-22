@@ -1138,6 +1138,848 @@ const u16 gRarePage10[] =
 	SPECIES_SILVALLY,		// 390
 };
 
+// Divergent-dex mons (shared table; hidden in normal mode by the seen-filter). Extend as the divergent dex grows.
+// These MUST be defined to get at-capture time dex entries
+
+const u16 gGrasslandDivergentPage1[] =
+{
+	SPECIES_ZIGZAGOON_G, // 1
+	SPECIES_LINOONE_G, // 2
+	SPECIES_OBSTAGOON, // 3
+};
+
+const u16 gGrasslandDivergentPage2[] =
+{
+	SPECIES_ZIGZAGOON, // 1 - alt
+	SPECIES_LINOONE, // 2 - alt
+};
+
+const u16 gGrasslandDivergentPage3[] =
+{
+	SPECIES_STARLY, // 3
+	SPECIES_STARAVIA, // 4
+	SPECIES_STARAPTOR, // 5
+};
+
+const u16 gGrasslandDivergentPage4[] =
+{
+	SPECIES_SHINX, // 12
+	SPECIES_LUXIO, // 13
+	SPECIES_LUXRAY, // 14
+};
+
+const u16 gGrasslandDivergentPage5[] =
+{
+	SPECIES_TAILLOW, // 15
+	SPECIES_SWELLOW, // 16
+};
+
+const u16 gGrasslandDivergentPage6[] =
+{
+	SPECIES_SENTRET, // 39
+	SPECIES_FURRET, // 40
+};
+
+const u16 gGrasslandDivergentPage7[] =
+{
+	SPECIES_HOPPIP, // 45
+	SPECIES_SKIPLOOM, // 46
+	SPECIES_JUMPLUFF, // 47
+};
+
+const u16 gGrasslandDivergentPage8[] =
+{
+	SPECIES_BUNNELBY, // 59
+	SPECIES_DIGGERSBY, // 60
+	SPECIES_BLITZLE, // 70
+	SPECIES_ZEBSTRIKA, // 71
+};
+
+const u16 gGrasslandDivergentPage9[] =
+{
+	SPECIES_VULPIX, // 135
+	SPECIES_NINETALES, // 136
+	SPECIES_VULPIX_A, // 135 - Alt
+	SPECIES_NINETALES_A, // 136 - Alt
+};
+
+const u16 gGrasslandDivergentPage10[] =
+{
+	SPECIES_ELECTRIKE, // 150
+	SPECIES_MANECTRIC, // 151
+	SPECIES_STUFFUL, // 152
+	SPECIES_BEWEAR, // 153
+};
+
+const u16 gGrasslandDivergentPage11[] =
+{
+	SPECIES_ELEKID, // 163
+	SPECIES_ELECTABUZZ, // 164
+	SPECIES_ELECTIVIRE, // 165
+};
+
+const u16 gGrasslandDivergentPage12[] =
+{
+	SPECIES_GULPIN, // 176
+	SPECIES_SWALOT, // 177
+	SPECIES_DODUO, // 178
+	SPECIES_DODRIO, // 179
+};
+
+const u16 gGrasslandDivergentPage13[] =
+{
+	SPECIES_PANCHAM, // 184
+	SPECIES_PANGORO, // 185
+};
+
+const u16 gGrasslandDivergentPage14[] =
+{
+	SPECIES_ODDISH, // 195
+	SPECIES_GLOOM, // 196
+	SPECIES_VILEPLUME, // 197
+	SPECIES_BELLOSSOM, // 198
+};
+
+const u16 gGrasslandDivergentPage15[] =
+{
+	SPECIES_TANGELA, // 213
+	SPECIES_TANGROWTH, // 214
+};
+
+const u16 gGrasslandDivergentPage16[] =
+{
+	SPECIES_PONYTA, // 215
+	SPECIES_RAPIDASH, // 216
+	SPECIES_PONYTA_G, // 215 - Alt
+	SPECIES_RAPIDASH_G, // 216 - Alt
+};
+
+const u16 gGrasslandDivergentPage17[] =
+{
+	SPECIES_SPRITZEE, // 217
+	SPECIES_AROMATISSE, // 218
+	SPECIES_GROWLITHE, // 221
+	SPECIES_ARCANINE, // 222
+};
+
+const u16 gGrasslandDivergentPage18[] =
+{
+	SPECIES_ZANGOOSE, // 271
+	SPECIES_SEVIPER, // 272
+};
+
+const u16 gGrasslandDivergentPage19[] =
+{
+	SPECIES_SCYTHER, // 280
+	SPECIES_SCIZOR, // 281
+};
+
+const u16 gGrasslandDivergentPage20[] =
+{
+	SPECIES_BOUFFALANT, // 285
+};
+
+const u16 gForestDivergentPage1[] =
+{
+	SPECIES_LEDYBA, // 8
+	SPECIES_LEDIAN, // 9
+	SPECIES_SPINARAK, // 10
+	SPECIES_ARIADOS, // 11
+};
+
+const u16 gForestDivergentPage2[] =
+{
+	SPECIES_BOUNSWEET, // 28
+	SPECIES_STEENEE, // 29
+	SPECIES_TSAREENA, // 30
+};
+
+const u16 gForestDivergentPage3[] =
+{
+	SPECIES_FOMANTIS, // 37
+	SPECIES_LURANTIS, // 38
+};
+
+const u16 gForestDivergentPage4[] =
+{
+	SPECIES_SEWADDLE, // 48
+	SPECIES_SWADLOON, // 49
+	SPECIES_LEAVANNY, // 50
+};
+
+const u16 gForestDivergentPage5[] =
+{
+	SPECIES_WEEDLE, // 51
+	SPECIES_KAKUNA, // 52
+	SPECIES_BEEDRILL, // 53
+};
+
+const u16 gForestDivergentPage6[] =
+{
+	SPECIES_CATERPIE, // 54
+	SPECIES_METAPOD, // 55
+	SPECIES_BUTTERFREE, // 56
+};
+
+const u16 gForestDivergentPage7[] =
+{
+	SPECIES_PANSAGE, // 57
+	SPECIES_SIMISAGE, // 58
+};
+
+const u16 gForestDivergentPage8[] =
+{
+	SPECIES_DRIFLOON, // 61
+	SPECIES_DRIFBLIM, // 62
+};
+
+const u16 gForestDivergentPage9[] =
+{
+	SPECIES_PIDGEY, // 67
+	SPECIES_PIDGEOTTO, // 68
+	SPECIES_PIDGEOT, // 69
+};
+
+const u16 gForestDivergentPage10[] =
+{
+	SPECIES_NATU, // 98
+	SPECIES_XATU, // 99
+};
+
+const u16 gForestDivergentPage11[] =
+{
+	SPECIES_ORICORIO, // 125
+	SPECIES_ORICORIO_Y, // 125 - Alt
+	SPECIES_ORICORIO_P, // 125 - Alt
+	SPECIES_ORICORIO_S, // 125 - Alt
+};
+
+const u16 gForestDivergentPage12[] =
+{
+	SPECIES_DEERLING, // 133
+	SPECIES_DEERLING_SUMMER, // 133
+	SPECIES_DEERLING_AUTUMN, // 133
+	SPECIES_DEERLING_WINTER, // 133
+};
+
+const u16 gForestDivergentPage13[] =
+{
+	SPECIES_SAWSBUCK, // 134
+	SPECIES_SAWSBUCK_SUMMER, // 134
+	SPECIES_SAWSBUCK_AUTUMN, // 134
+	SPECIES_SAWSBUCK_WINTER, // 134
+};
+
+const u16 gForestDivergentPage14[] =
+{
+	SPECIES_PANSEAR, // 137
+	SPECIES_SIMISEAR, // 138
+	SPECIES_PETILIL, // 144
+	SPECIES_LILLIGANT, // 145
+};
+
+const u16 gForestDivergentPage15[] =
+{
+	SPECIES_APPLIN, // 147
+	SPECIES_FLAPPLE, // 148
+	SPECIES_APPLETUN, // 149
+};
+
+const u16 gForestDivergentPage16[] =
+{
+	SPECIES_PANPOUR, // 166
+	SPECIES_SIMIPOUR, // 167
+};
+
+const u16 gForestDivergentPage17[] =
+{
+	SPECIES_EXEGGCUTE_A, // 170
+	SPECIES_EXEGGUTOR_A, // 171
+	SPECIES_EXEGGCUTE, // 170 - Alt
+	SPECIES_EXEGGUTOR, // 171 - Alt
+};
+
+const u16 gForestDivergentPage18[] =
+{
+	SPECIES_TROPIUS, // 180
+	SPECIES_STUNKY, // 182
+	SPECIES_SKUNTANK, // 183
+};
+
+const u16 gForestDivergentPage19[] =
+{
+	SPECIES_AIPOM, // 207
+	SPECIES_AMBIPOM, // 208
+	SPECIES_YANMA, // 237
+	SPECIES_YANMEGA, // 238
+};
+
+const u16 gForestDivergentPage20[] =
+{
+	SPECIES_IMPIDIMP, // 239
+	SPECIES_MORGREM, // 240
+	SPECIES_GRIMMSNARL, // 241
+};
+
+const u16 gForestDivergentPage21[] =
+{
+	SPECIES_PINSIR, // 247
+	SPECIES_MURKROW, // 248
+	SPECIES_HONCHKROW, // 249
+};
+
+const u16 gForestDivergentPage22[] =
+{
+	SPECIES_SWABLU, // 253
+	SPECIES_ALTARIA, // 254
+	SPECIES_DEDENNE, /// 255
+};
+
+const u16 gWatersEdgeDivergentPage1[] =
+{
+	SPECIES_CLOBBOPUS, // 6
+	SPECIES_GRAPPLOCT, // 7
+};
+
+const u16 gWatersEdgeDivergentPage2[] =
+{
+	SPECIES_WOOPER, // 12
+	SPECIES_QUAGSIRE, // 13
+};
+
+const u16 gWatersEdgeDivergentPage3[] =
+{
+	SPECIES_AZURILL, // 20
+	SPECIES_MARILL, // 21
+	SPECIES_AZUMARILL, // 22
+};
+
+const u16 gWatersEdgeDivergentPage4[] =
+{
+	SPECIES_CHEWTLE, // 26
+	SPECIES_DREDNAW, // 27
+	SPECIES_DEWPIDER, // 35
+	SPECIES_ARAQUANID, // 36
+};
+
+const u16 gWatersEdgeDivergentPage5[] =
+{
+	SPECIES_POLIWAG, // 41
+	SPECIES_POLIWHIRL, // 42
+	SPECIES_POLIWRATH, // 43
+	SPECIES_POLITOED, // 44
+};
+
+const u16 gWatersEdgeDivergentPage6[] =
+{
+	SPECIES_DUCKLETT, // 72
+	SPECIES_SWANNA, // 73
+};
+
+const u16 gWatersEdgeDivergentPage7[] =
+{
+	SPECIES_FEEBAS, // 131
+	SPECIES_MILOTIC, // 132
+};
+
+const u16 gWatersEdgeDivergentPage8[] =
+{
+	SPECIES_TYMPOLE, // 159
+	SPECIES_PALPITOAD, // 160
+	SPECIES_SEISMITOAD, // 161
+};
+
+const u16 gWatersEdgeDivergentPage9[] =
+{
+	SPECIES_WIMPOD, // 168
+	SPECIES_GOLISOPOD, // 169
+	SPECIES_ANORITH, // 174
+	SPECIES_ARMALDO, // 175
+};
+
+const u16 gWatersEdgeDivergentPage10[] =
+{
+	SPECIES_DREEPY, // 192
+	SPECIES_DRAKLOAK, // 193
+	SPECIES_DRAGAPULT, // 194
+};
+
+const u16 gWatersEdgeDivergentPage11[] =
+{
+	SPECIES_EISCUE, // 260
+	SPECIES_EISCUE_NOICE, // 260 - Alt
+	SPECIES_SKRELP, // 269
+	SPECIES_DRAGALGE, // 270
+};
+
+const u16 gWatersEdgeDivergentPage12[] =
+{
+	SPECIES_KRABBY, // 275
+	SPECIES_KINGLER, // 276
+};
+
+const u16 gSeaDivergentPage1[] =
+{
+	SPECIES_SPHEAL, // 115
+	SPECIES_SEALEO, // 116
+	SPECIES_WALREIN, // 117
+};
+
+const u16 gSeaDivergentPage2[] =
+{
+	SPECIES_CRAMORANT, // 162
+	SPECIES_CRAMORANT_GULPING, // 162 - Alt
+	SPECIES_CRAMORANT_GORGING, // 162 - Alt
+};
+
+const u16 gSeaDivergentPage3[] =
+{
+	SPECIES_STARYU, // 235
+	SPECIES_STARMIE, // 236
+};
+
+const u16 gSeaDivergentPage4[] =
+{
+	SPECIES_SEEL, // 258
+	SPECIES_DEWGONG, // 259
+};
+
+const u16 gSeaDivergentPage5[] =
+{
+	SPECIES_QWILFISH, // 260
+};
+
+const u16 gSeaDivergentPage6[] =
+{
+	SPECIES_WAILMER, // 278
+	SPECIES_WAILORD, // 279
+};
+
+const u16 gSeaDivergentPage7[] =
+{
+	SPECIES_WISHIWASHI, // 282
+	SPECIES_WISHIWASHI_S, // 282 - Alt
+};
+
+const u16 gCaveDivergentPage1[] =
+{
+	SPECIES_WOOBAT, // 31
+	SPECIES_SWOOBAT, // 32
+};
+
+const u16 gCaveDivergentPage2[] =
+{
+	SPECIES_DIGLETT_A, // 33
+	SPECIES_DUGTRIO_A, // 34
+	SPECIES_DIGLETT, // 33 - Alt
+	SPECIES_DUGTRIO, // 34 - Alt
+};
+
+const u16 gCaveDivergentPage3[] =
+{
+	SPECIES_TYNAMO, // 100
+	SPECIES_EELEKTRIK, // 101
+	SPECIES_EELEKTROSS, // 102
+};
+
+const u16 gCaveDivergentPage4[] =
+{
+	SPECIES_NOSEPASS, // 172
+	SPECIES_PROBOPASS, // 173
+};
+
+const u16 gCaveDivergentPage5[] =
+{
+	SPECIES_GASTLY, // 199
+	SPECIES_HAUNTER, // 200
+	SPECIES_GENGAR, // 201
+};
+
+const u16 gCaveDivergentPage6[] =
+{
+	SPECIES_ONIX, // 228
+	SPECIES_STEELIX, // 229
+};
+
+const u16 gCaveDivergentPage7[] =
+{
+	SPECIES_DEINO, // 230
+	SPECIES_ZWEILOUS, // 231
+	SPECIES_HYDREIGON, // 232
+};
+
+const u16 gCaveDivergentPage8[] =
+{
+	SPECIES_CRYOGONAL, // 264
+};
+
+
+const u16 gMountainDivergentPage1[] =
+{
+	SPECIES_CLEFFA, // 23
+	SPECIES_CLEFAIRY, // 24
+	SPECIES_CLEFABLE, // 25
+};
+
+const u16 gMountainDivergentPage2[] =
+{
+	SPECIES_MEDITITE, // 63
+	SPECIES_MEDICHAM, // 64
+	SPECIES_MAKUHITA, // 65
+	SPECIES_HARIYAMA, // 66
+};
+
+const u16 gMountainDivergentPage3[] =
+{
+	SPECIES_MACHOP, // 83
+	SPECIES_MACHOKE, // 84
+	SPECIES_MACHAMP, // 85
+};
+
+const u16 gMountainDivergentPage4[] =
+{
+	SPECIES_LARVITAR, // 103
+	SPECIES_PUPITAR, // 104
+	SPECIES_TYRANITAR, // 105
+};
+
+const u16 gMountainDivergentPage5[] =
+{
+	SPECIES_ARON, // 109
+	SPECIES_LAIRON, // 110
+	SPECIES_AGGRON, // 111
+};
+
+const u16 gMountainDivergentPage6[] =
+{
+	SPECIES_VANILLITE, // 112
+	SPECIES_VANILLISH, // 113
+	SPECIES_VANILLUXE, // 114
+};
+
+const u16 gMountainDivergentPage7[] =
+{
+	SPECIES_GEODUDE_A, // 118
+	SPECIES_GRAVELER_A, // 119
+	SPECIES_GOLEM_A, // 120
+};
+
+const u16 gMountainDivergentPage8[] =
+{
+	SPECIES_GEODUDE, // 118 - Alt
+	SPECIES_GRAVELER, // 119 - Alt
+	SPECIES_GOLEM, // 120 - Alt
+};
+
+const u16 gMountainDivergentPage9[] =
+{
+	SPECIES_SANDSHREW_A, // 123
+	SPECIES_SANDSLASH_A, // 124
+	SPECIES_SANDSHREW, // 123 - Alt
+	SPECIES_SANDSLASH, // 124 - Alt
+};
+
+const u16 gMountainDivergentPage10[] =
+{
+	SPECIES_NUMEL, // 126
+	SPECIES_CAMERUPT, // 127
+};
+
+const u16 gMountainDivergentPage11[] =
+{
+	SPECIES_CUBONE, // 139
+	SPECIES_MAROWAK_A, // 140
+	SPECIES_MAROWAK, // 140 - Alt
+};
+
+const u16 gMountainDivergentPage12[] =
+{
+	SPECIES_MAGBY, // 141
+	SPECIES_MAGMAR, // 142
+	SPECIES_MAGMORTAR, // 143
+	SPECIES_TOGEDEMARU, // 146
+};
+
+const u16 gMountainDivergentPage13[] =
+{
+	SPECIES_MUNCHLAX, // 209
+	SPECIES_SNORLAX, // 210
+	SPECIES_GLIGAR, // 233
+	SPECIES_GLISCOR, // 234
+};
+
+const u16 gMountainDivergentPage14[] =
+{
+	SPECIES_DURANT, // 256
+	SPECIES_HEATMOR, // 257
+	SPECIES_ABSOL, // 258
+};
+
+const u16 gMountainDivergentPage15[] =
+{
+	SPECIES_SNOVER, // 265
+	SPECIES_ABOMASNOW, // 266
+};
+
+const u16 gMountainDivergentPage16[] =
+{
+	SPECIES_DRUDDIGON, // 273
+	SPECIES_AERODACTYL, // 274
+};
+
+const u16 gRoughTerrainDivergentPage1[] =
+{
+	SPECIES_SILICOBRA, // 76
+	SPECIES_SANDACONDA, // 77
+	SPECIES_MARACTUS, // 78
+};
+
+const u16 gRoughTerrainDivergentPage2[] =
+{
+	SPECIES_DWEBBLE, // 79
+	SPECIES_CRUSTLE, // 80
+	SPECIES_BALTOY, // 81
+	SPECIES_CLAYDOL, // 82
+};
+
+const u16 gRoughTerrainDivergentPage3[] =
+{
+	SPECIES_SKORUPI, // 83
+	SPECIES_DRAPION, // 84
+};
+
+const u16 gRoughTerrainDivergentPage4[] =
+{
+	SPECIES_MAGNEMITE, // 106
+	SPECIES_MAGNETON, // 107
+	SPECIES_MAGNEZONE, // 108
+};
+
+const u16 gRoughTerrainDivergentPage5[] =
+{
+	SPECIES_BAGON, // 128
+	SPECIES_SHELGON, // 129
+	SPECIES_SALAMENCE, // 130
+};
+
+const u16 gRoughTerrainDivergentPage6[] =
+{
+	SPECIES_GOLETT, // 223
+	SPECIES_GOLURK, // 224
+};
+
+const u16 gRoughTerrainDivergentPage7[] =
+{
+	SPECIES_BELDUM, // 225
+	SPECIES_METANG, // 226
+	SPECIES_METAGROSS, // 227
+};
+
+const u16 gRoughTerrainDivergentPage8[] =
+{
+	SPECIES_PHANPY, // 242
+	SPECIES_DONPHAN, // 243
+};
+
+const u16 gRoughTerrainDivergentPage9[] =
+{
+	SPECIES_RHYHORN, // 244
+	SPECIES_RHYDON, // 245
+	SPECIES_RHYPERIOR, // 246
+};
+
+const u16 gRoughTerrainDivergentPage10[] =
+{
+	SPECIES_HONEDGE, // 250
+	SPECIES_DOUBLADE, // 251
+	SPECIES_AEGISLASH, // 252
+	SPECIES_AEGISLASH_BLADE, // 252 - Alt
+};
+
+const u16 gRoughTerrainDivergentPage11[] =
+{
+	SPECIES_ARCTOZOLT, // 283
+	SPECIES_DRACOVISH, // 284
+};
+
+const u16 gUrbanDivergentPage1[] =
+{
+	SPECIES_MILCERY, // 74
+	SPECIES_ALCREMIE_STRAWBERRY, // 75
+};
+
+const u16 gUrbanDivergentPage2[] =
+{
+	SPECIES_ALCREMIE_BERRY, // 75 - Alt
+	SPECIES_ALCREMIE_CLOVER, // 75 - Alt
+	SPECIES_ALCREMIE_FLOWER, // 75 - Alt
+};
+
+const u16 gUrbanDivergentPage3[] =
+{
+	SPECIES_ALCREMIE_LOVE, // 75 - Alt
+	SPECIES_ALCREMIE_RIBBON, // 75 - Alt
+	SPECIES_ALCREMIE_STAR, // 75 - Alt
+};
+
+const u16 gUrbanDivergentPage4[] =
+{
+	SPECIES_ABRA, // 88
+	SPECIES_KADABRA, // 89
+	SPECIES_ALAKAZAM, // 90
+};
+
+const u16 gUrbanDivergentPage5[] =
+{
+	SPECIES_SNUBBULL, // 91
+	SPECIES_GRANBULL, // 92
+	SPECIES_MEOWTH_G, // 93
+	SPECIES_PERRSERKER, // 94
+};
+
+const u16 gUrbanDivergentPage6[] =
+{
+	SPECIES_MEOWTH, // 93 - Alt
+	SPECIES_PERSIAN, // 94 - Alt
+	SPECIES_MEOWTH_A, // 93 - Alt
+	SPECIES_PERSIAN_A, // 94 - Alt
+};
+
+const u16 gUrbanDivergentPage7[] =
+{
+	SPECIES_SOLOSIS, // 95
+	SPECIES_DUOSION, // 96
+	SPECIES_REUNICLUS, // 97
+};
+
+const u16 gUrbanDivergentPage8[] =
+{
+	SPECIES_SMOOCHUM, // 121
+	SPECIES_JYNX, // 122
+	SPECIES_AUDINO, // 152
+};
+
+const u16 gUrbanDivergentPage9[] =
+{
+	SPECIES_TYROGUE, // 155
+	SPECIES_HITMONLEE, // 156
+	SPECIES_HITMONCHAN, // 157
+	SPECIES_HITMONTOP, // 158
+};
+
+const u16 gUrbanDivergentPage10[] =
+{
+	SPECIES_SINISTEA, // 186
+	SPECIES_POLTEAGEIST, // 187
+	SPECIES_SINISTEA_CHIPPED, // 186 - Alt
+	SPECIES_POLTEAGEIST_CHIPPED, // 187 - Alt
+};
+
+const u16 gUrbanDivergentPage11[] =
+{
+	SPECIES_KLEFKI, // 188
+	SPECIES_LITWICK, // 189
+	SPECIES_LAMPENT, // 190
+	SPECIES_CHANDELURE, // 191
+};
+
+const u16 gUrbanDivergentPage12[] =
+{
+	SPECIES_TRUBBISH, // 202
+	SPECIES_GARBODOR, // 203
+};
+
+const u16 gUrbanDivergentPage13[] =
+{
+	SPECIES_PORYGON, // 204
+	SPECIES_PORYGON2, // 205
+	SPECIES_PORYGON_Z, // 206
+	SPECIES_SMEARGLE, // 211
+};
+
+const u16 gUrbanDivergentPage14[] =
+{
+	SPECIES_MUNNA, // 219
+	SPECIES_MUSHARNA, // 220
+};
+
+const u16 gUrbanDivergentPage15[] =
+{
+	SPECIES_VOLTORB, // 262
+	SPECIES_ELECTRODE, // 263
+};
+
+const u16 gUrbanDivergentPage16[] =
+{
+	SPECIES_SHUPPET, // 267
+	SPECIES_BANETTE, // 268
+};
+
+const u16 gRareDivergentPage1[] =
+{
+	SPECIES_KUBFU, // 286
+	SPECIES_URSHIFU_SINGLE, // 287
+	SPECIES_URSHIFU_RAPID, // 288
+};
+
+const u16 gRareDivergentPage2[] =
+{
+	SPECIES_TORNADUS, // 288
+	SPECIES_THUNDURUS, // 289
+	SPECIES_LANDORUS, // 290
+};
+
+const u16 gRareDivergentPage3[] =
+{
+	SPECIES_TORNADUS_THERIAN, // 288 - Alt
+	SPECIES_THUNDURUS_THERIAN, // 289 - Alt
+	SPECIES_LANDORUS_THERIAN, // 290 - Alt
+};
+
+const u16 gRareDivergentPage4[] =
+{
+	SPECIES_MELOETTA, // 292
+	SPECIES_MELOETTA_PIROUETTE, // 292 - Alt
+};
+
+const u16 gRareDivergentPage5[] =
+{
+	SPECIES_LUGIA, // 293
+};
+
+const u16 gRareDivergentPage6[] =
+{
+	SPECIES_HOOPA, // 294
+	SPECIES_HOOPA_UNBOUND, // 294 - Alt
+};
+
+const u16 gRareDivergentPage7[] =
+{
+	SPECIES_HEATRAN, // 295
+};
+
+const u16 gRareDivergentPage8[] =
+{
+	SPECIES_ZARUDE, // 296
+	SPECIES_ZARUDE_DADA, // 296 - Alt
+};
+
+const u16 gRareDivergentPage9[] =
+{
+	SPECIES_SPECTRIER // 297
+};
+
+const u16 gRareDivergentPage10[] =
+{
+	SPECIES_MAGEARNA, // 298
+	SPECIES_MAGEARNA_P, // 298 - Alt
+};
+
+const u16 gRareDivergentPage11[] =
+{
+	SPECIES_DARKRAI // 299
+};
+
 const struct HabitatPage gGrasslandPages[] =
 {
 	{gGrasslandPage1, ARRAY_COUNT(gGrasslandPage1)}, 
@@ -1170,11 +2012,31 @@ const struct HabitatPage gGrasslandPages[] =
 	{gGrasslandPage28, ARRAY_COUNT(gGrasslandPage28)}, 
 	{gGrasslandPage29, ARRAY_COUNT(gGrasslandPage29)}, 
 	{gGrasslandPage30, ARRAY_COUNT(gGrasslandPage30)},
+	{gGrasslandDivergentPage1, ARRAY_COUNT(gGrasslandDivergentPage1)},
+	{gGrasslandDivergentPage2, ARRAY_COUNT(gGrasslandDivergentPage2)},
+	{gGrasslandDivergentPage3, ARRAY_COUNT(gGrasslandDivergentPage3)},
+	{gGrasslandDivergentPage4, ARRAY_COUNT(gGrasslandDivergentPage4)},
+	{gGrasslandDivergentPage5, ARRAY_COUNT(gGrasslandDivergentPage5)},
+	{gGrasslandDivergentPage6, ARRAY_COUNT(gGrasslandDivergentPage6)},
+	{gGrasslandDivergentPage7, ARRAY_COUNT(gGrasslandDivergentPage7)},
+	{gGrasslandDivergentPage8, ARRAY_COUNT(gGrasslandDivergentPage8)},
+	{gGrasslandDivergentPage9, ARRAY_COUNT(gGrasslandDivergentPage9)},
+	{gGrasslandDivergentPage10, ARRAY_COUNT(gGrasslandDivergentPage10)},
+	{gGrasslandDivergentPage11, ARRAY_COUNT(gGrasslandDivergentPage11)},
+	{gGrasslandDivergentPage12, ARRAY_COUNT(gGrasslandDivergentPage12)},
+	{gGrasslandDivergentPage13, ARRAY_COUNT(gGrasslandDivergentPage13)},
+	{gGrasslandDivergentPage14, ARRAY_COUNT(gGrasslandDivergentPage14)},
+	{gGrasslandDivergentPage15, ARRAY_COUNT(gGrasslandDivergentPage15)},
+	{gGrasslandDivergentPage16, ARRAY_COUNT(gGrasslandDivergentPage16)},
+	{gGrasslandDivergentPage17, ARRAY_COUNT(gGrasslandDivergentPage17)},
+	{gGrasslandDivergentPage18, ARRAY_COUNT(gGrasslandDivergentPage18)},
+	{gGrasslandDivergentPage19, ARRAY_COUNT(gGrasslandDivergentPage19)},
+	{gGrasslandDivergentPage20, ARRAY_COUNT(gGrasslandDivergentPage20)},
 };
 
 const struct HabitatPage gForestPages[] =
 {
-	{gForestPage1, ARRAY_COUNT(gForestPage1)}, 
+	{gForestPage1, ARRAY_COUNT(gForestPage1)},
 	{gForestPage2, ARRAY_COUNT(gForestPage2)}, 
 	{gForestPage3, ARRAY_COUNT(gForestPage3)}, 
 	{gForestPage4, ARRAY_COUNT(gForestPage4)}, 
@@ -1200,6 +2062,28 @@ const struct HabitatPage gForestPages[] =
 	{gForestPage24, ARRAY_COUNT(gForestPage24)}, 
 	{gForestPage25, ARRAY_COUNT(gForestPage25)}, 
 	{gForestPage26, ARRAY_COUNT(gForestPage26)},
+	{gForestDivergentPage1, ARRAY_COUNT(gForestDivergentPage1)},
+	{gForestDivergentPage2, ARRAY_COUNT(gForestDivergentPage2)},
+	{gForestDivergentPage3, ARRAY_COUNT(gForestDivergentPage3)},
+	{gForestDivergentPage4, ARRAY_COUNT(gForestDivergentPage4)},
+	{gForestDivergentPage5, ARRAY_COUNT(gForestDivergentPage5)},
+	{gForestDivergentPage6, ARRAY_COUNT(gForestDivergentPage6)},
+	{gForestDivergentPage7, ARRAY_COUNT(gForestDivergentPage7)},
+	{gForestDivergentPage8, ARRAY_COUNT(gForestDivergentPage8)},
+	{gForestDivergentPage9, ARRAY_COUNT(gForestDivergentPage9)},
+	{gForestDivergentPage10, ARRAY_COUNT(gForestDivergentPage10)},
+	{gForestDivergentPage11, ARRAY_COUNT(gForestDivergentPage11)},
+	{gForestDivergentPage12, ARRAY_COUNT(gForestDivergentPage12)},
+	{gForestDivergentPage13, ARRAY_COUNT(gForestDivergentPage13)},
+	{gForestDivergentPage14, ARRAY_COUNT(gForestDivergentPage14)},
+	{gForestDivergentPage15, ARRAY_COUNT(gForestDivergentPage15)},
+	{gForestDivergentPage16, ARRAY_COUNT(gForestDivergentPage16)},
+	{gForestDivergentPage17, ARRAY_COUNT(gForestDivergentPage17)},
+	{gForestDivergentPage18, ARRAY_COUNT(gForestDivergentPage18)},
+	{gForestDivergentPage19, ARRAY_COUNT(gForestDivergentPage19)},
+	{gForestDivergentPage20, ARRAY_COUNT(gForestDivergentPage20)},
+	{gForestDivergentPage21, ARRAY_COUNT(gForestDivergentPage21)},
+	{gForestDivergentPage22, ARRAY_COUNT(gForestDivergentPage22)},
 };
 
 const struct HabitatPage gWatersEdgePages[] =
@@ -1221,7 +2105,19 @@ const struct HabitatPage gWatersEdgePages[] =
 	{gWatersEdgePage15, ARRAY_COUNT(gWatersEdgePage15)}, 
 	{gWatersEdgePage16, ARRAY_COUNT(gWatersEdgePage16)}, 
 	{gWatersEdgePage17, ARRAY_COUNT(gWatersEdgePage17)},
-	{gWatersEdgePage18, ARRAY_COUNT(gWatersEdgePage18)}, 
+	{gWatersEdgePage18, ARRAY_COUNT(gWatersEdgePage18)},
+	{gWatersEdgeDivergentPage1, ARRAY_COUNT(gWatersEdgeDivergentPage1)},
+	{gWatersEdgeDivergentPage2, ARRAY_COUNT(gWatersEdgeDivergentPage2)},
+	{gWatersEdgeDivergentPage3, ARRAY_COUNT(gWatersEdgeDivergentPage3)},
+	{gWatersEdgeDivergentPage4, ARRAY_COUNT(gWatersEdgeDivergentPage4)},
+	{gWatersEdgeDivergentPage5, ARRAY_COUNT(gWatersEdgeDivergentPage5)},
+	{gWatersEdgeDivergentPage6, ARRAY_COUNT(gWatersEdgeDivergentPage6)},
+	{gWatersEdgeDivergentPage7, ARRAY_COUNT(gWatersEdgeDivergentPage7)},
+	{gWatersEdgeDivergentPage8, ARRAY_COUNT(gWatersEdgeDivergentPage8)},
+	{gWatersEdgeDivergentPage9, ARRAY_COUNT(gWatersEdgeDivergentPage9)},
+	{gWatersEdgeDivergentPage10, ARRAY_COUNT(gWatersEdgeDivergentPage10)},
+	{gWatersEdgeDivergentPage11, ARRAY_COUNT(gWatersEdgeDivergentPage11)},
+	{gWatersEdgeDivergentPage12, ARRAY_COUNT(gWatersEdgeDivergentPage12)},
 };
 
 const struct HabitatPage gSeaPages[] =
@@ -1236,7 +2132,14 @@ const struct HabitatPage gSeaPages[] =
 	{gSeaPage8, ARRAY_COUNT(gSeaPage8)}, 
 	{gSeaPage9, ARRAY_COUNT(gSeaPage9)}, 
 	{gSeaPage10, ARRAY_COUNT(gSeaPage10)}, 
-	{gSeaPage11, ARRAY_COUNT(gSeaPage11)}, 
+	{gSeaPage11, ARRAY_COUNT(gSeaPage11)},
+	{gSeaDivergentPage1, ARRAY_COUNT(gSeaDivergentPage1)},
+	{gSeaDivergentPage2, ARRAY_COUNT(gSeaDivergentPage2)},
+	{gSeaDivergentPage3, ARRAY_COUNT(gSeaDivergentPage3)},
+	{gSeaDivergentPage4, ARRAY_COUNT(gSeaDivergentPage4)},
+	{gSeaDivergentPage5, ARRAY_COUNT(gSeaDivergentPage5)},
+	{gSeaDivergentPage6, ARRAY_COUNT(gSeaDivergentPage6)},
+	{gSeaDivergentPage7, ARRAY_COUNT(gSeaDivergentPage7)},
 };
 
 const struct HabitatPage gCavePages[] =
@@ -1259,6 +2162,14 @@ const struct HabitatPage gCavePages[] =
 	{gCavePage16, ARRAY_COUNT(gCavePage16)}, 
 	{gCavePage17, ARRAY_COUNT(gCavePage17)}, 
 	{gCavePage18, ARRAY_COUNT(gCavePage18)},
+	{gCaveDivergentPage1, ARRAY_COUNT(gCaveDivergentPage1)},
+	{gCaveDivergentPage2, ARRAY_COUNT(gCaveDivergentPage2)},
+	{gCaveDivergentPage3, ARRAY_COUNT(gCaveDivergentPage3)},
+	{gCaveDivergentPage4, ARRAY_COUNT(gCaveDivergentPage4)},
+	{gCaveDivergentPage5, ARRAY_COUNT(gCaveDivergentPage5)},
+	{gCaveDivergentPage6, ARRAY_COUNT(gCaveDivergentPage6)},
+	{gCaveDivergentPage7, ARRAY_COUNT(gCaveDivergentPage7)},
+	{gCaveDivergentPage8, ARRAY_COUNT(gCaveDivergentPage8)},
 };
 
 const struct HabitatPage gMountainPages[] =
@@ -1284,6 +2195,22 @@ const struct HabitatPage gMountainPages[] =
 	{gMountainPage19, ARRAY_COUNT(gMountainPage19)}, 
 	{gMountainPage20, ARRAY_COUNT(gMountainPage20)}, 
 	{gMountainPage21, ARRAY_COUNT(gMountainPage21)},
+	{gMountainDivergentPage1, ARRAY_COUNT(gMountainDivergentPage1)},
+	{gMountainDivergentPage2, ARRAY_COUNT(gMountainDivergentPage2)},
+	{gMountainDivergentPage3, ARRAY_COUNT(gMountainDivergentPage3)},
+	{gMountainDivergentPage4, ARRAY_COUNT(gMountainDivergentPage4)},
+	{gMountainDivergentPage5, ARRAY_COUNT(gMountainDivergentPage5)},
+	{gMountainDivergentPage6, ARRAY_COUNT(gMountainDivergentPage6)},
+	{gMountainDivergentPage7, ARRAY_COUNT(gMountainDivergentPage7)},
+	{gMountainDivergentPage8, ARRAY_COUNT(gMountainDivergentPage8)},
+	{gMountainDivergentPage9, ARRAY_COUNT(gMountainDivergentPage9)},
+	{gMountainDivergentPage10, ARRAY_COUNT(gMountainDivergentPage10)},
+	{gMountainDivergentPage11, ARRAY_COUNT(gMountainDivergentPage11)},
+	{gMountainDivergentPage12, ARRAY_COUNT(gMountainDivergentPage12)},
+	{gMountainDivergentPage13, ARRAY_COUNT(gMountainDivergentPage13)},
+	{gMountainDivergentPage14, ARRAY_COUNT(gMountainDivergentPage14)},
+	{gMountainDivergentPage15, ARRAY_COUNT(gMountainDivergentPage15)},
+	{gMountainDivergentPage16, ARRAY_COUNT(gMountainDivergentPage16)},
 };
 
 const struct HabitatPage gRoughTerrainPages[] =
@@ -1302,7 +2229,18 @@ const struct HabitatPage gRoughTerrainPages[] =
 	{gRoughTerrainPage12, ARRAY_COUNT(gRoughTerrainPage12)}, 
 	{gRoughTerrainPage13, ARRAY_COUNT(gRoughTerrainPage13)}, 
 	{gRoughTerrainPage14, ARRAY_COUNT(gRoughTerrainPage14)}, 
-	{gRoughTerrainPage15, ARRAY_COUNT(gRoughTerrainPage15)}, 
+	{gRoughTerrainPage15, ARRAY_COUNT(gRoughTerrainPage15)},
+	{gRoughTerrainDivergentPage1, ARRAY_COUNT(gRoughTerrainDivergentPage1)},
+	{gRoughTerrainDivergentPage2, ARRAY_COUNT(gRoughTerrainDivergentPage2)},
+	{gRoughTerrainDivergentPage3, ARRAY_COUNT(gRoughTerrainDivergentPage3)},
+	{gRoughTerrainDivergentPage4, ARRAY_COUNT(gRoughTerrainDivergentPage4)},
+	{gRoughTerrainDivergentPage5, ARRAY_COUNT(gRoughTerrainDivergentPage5)},
+	{gRoughTerrainDivergentPage6, ARRAY_COUNT(gRoughTerrainDivergentPage6)},
+	{gRoughTerrainDivergentPage7, ARRAY_COUNT(gRoughTerrainDivergentPage7)},
+	{gRoughTerrainDivergentPage8, ARRAY_COUNT(gRoughTerrainDivergentPage8)},
+	{gRoughTerrainDivergentPage9, ARRAY_COUNT(gRoughTerrainDivergentPage9)},
+	{gRoughTerrainDivergentPage10, ARRAY_COUNT(gRoughTerrainDivergentPage10)},
+	{gRoughTerrainDivergentPage11, ARRAY_COUNT(gRoughTerrainDivergentPage11)},
 };
 
 const struct HabitatPage gUrbanPages[] =
@@ -1326,6 +2264,22 @@ const struct HabitatPage gUrbanPages[] =
 	{gUrbanPage17, ARRAY_COUNT(gUrbanPage17)}, 
 	{gUrbanPage18, ARRAY_COUNT(gUrbanPage18)},
 	{gUrbanPage19, ARRAY_COUNT(gUrbanPage19)},
+	{gUrbanDivergentPage1, ARRAY_COUNT(gUrbanDivergentPage1)},
+	{gUrbanDivergentPage2, ARRAY_COUNT(gUrbanDivergentPage2)},
+	{gUrbanDivergentPage3, ARRAY_COUNT(gUrbanDivergentPage3)},
+	{gUrbanDivergentPage4, ARRAY_COUNT(gUrbanDivergentPage4)},
+	{gUrbanDivergentPage5, ARRAY_COUNT(gUrbanDivergentPage5)},
+	{gUrbanDivergentPage6, ARRAY_COUNT(gUrbanDivergentPage6)},
+	{gUrbanDivergentPage7, ARRAY_COUNT(gUrbanDivergentPage7)},
+	{gUrbanDivergentPage8, ARRAY_COUNT(gUrbanDivergentPage8)},
+	{gUrbanDivergentPage9, ARRAY_COUNT(gUrbanDivergentPage9)},
+	{gUrbanDivergentPage10, ARRAY_COUNT(gUrbanDivergentPage10)},
+	{gUrbanDivergentPage11, ARRAY_COUNT(gUrbanDivergentPage11)},
+	{gUrbanDivergentPage12, ARRAY_COUNT(gUrbanDivergentPage12)},
+	{gUrbanDivergentPage13, ARRAY_COUNT(gUrbanDivergentPage13)},
+	{gUrbanDivergentPage14, ARRAY_COUNT(gUrbanDivergentPage14)},
+	{gUrbanDivergentPage15, ARRAY_COUNT(gUrbanDivergentPage15)},
+	{gUrbanDivergentPage16, ARRAY_COUNT(gUrbanDivergentPage16)},
 };
 
 const struct HabitatPage gRarePages[] =
@@ -1340,6 +2294,17 @@ const struct HabitatPage gRarePages[] =
 	{gRarePage8, ARRAY_COUNT(gRarePage8)}, 
 	{gRarePage9, ARRAY_COUNT(gRarePage9)},
 	{gRarePage10, ARRAY_COUNT(gRarePage10)},
+	{gRareDivergentPage1, ARRAY_COUNT(gRareDivergentPage1)},
+	{gRareDivergentPage2, ARRAY_COUNT(gRareDivergentPage2)},
+	{gRareDivergentPage3, ARRAY_COUNT(gRareDivergentPage3)},
+	{gRareDivergentPage4, ARRAY_COUNT(gRareDivergentPage4)},
+	{gRareDivergentPage5, ARRAY_COUNT(gRareDivergentPage5)},
+	{gRareDivergentPage6, ARRAY_COUNT(gRareDivergentPage6)},
+	{gRareDivergentPage7, ARRAY_COUNT(gRareDivergentPage7)},
+	{gRareDivergentPage8, ARRAY_COUNT(gRareDivergentPage8)},
+	{gRareDivergentPage9, ARRAY_COUNT(gRareDivergentPage9)},
+	{gRareDivergentPage10, ARRAY_COUNT(gRareDivergentPage10)},
+	{gRareDivergentPage11, ARRAY_COUNT(gRareDivergentPage11)},
 };
 
 const struct Habitat gHabitatPtrsTable[9] =
@@ -1354,3 +2319,7 @@ const struct Habitat gHabitatPtrsTable[9] =
 	{gUrbanPages, ARRAY_COUNT(gUrbanPages)},
 	{gRarePages, ARRAY_COUNT(gRarePages)},
 };
+
+// Divergent-dex mons share this single habitat table with the normal roster.
+// The pokedex seen-filter keeps each mode's mons out of the other mode's
+// habitat view, since a save only marks its own mode's species as seen.

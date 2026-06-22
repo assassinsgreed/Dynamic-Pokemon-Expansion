@@ -9,9 +9,12 @@
 extern const u8 gSpeciesNames[][POKEMON_NAME_LENGTH + 1];
 extern const u16 gSpeciesIdToCryId[];
 extern const u16 gSpeciesToNationalPokedexNum[];
+extern u16 __attribute__((long_call)) SpeciesToNationalPokedexNum(u16 species);
 
 extern const u16 gPokedexOrder_Regional[];
 extern const u16 gRegionalDexCount;
+extern const u16 gPokedexOrder_Divergent_Regional[];
+extern const u16 gDivergentRegionalDexCount;
 extern const u16 gPokedexOrder_Alphabetical[];
 extern const u16 gPokedexOrderAlphabeticalCount;
 extern const u16 gPokedexOrder_Weight[];
@@ -20,22 +23,41 @@ extern const u16 gPokedexOrder_Height[];
 extern const u16 gPokedexOrderHeightCount;
 extern const u16 gPokedexOrder_Type[];
 extern const u16 gPokedexOrderTypeCount;
+extern const u16 gPokedexOrder_Divergent_Alphabetical[];
+extern const u16 gPokedexOrderDivergentAlphabeticalCount;
+extern const u16 gPokedexOrder_Divergent_Weight[];
+extern const u16 gPokedexOrderDivergentWeightCount;
+extern const u16 gPokedexOrder_Divergent_Height[];
+extern const u16 gPokedexOrderDivergentHeightCount;
+extern const u16 gPokedexOrder_Divergent_Type[];
+extern const u16 gPokedexOrderDivergentTypeCount;
 
 extern const struct AlternateDexEntries gAlternateDexEntries[];
 extern const struct CompressedSpriteSheet gMonBackPicTable[];
 extern const struct CompressedSpriteSheet gMonFrontPicTable[];
 extern const struct CompressedSpritePalette gMonPaletteTable[];
 extern const struct CompressedSpritePalette gMonShinyPaletteTable[];
-
-const u16 gNumSpecies = NUM_SPECIES;
+const u16 gNumSpecies = NUM_SPECIES;  
 const u16 gNumDexEntries = FINAL_DEX_ENTRY;
+
+const u16 FlagDivergentRegionalDex = 0x93F;
 
 u8 __attribute__((long_call)) GetGenderFromSpeciesAndPersonality(u16 species, u32 personality);
 u8  __attribute__((long_call)) GetUnownLetterFromPersonality(u32 personality);
 bool8 __attribute__((long_call)) GetSetPokedexFlag(u16 nationalNum, u8 caseID);
 s8 __attribute__((long_call)) DexFlagCheck(u16 nationalDexNo, u8 caseId, bool8 indexIsSpecies);
-u16 __attribute__((long_call)) SpeciesToNationalPokedexNum(u16 species);
 void __attribute__((long_call)) break_func();
+
+// Plain species -> national number lookup. gSpeciesToNationalPokedexNum already holds the
+// divergent numbers (391+) for divergent-only species, so no mode-specific handling is needed.
+// (The display hook resolves this symbol to the ROM function via BPRE.ld; this C copy mirrors it.)
+u16 SpeciesToNationalPokedexNum(u16 species)
+{
+	if (species == 0 || species >= NUM_SPECIES)
+		return 0;
+
+	return gSpeciesToNationalPokedexNum[species - 1];
+}
 
 //This file's functions
 u16 TryGetFemaleGenderedSpecies(u16 species, u32 personality);
@@ -70,9 +92,11 @@ u16 NationalPokedexNumToSpecies(u16 nationalNum)
 		return 0;
 
 	species = 0;
-	
-	//Optimization
-	if (nationalNum <= SPECIES_SHIFTRY || nationalNum >= SPECIES_TURTWIG) //Hoenn Mons are too out of order for this to work
+
+	// gSpeciesToNationalPokedexNum maps every species to its number across both ranges
+	// (1-390 normal, 391-689 divergent, no overlap), so a single table reverse-maps both.
+	//Optimization (only valid for the normal, contiguously-ordered dex)
+	if (nationalNum <= FINAL_DEX_ENTRY && (nationalNum <= SPECIES_SHIFTRY || nationalNum >= SPECIES_TURTWIG)) //Hoenn Mons are too out of order for this to work
 	{
 		for (i = 0; i < ARRAY_COUNT(sPivotalDexSpecies); ++i)
 		{
@@ -234,9 +258,10 @@ u16 CountSpeciesInDex(u8 caseId, bool8 whichDex)
 
 	switch (whichDex) {
 		case 0: //Regional
-			for (i = 0; i < gRegionalDexCount; ++i)
+			for (i = 0; i < (FlagGet(FlagDivergentRegionalDex) ? gDivergentRegionalDexCount : gRegionalDexCount); ++i)
 			{
-				if (DexFlagCheck(SpeciesToNationalPokedexNum(gPokedexOrder_Regional[i]), caseId, FALSE))
+				u16 species = FlagGet(FlagDivergentRegionalDex) ? gPokedexOrder_Divergent_Regional[i] : gPokedexOrder_Regional[i];
+				if (DexFlagCheck(species, caseId, TRUE)) //Check by species (mode-independent)
 					count++;
 			}
 			break;
@@ -256,9 +281,10 @@ u16 GetRegionalPokedexCount(u8 caseId)
 {
 	u16 i, count;
 
-	for (i = 0, count = 0; i < gRegionalDexCount; ++i)
+	for (i = 0, count = 0; i < (FlagGet(FlagDivergentRegionalDex) ? gDivergentRegionalDexCount : gRegionalDexCount); ++i)
 	{
-		if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(gPokedexOrder_Regional[i]), caseId))
+		u16 species = FlagGet(FlagDivergentRegionalDex) ? gPokedexOrder_Divergent_Regional[i] : gPokedexOrder_Regional[i];
+		if (DexFlagCheck(species, caseId, TRUE)) //Check by species (mode-independent)
 			count++;
 	}
 
@@ -269,9 +295,10 @@ bool16 HasAllRegionalMons(void)
 {
 	u16 i;
 
-	for (i = 0; i < gRegionalDexCount; ++i)
+	for (i = 0; i < (FlagGet(FlagDivergentRegionalDex) ? gDivergentRegionalDexCount : gRegionalDexCount); ++i)
 	{
-		if (!GetSetPokedexFlag(SpeciesToNationalPokedexNum(gPokedexOrder_Regional[i]), FLAG_GET_CAUGHT))
+		u16 species = FlagGet(FlagDivergentRegionalDex) ? gPokedexOrder_Divergent_Regional[i] : gPokedexOrder_Regional[i];
+		if (!DexFlagCheck(species, FLAG_GET_CAUGHT, TRUE)) //Check by species (mode-independent)
 			return FALSE;
 	}
 
@@ -282,9 +309,10 @@ bool16 sp1B9_SeenAllRegionalMons(void)
 {
 	u16 i;
 
-	for (i = 0; i < gRegionalDexCount; ++i)
+	for (i = 0; i < (FlagGet(FlagDivergentRegionalDex) ? gDivergentRegionalDexCount : gRegionalDexCount); ++i)
 	{
-		if (!GetSetPokedexFlag(SpeciesToNationalPokedexNum(gPokedexOrder_Regional[i]), FLAG_GET_SEEN))
+		u16 species = FlagGet(FlagDivergentRegionalDex) ? gPokedexOrder_Divergent_Regional[i] : gPokedexOrder_Regional[i];
+		if (!DexFlagCheck(species, FLAG_GET_SEEN, TRUE)) //Check by species (mode-independent)
 			return FALSE;
 	}
 
@@ -307,18 +335,23 @@ bool16 HasAllMons(void)
 u16 SpeciesToRegionalDexNum(u16 species)
 {
 	u16 i;
+	bool8 divergent = FlagGet(FlagDivergentRegionalDex);
+	const u16* dexList = divergent ? gPokedexOrder_Divergent_Regional : gPokedexOrder_Regional;
+	u16 count = divergent ? gDivergentRegionalDexCount : gRegionalDexCount;
 
-	for (i = 0; i < gRegionalDexCount; ++i)
+	for (i = 0; i < count; ++i)
 	{
-		if (gPokedexOrder_Regional[i] == species)
+		if (dexList[i] == species)
 			return i + 1;
 	}
-	
+
 	return 0;
 }
 
 extern const u16 gPokedexOrder_Regional[];
 extern const u16 gRegionalDexCount;
+extern const u16 gPokedexOrder_Divergent_Regional[];
+extern const u16 gDivergentRegionalDexCount;
 extern const u16 gPokedexOrder_Alphabetical[];
 extern const u16 gPokedexOrderAlphabeticalCount;
 extern const u16 gPokedexOrder_Weight[];
@@ -327,6 +360,14 @@ extern const u16 gPokedexOrder_Height[];
 extern const u16 gPokedexOrderHeightCount;
 extern const u16 gPokedexOrder_Type[];
 extern const u16 gPokedexOrderTypeCount;
+extern const u16 gPokedexOrder_Divergent_Alphabetical[];
+extern const u16 gPokedexOrderDivergentAlphabeticalCount;
+extern const u16 gPokedexOrder_Divergent_Weight[];
+extern const u16 gPokedexOrderDivergentWeightCount;
+extern const u16 gPokedexOrder_Divergent_Height[];
+extern const u16 gPokedexOrderDivergentHeightCount;
+extern const u16 gPokedexOrder_Divergent_Type[];
+extern const u16 gPokedexOrderDivergentTypeCount;
 
 u16 LoadPokedexViews(u8 type)
 {
@@ -337,27 +378,27 @@ u16 LoadPokedexViews(u8 type)
 
 	switch (type) {
 		case 0:
-			dexList = gPokedexOrder_Regional;
-			count = gRegionalDexCount;
+			dexList = FlagGet(FlagDivergentRegionalDex) ? gPokedexOrder_Divergent_Regional : gPokedexOrder_Regional;
+			count = FlagGet(FlagDivergentRegionalDex) ? gDivergentRegionalDexCount : gRegionalDexCount;
 			showUnseenSpecies = TRUE;
 			showUncaughtSpecies = TRUE;
 			break;
 		case 1:
-			dexList = gPokedexOrder_Alphabetical;
-			count = gPokedexOrderAlphabeticalCount;
+			dexList = FlagGet(FlagDivergentRegionalDex) ? gPokedexOrder_Divergent_Alphabetical : gPokedexOrder_Alphabetical;
+			count = FlagGet(FlagDivergentRegionalDex) ? gPokedexOrderDivergentAlphabeticalCount : gPokedexOrderAlphabeticalCount;
 			showUncaughtSpecies = TRUE;
 			break;
 		case 2:
-			dexList = gPokedexOrder_Type;
-			count = gPokedexOrderTypeCount;
+			dexList = FlagGet(FlagDivergentRegionalDex) ? gPokedexOrder_Divergent_Type : gPokedexOrder_Type;
+			count = FlagGet(FlagDivergentRegionalDex) ? gPokedexOrderDivergentTypeCount : gPokedexOrderTypeCount;
 			break;
 		case 3:
-			dexList = gPokedexOrder_Weight;
-			count = gPokedexOrderWeightCount;
+			dexList = FlagGet(FlagDivergentRegionalDex) ? gPokedexOrder_Divergent_Weight : gPokedexOrder_Weight;
+			count = FlagGet(FlagDivergentRegionalDex) ? gPokedexOrderDivergentWeightCount : gPokedexOrderWeightCount;
 			break;
 		case 4:
-			dexList = gPokedexOrder_Height;
-			count = gPokedexOrderHeightCount;
+			dexList = FlagGet(FlagDivergentRegionalDex) ? gPokedexOrder_Divergent_Height : gPokedexOrder_Height;
+			count = FlagGet(FlagDivergentRegionalDex) ? gPokedexOrderDivergentHeightCount : gPokedexOrderHeightCount;
 			break;
 		case 5:
 		default:
@@ -367,9 +408,11 @@ u16 LoadPokedexViews(u8 type)
 	for (i = 0, counter = 0, lastMeaningfulIndex = 0; i < count; ++i)
 	{
 		u16 species = dexList[i];
+		// Seen/caught flags are keyed on SPECIES (indexIsSpecies = TRUE), which is
+		// mode-independent. The divergent dex NUMBER is only for display, not flags.
 		bool8 seen = DexFlagCheck(species, FLAG_GET_SEEN, TRUE);
 		bool8 caught = DexFlagCheck(species, FLAG_GET_CAUGHT, TRUE);
-		
+
 		if (!seen)
 		{
 			if (showUnseenSpecies)
@@ -395,7 +438,7 @@ u16 LoadPokedexViews(u8 type)
 		//Fix empty list
 		lastMeaningfulIndex = 1;
 		gPokedexScreenDataPtr->listItem[0].name = (void*) 0x8415F66; //-----
-		gPokedexScreenDataPtr->listItem[0].id = gPokedexOrder_Regional[0] | (0 << 16); //Unseen
+		gPokedexScreenDataPtr->listItem[0].id = (FlagGet(FlagDivergentRegionalDex) ? gPokedexOrder_Divergent_Regional[0] : gPokedexOrder_Regional[0]) | (0 << 16); //Unseen
 	}
 
 	return lastMeaningfulIndex;

@@ -32,10 +32,13 @@ DisplayRegionalDexNumHook:
 	beq UseRegionalDexOrdering
 	ldr r0, =0x203ACF0
 	ldr r0, [r0]
+	cmp r0, #0x0		@ null check: no pokedex screen open, use national
+	beq UseNationalOrdering
 	add r0, #0xC
 	ldr r0, [r0]
-	cmp r0, #0x9	@;Check if looking at regional dex
+	cmp r0, #0x9		@;Check if looking at regional dex list
 	beq UseRegionalDexOrdering
+UseNationalOrdering:
 	mov r0, r5
 	ldr r1, =SpeciesToNationalPokedexNum
 	bl bxr1
@@ -44,7 +47,7 @@ DisplayRegionalDexNumHook:
 UseRegionalDexOrdering:
 	mov r0, r5
 	bl SpeciesToRegionalDexNum
-	
+
 DisplayDexNumberReturn:
 	mov r5, r0
 	ldr r0, =0x8104A70 | 1

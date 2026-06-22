@@ -50,6 +50,7 @@ extern const u8 gGameLanguage;
 
 void __attribute__((long_call)) SetMainCallback1(MainCallback callback);
 void __attribute__((long_call)) SetMainCallback2(MainCallback callback);
+bool8 __attribute__((long_call)) FlagGet(u16 id);
 /*
 void AgbMain(void);
 void InitKeys(void);

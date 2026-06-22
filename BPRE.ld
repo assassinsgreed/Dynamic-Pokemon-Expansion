@@ -23,3 +23,6 @@ LZ77UnCompWram = 0x81E3B70 | 1;
 
 /*The Deal Breaker*/
 break_func = 0x08416304 | 1;
+
+/*Divergent Pokedex*/
+FlagGet = 0x806E6D0 | 1;
