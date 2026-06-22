@@ -3316,30 +3316,30 @@ const struct PokedexEntry gPokedexEntries[DIVERGENT_DEX_COUNT] =
 	// 	.trainerScale = 256,
 	// 	.trainerOffset = 65534,
 	// },
-	[NATIONAL_DIVERGENT_DEX_TAILLOW] =
-	{
-		.categoryName = {_T, _i, _n, _y, _s, _w, _a, _l, _l, _o, _w, _END},
-		.height = 3,
-		.weight = 23,
-		.description = (const u8*) 0x844bb06,
-		.unusedDescription = (const u8*) 0x844ba31,
-		.pokemonScale = 465,
-		.pokemonOffset = 20,
-		.trainerScale = 256,
-		.trainerOffset = 65534,
-	},
-	[NATIONAL_DIVERGENT_DEX_SWELLOW] =
-	{
-		.categoryName = {_S, _w, _a, _l, _l, _o, _w, _END, _SPACE, _SPACE, _SPACE, _SPACE},
-		.height = 7,
-		.weight = 198,
-		.description = (const u8*) 0x844bb6f,
-		.unusedDescription = (const u8*) 0x844baa1,
-		.pokemonScale = 428,
-		.pokemonOffset = 13,
-		.trainerScale = 256,
-		.trainerOffset = 65534,
-	},
+	// [NATIONAL_DIVERGENT_DEX_TAILLOW] =
+	// {
+	// 	.categoryName = {_T, _i, _n, _y, _s, _w, _a, _l, _l, _o, _w, _END},
+	// 	.height = 3,
+	// 	.weight = 23,
+	// 	.description = (const u8*) 0x844bb06,
+	// 	.unusedDescription = (const u8*) 0x844ba31,
+	// 	.pokemonScale = 465,
+	// 	.pokemonOffset = 20,
+	// 	.trainerScale = 256,
+	// 	.trainerOffset = 65534,
+	// },
+	// [NATIONAL_DIVERGENT_DEX_SWELLOW] =
+	// {
+	// 	.categoryName = {_S, _w, _a, _l, _l, _o, _w, _END, _SPACE, _SPACE, _SPACE, _SPACE},
+	// 	.height = 7,
+	// 	.weight = 198,
+	// 	.description = (const u8*) 0x844bb6f,
+	// 	.unusedDescription = (const u8*) 0x844baa1,
+	// 	.pokemonScale = 428,
+	// 	.pokemonOffset = 13,
+	// 	.trainerScale = 256,
+	// 	.trainerOffset = 65534,
+	// },
 	[NATIONAL_DEX_WINGULL] =
 	{
 		.categoryName = {_S, _e, _a, _g, _u, _l, _l, _END, _SPACE, _SPACE, _SPACE, _SPACE},
@@ -5308,18 +5308,18 @@ const struct PokedexEntry gPokedexEntries[DIVERGENT_DEX_COUNT] =
 	// 	.trainerScale = 256,
 	// 	.trainerOffset = 0,
 	// },
-	// [NATIONAL_DEX_SPIRITOMB] =
-	// {
-	// 	.categoryName = {_F, _o, _r, _b, _i, _d, _d, _e, _n, _END, _SPACE, _SPACE},
-	// 	.height = 10,
-	// 	.weight = 1080,
-	// 	.description = DEX_ENTRY_SPIRITOMB,
-	// 	.unusedDescription = (const u8*) 0x8444cb1,
-	// 	.pokemonScale = 256,
-	// 	.pokemonOffset = 0,
-	// 	.trainerScale = 256,
-	// 	.trainerOffset = 0,
-	// },
+	[NATIONAL_DIVERGENT_DEX_SPIRITOMB] =
+	{
+		.categoryName = {_F, _o, _r, _b, _i, _d, _d, _e, _n, _END, _SPACE, _SPACE},
+		.height = 10,
+		.weight = 1080,
+		.description = DEX_ENTRY_SPIRITOMB,
+		.unusedDescription = (const u8*) 0x8444cb1,
+		.pokemonScale = 256,
+		.pokemonOffset = 0,
+		.trainerScale = 256,
+		.trainerOffset = 0,
+	},
 	[NATIONAL_DEX_GIBLE] =
 	{
 		.categoryName = {_L, _a, _n, _d, _SPACE, _S, _h, _a, _r, _k, _END, _SPACE},
@@ -9364,18 +9364,18 @@ const struct PokedexEntry gPokedexEntries[DIVERGENT_DEX_COUNT] =
 	// 	.trainerScale = 0,
 	// 	.trainerOffset = 0,
 	// },
-	// [NATIONAL_DEX_DRAMPA] =
-	// {
-	// 	.categoryName = {_P, _l, _a, _c, _i, _d, _END, _SPACE, _SPACE, _SPACE, _SPACE, _SPACE},
-	// 	.height = 30,
-	// 	.weight = 1850,
-	// 	.description = DEX_ENTRY_DRAMPA,
-	// 	.unusedDescription = (const u8*) 0x8444cb1,
-	// 	.pokemonScale = 0,
-	// 	.pokemonOffset = 0,
-	// 	.trainerScale = 0,
-	// 	.trainerOffset = 0,
-	// },
+	[NATIONAL_DIVERGENT_DEX_DRAMPA] =
+	{
+		.categoryName = {_P, _l, _a, _c, _i, _d, _END, _SPACE, _SPACE, _SPACE, _SPACE, _SPACE},
+		.height = 30,
+		.weight = 1850,
+		.description = DEX_ENTRY_DRAMPA,
+		.unusedDescription = (const u8*) 0x8444cb1,
+		.pokemonScale = 0,
+		.pokemonOffset = 0,
+		.trainerScale = 0,
+		.trainerOffset = 0,
+	},
 	[NATIONAL_DEX_DHELMISE] =
 	{
 		.categoryName = {_S, _e, _a, _SPACE, _C, _r, _e, _e, _p, _e, _r, _END},
