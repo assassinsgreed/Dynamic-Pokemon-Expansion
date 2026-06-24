@@ -1222,8 +1222,8 @@ const u16 gGrasslandDivergentPage12[] =
 {
 	SPECIES_GULPIN, // 176
 	SPECIES_SWALOT, // 177
-	SPECIES_DODUO, // 178
-	SPECIES_DODRIO, // 179
+	SPECIES_KRICKETOT, // 9
+	SPECIES_KRICKETUNE, // 10
 };
 
 const u16 gGrasslandDivergentPage13[] =
@@ -1281,8 +1281,6 @@ const u16 gGrasslandDivergentPage20[] =
 
 const u16 gForestDivergentPage1[] =
 {
-	SPECIES_LEDYBA, // 8
-	SPECIES_LEDIAN, // 9
 	SPECIES_SPINARAK, // 10
 	SPECIES_ARIADOS, // 11
 };
@@ -1344,6 +1342,7 @@ const u16 gForestDivergentPage10[] =
 {
 	SPECIES_NATU, // 98
 	SPECIES_XATU, // 99
+	SPECIES_HAWLUCHA, // 176
 };
 
 const u16 gForestDivergentPage11[] =
@@ -1389,6 +1388,8 @@ const u16 gForestDivergentPage16[] =
 {
 	SPECIES_PANPOUR, // 166
 	SPECIES_SIMIPOUR, // 167
+	SPECIES_INDEEDEE, // 177
+	SPECIES_INDEEDEE_FEMALE, // 177
 };
 
 const u16 gForestDivergentPage17[] =
@@ -1516,6 +1517,8 @@ const u16 gWatersEdgeDivergentPage12[] =
 {
 	SPECIES_KRABBY, // 275
 	SPECIES_KINGLER, // 276
+	SPECIES_BARBOACH, // 278
+	SPECIES_WHISCASH, // 279
 };
 
 const u16 gSeaDivergentPage1[] =
@@ -1550,12 +1553,6 @@ const u16 gSeaDivergentPage5[] =
 };
 
 const u16 gSeaDivergentPage6[] =
-{
-	SPECIES_WAILMER, // 278
-	SPECIES_WAILORD, // 279
-};
-
-const u16 gSeaDivergentPage7[] =
 {
 	SPECIES_WISHIWASHI, // 282
 	SPECIES_WISHIWASHI_S, // 282 - Alt
@@ -2139,7 +2136,6 @@ const struct HabitatPage gSeaPages[] =
 	{gSeaDivergentPage4, ARRAY_COUNT(gSeaDivergentPage4)},
 	{gSeaDivergentPage5, ARRAY_COUNT(gSeaDivergentPage5)},
 	{gSeaDivergentPage6, ARRAY_COUNT(gSeaDivergentPage6)},
-	{gSeaDivergentPage7, ARRAY_COUNT(gSeaDivergentPage7)},
 };
 
 const struct HabitatPage gCavePages[] =

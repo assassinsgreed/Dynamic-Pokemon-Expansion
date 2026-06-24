@@ -65,4 +65,5 @@ enum MegaEvoVariants
 #define MB_SHALLOW_WATER 0x17 //For Alolan Raichu
 
 #define MAPSEC_ROUTE12_WEST 0x64
+#define MAPSEC_HESSON_PASS 0x8A
 #define MAPSEC_DAIMYN_FACTORY 0x8E
