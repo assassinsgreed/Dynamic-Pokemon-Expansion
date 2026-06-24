@@ -40,7 +40,7 @@ extern const struct CompressedSpritePalette gMonShinyPaletteTable[];
 const u16 gNumSpecies = NUM_SPECIES;  
 const u16 gNumDexEntries = FINAL_DEX_ENTRY;
 
-const u16 FlagDivergentRegionalDex = 0x93F;
+const u16 FlagDivergentRegionalDex = 0x945;
 
 u8 __attribute__((long_call)) GetGenderFromSpeciesAndPersonality(u16 species, u32 personality);
 u8  __attribute__((long_call)) GetUnownLetterFromPersonality(u32 personality);
