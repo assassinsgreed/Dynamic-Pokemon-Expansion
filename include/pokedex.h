@@ -781,7 +781,7 @@ enum
 #define NATIONAL_DIVERGENT_DEX_THUNDURUS 679 // 289
 #define NATIONAL_DIVERGENT_DEX_LANDORUS 680 // 290
 // JIRACHI has no divergent dex number - reuses NATIONAL_DEX_JIRACHI (same number in both modes)
-#define NATIONAL_DIVERGENT_DEX_MELOETTA 682 // 292
+#define NATIONAL_DIVERGENT_DEX_XERNEAS 682 // 292
 #define NATIONAL_DIVERGENT_DEX_LUGIA 683 // 293
 #define NATIONAL_DIVERGENT_DEX_HOOPA 684 // 294
 #define NATIONAL_DIVERGENT_DEX_HEATRAN 685 // 295
@@ -996,7 +996,6 @@ extern const u8 DEX_ENTRY_VOLCARONA[];
 extern const u8 DEX_ENTRY_TORNADUS[];
 extern const u8 DEX_ENTRY_THUNDURUS[];
 extern const u8 DEX_ENTRY_LANDORUS[];
-extern const u8 DEX_ENTRY_MELOETTA[];
 extern const u8 DEX_ENTRY_CHESPIN[];
 extern const u8 DEX_ENTRY_QUILLADIN[];
 extern const u8 DEX_ENTRY_CHESNAUGHT[];
@@ -1051,6 +1050,7 @@ extern const u8 DEX_ENTRY_BERGMITE[];
 extern const u8 DEX_ENTRY_AVALUGG[];
 extern const u8 DEX_ENTRY_NOIBAT[];
 extern const u8 DEX_ENTRY_NOIVERN[];
+extern const u8 DEX_ENTRY_XERNEAS[];
 extern const u8 DEX_ENTRY_HOOPA[];
 extern const u8 DEX_ENTRY_VOLCANION[];
 extern const u8 DEX_ENTRY_ROWLET[];

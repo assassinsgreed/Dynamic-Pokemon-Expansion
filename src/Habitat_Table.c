@@ -1935,8 +1935,8 @@ const u16 gRareDivergentPage3[] =
 
 const u16 gRareDivergentPage4[] =
 {
-	SPECIES_MELOETTA, // 292
-	SPECIES_MELOETTA_PIROUETTE, // 292 - Alt
+	SPECIES_XERNEAS, // 292
+	SPECIES_XERNEAS_NATURAL, // 292 - Alt
 };
 
 const u16 gRareDivergentPage5[] =
