@@ -787,7 +787,7 @@ enum
 #define NATIONAL_DIVERGENT_DEX_HEATRAN 685 // 295
 #define NATIONAL_DIVERGENT_DEX_ZARUDE 686 // 296
 #define NATIONAL_DIVERGENT_DEX_SPECTRIER 687 // 297
-#define NATIONAL_DIVERGENT_DEX_MAGEARNA 688 // 298
+#define NATIONAL_DIVERGENT_DEX_GENESECT 688 // 298
 #define NATIONAL_DIVERGENT_DEX_DARKRAI 689 // 299
 // VICTINI has no divergent dex number - reuses NATIONAL_DEX_VICTINI (same number in both modes)
 // No need to replicate the starter and UB list here because the list above is just for pokemon that differ
@@ -996,6 +996,7 @@ extern const u8 DEX_ENTRY_VOLCARONA[];
 extern const u8 DEX_ENTRY_TORNADUS[];
 extern const u8 DEX_ENTRY_THUNDURUS[];
 extern const u8 DEX_ENTRY_LANDORUS[];
+extern const u8 DEX_ENTRY_GENESECT[];
 extern const u8 DEX_ENTRY_CHESPIN[];
 extern const u8 DEX_ENTRY_QUILLADIN[];
 extern const u8 DEX_ENTRY_CHESNAUGHT[];
@@ -1253,7 +1254,6 @@ extern const u8 DEX_ENTRY_WISHIWASHI_S[];
 extern const u8 DEX_ENTRY_NECROZMA_DUSK_MANE[];
 extern const u8 DEX_ENTRY_NECROZMA_DAWN_WINGS[];
 extern const u8 DEX_ENTRY_NECROZMA_ULTRA[];
-extern const u8 DEX_ENTRY_MAGEARNA[];
 extern const u8 DEX_ENTRY_CRAMORANT_GULPING[];
 extern const u8 DEX_ENTRY_CRAMORANT_GORGING[];
 extern const u8 DEX_ENTRY_TOXTRICITY_LOW_KEY[];

@@ -1968,11 +1968,18 @@ const u16 gRareDivergentPage9[] =
 
 const u16 gRareDivergentPage10[] =
 {
-	SPECIES_MAGEARNA, // 298
-	SPECIES_MAGEARNA_P, // 298 - Alt
+	SPECIES_GENESECT, // 298
 };
 
 const u16 gRareDivergentPage11[] =
+{
+	SPECIES_GENESECT_SHOCK, // 298 - Alt
+	SPECIES_GENESECT_BURN, // 298 - Alt
+	SPECIES_GENESECT_CHILL, // 298 - Alt
+	SPECIES_GENESECT_DOUSE, // 298 - Alt
+};
+
+const u16 gRareDivergentPage12[] =
 {
 	SPECIES_DARKRAI // 299
 };
@@ -2301,6 +2308,7 @@ const struct HabitatPage gRarePages[] =
 	{gRareDivergentPage9, ARRAY_COUNT(gRareDivergentPage9)},
 	{gRareDivergentPage10, ARRAY_COUNT(gRareDivergentPage10)},
 	{gRareDivergentPage11, ARRAY_COUNT(gRareDivergentPage11)},
+	{gRareDivergentPage12, ARRAY_COUNT(gRareDivergentPage12)},
 };
 
 const struct Habitat gHabitatPtrsTable[9] =
