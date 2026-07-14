@@ -1684,8 +1684,8 @@ const u16 gMountainDivergentPage10[] =
 const u16 gMountainDivergentPage11[] =
 {
 	SPECIES_CUBONE_A, // 139
-	SPECIES_MAROWAK_A, // 140
 	SPECIES_MAROWAK, // 140 - Alt
+	SPECIES_MAROWAK_A, // 140
 };
 
 const u16 gMountainDivergentPage12[] =
