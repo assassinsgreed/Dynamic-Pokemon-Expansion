@@ -1700,24 +1700,30 @@ const u16 gMountainDivergentPage13[] =
 {
 	SPECIES_MUNCHLAX, // 209
 	SPECIES_SNORLAX, // 210
-	SPECIES_GLIGAR, // 233
-	SPECIES_GLISCOR, // 234
+	SPECIES_GLIGAR, // 231
+	SPECIES_GLISCOR, // 232
 };
 
 const u16 gMountainDivergentPage14[] =
+{
+	SPECIES_DRAMPA, // 233
+	SPECIES_SPIRITOMB, // 234
+};
+
+const u16 gMountainDivergentPage15[] =
 {
 	SPECIES_DURANT, // 256
 	SPECIES_HEATMOR, // 257
 	SPECIES_ABSOL, // 258
 };
 
-const u16 gMountainDivergentPage15[] =
+const u16 gMountainDivergentPage16[] =
 {
 	SPECIES_SNOVER, // 265
 	SPECIES_ABOMASNOW, // 266
 };
 
-const u16 gMountainDivergentPage16[] =
+const u16 gMountainDivergentPage17[] =
 {
 	SPECIES_DRUDDIGON, // 273
 	SPECIES_AERODACTYL, // 274
@@ -2213,6 +2219,7 @@ const struct HabitatPage gMountainPages[] =
 	{gMountainDivergentPage14, ARRAY_COUNT(gMountainDivergentPage14)},
 	{gMountainDivergentPage15, ARRAY_COUNT(gMountainDivergentPage15)},
 	{gMountainDivergentPage16, ARRAY_COUNT(gMountainDivergentPage16)},
+	{gMountainDivergentPage17, ARRAY_COUNT(gMountainDivergentPage17)},
 };
 
 const struct HabitatPage gRoughTerrainPages[] =
