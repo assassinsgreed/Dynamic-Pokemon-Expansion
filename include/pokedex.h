@@ -793,13 +793,18 @@ enum
 // No need to replicate the starter and UB list here because the list above is just for pokemon that differ
 // Rotom & Ditto are duplicated for ease of readability
 
+// PERSIAN is not in the divergent dex, but needs it's own dedicated pokedex entry so it can be registered
+// as seen/caught when swarming, as well as have a dex entry separate from Perrserker.
+// This does not have an impact on the 390 catchable pokemon in divergent mode; Perrsian doesn't appear in the dex count
+#define NATIONAL_DIVERGENT_DEX_PERSIAN 690
+
 #define FINAL_DEX_ENTRY NATIONAL_DEX_SILVALLY //Not +1 b/c used like this for some asm
 #define NATIONAL_DEX_COUNT FINAL_DEX_ENTRY + 1
 
-// Backing-store size for gPokedexEntries. It must cover the divergent storage range (391-689)
+// Backing-store size for gPokedexEntries. It must cover the divergent storage range (391-690)
 // so divergent-mode entry data can be looked up by national dex number. This does NOT change
 // the visible dex size, which stays 390 via FINAL_DEX_ENTRY / gNumDexEntries.
-#define FINAL_DIVERGENT_DEX_ENTRY NATIONAL_DIVERGENT_DEX_DARKRAI
+#define FINAL_DIVERGENT_DEX_ENTRY NATIONAL_DIVERGENT_DEX_PERSIAN
 #define DIVERGENT_DEX_COUNT (FINAL_DIVERGENT_DEX_ENTRY + 1)
 
 extern const u8 DEX_ENTRY_TURTWIG[];

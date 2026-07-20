@@ -640,18 +640,18 @@ const struct PokedexEntry gPokedexEntries[DIVERGENT_DEX_COUNT] =
 		.trainerScale = 256,
 		.trainerOffset = 65534,
 	},
-	// [NATIONAL_DEX_PERSIAN] =
-	// {
-	// 	.categoryName = {_C, _l, _a, _s, _s, _y, _SPACE, _C, _a, _t, _END, _SPACE},
-	// 	.height = 10,
-	// 	.weight = 320,
-	// 	.description = (const u8*) 0x84461f1,
-	// 	.unusedDescription = (const u8*) 0x84461a6,
-	// 	.pokemonScale = 320,
-	// 	.pokemonOffset = 10,
-	// 	.trainerScale = 256,
-	// 	.trainerOffset = 65534,
-	// },
+	[NATIONAL_DIVERGENT_DEX_PERSIAN] =
+	{
+		.categoryName = {_C, _l, _a, _s, _s, _y, _SPACE, _C, _a, _t, _END, _SPACE},
+		.height = 10,
+		.weight = 320,
+		.description = (const u8*) 0x84461f1,
+		.unusedDescription = (const u8*) 0x84461a6,
+		.pokemonScale = 320,
+		.pokemonOffset = 10,
+		.trainerScale = 256,
+		.trainerOffset = 65534,
+	},
 	// [NATIONAL_DEX_PSYDUCK] =
 	// {
 	// 	.categoryName = {_D, _u, _c, _k, _END, _SPACE, _SPACE, _SPACE, _SPACE, _SPACE, _SPACE, _SPACE},
@@ -10812,9 +10812,9 @@ const struct AlternateDexEntries gAlternateDexEntries[] =
 	// ALTERNATE_ENTRY(NINETALES_A),
 	ALTERNATE_ENTRY(DIGLETT_A),
 	ALTERNATE_ENTRY(DUGTRIO_A),
-	// ALTERNATE_ENTRY(MEOWTH_A),
+	ALTERNATE_ENTRY(MEOWTH_A),
 	ALTERNATE_ENTRY(MEOWTH_G),
-	// ALTERNATE_ENTRY(PERSIAN_A),
+	ALTERNATE_ENTRY(PERSIAN_A),
 	ALTERNATE_ENTRY(GEODUDE_A),
 	ALTERNATE_ENTRY(GRAVELER_A),
 	ALTERNATE_ENTRY(GOLEM_A),

@@ -1170,24 +1170,18 @@ const u16 gGrasslandDivergentPage4[] =
 
 const u16 gGrasslandDivergentPage5[] =
 {
-	SPECIES_TAILLOW, // 15
-	SPECIES_SWELLOW, // 16
-};
-
-const u16 gGrasslandDivergentPage6[] =
-{
 	SPECIES_SENTRET, // 39
 	SPECIES_FURRET, // 40
 };
 
-const u16 gGrasslandDivergentPage7[] =
+const u16 gGrasslandDivergentPage6[] =
 {
 	SPECIES_HOPPIP, // 45
 	SPECIES_SKIPLOOM, // 46
 	SPECIES_JUMPLUFF, // 47
 };
 
-const u16 gGrasslandDivergentPage8[] =
+const u16 gGrasslandDivergentPage7[] =
 {
 	SPECIES_BUNNELBY, // 59
 	SPECIES_DIGGERSBY, // 60
@@ -1195,7 +1189,7 @@ const u16 gGrasslandDivergentPage8[] =
 	SPECIES_ZEBSTRIKA, // 71
 };
 
-const u16 gGrasslandDivergentPage9[] =
+const u16 gGrasslandDivergentPage8[] =
 {
 	SPECIES_VULPIX, // 135
 	SPECIES_NINETALES, // 136
@@ -1203,7 +1197,7 @@ const u16 gGrasslandDivergentPage9[] =
 	SPECIES_NINETALES_A, // 136 - Alt
 };
 
-const u16 gGrasslandDivergentPage10[] =
+const u16 gGrasslandDivergentPage9[] =
 {
 	SPECIES_ELECTRIKE, // 150
 	SPECIES_MANECTRIC, // 151
@@ -1211,14 +1205,14 @@ const u16 gGrasslandDivergentPage10[] =
 	SPECIES_BEWEAR, // 153
 };
 
-const u16 gGrasslandDivergentPage11[] =
+const u16 gGrasslandDivergentPage10[] =
 {
 	SPECIES_ELEKID, // 163
 	SPECIES_ELECTABUZZ, // 164
 	SPECIES_ELECTIVIRE, // 165
 };
 
-const u16 gGrasslandDivergentPage12[] =
+const u16 gGrasslandDivergentPage11[] =
 {
 	SPECIES_GULPIN, // 176
 	SPECIES_SWALOT, // 177
@@ -1226,13 +1220,13 @@ const u16 gGrasslandDivergentPage12[] =
 	SPECIES_KRICKETUNE, // 10
 };
 
-const u16 gGrasslandDivergentPage13[] =
+const u16 gGrasslandDivergentPage12[] =
 {
 	SPECIES_PANCHAM, // 184
 	SPECIES_PANGORO, // 185
 };
 
-const u16 gGrasslandDivergentPage14[] =
+const u16 gGrasslandDivergentPage13[] =
 {
 	SPECIES_ODDISH, // 195
 	SPECIES_GLOOM, // 196
@@ -1240,13 +1234,13 @@ const u16 gGrasslandDivergentPage14[] =
 	SPECIES_BELLOSSOM, // 198
 };
 
-const u16 gGrasslandDivergentPage15[] =
+const u16 gGrasslandDivergentPage14[] =
 {
 	SPECIES_TANGELA, // 213
 	SPECIES_TANGROWTH, // 214
 };
 
-const u16 gGrasslandDivergentPage16[] =
+const u16 gGrasslandDivergentPage15[] =
 {
 	SPECIES_PONYTA, // 215
 	SPECIES_RAPIDASH, // 216
@@ -1254,7 +1248,7 @@ const u16 gGrasslandDivergentPage16[] =
 	SPECIES_RAPIDASH_G, // 216 - Alt
 };
 
-const u16 gGrasslandDivergentPage17[] =
+const u16 gGrasslandDivergentPage16[] =
 {
 	SPECIES_SPRITZEE, // 217
 	SPECIES_AROMATISSE, // 218
@@ -1262,19 +1256,19 @@ const u16 gGrasslandDivergentPage17[] =
 	SPECIES_ARCANINE, // 222
 };
 
-const u16 gGrasslandDivergentPage18[] =
+const u16 gGrasslandDivergentPage17[] =
 {
 	SPECIES_ZANGOOSE, // 271
 	SPECIES_SEVIPER, // 272
 };
 
-const u16 gGrasslandDivergentPage19[] =
+const u16 gGrasslandDivergentPage18[] =
 {
 	SPECIES_SCYTHER, // 280
 	SPECIES_SCIZOR, // 281
 };
 
-const u16 gGrasslandDivergentPage20[] =
+const u16 gGrasslandDivergentPage19[] =
 {
 	SPECIES_BOUFFALANT, // 285
 };
@@ -2040,7 +2034,6 @@ const struct HabitatPage gGrasslandPages[] =
 	{gGrasslandDivergentPage17, ARRAY_COUNT(gGrasslandDivergentPage17)},
 	{gGrasslandDivergentPage18, ARRAY_COUNT(gGrasslandDivergentPage18)},
 	{gGrasslandDivergentPage19, ARRAY_COUNT(gGrasslandDivergentPage19)},
-	{gGrasslandDivergentPage20, ARRAY_COUNT(gGrasslandDivergentPage20)},
 };
 
 const struct HabitatPage gForestPages[] =
