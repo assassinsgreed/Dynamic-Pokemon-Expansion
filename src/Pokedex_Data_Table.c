@@ -10723,7 +10723,7 @@ const struct PokedexEntry gPokedexEntries[DIVERGENT_DEX_COUNT] =
 	[NATIONAL_DIVERGENT_DEX_ZARUDE] =
 	{
 		.categoryName = {_R, _o, _g, _u, _e, _M, _o, _n, _k, _e, _y, _END},
-		.height = 1543,
+		.height = 18,
 		.weight = 700,
 		.description = DEX_ENTRY_ZARUDE,
 		.unusedDescription = (const u8*) 0x8444cb1,
