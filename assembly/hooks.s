@@ -81,6 +81,25 @@ GenderedMonIconHook:
 	bx r0
 
 .pool
+@0x80266B6 with r2
+@PutMonIconOnLvlUpBox gets its tiles from GetMonIconPtr (personality aware, so it
+@returns the female form) but its palette from GetValidMonIconPalettePtr, which only
+@takes a species. Substitute the species in r4 up front so both agree - otherwise a
+@female Jellicent/Unfezant draws its own tiles with the base form's icon palette.
+LvlUpBoxMonIconHook:
+	movs r1, #0x0 @MON_DATA_PERSONALITY
+	ldr r2, =GetMonData
+	bl bxr2
+	push {r0} @Personality
+	mov r1, r0
+	mov r0, r4 @Species
+	bl TryGetFemaleGenderedSpecies
+	mov r4, r0
+	pop {r1} @Personality
+	ldr r2, =0x80266C0 | 1
+	bx r2
+
+.pool
 @0x8139DDC with r1
 SummaryScreenIconPalHook:
 	mov r4, r0

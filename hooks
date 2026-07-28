@@ -1,6 +1,7 @@
 ##
 LoadSpecialPokePicHook 800ECF2 4
 LoadSpecialPokePicHook 0800F136 4
+LvlUpBoxMonIconHook 80266B6 2
 BattleLoadPlayerMonSpriteGfxHook 80344E4 0
 BattleLoadOpponentMonSpriteGfxHook 803436C 0
 
