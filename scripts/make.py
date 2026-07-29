@@ -65,9 +65,7 @@ def ChangeFileLine(filePath: str, lineToChange: int, replacement: str):
 
 
 def EditLinker(offset: int):
-    # LENGTH runs to the 32MB cap so ld errors on overflow instead of insert.py silently writing an unbootable rom.
-    ChangeFileLine("linker.ld", 4, "\t\trom     : ORIGIN = (0x08000000 + " + hex(offset)
-                   + "), LENGTH = (0x0A000000 - (0x08000000 + " + hex(offset) + "))\n")
+    ChangeFileLine("linker.ld", 4, "\t\trom     : ORIGIN = (0x08000000 + " + hex(offset) + "), LENGTH = 32M\n")
 
 
 def EditInsert(offset: int):
