@@ -11,6 +11,13 @@ OFFSET_TO_PUT = 0x184d310
 SOURCE_ROM = "BPRE0.gba"
 ROM_NAME = "test.gba"
 
+# Secondary region for bulk read-only data. Must match rom2 in linker.ld.
+# 0x1000000-0x1200000 is the gap between the end of the 16MB source rom and
+# the B2W2 music patch; nothing else in the build chain writes there.
+OFFSET_TO_PUT_2 = 0x1000000
+REGION_2_LENGTH = 0x200000
+ROM_SIZE_LIMIT = 0x2000000  # GBA hard cap; a rom past this will not boot
+
 if sys.platform.startswith('win'):
     PathVar = os.environ.get('Path')
     Paths = PathVar.split(';')
@@ -37,6 +44,7 @@ else:  # Linux, OSX, etc.
     AS = (PREFIX + 'as')
 
 OUTPUT = 'build/output.bin'
+OUTPUT_2 = 'build/output2.bin'
 BYTE_REPLACEMENT = 'bytereplacement'
 HOOKS = 'hooks'
 REPOINTS = 'repoints'
@@ -288,10 +296,40 @@ def main():
     with open(ROM_NAME, 'rb+') as rom:
         print("Inserting code.")
         table = GetSymbols(GetTextSection())
-        rom.seek(OFFSET_TO_PUT)
+
         with open(OUTPUT, 'rb') as binary:
-            rom.write(binary.read())
-            binary.close()
+            mainBlob = binary.read()
+
+        if OFFSET_TO_PUT + len(mainBlob) > ROM_SIZE_LIMIT:
+            print('Error: the main blob ends at 0x{:X}, past the 0x{:X} rom limit by {} bytes.\n'
+                  .format(OFFSET_TO_PUT + len(mainBlob), ROM_SIZE_LIMIT,
+                          OFFSET_TO_PUT + len(mainBlob) - ROM_SIZE_LIMIT)
+                  + 'Move more read-only data into .rom2 or trim the engine.')
+            sys.exit(1)
+
+        rom.seek(OFFSET_TO_PUT)
+        rom.write(mainBlob)
+
+        if os.path.isfile(OUTPUT_2):
+            with open(OUTPUT_2, 'rb') as binary:
+                secondBlob = binary.read()
+
+            if len(secondBlob) > REGION_2_LENGTH:
+                print('Error: .rom2 is {} bytes, {} more than the {} bytes free at 0x{:X}.\n'
+                      .format(len(secondBlob), len(secondBlob) - REGION_2_LENGTH,
+                              REGION_2_LENGTH, OFFSET_TO_PUT_2)
+                      + 'Writing it would run into the B2W2 music patch at 0x1200000.')
+                sys.exit(1)
+
+            if secondBlob:
+                rom.seek(OFFSET_TO_PUT_2)
+                rom.write(secondBlob)
+                print('.rom2:     {} bytes at 0x{:X}, {} bytes spare before 0x{:X}.'
+                      .format(len(secondBlob), OFFSET_TO_PUT_2,
+                              REGION_2_LENGTH - len(secondBlob), OFFSET_TO_PUT_2 + REGION_2_LENGTH))
+
+        print('Main blob: {} bytes at 0x{:X}, {} bytes spare below the rom limit.'
+              .format(len(mainBlob), OFFSET_TO_PUT, ROM_SIZE_LIMIT - OFFSET_TO_PUT - len(mainBlob)))
 
         # Adjust symbol table
         for entry in table:

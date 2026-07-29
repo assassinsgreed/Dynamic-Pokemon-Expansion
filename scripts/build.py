@@ -260,7 +260,7 @@ def GetFlagsFromFlagFile(filePath: str) -> [str]:
     return flags
 
 
-def ProcessSpriteSet(fileListing: [str], flags: [str], outputFile: str, title: str):
+def ProcessSpriteSet(fileListing: [str], flags: [str], outputFile: str, title: str, section: str = ''):
     assembledFile = os.path.join(ASSEMBLY, 'generated', outputFile)
     if (not os.path.isfile(assembledFile)
             or max(list(map(os.path.getmtime, fileListing))) > os.path.getmtime(assembledFile)):  # If a sprite has been modified
@@ -275,7 +275,13 @@ def ProcessSpriteSet(fileListing: [str], flags: [str], outputFile: str, title: s
                 RunCommand([GR, sprite] + flags + ['-o', assembled])
 
             with open(assembled, 'r') as tempFile:
-                combinedFile.write(tempFile.read())
+                contents = tempFile.read()
+
+            # Retag here rather than in the per-sprite .s files so that grit regenerating a sprite can't silently undo it.
+            if section:
+                contents = contents.replace('.section .rodata', '.section ' + section)
+
+            combinedFile.write(contents)
         combinedFile.close()
 
 
@@ -292,7 +298,8 @@ def ProcessSpriteGraphics():
 
     ProcessSpriteSet(frontsprites, frontFlags, 'frontsprites.s', "Front Sprites")
     ProcessSpriteSet(backsprites, backFlags, 'backsprites.s', "Back Sprites")
-    ProcessSpriteSet(iconsprites, iconFlags, 'iconsprites.s', "Icon Sprites")
+    # Icons go to .rodata.rom2 so linker.ld can park them at 0x09000000, outside the append region that is squeezed against the 32MB cap.
+    ProcessSpriteSet(iconsprites, iconFlags, 'iconsprites.s', "Icon Sprites", '.rodata.rom2')
     ProcessSpriteSet(castformsprites, castformFlags, 'castformsprites.s', "Castform Sprites")
 
 
@@ -345,9 +352,14 @@ def LinkObjects(objects: itertools.chain) -> str:
 
 
 def Objcopy(binary: str):
-    """Run the objcopy."""
-    cmd = [OBJCOPY, '-O', 'binary', binary, 'build/output.bin']
-    RunCommand(cmd)
+    """Extract one flat binary per ROM region.
+
+    The two regions are far apart in the address space, so a single
+    'objcopy -O binary' would emit one file spanning the gap between them.
+    Each is extracted separately and inserted at its own offset.
+    """
+    RunCommand([OBJCOPY, '-O', 'binary', '-j', '.text', binary, 'build/output.bin'])
+    RunCommand([OBJCOPY, '-O', 'binary', '-j', '.rom2', binary, 'build/output2.bin'])
 
 
 def RunGlob(globString: str, fn) -> map:
