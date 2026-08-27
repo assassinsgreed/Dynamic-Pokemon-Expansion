@@ -1,11 +1,11 @@
 import os
+import re
 import sys
 from glob import glob
 
 # Data
 TM_HM_COUNT = 128
 TUTOR_COUNT = 96
-SPECIES_COUNT = 0x4F3 + 1
 
 TM_OUTPUT = "assembly/generated/tm_compatibility.s"
 TUTOR_OUTPUT = "assembly/generated/tutor_compatibility.s"
@@ -25,7 +25,9 @@ def TutorDataBuilder():
 
 def DataBuilder(directory: str, numEntries: int, outputFile: str, dataType: str):
     fileList = [file for file in glob(directory + "**/*.txt", recursive=True)]
-    if os.path.isfile(outputFile) and max(list(map(os.path.getmtime, fileList))) < os.path.getmtime(outputFile):
+    # Get the species count at runtime
+    dependencies = fileList + [SPECIES_DEFINES, os.path.abspath(__file__)]
+    if os.path.isfile(outputFile) and max(map(os.path.getmtime, dependencies)) < os.path.getmtime(outputFile):
         return
 
     print("Processing {} Data.".format(dataType))
@@ -152,8 +154,27 @@ def ChangeFileLine(filePath: str, lineToChange: int, replacement: str):
         file.write(copy)
 
 
+def GetSpeciesCount(definesFile: str, reverseSpeciesDict: {}) -> int:
+    """Resolve `#define NUM_SPECIES (SPECIES_LAST + 1)` from the header.
+
+    The generated compatibility tables are flat and positional, so their row
+    count must track species.h exactly. Deriving it here keeps a renumbering
+    from silently leaving them short.
+    """
+    with open(definesFile, 'r') as file:
+        for line in file:
+            if line.startswith('#define NUM_SPECIES'):
+                expr = line.split(None, 2)[2].split('//')[0].strip()
+                expr = re.sub(r'SPECIES_\w+',
+                              lambda m: str(reverseSpeciesDict[m.group(0)]), expr)
+                return eval(expr)
+
+    raise ValueError('NUM_SPECIES not found in ' + definesFile)
+
+
 SpeciesDict = DefinesDictMaker(SPECIES_DEFINES)
 ReverseSpeciesDict = ReverseDict(SpeciesDict)
+SPECIES_COUNT = GetSpeciesCount(SPECIES_DEFINES, ReverseSpeciesDict)
 
 if __name__ == '__main__':
     TMDataBuilder()
