@@ -32,9 +32,9 @@ if sys.platform.startswith('win'):
     AS = PATH + PREFIX + 'as'
     CC = PATH + PREFIX + 'gcc'
     LD = PATH + PREFIX + 'ld'
-    GR = 'deps/grit.exe'
-    WAV2AGB = 'deps/wav2agb.exe'
-    MID2AGB = 'deps/mid2agb.exe'
+    GR = os.path.join('deps', 'grit.exe')
+    WAV2AGB = os.path.join('deps', 'wav2agb.exe')
+    MID2AGB = os.path.join('deps', 'mid2agb.exe')
     OBJCOPY = PATH + PREFIX + 'objcopy'
 
 else:  # Linux, OSX, etc.
