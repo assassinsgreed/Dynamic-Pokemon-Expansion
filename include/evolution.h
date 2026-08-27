@@ -20,7 +20,7 @@ enum EvolutionMethods
 	EVO_LEVEL,
 	EVO_TRADE,
 	EVO_TRADE_ITEM,
-	EVO_ITEM,		// for dawn stone, add MON_MALE(0x0) or MON_FEMALE(0xFF) to .unknown in evo table entry
+	EVO_ITEM,		// for dawn stone, add MON_MALE(0x0) or MON_FEMALE(0xFE) to .unknown in evo table entry
 	EVO_LEVEL_ATK_GT_DEF,
 	EVO_LEVEL_ATK_EQ_DEF,
 	EVO_LEVEL_ATK_LT_DEF,
@@ -35,7 +35,7 @@ enum EvolutionMethods
 	EVO_TYPE_IN_PARTY,	//specific type (param) in party after given level (unknown).
 	EVO_MAP, 	// specific map evolution. bank in param, map in unknown
 	EVO_MALE_LEVEL,		// above given level if male
-	EVO_FEMALE_LEVEL,	// above given level if female	
+	EVO_FEMALE_LEVEL,	// above given level if female
 	EVO_LEVEL_NIGHT,	// above given level at night
 	EVO_LEVEL_DAY,		// above given level during day
 	EVO_HOLD_ITEM_NIGHT,	// level up holding item at night (eg. sneasel)
@@ -49,6 +49,11 @@ enum EvolutionMethods
 	EVO_NATURE_LOW, // evolution based on low key nature at a certain level
 	EVO_DAMAGE_LOCATION, // recieve 49+ damage in battle without fainting, walk to specific tile
 	EVO_ITEM_LOCATION, // Stand on a tile with a certain behaviour and use an item on a Pokemon
+	EVO_LEVEL_HOLD_ITEM, // Level up to a certain level while holding an item
+	EVO_ITEM_HOLD_ITEM, // Use and item on a Pokemon while its holding an item
+	EVO_MOVE_MALE, // Knows a given move and is male
+	EVO_MOVE_FEMALE, // Knows a given move and is female
+	EVO_ITEM_NIGHT, // Item is used on it at night
 };
 
 #define EVO_GIGANTAMAX 0xFD

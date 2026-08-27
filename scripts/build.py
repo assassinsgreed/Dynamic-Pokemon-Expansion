@@ -117,9 +117,14 @@ def CreateOutputFile(fileName: str, newFileName: str) -> [str, bool]:
 
 def MakeGeneralOutputFile(fileName: str) -> [str, bool]:
     """Return hash of filename to use as object filename."""
-    m = hashlib.md5()
-    m.update(fileName.encode())
-    newFileName = os.path.join(BUILD, m.hexdigest() + '.o')
+    base = os.path.basename(fileName)
+    if base in ('frontsprites.s', 'backsprites.s', 'iconsprites.s', 'castformsprites.s'):
+        # Stable name so linker.ld can place this object in .rom2 by name.
+        newFileName = os.path.join(BUILD, 'IMG_' + base[:-2] + '.o')
+    else:
+        m = hashlib.md5()
+        m.update(fileName.encode())
+        newFileName = os.path.join(BUILD, m.hexdigest() + '.o')
 
     return CreateOutputFile(fileName, newFileName)
 
@@ -345,9 +350,15 @@ def LinkObjects(objects: itertools.chain) -> str:
 
 
 def Objcopy(binary: str):
-    """Run the objcopy."""
-    cmd = [OBJCOPY, '-O', 'binary', binary, 'build/output.bin']
-    RunCommand(cmd)
+    """Emit .text and .rom2 as separate flat binaries.
+
+    They live ~8MB apart in VMA space, so a single -O binary pass would produce
+    one blob spanning the gap and insert.py would write it at the wrong offset.
+    """
+    RunCommand([OBJCOPY, '-O', 'binary', '--remove-section=.rom2',
+                binary, 'build/output.bin'])
+    RunCommand([OBJCOPY, '-O', 'binary', '--only-section=.rom2',
+                binary, 'build/rom2.bin'])
 
 
 def RunGlob(globString: str, fn) -> map:

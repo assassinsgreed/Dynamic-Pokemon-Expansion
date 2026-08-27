@@ -9,6 +9,10 @@ import _io
 
 OFFSET_TO_PUT = 0x184d310
 SOURCE_ROM = "BPRE0.gba"
+# Some Pokemon data (hisui) moved to earlier in the rom (before the music patch) to avoid overflowing the 32mb limit
+ROM2_OUTPUT = 'build/rom2.bin'
+ROM2_OFFSET = 0x1000000
+ROM2_LIMIT  = 0x1200000
 ROM_NAME = "test.gba"
 
 if sys.platform.startswith('win'):
@@ -292,6 +296,16 @@ def main():
         with open(OUTPUT, 'rb') as binary:
             rom.write(binary.read())
             binary.close()
+
+        if os.path.isfile(ROM2_OUTPUT):
+            with open(ROM2_OUTPUT, 'rb') as binary:
+                rom2data = binary.read()
+            if ROM2_OFFSET + len(rom2data) > ROM2_LIMIT:
+                print('Error: .rom2 is 0x%X bytes, past the 0x%X limit at 0x%X.'
+                      % (len(rom2data), ROM2_LIMIT - ROM2_OFFSET, ROM2_OFFSET))
+                sys.exit(1)
+            rom.seek(ROM2_OFFSET)
+            rom.write(rom2data)
 
         # Adjust symbol table
         for entry in table:

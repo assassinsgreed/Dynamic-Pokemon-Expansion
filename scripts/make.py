@@ -64,8 +64,13 @@ def ChangeFileLine(filePath: str, lineToChange: int, replacement: str):
         file.write(copy)
 
 
+CART_SIZE = 0x2000000
+
 def EditLinker(offset: int):
-    ChangeFileLine("linker.ld", 4, "\t\trom     : ORIGIN = (0x08000000 + " + hex(offset) + "), LENGTH = 32M\n")
+    length = CART_SIZE - offset
+    ChangeFileLine("linker.ld", 4,
+                   "\t\trom     : ORIGIN = (0x08000000 + " + hex(offset)
+                   + "), LENGTH = " + hex(length) + "\n")
 
 
 def EditInsert(offset: int):
