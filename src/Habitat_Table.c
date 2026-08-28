@@ -191,6 +191,7 @@ const u16 gGrasslandPage27[] =
 	SPECIES_CYNDAQUIL,	// 313
 	SPECIES_QUILAVA,	// 314
 	SPECIES_TYPHLOSION,	// 315
+	SPECIES_TYPHLOSION_H, // 315 - Alt
 };
 
 const u16 gGrasslandPage28[] =
@@ -285,6 +286,8 @@ const u16 gForestPage11[] =
 {
 	SPECIES_SNEASEL,	// 133
 	SPECIES_WEAVILE,	// 134
+	SPECIES_SNEASEL_H,	// 133 - Alt
+	SPECIES_SNEASLER,	// 692 (Not in dex count)
 };
 
 const u16 gForestPage12[] =
@@ -336,6 +339,8 @@ const u16 gForestPage19[] =
 {
 	SPECIES_ZORUA,		// 253
 	SPECIES_ZOROARK,	// 254
+	SPECIES_ZORUA_H,	// 253 - Alt
+	SPECIES_ZOROARK_H,	// 254 - Alt
 };
 
 const u16 gForestPage20[] =
@@ -377,6 +382,7 @@ const u16 gForestPage25[] =
 	SPECIES_ROWLET,		// 355
 	SPECIES_DARTRIX,	// 356
 	SPECIES_DECIDUEYE,	// 357
+	SPECIES_DECIDUEYE_H // 357 - Alt
 };
 
 const u16 gForestPage26[] =
@@ -415,81 +421,88 @@ const u16 gWatersEdgePage4[] =
 
 const u16 gWatersEdgePage5[] =
 {
+	SPECIES_SLIGGOO_H,	// 221 - Alt
+	SPECIES_GOODRA_H,	// 222 - Alt
+};
+
+const u16 gWatersEdgePage6[] =
+{
 	SPECIES_SHELLOS,		// 223
 	SPECIES_GASTRODON,		// 224
 	SPECIES_SHELLOS_EAST,	// 223
 	SPECIES_GASTRODON_EAST,	// 224
 };
 
-const u16 gWatersEdgePage6[] =
+const u16 gWatersEdgePage7[] =
 {
 	SPECIES_PINCURCHIN,	// 237
 	SPECIES_STUNFISK_G,	// 239
 	SPECIES_STUNFISK,	// 239
 };
 
-const u16 gWatersEdgePage7[] =
+const u16 gWatersEdgePage8[] =
 {
 	SPECIES_BINACLE,	// 243
 	SPECIES_BARBARACLE,	// 244
 };
 
-const u16 gWatersEdgePage8[] =
+const u16 gWatersEdgePage9[] =
 {
 	SPECIES_SANDYGAST,	// 260
 	SPECIES_PALOSSAND,	// 261
 };
 
-const u16 gWatersEdgePage9[] =
+const u16 gWatersEdgePage10[] =
 {
 	SPECIES_SLOWPOKE,	// 262
 	SPECIES_SLOWBRO,	// 263
 	SPECIES_SLOWKING,	// 264
 };
 
-const u16 gWatersEdgePage10[] =
+const u16 gWatersEdgePage11[] =
 {
 	SPECIES_SLOWPOKE_G,	// 262
 	SPECIES_SLOWBRO_G,	// 263
 	SPECIES_SLOWKING_G,	// 264
 };
 
-const u16 gWatersEdgePage11[] =
+const u16 gWatersEdgePage12[] =
 {
 	SPECIES_SQUIRTLE,	// 307
 	SPECIES_WARTORTLE,	// 308
 	SPECIES_BLASTOISE,	// 309
 };
 
-const u16 gWatersEdgePage12[] =
+const u16 gWatersEdgePage13[] =
 {
 	SPECIES_TOTODILE,	// 316
 	SPECIES_CROCONAW,	// 317
 	SPECIES_FERALIGATR,	// 318
 };
 
-const u16 gWatersEdgePage13[] =
+const u16 gWatersEdgePage14[] =
 {
 	SPECIES_MUDKIP,		// 325
 	SPECIES_MARSHTOMP,	// 326
 	SPECIES_SWAMPERT,	// 327
 };
 
-const u16 gWatersEdgePage14[] =
+const u16 gWatersEdgePage15[] =
 {
 	SPECIES_PIPLUP,		// 334
 	SPECIES_PRINPLUP,	// 335
 	SPECIES_EMPOLEON,	// 336
 };
 
-const u16 gWatersEdgePage15[] =
+const u16 gWatersEdgePage16[] =
 {
 	SPECIES_OSHAWOTT,	// 343
 	SPECIES_DEWOTT,		// 344
 	SPECIES_SAMUROTT,	// 345
+	SPECIES_SAMUROTT_H // 345 - Alt
 };
 
-const u16 gWatersEdgePage16[] =
+const u16 gWatersEdgePage17[] =
 {
 	SPECIES_FROAKIE,		// 352
 	SPECIES_FROGADIER,		// 353
@@ -497,14 +510,14 @@ const u16 gWatersEdgePage16[] =
 	// SPECIES_ASHGRENINJA,	// 354
 };
 
-const u16 gWatersEdgePage17[] =
+const u16 gWatersEdgePage18[] =
 {
 	SPECIES_POPPLIO,	// 361
 	SPECIES_BRIONNE,	// 362
 	SPECIES_PRIMARINA,	// 363
 };
 
-const u16 gWatersEdgePage18[] =
+const u16 gWatersEdgePage19[] =
 {
 	SPECIES_SOBBLE,		// 370
 	SPECIES_DRIZZILE,	// 371
@@ -689,6 +702,7 @@ const u16 gCavePage17[] =
 {
 	SPECIES_BERGMITE,	// 274
 	SPECIES_AVALUGG,	// 275
+	SPECIES_AVALUGG_H   // 275 - Alt
 };
 
 const u16 gCavePage18[] =
@@ -1252,23 +1266,30 @@ const u16 gGrasslandDivergentPage16[] =
 {
 	SPECIES_SPRITZEE, // 217
 	SPECIES_AROMATISSE, // 218
-	SPECIES_GROWLITHE, // 221
-	SPECIES_ARCANINE, // 222
 };
 
 const u16 gGrasslandDivergentPage17[] =
+{
+	SPECIES_GROWLITHE, // 221
+	SPECIES_ARCANINE, // 222
+	SPECIES_GROWLITHE_H, // 221 - Alt
+	SPECIES_ARCANINE_H,	 // 222 - Alt
+};
+
+const u16 gGrasslandDivergentPage18[] =
 {
 	SPECIES_ZANGOOSE, // 271
 	SPECIES_SEVIPER, // 272
 };
 
-const u16 gGrasslandDivergentPage18[] =
+const u16 gGrasslandDivergentPage19[] =
 {
 	SPECIES_SCYTHER, // 280
 	SPECIES_SCIZOR, // 281
+	SPECIES_KLEAVOR, // 691 (not added to dex count)
 };
 
-const u16 gGrasslandDivergentPage19[] =
+const u16 gGrasslandDivergentPage20[] =
 {
 	SPECIES_BOUFFALANT, // 285
 };
@@ -1367,18 +1388,23 @@ const u16 gForestDivergentPage14[] =
 {
 	SPECIES_PANSEAR, // 137
 	SPECIES_SIMISEAR, // 138
-	SPECIES_PETILIL, // 144
-	SPECIES_LILLIGANT, // 145
 };
 
 const u16 gForestDivergentPage15[] =
+{
+	SPECIES_PETILIL, // 144
+	SPECIES_LILLIGANT, // 145
+	SPECIES_LILLIGANT_H // 145 - Alt
+};
+
+const u16 gForestDivergentPage16[] =
 {
 	SPECIES_APPLIN, // 147
 	SPECIES_FLAPPLE, // 148
 	SPECIES_APPLETUN, // 149
 };
 
-const u16 gForestDivergentPage16[] =
+const u16 gForestDivergentPage17[] =
 {
 	SPECIES_PANPOUR, // 166
 	SPECIES_SIMIPOUR, // 167
@@ -1386,21 +1412,21 @@ const u16 gForestDivergentPage16[] =
 	SPECIES_INDEEDEE_FEMALE, // 177
 };
 
-const u16 gForestDivergentPage17[] =
+const u16 gForestDivergentPage18[] =
 {
 	SPECIES_EXEGGCUTE_A, // 170
 	SPECIES_EXEGGUTOR_A, // 171
 	SPECIES_EXEGGUTOR, // 171 - Alt
 };
 
-const u16 gForestDivergentPage18[] =
+const u16 gForestDivergentPage19[] =
 {
 	SPECIES_TROPIUS, // 180
 	SPECIES_STUNKY, // 182
 	SPECIES_SKUNTANK, // 183
 };
 
-const u16 gForestDivergentPage19[] =
+const u16 gForestDivergentPage20[] =
 {
 	SPECIES_AIPOM, // 207
 	SPECIES_AMBIPOM, // 208
@@ -1408,21 +1434,21 @@ const u16 gForestDivergentPage19[] =
 	SPECIES_YANMEGA, // 238
 };
 
-const u16 gForestDivergentPage20[] =
+const u16 gForestDivergentPage21[] =
 {
 	SPECIES_IMPIDIMP, // 239
 	SPECIES_MORGREM, // 240
 	SPECIES_GRIMMSNARL, // 241
 };
 
-const u16 gForestDivergentPage21[] =
+const u16 gForestDivergentPage22[] =
 {
 	SPECIES_PINSIR, // 247
 	SPECIES_MURKROW, // 248
 	SPECIES_HONCHKROW, // 249
 };
 
-const u16 gForestDivergentPage22[] =
+const u16 gForestDivergentPage23[] =
 {
 	SPECIES_SWABLU, // 253
 	SPECIES_ALTARIA, // 254
@@ -1543,6 +1569,8 @@ const u16 gSeaDivergentPage4[] =
 const u16 gSeaDivergentPage5[] =
 {
 	SPECIES_QWILFISH, // 260
+	SPECIES_QWILFISH_H,	// 260 - Alt
+	SPECIES_OVERQWIL,	// 693 (Not in Pokedex counts)
 };
 
 const u16 gSeaDivergentPage6[] =
@@ -1903,6 +1931,8 @@ const u16 gUrbanDivergentPage15[] =
 {
 	SPECIES_VOLTORB, // 262
 	SPECIES_ELECTRODE, // 263
+	SPECIES_VOLTORB_H, // 262 - Alt
+	SPECIES_ELECTRODE_H, // 263 - Alt
 };
 
 const u16 gUrbanDivergentPage16[] =
@@ -2034,8 +2064,8 @@ const struct HabitatPage gGrasslandPages[] =
 	{gGrasslandDivergentPage17, ARRAY_COUNT(gGrasslandDivergentPage17)},
 	{gGrasslandDivergentPage18, ARRAY_COUNT(gGrasslandDivergentPage18)},
 	{gGrasslandDivergentPage19, ARRAY_COUNT(gGrasslandDivergentPage19)},
+	{gGrasslandDivergentPage20, ARRAY_COUNT(gGrasslandDivergentPage20)},
 };
-
 const struct HabitatPage gForestPages[] =
 {
 	{gForestPage1, ARRAY_COUNT(gForestPage1)},
@@ -2086,6 +2116,7 @@ const struct HabitatPage gForestPages[] =
 	{gForestDivergentPage20, ARRAY_COUNT(gForestDivergentPage20)},
 	{gForestDivergentPage21, ARRAY_COUNT(gForestDivergentPage21)},
 	{gForestDivergentPage22, ARRAY_COUNT(gForestDivergentPage22)},
+	{gForestDivergentPage23, ARRAY_COUNT(gForestDivergentPage23)},
 };
 
 const struct HabitatPage gWatersEdgePages[] =
@@ -2108,6 +2139,7 @@ const struct HabitatPage gWatersEdgePages[] =
 	{gWatersEdgePage16, ARRAY_COUNT(gWatersEdgePage16)}, 
 	{gWatersEdgePage17, ARRAY_COUNT(gWatersEdgePage17)},
 	{gWatersEdgePage18, ARRAY_COUNT(gWatersEdgePage18)},
+	{gWatersEdgePage19, ARRAY_COUNT(gWatersEdgePage19)},
 	{gWatersEdgeDivergentPage1, ARRAY_COUNT(gWatersEdgeDivergentPage1)},
 	{gWatersEdgeDivergentPage2, ARRAY_COUNT(gWatersEdgeDivergentPage2)},
 	{gWatersEdgeDivergentPage3, ARRAY_COUNT(gWatersEdgeDivergentPage3)},
