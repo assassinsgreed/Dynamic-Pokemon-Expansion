@@ -793,18 +793,20 @@ enum
 // No need to replicate the starter and UB list here because the list above is just for pokemon that differ
 // Rotom & Ditto are duplicated for ease of readability
 
-// PERSIAN is not in the divergent dex, but needs it's own dedicated pokedex entry so it can be registered
-// as seen/caught when swarming, as well as have a dex entry separate from Perrserker.
-// This does not have an impact on the 390 catchable pokemon in divergent mode; Perrsian doesn't appear in the dex count
+// Pokemon that are not in the pokedex count but evolve from a pokemon that is
+// need to have dex entries for seen/caught flags. These are not counted toward dex completion.
 #define NATIONAL_DIVERGENT_DEX_PERSIAN 690
+#define NATIONAL_DIVERGENT_DEX_KLEAVOR 691
+#define NATIONAL_DEX_SNEASLER 692
+#define NATIONAL_DIVERGENT_DEX_OVERQWIL 693
 
 #define FINAL_DEX_ENTRY NATIONAL_DEX_SILVALLY //Not +1 b/c used like this for some asm
 #define NATIONAL_DEX_COUNT FINAL_DEX_ENTRY + 1
 
-// Backing-store size for gPokedexEntries. It must cover the divergent storage range (391-690)
+// Backing-store size for gPokedexEntries. It must cover the divergent storage range (391-693)
 // so divergent-mode entry data can be looked up by national dex number. This does NOT change
 // the visible dex size, which stays 390 via FINAL_DEX_ENTRY / gNumDexEntries.
-#define FINAL_DIVERGENT_DEX_ENTRY NATIONAL_DIVERGENT_DEX_PERSIAN
+#define FINAL_DIVERGENT_DEX_ENTRY NATIONAL_DIVERGENT_DEX_OVERQWIL
 #define DIVERGENT_DEX_COUNT (FINAL_DIVERGENT_DEX_ENTRY + 1)
 
 extern const u8 DEX_ENTRY_TURTWIG[];
@@ -1275,3 +1277,21 @@ extern const u8 DEX_ENTRY_INDEEDEE_FEMALE[];
 extern const u8 DEX_ENTRY_MORPEKO_HANGRY[];
 extern const u8 DEX_ENTRY_URSHIFU_RAPID[];
 extern const u8 DEX_ENTRY_ZARUDE_DADA[];
+extern const u8 DEX_ENTRY_KLEAVOR[];
+extern const u8 DEX_ENTRY_SNEASLER[];
+extern const u8 DEX_ENTRY_OVERQWIL[];
+extern const u8 DEX_ENTRY_GROWLITHE_H[];
+extern const u8 DEX_ENTRY_ARCANINE_H[];
+extern const u8 DEX_ENTRY_VOLTORB_H[];
+extern const u8 DEX_ENTRY_ELECTRODE_H[];
+extern const u8 DEX_ENTRY_TYPHLOSION_H[];
+extern const u8 DEX_ENTRY_QWILFISH_H[];
+extern const u8 DEX_ENTRY_SNEASEL_H[];
+extern const u8 DEX_ENTRY_SAMUROTT_H[];
+extern const u8 DEX_ENTRY_LILLIGANT_H[];
+extern const u8 DEX_ENTRY_ZORUA_H[];
+extern const u8 DEX_ENTRY_ZOROARK_H[];
+extern const u8 DEX_ENTRY_SLIGGOO_H[];
+extern const u8 DEX_ENTRY_GOODRA_H[];
+extern const u8 DEX_ENTRY_AVALUGG_H[];
+extern const u8 DEX_ENTRY_DECIDUEYE_H[];

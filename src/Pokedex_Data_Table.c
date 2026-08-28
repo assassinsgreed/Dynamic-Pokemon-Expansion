@@ -10794,7 +10794,43 @@ const struct PokedexEntry gPokedexEntries[DIVERGENT_DEX_COUNT] =
 	// 	.pokemonOffset = 0,
 	// 	.trainerScale = 0,
 	// 	.trainerOffset = 0,
-	// },
+	// },
+	[NATIONAL_DIVERGENT_DEX_KLEAVOR] =
+	{
+		.categoryName = {_A, _x, _e, _END, _SPACE, _SPACE, _SPACE, _SPACE, _SPACE, _SPACE, _SPACE, _SPACE},
+		.height = 18,
+		.weight = 890,
+		.description = DEX_ENTRY_KLEAVOR,
+		.unusedDescription = (const u8*) 0x8444cb1,
+		.pokemonScale = 0,
+		.pokemonOffset = 0,
+		.trainerScale = 0,
+		.trainerOffset = 0,
+	},
+	[NATIONAL_DEX_SNEASLER] =
+	{
+		.categoryName = {_F, _r, _e, _e, _SPACE, _C, _l, _i, _m, _b, _END, _SPACE},
+		.height = 13,
+		.weight = 430,
+		.description = DEX_ENTRY_SNEASLER,
+		.unusedDescription = (const u8*) 0x8444cb1,
+		.pokemonScale = 0,
+		.pokemonOffset = 0,
+		.trainerScale = 0,
+		.trainerOffset = 0,
+	},
+	[NATIONAL_DIVERGENT_DEX_OVERQWIL] =
+	{
+		.categoryName = {_P, _i, _n, _SPACE, _C, _l, _u, _s, _t, _e, _r, _END},
+		.height = 25,
+		.weight = 605,
+		.description = DEX_ENTRY_OVERQWIL,
+		.unusedDescription = (const u8*) 0x8444cb1,
+		.pokemonScale = 0,
+		.pokemonOffset = 0,
+		.trainerScale = 0,
+		.trainerOffset = 0,
+	},
 };
 
 //Certain Pokemon forms can have alternate dex entries when viewed
@@ -10873,5 +10909,20 @@ const struct AlternateDexEntries gAlternateDexEntries[] =
 	ALTERNATE_ENTRY(ZARUDE_DADA),
 	// ALTERNATE_ENTRY(CALYREX_ICE_RIDER),
 	// ALTERNATE_ENTRY(CALYREX_SHADOW_RIDER),
+	ALTERNATE_ENTRY(GROWLITHE_H),
+	ALTERNATE_ENTRY(ARCANINE_H),
+	ALTERNATE_ENTRY(VOLTORB_H),
+	ALTERNATE_ENTRY(ELECTRODE_H),
+	ALTERNATE_ENTRY(TYPHLOSION_H),
+	ALTERNATE_ENTRY(QWILFISH_H),
+	ALTERNATE_ENTRY(SNEASEL_H),
+	ALTERNATE_ENTRY(SAMUROTT_H),
+	ALTERNATE_ENTRY(LILLIGANT_H),
+	ALTERNATE_ENTRY(ZORUA_H),
+	ALTERNATE_ENTRY(ZOROARK_H),
+	ALTERNATE_ENTRY(SLIGGOO_H),
+	ALTERNATE_ENTRY(GOODRA_H),
+	ALTERNATE_ENTRY(AVALUGG_H),
+	ALTERNATE_ENTRY(DECIDUEYE_H),
 	{SPECIES_TABLES_TERMIN, 0}
 };
