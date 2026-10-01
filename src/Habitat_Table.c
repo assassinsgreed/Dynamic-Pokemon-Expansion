@@ -716,8 +716,8 @@ const u16 gMountainPage1[] =
 {
 	SPECIES_ROCKRUFF,		// 16
 	SPECIES_LYCANROC,		// 17
-	// SPECIES_LYCANROC_N,		// 17
-	// SPECIES_LYCANROC_DUSK,	// 17
+	SPECIES_LYCANROC_N,		// 17 - Alt
+	SPECIES_LYCANROC_DUSK,	// 17 - Alt
 };
 
 const u16 gMountainPage2[] =
@@ -1026,7 +1026,7 @@ const u16 gUrbanPage11[] =
 {
 	SPECIES_TOXEL,				// 213
 	SPECIES_TOXTRICITY,			// 214
-	// SPECIES_TOXTRICITY_LOW_KEY,	// 214
+	SPECIES_TOXTRICITY_LOW_KEY,	// 214
 };
 
 const u16 gUrbanPage12[] =
