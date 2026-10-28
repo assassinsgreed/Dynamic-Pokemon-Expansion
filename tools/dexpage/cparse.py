@@ -14,7 +14,11 @@ class UnresolvedConditional(Exception):
 
 
 def read(path: Path) -> str:
-    return path.read_text(encoding="utf-8", errors="replace")
+    data = path.read_bytes()
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data.decode("cp1252")  # some hand-edited files are saved as Windows-1252
 
 
 def collect_defines(*files: Path) -> dict[str, str]:
@@ -124,7 +128,7 @@ def match_brace(text: str, open_idx: int) -> int:
 
 
 def array_body(text: str, array_name: str) -> str:
-    m = re.search(rf"\b{re.escape(array_name)}\s*\[[^\]]*\]\s*=\s*{{", text)
+    m = re.search(rf"\b{re.escape(array_name)}\s*(?:\[[^\]]*\]\s*)+=\s*{{", text)
     if not m:
         raise KeyError(array_name)
     start = m.end() - 1
