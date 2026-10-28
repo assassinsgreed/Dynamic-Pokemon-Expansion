@@ -426,5 +426,6 @@ def evolution_links(data: SourceData, included: set[str]) -> dict[str, list[dict
                 continue
             text = evolution_text(data, method, param, target, extra)
             if text is not None:
-                links.setdefault(src, []).append({"to": target, "text": text})
+                item = next((v for v in (param, extra) if v.startswith("ITEM_") and v != "ITEM_NONE"), None)
+                links.setdefault(src, []).append({"to": target, "text": text, **({"item": item} if item else {})})
     return links

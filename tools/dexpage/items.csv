@@ -1,4 +1,41 @@
 Item,Category,Where,Use
+Max Revive,,PokeChip Crusher (5 chips),
+PPMax,,PokeChip Crusher (10 chips),
+Rare Candy,,PokeChip Crusher (10 chips),
+Bottle Cap,,PokeChip Crusher (15 chips),
+Ability Capsule,,PokeChip Crusher (15 chips),
+Ability Patch,,PokeChip Crusher (25 chips),
+Gold Bottle Cap,,PokeChip Crusher (35 chips),
+Master Ball,,PokeChip Crusher (50 chips),
+Hard Stone,,Mining minigame (20%),
+Everstone,,Mining minigame (20%),
+Red Shard,,Mining minigame (10%),
+Blue Shard,,Mining minigame (10%),
+Green Shard,,Mining minigame (10%),
+Yellow Shard,,Mining minigame (10%),
+Evo Stone,,Mining minigame (9%),
+Heart Scale,,Mining minigame (6%),
+Revive,,Mining minigame (5%),
+Star Piece,,Mining minigame (15%),
+Fossil,,Mining minigame (10%),
+Joltik,,Daimyn City Game Corner (500 coins),
+Mudbray,,Daimyn City Game Corner (500 coins),
+Mankey,,Daimyn City Game Corner (500 coins),
+Minior,,"Daimyn City Game Corner (1,000 coins)",
+Turtonator,,"Daimyn City Game Corner (2,000 coins)",
+Dratini,,"Daimyn City Game Corner (3,000 coins)",
+Toxic Orb,,"Daimyn City Game Corner (1,000 coins)",
+Flame Orb,,"Daimyn City Game Corner (1,000 coins)",
+Rare Candy,,"Daimyn City Game Corner (1,500 coins)",
+Life Orb,,"Daimyn City Game Corner (2,000 coins)",
+Assault Vest,,"Daimyn City Game Corner (2,000 coins)",
+Weakness Policy,,"Daimyn City Game Corner (2,000 coins)",
+Focus Sash,,"Daimyn City Game Corner (2,000 coins)",
+Choice Band,,"Daimyn City Game Corner (2,500 coins)",
+Choice Specs,,"Daimyn City Game Corner (2,500 coins)",
+Choice Scarf,,"Daimyn City Game Corner (2,500 coins)",
+Leftovers,,"Daimyn City Game Corner (3,000 coins)",
+Eviolite,,"Daimyn City Game Corner (3,000 coins)",
 Cheri Berry,Berries,"Ferrox Village shop
 Tsarvosa City",Cures paralysis
 Chesto Berry,Berries,"Ferrox Village shop
@@ -292,7 +329,13 @@ Reveal Glass,Forme Changing Items,"Uteyan Ruins
 (Divergent mode only)","Tornadus, Thundurus, and Landorus"
 Prison Bottle,Forme Changing Items,"Uteyan Ruins
 (Divergent mode only)",Hoopa
-Red/Yellow/Pink/Purple Nectar,Forme Changing Items,"Daimyn City Mall Incense Shop 
+Red Nectar,Forme Changing Items,"Daimyn City Mall Incense Shop 
+(Divergent Mode only)",Oricorio
+Yellow Nectar,Forme Changing Items,"Daimyn City Mall Incense Shop 
+(Divergent Mode only)",Oricorio
+Pink Nectar,Forme Changing Items,"Daimyn City Mall Incense Shop 
+(Divergent Mode only)",Oricorio
+Purple Nectar,Forme Changing Items,"Daimyn City Mall Incense Shop 
 (Divergent Mode only)",Oricorio
 Focus Band,Held Items,"Route 16 Island
 Rubarr Desert Cave (hidden)",Sometimes withstand fatal damage at 1 HP

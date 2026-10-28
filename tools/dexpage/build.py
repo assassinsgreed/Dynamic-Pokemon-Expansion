@@ -12,7 +12,9 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 from .items import load_items, load_machine_locations
-from .load_cfru import ability_display_name
+import difflib
+
+from .load_cfru import ability_display, marts
 from .locations import attach_encounters, load_encounters
 from .paths import Paths
 from .roster import Entry, SourceData, build_roster, evolution_links, load_source_data
@@ -55,11 +57,11 @@ def _move_of(method: str, item: tuple | str) -> str:
 
 
 def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: list[dict], held: list[str],
-         item_index: dict) -> dict:
+         item_index: dict, item_by_const: dict) -> dict:
     s = e.stats
     national = data.national.get(e.key) or data.national.get(e.base)
     # CFRU shows some abilities under another name for particular species (Protean is Libero on Cinderace)
-    ability = lambda a: ability_display_name(data.paths, a, e.key, national, s["types"])
+    ability = lambda a: list(ability_display(data.paths, a, e.key, national, s["types"]))
     official = e.key.removeprefix("SPECIES_").replace("_", " ").title()
     return {
         "key": e.key,
@@ -77,7 +79,7 @@ def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: 
         "growth": s["growth"].replace("_", " ").title(),
         "evs": [s["ev_yield"][k] for k in STAT_KEYS],
         "family": e.family,
-        "evo": [[index[l["to"]], l["text"]] for l in links],
+        "evo": [[index[l["to"]], l["text"], item_by_const.get(l.get("item"))] for l in links],
         "s": search_keys(e.name, official, f"{e.form} {e.name}" if e.form else None),
         "movesOf": index.get(e.base) if e.battle_form else None,
         "loc": locations,
@@ -103,11 +105,11 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
                 if move in moves:
                     moves[move]["learners"].append([i, _how(method, item)])
     locations, held, unmatched = attach_encounters(load_encounters(), roster)
-    items, item_index, icon_sheet = _items(data, held)
+    items, item_index, item_by_const, icon_sheet = _items(data, held, evo_links)
     _attach_machine_locations(data, moves)
     return {
-        "mons": [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, []), held.get(e.key, []), item_index)
-                 for e in roster],
+        "mons": [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, []), held.get(e.key, []),
+                      item_index, item_by_const) for e in roster],
         "items": items,
         "itemSheet": icon_sheet,
         "moves": moves,
@@ -115,8 +117,8 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
     }
 
 
-def _items(data: SourceData, held: dict[str, list[str]]) -> tuple[list[dict], dict[str, int], str]:
-    """Feature-list items (plus any wild held item it doesn't list), each matched to its ROM icon."""
+def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tuple[list[dict], dict[str, int], dict[str, int], str]:
+    """Feature-list items (plus wild held items and evolution items it doesn't list), each matched to its ROM icon."""
     const_for: dict[str, str] = {}
     for const, name in data.items.items():
         const_for.setdefault(_norm(name), const)
@@ -127,27 +129,66 @@ def _items(data: SourceData, held: dict[str, list[str]]) -> tuple[list[dict], di
     index: dict[str, int] = {}
 
     def add(name: str, category: str, where: list[str], use: str) -> None:
-        if _norm(name) in index:
+        const = const_for.get(_norm(name))
+        if const is None:
+            # Small spelling slips in the doc ("Banetite") resolve to the game's own spelling
+            close = difflib.get_close_matches(_norm(name), list(const_for), n=1, cutoff=0.88)
+            if close:
+                const = const_for[close[0]]
+                fixed = data.items.get(const, name)
+                print(f"note: item {name!r} matched to the game's {fixed!r}", file=sys.stderr)
+                name = fixed
+        if _norm(name) in index:  # the same item in several tables: merge what each adds
+            item = items[index[_norm(name)]]
+            item["where"] += [w for w in where if w not in item["where"]]
+            item["category"] = item["category"] or category
+            item["use"] = item["use"] or use
             return
         index[_norm(name)] = len(items)
-        items.append({"name": name, "category": category, "where": where, "use": use,
-                      "key": const_for.get(_norm(name))})
+        items.append({"name": name, "category": category, "where": list(where), "use": use, "key": const})
 
     for item in load_items():
         add(item["name"], item["category"], item["where"], item["use"])
+    for mart in marts(data.paths):
+        for const in mart["items"]:
+            if const in data.items:
+                add(data.items[const], "", [mart["where"]], "")
+    for item in items:
+        # "Daimyn City Mall" from the doc is redundant next to "Daimyn City Mall · Gems shop"
+        places = {w.split(" · ")[0] for w in item["where"] if " · " in w}
+        item["where"] = [w for w in item["where"] if w not in places]
+        item["category"] = item["category"] or "Other"
     for names in held.values():
         for h in names:
             add(h.split(" (")[0], "Held by wild Pokémon", [], "")
+    for links in evo_links.values():
+        for link in links:
+            if link.get("item") and link["item"] in data.items and _norm(data.items[link["item"]]) not in index:
+                add(data.items[link["item"]], "Evolution", [], "")
+
+    by_const = {}
+    for k, item in enumerate(items):
+        if item["key"]:
+            by_const.setdefault(item["key"], k)
+            by_const.setdefault(item["key"], k)
+    for const, name in data.items.items():  # the evolution table names items by constant; match through the name too
+        if const not in by_const and _norm(name) in index:
+            by_const[const] = index[_norm(name)]
 
     wanted = {i["key"]: data.item_ids[i["key"]] for i in items if i["key"]}
     sheet, offsets = pack(item_icons(data.paths.rom, wanted), 24)
     for item in items:
         item["icon"] = offsets.get(item.pop("key"))
-    return items, index, "data:image/webp;base64," + base64.b64encode(sheet).decode()
+    return items, index, by_const, "data:image/webp;base64," + base64.b64encode(sheet).decode()
 
 
 def _attach_machine_locations(data: SourceData, moves: dict) -> None:
     where = load_machine_locations()
+    for m in data.machines:
+        if m["kind"] != "Tutor" and m["move"] in moves:  # "TM02", "tm2" and "HM01" all find the move
+            for key in (f"{m['kind']}{m['num']:02d}", f"{m['kind']}{m['num']}"):
+                if key.lower() not in moves[m["move"]]["s"]:
+                    moves[m["move"]]["s"].append(key.lower())
     for m in data.machines:
         loc = where.get((m["kind"], m["num"]))
         if loc and m["kind"] != "Tutor" and m["move"] in moves:

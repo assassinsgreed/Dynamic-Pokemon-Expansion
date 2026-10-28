@@ -46,7 +46,7 @@ def test_learner_labels(data):
 def test_evolution_links_use_indices(data):
     mons = {m["key"]: i for i, m in enumerate(data["mons"])}
     kadabra = data["mons"][mons["SPECIES_KADABRA"]]
-    assert [mons["SPECIES_ALAKAZAM"], "Use Linking Cord"] in kadabra["evo"]
+    assert [mons["SPECIES_ALAKAZAM"], "Use Linking Cord", next(i for i, it in enumerate(data["items"]) if it["name"] == "Linking Cord")] in kadabra["evo"]
 
 
 def test_page_is_self_contained(html):
@@ -134,7 +134,7 @@ def test_header_icon_embedded(html):
 def test_items_in_page(data):
     items = {i["name"]: i for i in data["items"]}
     stone = items["Fire Stone"]
-    assert stone["icon"] is not None and "Daimyn City Mall" in stone["where"]
+    assert stone["icon"] is not None and any(w.startswith("Daimyn City Mall") for w in stone["where"])
     assert items["Venusaurite-G"]["icon"] is not None
 
 
@@ -150,8 +150,41 @@ def test_tm_locations_on_moves(data):
 
 def test_ability_names_follow_cfru_overrides(data):
     by = {m["key"]: m for m in data["mons"]}
+    names = lambda m: [a[0] for a in m["abilities"]] + ([m["hidden"][0]] if m["hidden"] else [])
     cinderace = by["SPECIES_CINDERACE"]
-    assert "Libero" in cinderace["abilities"] + [cinderace["hidden"]]
-    assert "Protean" not in cinderace["abilities"] + [cinderace["hidden"]]
-    torkoal = by["SPECIES_TORKOAL"]
-    assert "White Smoke" in torkoal["abilities"] + [torkoal["hidden"]]
+    assert "Libero" in names(cinderace) and "Protean" not in names(cinderace)
+    assert "White Smoke" in names(by["SPECIES_TORKOAL"])
+
+
+def test_ability_descriptions_from_the_game(data):
+    by = {m["key"]: m for m in data["mons"]}
+    cinderace = by["SPECIES_CINDERACE"]
+    assert cinderace["hidden"] == ["Libero", "Changes type to match move."]
+    assert cinderace["abilities"][0][0] == "Blaze" and cinderace["abilities"][0][1]   # vanilla text read from the ROM
+
+
+def test_evolution_items_link_to_item_cards(data):
+    by = {m["key"]: (i, m) for i, m in enumerate(data["mons"])}
+    arcanine = by["SPECIES_ARCANINE"][0]
+    link = next(l for l in by["SPECIES_GROWLITHE"][1]["evo"] if l[0] == arcanine)
+    assert data["items"][link[2]]["name"] == "Fire Stone"
+
+
+def test_moves_searchable_by_tm_number(data):
+    keys = data["moves"]["MOVE_DRAGONCLAW"]["s"]
+    assert "tm02" in keys and "tm2" in keys
+
+
+def test_item_name_fixes(data):
+    items = {i["name"]: i for i in data["items"]}
+    assert items["Banettite"]["icon"] is not None          # the doc spells it "Banetite"
+    for colour in ("Red", "Yellow", "Pink", "Purple"):
+        assert items[f"{colour} Nectar"]["icon"] is not None   # one doc row, four items
+
+
+def test_shop_stock_merged_into_item_locations(data):
+    items = {i["name"]: i for i in data["items"]}
+    glasses = items["Black Glasses"]["where"]
+    assert "Lake Laplaz" in glasses
+    assert any(w.startswith("Daimyn City Mall · ") for w in glasses)
+    assert any(w.startswith("Daimyn City Game Corner") for w in items["Life Orb"]["where"])

@@ -143,6 +143,12 @@ def item_icons(rom_path: Path, item_ids: dict[str, int]) -> dict[str, Image.Imag
     return icons
 
 
+def read_text(rom_path: Path, address: int, limit: int = 200) -> str:
+    rom = rom_path.read_bytes()
+    o = address - ROM_BASE
+    return decode(rom[o:o + limit], load_charmap())
+
+
 def item_names(rom_path: Path, item_ids: dict[str, int]) -> dict[str, str]:
     if not rom_path.exists():
         raise RomError(f"built ROM not found: {rom_path} (build Complete-Fire-Red-Upgrade first)")

@@ -87,21 +87,42 @@ def item_ids(p: Paths) -> dict[str, int]:
 
 
 def _labelled_strings(p: Paths, table: str) -> dict[str, str]:
-    """Text of every #org @label in a .string file, by label (for strings referenced by symbol, not position)."""
-    result, label = {}, None
-    for line in read(p.cfru / table).splitlines():
+    """Text of every #org @label in a .string file, by label (for strings referenced by symbol, not position).
+    Consecutive labels share the text that follows them; #ifdef blocks are resolved first."""
+    result, labels = {}, []
+    for line in resolve_conditionals(read(p.cfru / table), defines(p)).splitlines():
         if line.startswith("#org"):
-            label = line.split("@", 1)[1].strip()
-        elif label and line.strip():
-            result[label] = decode_text(line.strip())
-            label = None
+            labels.append(line.split("@", 1)[1].strip())
+        elif labels and line.strip() and not line.startswith("#"):
+            for label in labels:
+                result[label] = decode_text(line.strip().replace("\\n", " ").replace("\\l", " "))
+            labels = []
+    return result
+
+
+@cache
+def ability_descriptions(p: Paths) -> dict[str, str]:
+    """gAbilityDescriptions (assembly/data/ability_description_table.s): each entry is either a vanilla ROM
+    address or a symbol from strings/ability_descriptions.string."""
+    from .rom import read_text
+
+    strings = _labelled_strings(p, "strings/ability_descriptions.string")
+    by_id = {v: k for k, v in parse_int_defines(p.cfru / "include/constants/abilities.h", "ABILITY_").items()}
+    table = read(p.cfru / "assembly/data/ability_description_table.s")
+    entries = re.findall(r"^\.word\s+(\w+)", table[table.index("gAbilityDescriptions:"):], flags=re.M)
+    result = {}
+    for ability_id, target in enumerate(entries):  # positional: entry N describes ability N
+        if ability_id not in by_id:
+            continue
+        text = read_text(p.rom, int(target, 16)) if target.startswith("0x") else strings.get(target, "")
+        result[by_id[ability_id]] = " ".join(text.split())
     return result
 
 
 @cache
 def ability_name_overrides(p: Paths) -> list[tuple[str, str, frozenset, frozenset, frozenset]]:
-    """Rules from GetAbilityNameOverride (src/ability_util.c): (ABILITY_*, display name, species, national dex
-    numbers, types). The renamed ability applies when the species, its national dex number, or one of its types
+    """Rules from GetAbilityNameOverride (src/ability_util.c): (ABILITY_*, gText_AbilityName_* label, species,
+    national dex numbers, types). The renamed ability applies when the species, its national dex number, or one of its types
     matches."""
     raw = strip_comments(read(p.cfru / "src/ability_util.c"))
     names = _labelled_strings(p, "strings/ability_name_table.string")
@@ -122,23 +143,76 @@ def ability_name_overrides(p: Paths) -> list[tuple[str, str, frozenset, frozense
     for ability, block in zip(cases[1::2], cases[2::2]):
         # switch (dexNum) { case NATIONAL_DEX_A: case NATIONAL_DEX_B: return gText_AbilityName_X; ... }
         for dexes, label in re.findall(r"((?:case\s+NATIONAL_DEX_\w+\s*:\s*)+)return\s+(gText_AbilityName_\w+)", block):
-            rules.append((ability, names[label], frozenset(), frozenset(re.findall(r"NATIONAL_DEX_\w+", dexes)), frozenset()))
+            rules.append((ability, label, frozenset(), frozenset(re.findall(r"NATIONAL_DEX_\w+", dexes)), frozenset()))
         # if (Predicate(...)) return gText_AbilityName_X;
         for call, label in re.findall(r"if\s*\((\w+\([^)]*\))\)\s*return\s+(gText_AbilityName_\w+)", block):
             fn = call.split("(")[0]
             if fn == "IsSpeciesOfType":
                 types = frozenset(t.removeprefix("TYPE_") for t in re.findall(r"TYPE_\w+", call))
-                rules.append((ability, names[label], frozenset(), frozenset(), types))
+                rules.append((ability, label, frozenset(), frozenset(), types))
             elif fn.startswith(("SpeciesHas", "Is")):
                 species, national = predicate_targets(fn)
-                rules.append((ability, names[label], species, national, frozenset()))
+                rules.append((ability, label, species, national, frozenset()))
             else:
                 raise ValueError(f"unsupported ability-name rule {call!r}")
     return rules
 
 
-def ability_display_name(p: Paths, ability: str, species: str, national: str | None, types: list[str]) -> str:
-    for rule_ability, name, species_set, national_set, type_set in ability_name_overrides(p):
+def ability_display(p: Paths, ability: str, species: str, national: str | None, types: list[str]) -> tuple[str, str]:
+    """(name, description) as the game shows them for this species. A renamed ability keeps its base description
+    unless the game has a matching gText_AbilityDescription_* string (GetAbilityDescriptionOverride)."""
+    names = _labelled_strings(p, "strings/ability_name_table.string")
+    descriptions = _labelled_strings(p, "strings/ability_descriptions.string")
+    description = ability_descriptions(p).get(ability, "")
+    for rule_ability, label, species_set, national_set, type_set in ability_name_overrides(p):
         if rule_ability == ability and (species in species_set or national in national_set or set(types) & type_set):
-            return name
-    return ability_names(p).get(ability, ability)
+            override = descriptions.get(label.replace("AbilityName", "AbilityDescription"))
+            return names[label], " ".join((override or description).split())
+    return ability_names(p).get(ability, ability), description
+
+
+BADGE_WORDS = {"No": 0, "One": 1, "Two": 2, "Three": 3, "Four": 4, "Five": 5, "Six": 6, "Seven": 7, "Eight": 8}
+# Script prefixes whose camel-case name isn't the place players know
+PLACE_ALIASES = {"FerroxFacilities": "Ferrox Village", "HeleoFacilities": "Heleo City", "LaplazFacilities": "Laplaz Town"}
+
+
+def _words(camel: str) -> str:
+    return re.sub(r"(?<=[a-z])(?=[A-Z0-9])|(?<=[0-9])(?=[A-Z])", " ", camel)
+
+
+@cache
+def marts(p: Paths) -> list[dict]:
+    """Every `pokemart <list>` in CFRU's overworld scripts: {"where": place and shop, "items": [ITEM_*]}.
+
+    The place comes from the script that opens the shop (EventScript_DaimynCityMall_Shop_Gems → Daimyn City Mall),
+    falling back to the script file's name; the standard Poké Mart stock is gated by badge count."""
+    root = p.cfru / "assembly/overworld_scripts"
+    files = {f: strip_comments(read(f)) for f in sorted(root.rglob("*.s"))}
+    lists: dict[str, list[str]] = {}
+    for text in files.values():
+        for m in re.finditer(r"^(\w+):\s*\n((?:[ \t]*\.hword[ \t]+ITEM_\w+[^\n]*\n)+)", text, flags=re.M):
+            lists[m.group(1)] = [i for i in re.findall(r"ITEM_\w+", m.group(2)) if i != "ITEM_NONE"]
+
+    result, seen = [], set()
+    for path, text in files.items():
+        for m in re.finditer(r"pokemart\s+(\w+)", text):
+            label = m.group(1)
+            items = lists.get(label, [])
+            if not items:
+                continue
+            opener = [x.group(1) for x in re.finditer(r"^(\w+):", text[:m.start()], flags=re.M)]
+            script = opener[-1] if opener else ""
+            badges = re.fullmatch(r"(\w+?)Badges?_Stock", label)
+            if badges:
+                n = BADGE_WORDS.get(badges.group(1), 0)
+                where = "Poké Marts" + (f" (after {n} badge{'s' if n > 1 else ''})" if n else "")
+            else:
+                prefix = script.removeprefix("EventScript_").split("_")[0] if script.startswith("EventScript_") else ""
+                place = PLACE_ALIASES.get(prefix) or (_words(prefix) if prefix else _words(path.stem.replace("_", " ").title().replace(" ", "")))
+                shop = _words(re.sub(r"(Shop|Stock|Items|Mart)(Divergent)?$", "", label.split("_")[-1]) or label)
+                where = f"{place} · {shop} shop" + (" (Divergent)" if "Divergent" in label + script else "")
+            if (where, label) in seen:
+                continue
+            seen.add((where, label))
+            result.append({"where": where, "items": items})
+    return result

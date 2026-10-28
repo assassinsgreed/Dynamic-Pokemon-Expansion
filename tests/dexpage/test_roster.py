@@ -28,8 +28,8 @@ def test_no_trade_or_gigantamax(evo_links):
 
 
 def test_evolution_text(evo_links):
-    assert {"to": "SPECIES_ALAKAZAM", "text": "Use Linking Cord"} in evo_links["SPECIES_KADABRA"]
-    assert {"to": "SPECIES_VENUSAUR_GIGA", "text": "Mega Evolve holding VenusauriteG"} in evo_links["SPECIES_VENUSAUR"]
+    assert {"to": "SPECIES_ALAKAZAM", "text": "Use Linking Cord", "item": "ITEM_LINK_STONE"} in evo_links["SPECIES_KADABRA"]
+    assert {"to": "SPECIES_VENUSAUR_GIGA", "text": "Mega Evolve holding VenusauriteG", "item": "ITEM_VENUSAURITE_G"} in evo_links["SPECIES_VENUSAUR"]
     dusk = [l["text"] for l in evo_links["SPECIES_ROCKRUFF"] if l["to"] == "SPECIES_LYCANROC_DUSK"]
     assert dusk == ["Lv. 25, 5 PM–7:59 PM"]
     # reversion rows (Mega → base with ITEM_NONE) are not evolutions

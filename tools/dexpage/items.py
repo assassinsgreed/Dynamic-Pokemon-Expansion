@@ -20,6 +20,14 @@ def _lines(text: str) -> list[str]:
     return [line.strip() for line in text.splitlines() if line.strip()]
 
 
+def _split_variants(name: str) -> list[str]:
+    """"Red/Yellow/Pink/Purple Nectar" is four items sharing one row."""
+    if "/" not in name or " " not in name:
+        return [name]
+    variants, suffix = name.rsplit(" ", 1)
+    return [f"{v.strip()} {suffix}" for v in variants.split("/")]
+
+
 def load_items(path: Path = ITEMS_CSV) -> list[dict]:
     with path.open(encoding="utf-8", newline="") as f:
         return [{"name": r["Item"], "category": r["Category"], "where": _lines(r["Where"]), "use": r["Use"]}
@@ -55,13 +63,23 @@ def import_docx(docx_path: Path) -> None:
                 for r in rows:
                     if r[0].isdigit():
                         machines.append([kind, r[0], r[1], r[2], r[3] if len(r) > 3 else ""])
+            elif header[:2] in (["Prize", "Coin Cost"], ["Chip Cost", "Item"], ["Prize", "Chance to Find"]):
+                # Prize tables: the item is obtainable here, at a price or a chance
+                for r in rows:
+                    name, detail = (r[1], r[0]) if header[0] == "Chip Cost" else (r[0], r[1])
+                    where = {"Coin Cost": f"Daimyn City Game Corner ({detail} coins)",
+                             "Item": f"PokeChip Crusher ({detail} chips)",
+                             "Chance to Find": f"Mining minigame ({detail})"}[header[1]]
+                    for single in _split_variants(name):
+                        items.append([single, "", where, ""])
             elif header[0] in ITEM_TABLE_HEADERS and len(header) >= 3 and header[1].startswith(("Where", "How")):
                 for r in rows:
                     if r[0]:
                         # A second line in the name cell is a note, e.g. "Razor Claw" + "(Must hold @ night)"
                         name, *note = _lines(r[0])
                         use = "\n".join([*note, r[2]]) if note else r[2]
-                        items.append([name + NAME_SUFFIX.get(heading, ""), heading, r[1], use])
+                        for single in _split_variants(name):
+                            items.append([single + NAME_SUFFIX.get(heading, ""), heading, r[1], use])
 
     with ITEMS_CSV.open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
