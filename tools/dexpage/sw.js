@@ -23,8 +23,13 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       fetch(req)
         .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((cache) => cache.put("index.html", copy));
+          // Only a real copy of the page may replace the offline one (never a 404 page or redirect)
+          const url = new URL(req.url);
+          const isPage = url.pathname.endsWith("/") || url.pathname.endsWith("/index.html");
+          if (res.ok && res.type === "basic" && isPage) {
+            const copy = res.clone();
+            caches.open(CACHE).then((cache) => cache.put("index.html", copy));
+          }
           return res;
         })
         .catch(() => caches.match("index.html"))

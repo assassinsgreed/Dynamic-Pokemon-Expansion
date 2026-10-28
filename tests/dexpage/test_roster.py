@@ -31,7 +31,7 @@ def test_evolution_text(evo_links):
     assert {"to": "SPECIES_ALAKAZAM", "text": "Use Linking Cord"} in evo_links["SPECIES_KADABRA"]
     assert {"to": "SPECIES_VENUSAUR_GIGA", "text": "Mega Evolve holding VenusauriteG"} in evo_links["SPECIES_VENUSAUR"]
     dusk = [l["text"] for l in evo_links["SPECIES_ROCKRUFF"] if l["to"] == "SPECIES_LYCANROC_DUSK"]
-    assert dusk == ["Lv. 25, 5 PM–8 PM"]
+    assert dusk == ["Lv. 25, 5 PM–7:59 PM"]
     # reversion rows (Mega → base with ITEM_NONE) are not evolutions
     assert "SPECIES_VENUSAUR_MEGA" not in evo_links or not evo_links["SPECIES_VENUSAUR_MEGA"]
 
@@ -62,3 +62,45 @@ def test_kangaskhan_power_up_punch_matches_source(roster, paths):
     src = {m for _, m in levelup(paths)["SPECIES_KANGASKHAN"]} | set(egg_moves(paths).get("SPECIES_KANGASKHAN", []))
     # Power-Up Punch is not a TM/tutor in this game, so only level-up/egg can grant it
     assert ("MOVE_POWERUPPUNCH" in all_moves(k)) == ("MOVE_POWERUPPUNCH" in src)
+
+
+def _egg(roster, key):
+    return set(next(e for e in roster if e.key == key).moves["egg"])
+
+
+def test_regional_forms_use_their_own_egg_family(roster, paths):
+    src = egg_moves(paths)
+    assert _egg(roster, "SPECIES_NINETALES_A") == set(src["SPECIES_VULPIX_A"])
+
+
+def test_incense_babies_include_the_second_stage_list(roster, paths):
+    src = egg_moves(paths)
+    assert "MOVE_BELLYDRUM" in _egg(roster, "SPECIES_AZUMARILL")
+    assert _egg(roster, "SPECIES_AZUMARILL") == set(src.get("SPECIES_AZURILL", [])) | set(src["SPECIES_MARILL"])
+
+
+def test_form_labels_for_dex_forms(roster):
+    by = {e.key: e for e in roster}
+    assert by["SPECIES_ZIGZAGOON_G"].form == "Galarian"
+    assert by["SPECIES_PORYGON_Z"].form is None          # its own species, not a Porygon form
+    assert by["SPECIES_WISHIWASHI_S"].form == "School"
+    assert by["SPECIES_TOXTRICITY_LOW_KEY_GIGA"].form == "Low Key Mega G"
+
+
+def test_dusk_time_range_is_exact(evo_links):
+    dusk = [l["text"] for l in evo_links["SPECIES_ROCKRUFF"] if l["to"] == "SPECIES_LYCANROC_DUSK"]
+    assert dusk == ["Lv. 25, 5 PM–7:59 PM"]
+
+
+def test_item_names_are_never_guessed(evo_links):
+    texts = [l["text"] for ls in evo_links.values() for l in ls]
+    assert not any("?" in t for t in texts)
+    garb = [l["text"] for l in evo_links["SPECIES_GARBODOR"]]
+    assert garb and all(t.startswith("Mega Evolve holding ") for t in garb)
+
+
+def test_unknown_item_raises(source_data):
+    import pytest
+    from tools.dexpage.roster import evolution_text
+    with pytest.raises(ValueError):
+        evolution_text(source_data, "EVO_ITEM", "ITEM_DOES_NOT_EXIST", "SPECIES_BULBASAUR", "0")

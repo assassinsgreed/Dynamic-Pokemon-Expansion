@@ -17,7 +17,11 @@ FORM_LABELS = {
     "MEGA": "Mega", "MEGA_X": "Mega X", "MEGA_Y": "Mega Y",
     "GIGA": "Mega G",  # Gigantamax forms are Mega-style evolutions in this game
     "PRIMAL": "Primal", "N": "Midnight", "DUSK": "Dusk",
-    "Y": "Pom-Pom", "P": "Pa'u", "S": "Sensu",
+}
+# Suffixes that mean different things on different species
+KEY_FORM_LABELS = {
+    "SPECIES_ORICORIO_Y": "Pom-Pom", "SPECIES_ORICORIO_P": "Pa'u", "SPECIES_ORICORIO_S": "Sensu",
+    "SPECIES_WISHIWASHI_S": "School",
 }
 
 DROPPED_METHODS = {"EVO_TRADE", "EVO_TRADE_ITEM", "EVO_GIGANTAMAX"}  # impossible in game
@@ -72,7 +76,7 @@ def load_source_data(p: Paths) -> SourceData:
         machines=load_dpe.machine_compat(p), evolutions=load_dpe.evolutions(p),
         names=load_dpe.species_names(p), sprites=load_dpe.front_pic(p),
         national=_national_dex(p), moves=load_cfru.moves(p),
-        items=item_names(p.rom, load_cfru.item_ids(p)), abilities=load_cfru.ability_names(p),
+        items=item_names(p.rom, {**load_cfru.item_ids(p), **load_dpe.item_ids(p)}), abilities=load_cfru.ability_names(p),
     )
 
 
@@ -136,15 +140,47 @@ def special_tutor_moves(species: str, types: list[str], national: str | None,
 
 # ---------------------------------------------------------------- forms
 
-def _split_form(key: str, ids: dict) -> tuple[str, str | None]:
-    """(base species, form label) using the longest SPECIES_* prefix that is itself a species."""
+def _split_form(key: str, ids: dict, names: dict) -> tuple[str, str | None]:
+    """(base species, form label) from the longest SPECIES_* prefix that shares this species' in-game name.
+
+    The shared name is what makes it a form: Porygon-Z starts with SPECIES_PORYGON but is its own species."""
     parts = key.split("_")
     for cut in range(len(parts) - 1, 1, -1):
         base = "_".join(parts[:cut])
-        if base in ids:
+        if base in ids and names.get(base) == names.get(key):
             suffix = "_".join(parts[cut:])
-            return base, FORM_LABELS.get(suffix, suffix.replace("_", " ").title())
+            return base, KEY_FORM_LABELS.get(key) or FORM_LABELS.get(suffix, suffix.replace("_", " ").title())
     return key, None
+
+
+@cache
+def _egg_rules(p: Paths) -> tuple[dict, dict]:
+    """GetOverrideEggSpecies (national dex → egg species) and AlterSpeciesWithIncenseItems (baby → no-incense
+    species) from CFRU src/daycare.c; GetAllEggMoves unions the egg moves of both species."""
+    raw = strip_comments(read(p.cfru / "src/daycare.c"))
+
+    def function(name: str) -> str:
+        start = re.search(rf"^static\s+\w+\s+{name}\s*\([^;]*?\)\s*{{", raw, flags=re.M).start()
+        return resolve_conditionals(raw[start:raw.index("\n}", start)], load_cfru.defines(p))
+
+    override = dict(re.findall(r"case\s+(NATIONAL_DEX_\w+)\s*:[^;]*?eggSpecies\s*=\s*(SPECIES_\w+)",
+                               function("GetOverrideEggSpecies")))
+    incense = dict(re.findall(r"case\s+(SPECIES_\w+)\s*:[^;]*?\*species\s*=\s*(SPECIES_\w+)",
+                              function("AlterSpeciesWithIncenseItems")))
+    if not incense:
+        raise ValueError("could not read AlterSpeciesWithIncenseItems from daycare.c")
+    return override, incense
+
+
+def _egg_moves(data: SourceData, key: str, roots: dict) -> list[str]:
+    override, incense = _egg_rules(data.paths)
+    egg_species = roots.get(key, key)
+    egg_species = override.get(data.national.get(egg_species), egg_species)
+    moves = list(data.egg.get(egg_species, []))
+    alt = incense.get(egg_species)
+    if alt:
+        moves += [m for m in data.egg.get(alt, []) if m not in moves]
+    return moves
 
 
 def _mega_links(data: SourceData, source: str) -> list[tuple]:
@@ -164,14 +200,13 @@ def _machine_moves(data: SourceData, key: str) -> tuple[list, list]:
     return tm, tutor
 
 
-def _moves_for(data: SourceData, key: str, base: str, family_root: str) -> dict:
+def _moves_for(data: SourceData, key: str, base: str, roots: dict) -> dict:
     tm, tutor = _machine_moves(data, key)
     stats = data.stats.get(key) or data.stats[base]
     national = data.national.get(key) or data.national.get(base)
-    egg = data.egg.get(key) or data.egg.get(family_root, [])
     return {
         "level": list(data.levelup.get(key) or data.levelup.get(base, [])),
-        "egg": list(egg),
+        "egg": _egg_moves(data, key, roots),
         "tm": tm,
         "tutor": tutor,
         "special": special_tutor_moves(key, stats["types"], national, data.paths),
@@ -216,32 +251,36 @@ def build_roster(data: SourceData) -> list[Entry]:
     for key, kinds in data.habitat.items():
         if key in dex_species:
             continue
-        base, form = _split_form(key, data.ids)
+        base, form = _split_form(key, data.ids, data.names)
         bases[key] = (base, form)
         modes[key] = {STANDARD if k == "standard" else DIVERGENT for k in kinds} | modes.get(base, set())
+
+    def form_of(key: str) -> str | None:
+        return bases[key][1] if key in bases else _split_form(key, data.ids, data.names)[1]
 
     for source in list(modes):
         for _, _, target, _ in _mega_links(data, source):
             if target not in modes:
-                bases[target] = (source, _split_form(target, data.ids)[1])
+                mega = _split_form(target, data.ids, data.names)[1]
+                # e.g. Low Key Toxtricity's Giga form reads "Low Key Mega G"
+                label = " ".join(x for x in (form_of(source), mega) if x)
+                bases[target] = (source, label or None)
                 modes[target] = set(modes[source])
 
     entries: dict[str, Entry] = {}
     for key, mode_set in modes.items():
         if key not in data.stats:
             continue
-        base, form = bases.get(key, (key, None))
-        root = roots.get(base, base)
+        base = bases[key][0] if key in bases else key
         is_mega = key in bases and any(t == key for *_, t, _ in _mega_links(data, base))
         entry = Entry(
-            key=key, name=data.names.get(key, key), form=form,
+            key=key, name=data.names.get(key, key), form=form_of(key),
             modes=[m for m in (STANDARD, DIVERGENT) if m in mode_set],
             dex={k: v for k, v in (("std", _index(data.std, key)), ("div", _index(data.div, key))) if v},
-            base=base, stats=data.stats[key], family=roots.get(key, root), battle_form=is_mega,
+            base=base, stats=data.stats[key], family=roots.get(key, key), battle_form=is_mega,
         )
         # Megas only exist in battle: they learn exactly what their base learns
-        entry.moves = (_moves_for(data, base, base, root) if is_mega
-                       else _moves_for(data, key, base, root))
+        entry.moves = _moves_for(data, base, base, roots) if is_mega else _moves_for(data, key, base, roots)
         entries[key] = entry
 
     for key, (base, _) in bases.items():
@@ -304,7 +343,12 @@ def _pretty_const(value: str, prefix: str) -> str:
 
 
 def evolution_text(data: SourceData, method: str, param: str, target: str, extra: str) -> str | None:
-    item = lambda c: data.items.get(c) or _pretty_const(c, "ITEM_")
+    def item(const: str) -> str:
+        name = data.items.get(const)
+        if not name or "?" in name:
+            raise ValueError(f"no in-game name for {const} in the ROM (is test.gba up to date?)")
+        return name
+
     move = lambda c: data.moves[c]["name"] if c in data.moves else _pretty_const(c, "MOVE_")
     type_ = lambda c: c.removeprefix("TYPE_").title()
     gender = {"MON_MALE": " (male)", "MON_FEMALE": " (female)"}.get(extra, "")
@@ -367,7 +411,9 @@ def _time_range(extra: str) -> str:
     m = re.fullmatch(r"TIME_RANGE\(\s*(\d+)\s*,\s*(\d+)\s*\)", extra)
     if not m:
         raise ValueError(f"unexpected time range {extra!r}")
-    return f"{_hour(int(m.group(1)))}–{_hour(int(m.group(2)))}"
+    # The game checks start <= hour < end, so the window closes at end-1:59
+    end = int(m.group(2)) - 1
+    return f"{_hour(int(m.group(1)))}–{(end % 12) or 12}:59 {'AM' if end < 12 else 'PM'}"
 
 
 def evolution_links(data: SourceData, included: set[str]) -> dict[str, list[dict]]:

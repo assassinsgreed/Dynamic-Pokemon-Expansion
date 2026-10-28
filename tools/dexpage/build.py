@@ -5,11 +5,13 @@ import hashlib
 import io
 import json
 import re
+import sys
 import unicodedata
 from pathlib import Path
 
 from PIL import Image, ImageDraw
 
+from .locations import attach_encounters, load_encounters
 from .paths import Paths
 from .roster import Entry, SourceData, build_roster, evolution_links, load_source_data
 from .sprites import build_sheet
@@ -24,11 +26,12 @@ def _norm(s: str) -> str:
     return re.sub(r"[^a-z0-9]", "", s.lower())
 
 
-def search_keys(name: str, official: str | None) -> list[str]:
-    """Normalised strings a search should match: the in-game name and, if different, the official one."""
+def search_keys(name: str, *aliases: str | None) -> list[str]:
+    """Normalised strings a search should match: the in-game name plus any distinct aliases."""
     keys = [_norm(name)]
-    if official and _norm(official) not in keys:
-        keys.append(_norm(official))
+    for alias in aliases:
+        if alias and _norm(alias) not in keys:
+            keys.append(_norm(alias))
     return keys
 
 
@@ -48,7 +51,7 @@ def _move_of(method: str, item: tuple | str) -> str:
     return item[0] if method == "special" else item[1]
 
 
-def _mon(data: SourceData, e: Entry, index: dict, links: list[dict]) -> dict:
+def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: list[dict]) -> dict:
     s = e.stats
     official = e.key.removeprefix("SPECIES_").replace("_", " ").title()
     return {
@@ -68,17 +71,21 @@ def _mon(data: SourceData, e: Entry, index: dict, links: list[dict]) -> dict:
         "evs": [s["ev_yield"][k] for k in STAT_KEYS],
         "family": e.family,
         "evo": [[index[l["to"]], l["text"]] for l in links],
-        "s": search_keys(e.name, official),
+        "s": search_keys(e.name, official, f"{e.form} {e.name}" if e.form else None),
         "movesOf": index.get(e.base) if e.battle_form else None,
+        "loc": locations,
     }
 
 
 def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
     index = {e.key: i for i, e in enumerate(roster)}
-    moves = {k: {"name": m["name"], "official": m["official"] if _norm(m["official"]) != _norm(m["name"]) else None,
-                 "type": m["type"], "split": m["split"], "power": m["power"],
-                 "acc": m["accuracy"], "pp": m["pp"], "learners": []}
-             for k, m in data.moves.items()}
+    moves = {}
+    for k, m in data.moves.items():
+        # Name-table labels are truncated too (NAME_POWER_UP_HIT), so the constant supplies the full name
+        keys = search_keys(m["name"], m["official"], k.removeprefix("MOVE_"))
+        moves[k] = {"name": m["name"], "official": m["official"] if _norm(m["official"]) != _norm(m["name"]) else None,
+                    "type": m["type"], "split": m["split"], "power": m["power"],
+                    "acc": m["accuracy"], "pp": m["pp"], "s": keys, "learners": []}
     for i, e in enumerate(roster):
         if e.battle_form:
             continue  # listed under its base species instead
@@ -87,9 +94,11 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
                 move = _move_of(method, item)
                 if move in moves:
                     moves[move]["learners"].append([i, _how(method, item)])
+    locations, unmatched = attach_encounters(load_encounters(), roster)
     return {
-        "mons": [_mon(data, e, index, evo_links.get(e.key, [])) for e in roster],
+        "mons": [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, [])) for e in roster],
         "moves": moves,
+        "unmatchedEncounters": unmatched,
     }
 
 
@@ -109,8 +118,8 @@ def _icon(size: int) -> bytes:
 
 
 MANIFEST = {
-    "name": "Shooting Stars Dex",
-    "short_name": "Dex",
+    "name": "Pokemon Amethyst Pokedex",
+    "short_name": "Amethyst Dex",
     "start_url": "./",
     "scope": "./",
     "display": "standalone",
@@ -126,7 +135,10 @@ def build(paths: Paths, out: Path) -> None:
     roster = build_roster(data)
     links = evolution_links(data, {e.key for e in roster})
     sheet, offsets = build_sheet({e.key: data.sprites[e.key] for e in roster})
-    html = render(page_data(data, roster, links), sheet, offsets).encode("utf-8")
+    page = page_data(data, roster, links)
+    for name in page["unmatchedEncounters"]:
+        print(f"warning: encounters.csv row for {name!r} matches no Pokémon on the page", file=sys.stderr)
+    html = render(page, sheet, offsets).encode("utf-8")
 
     out.mkdir(parents=True, exist_ok=True)
     (out / "index.html").write_bytes(html)

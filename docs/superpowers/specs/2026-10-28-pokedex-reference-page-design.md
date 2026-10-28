@@ -26,6 +26,10 @@ Collin wants one reference people can open on a PC or a phone and get those answ
 | Offline use | Players want the info **without internet access**. Two ways, both required: (1) a **"Download for offline use"** link that saves the single self-contained `.html`, which works fully (search, filters, sprites) when opened from disk; (2) the Pages site is an **installable PWA** — web app manifest + service worker that caches the page and assets after one visit, so "Add to Home Screen" gives an icon that works offline. The service worker must pick up a regenerated page (versioned cache, e.g. by content hash) so players don't get stuck on stale data. | Collin |
 | PDF export | Not now — loses search/filters; revisit only if asked | Collin |
 | Iteration | Ship a first version, iterate from feedback | Collin |
+| Name | Page title/app name: **Pokemon Amethyst Pokedex** | Collin (round 2) |
+| Locations | **Now in scope** (reverses the original non-goal). Source: the Encounters tab of Collin's "Pokémon Amethyst: Where to Find Every Pokémon" sheet, stored as static `tools/dexpage/encounters.csv`; Collin re-exports it by hand when it changes. Rows match roster entries by name + "(Form)"; unmatched rows are reported by the build. | Collin (round 2) |
+| Detail tabs | The expanded entry has tabs: **Level up, Egg moves, TM/HM, Tutor, Locations**, each with its own filter box. Special tutors live under Tutor. | Collin (round 2) |
+| Evolutions | Every Pokémon in the evolution chain is clickable and opens that entry | Collin (round 2) |
 
 ## Which Pokémon appear
 
@@ -75,7 +79,7 @@ Typing a move name matches moves as well as Pokémon. A move result shows its ty
 
 ## Non-goals
 
-- Locations / encounter data, item locations.
+- ~~Locations / encounter data~~ (moved into scope in round 2; item locations remain out of scope).
 - Trainer data, damage calc, team builder.
 - Pokémon outside both dexes (and their forms).
 

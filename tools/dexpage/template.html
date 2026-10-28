@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Shooting Stars Dex</title>
+<title>Pokemon Amethyst Pokedex</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Searchable Pokédex for Standard and Divergent modes: stats, evolutions, and every way to learn each move.">
+<meta name="description" content="Searchable Pokédex for Pokémon Amethyst: stats, evolutions, locations, and every way to learn each move in Standard and Divergent modes.">
 <meta name="theme-color" content="#c8203a">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -124,8 +124,10 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .evo ul ul { padding-left: 18px; border-left: 2px solid var(--line); margin-left: 17px; }
 .evo li > .node { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .evo .how { font-size: 12.5px; color: var(--ink); background: var(--sunk); border: 1px solid var(--line); padding: 2px 7px; border-radius: 999px; }
-.link { background: none; border: 0; padding: 2px 4px 2px 0; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border-radius: 6px; text-align: left; }
+.link { background: var(--sunk); border: 1px solid var(--line); padding: 1px 10px 1px 1px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border-radius: 999px; text-align: left; }
+.link:hover { border-color: var(--muted); }
 .link:hover .ln { text-decoration: underline; }
+.link.current { border-color: var(--accent); background: var(--accent-soft); cursor: default; }
 .link .ln { font-weight: 600; }
 .link .ln small { font-weight: 400; color: var(--muted); }
 .link.current .ln { color: var(--accent); }
@@ -140,6 +142,16 @@ table.mv tr:last-child td { border-bottom: 0; }
 .mvname { background: none; border: 0; padding: 0; cursor: pointer; font-weight: 600; text-align: left; }
 .mvname:hover { text-decoration: underline; color: var(--accent); }
 .note { color: var(--muted); font-size: 12.5px; }
+.note .link { vertical-align: middle; margin: 2px 0; }
+.tabs { display: grid; gap: 10px; }
+.tablist { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--line); scrollbar-width: none; }
+.tablist button { flex: none; border: 0; background: none; padding: 8px 10px; font: 600 13px var(--font-display); letter-spacing: .03em; color: var(--muted); cursor: pointer; border-bottom: 2.5px solid transparent; margin-bottom: -1px; }
+.tablist button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tablist .c { font: 500 11.5px var(--font-data); color: var(--muted); }
+.tabfilter { width: 100%; font: 14px var(--font-body); color: var(--ink); background: var(--sunk); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; }
+.tabfilter:focus { outline: none; border-color: var(--accent); }
+table.loc td { vertical-align: top; }
+table.loc td.meth { white-space: nowrap; font-size: 13px; }
 .groups { display: grid; gap: 16px; }
 
 /* Move card */
@@ -181,8 +193,8 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding-block
 <header class="console">
   <div class="wrap">
     <div class="brand">
-      <h1><span class="lens" aria-hidden="true"></span>Shooting Stars Dex</h1>
-      <div class="meta"><span class="long">Stats, evolutions &amp; every way to learn a move</span><a id="dl" href="dex.html" download="shooting-stars-dex.html" hidden>Download for offline use</a></div>
+      <h1><span class="lens" aria-hidden="true"></span>Pokemon Amethyst Pokedex</h1>
+      <div class="meta"><span class="long">Stats, evolutions, locations &amp; every way to learn a move</span><a id="dl" href="dex.html" download="pokemon-amethyst-pokedex.html" hidden>Download for offline use</a></div>
     </div>
     <div class="search">
       <input id="q" type="search" placeholder="Search Pokémon or moves — e.g. Rockruff, Ceaseless Edge" autocomplete="off" spellcheck="false" aria-label="Search Pokémon or moves">
@@ -200,7 +212,7 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding-block
   </div>
 </header>
 <main><div class="wrap" id="out"></div></main>
-<footer class="wrap">Generated from the game's source data. Where to find Pokémon and items isn't covered.</footer>
+<footer class="wrap">Generated from the game's source data. Locations come from the “Pokémon Amethyst: Where to Find Every Pokémon” sheet. Item locations aren't covered.</footer>
 
 <script>
 const DEX = __DEX_DATA__;
@@ -233,9 +245,9 @@ const SHEET = "__SPRITE_SHEET__";
   for (const k of moveKeys) for (const [i, how] of moves[k].learners) monMoves[i].push([k, how]);
   const parent = new Map();
   mons.forEach((m, i) => m.evo.forEach(([to]) => { if (!parent.has(to)) parent.set(to, i); }));
-  const moveSearch = moveKeys.map((k) => [k, norm(moves[k].name), moves[k].official ? norm(moves[k].official) : ""]);
+  const moveSearch = moveKeys.map((k) => [k, moves[k].s]);  // in-game name, official name, constant name
 
-  const state = { q: "", mode: "", type: "", limit: 60, open: null };
+  const state = { q: "", mode: "", type: "", limit: 60, open: null, tab: "level", tabFilter: "" };
   try { state.mode = localStorage.getItem("dex-mode") || ""; } catch (e) {}
 
   const typeBadge = (t) => `<span class="type t-${t}">${t === "MYSTERY" ? "???" : t[0] + t.slice(1).toLowerCase()}</span>`;
@@ -299,34 +311,98 @@ const SHEET = "__SPRITE_SHEET__";
 
   function moveTable(title, list, howHeader, note) {
     if (!list.length) return "";
-    return `<section><h3>${title}</h3>${note ? `<p class="note">${note}</p>` : ""}<div class="moves"><table class="mv"><thead><tr>${
+    return `<section>${title ? `<h3>${title}</h3>` : ""}${note ? `<p class="note">${note}</p>` : ""}<div class="moves"><table class="mv"><thead><tr>${
       howHeader ? `<th>${howHeader}</th>` : ""}<th>Move</th><th>Type</th><th>Cat</th><th style="text-align:right">Pow</th><th class="hide-sm" style="text-align:right">Acc</th><th class="hide-sm" style="text-align:right">PP</th></tr></thead><tbody>${
       list.map(([k, how]) => moveRow(k, how, !!howHeader)).join("")}</tbody></table></div></section>`;
   }
 
-  function movesSection(i) {
-    const m = mons[i];
-    if (m.movesOf !== null) {
-      return `<section><h3>Moves</h3><p class="note">Exists only in battle, so it knows whatever its base form knows: ${monLink(m.movesOf, i)}</p></section>`;
-    }
+  // Move lists per tab, in game order
+  function moveLists(i) {
     const all = monMoves[i];
     const lvl = all.filter(([, h]) => h === "Evo" || h.startsWith("Lv "))
       .map((x, n) => [x, n]).sort((a, b) => {
         const la = a[0][1] === "Evo" ? 0 : +a[0][1].slice(3), lb = b[0][1] === "Evo" ? 0 : +b[0][1].slice(3);
         return la - lb || a[1] - b[1];
       }).map(([x]) => x);
-    const tm = all.filter(([, h]) => /^(TM|HM)\d/.test(h)).sort((a, b) => (a[1][0] === "H") - (b[1][0] === "H") || +a[1].slice(2) - +b[1].slice(2));
-    const tutor = all.filter(([, h]) => h.startsWith("Tutor")).sort((a, b) => +a[1].slice(6) - +b[1].slice(6));
-    const egg = all.filter(([, h]) => h === "Egg").sort((a, b) => moves[a[0]].name.localeCompare(moves[b[0]].name));
+    const tm = all.filter(([, h]) => /^(TM|HM)\d/.test(h))
+      .sort((a, b) => (a[1][0] === "H") - (b[1][0] === "H") || parseInt(a[1].slice(2), 10) - parseInt(b[1].slice(2), 10));
+    const tutor = all.filter(([, h]) => h.startsWith("Tutor")).sort((a, b) => parseInt(a[1].slice(6), 10) - parseInt(b[1].slice(6), 10));
     const special = all.filter(([, h]) => h.startsWith("Special:")).map(([k, h]) => [k, h.slice(9)]);
-    const hasEvo = lvl.some(([, h]) => h === "Evo");
-    return `<div class="groups">
-      ${moveTable("Level up", lvl, "Lv", hasEvo ? "<b>Evo</b> = learned on evolution, and also offered by the move relearner." : "")}
-      ${moveTable("TM / HM", tm, "No.")}
-      ${moveTable("Move tutor", tutor, "No.")}
-      ${moveTable("Special tutor", special, "Who")}
-      ${moveTable("Egg moves", egg, "")}
-      ${!all.length ? '<p class="note">Learns no moves.</p>' : ""}
+    const egg = all.filter(([, h]) => h === "Egg").sort((a, b) => moves[a[0]].name.localeCompare(moves[b[0]].name));
+    return { level: lvl, egg, tm, tutor, special };
+  }
+
+  const TABS = [["level", "Level up"], ["egg", "Egg moves"], ["tm", "TM / HM"], ["tutor", "Tutor"], ["loc", "Locations"]];
+
+  function locRows(i) {
+    return mons[i].loc.filter((l) => !state.mode || l.mode === "Both" || l.mode === state.mode);
+  }
+
+  function tabCount(i, tab, lists) {
+    if (tab === "loc") return locRows(i).length;
+    if (tab === "tutor") return lists.tutor.length + lists.special.length;
+    return lists[tab].length;
+  }
+
+  const moveMatches = (f) => ([k, how]) => {
+    if (!f) return true;
+    const mv = moves[k];
+    return [mv.name, mv.official || "", mv.type, CAT_NAME[mv.split], how].some((s) => norm(s).includes(f));
+  };
+
+  function locTable(rows) {
+    return `<div class="moves"><table class="mv loc"><thead><tr><th>Location</th><th>Method</th><th style="text-align:right">Lv</th><th style="text-align:right">Rate</th><th class="hide-sm">Mode</th></tr></thead><tbody>${
+      rows.map((l) => `<tr><td><b>${esc(l.location)}</b>${l.sub ? `<div class="note">${esc(l.sub)}</div>` : ""}${
+        l.variant ? `<div class="note">${esc(l.variant)}</div>` : ""}${l.notes ? `<div class="note">${esc(l.notes)}</div>` : ""}${
+        l.item ? `<div class="note">Holds: ${esc(l.item)}</div>` : ""}</td>
+        <td class="meth">${esc(l.method)}</td><td class="n">${esc(l.levels || "—")}</td><td class="n">${esc(l.rate || "—")}</td>
+        <td class="hide-sm"><span class="mode${l.mode === "Divergent" ? " d" : ""}">${esc(l.mode)}</span></td></tr>`).join("")}</tbody></table></div>`;
+  }
+
+  function noLocations(i) {
+    const m = mons[i];
+    if (m.movesOf !== null) return `<p class="note">Mega Evolve or transform ${monLink(m.movesOf, i)} in battle.</p>`;
+    const from = parent.has(i) ? parent.get(i) : null;
+    return `<p class="note">Not found in the wild${state.mode ? ` in ${state.mode} mode` : ""}.${
+      from !== null ? ` Evolve it from ${monLink(from, i)}` : ""}</p>`;
+  }
+
+  function panel(i) {
+    const m = mons[i];
+    const f = norm(state.tabFilter);
+    if (state.tab === "loc") {
+      const rows = locRows(i).filter((l) => !f || [l.location, l.sub || "", l.method, l.notes || "", l.item || "", l.variant || ""].some((s) => norm(s).includes(f)));
+      if (!locRows(i).length) return noLocations(i);
+      return rows.length ? locTable(rows) : `<p class="note">No locations match “${esc(state.tabFilter)}”.</p>`;
+    }
+    const battleNote = m.movesOf !== null
+      ? `<p class="note">Exists only in battle, so it knows whatever ${monLink(m.movesOf, i)} knows.</p>` : "";
+    const lists = moveLists(m.movesOf ?? i);
+    const keep = moveMatches(f);
+    const empty = (what) => `${battleNote}<p class="note">${f ? `No ${what} match “${esc(state.tabFilter)}”.` : `No ${what}.`}</p>`;
+    if (state.tab === "tutor") {
+      const tutor = lists.tutor.filter(keep), special = lists.special.filter(keep);
+      if (!tutor.length && !special.length) return empty("tutor moves");
+      return `${battleNote}<div class="groups">${moveTable("Move tutor", tutor, "No.")}${moveTable("Special tutor", special, "Who")}</div>`;
+    }
+    const rows = lists[state.tab].filter(keep);
+    if (!rows.length) return empty({ level: "level-up moves", egg: "egg moves", tm: "TMs or HMs" }[state.tab]);
+    if (state.tab === "level") {
+      const hasEvo = rows.some(([, h]) => h === "Evo");
+      return battleNote + moveTable("", rows, "Lv", hasEvo ? "<b>Evo</b> = learned on evolution, and also offered by the move relearner." : "");
+    }
+    if (state.tab === "egg") return battleNote + moveTable("", rows, "", "Egg moves come from the first Pokémon in its evolution line.");
+    return battleNote + moveTable("", rows, "No.");
+  }
+
+  function tabsBlock(i) {
+    const lists = moveLists(mons[i].movesOf ?? i);
+    const placeholder = state.tab === "loc" ? "Filter locations, e.g. Route 10, Surf, Night" : "Filter moves, e.g. Fire, Physical, TM2";
+    return `<div class="tabs" data-tabs="${i}">
+      <div class="tablist" role="tablist">${TABS.map(([id, label]) =>
+        `<button role="tab" data-tab="${id}" aria-selected="${state.tab === id}">${label} <span class="c">${tabCount(i, id, lists)}</span></button>`).join("")}</div>
+      <input class="tabfilter" id="tabfilter-${i}" type="search" placeholder="${placeholder}" value="${esc(state.tabFilter)}" aria-label="Filter this tab" autocomplete="off">
+      <div class="panel" role="tabpanel">${panel(i)}</div>
     </div>`;
   }
 
@@ -349,7 +425,7 @@ const SHEET = "__SPRITE_SHEET__";
         </dl></section>
       </div>
       <section><h3>Evolution</h3>${evoTree(i)}</section>
-      ${movesSection(i)}
+      ${tabsBlock(i)}
     </div>`;
   }
 
@@ -376,8 +452,8 @@ const SHEET = "__SPRITE_SHEET__";
     let html = "";
     let matchedMoves = [];
     if (q.length >= 2) {
-      const exact = moveSearch.filter(([, a, b]) => a === q || b === q);
-      const partial = moveSearch.filter(([, a, b]) => !(a === q || b === q) && (a.includes(q) || (b && b.includes(q))));
+      const exact = moveSearch.filter(([, keys]) => keys.includes(q));
+      const partial = moveSearch.filter(([, keys]) => !keys.includes(q) && keys.some((x) => x.includes(q)));
       matchedMoves = exact.concat(partial).map(([k]) => k);
     }
     const list = [];
@@ -389,7 +465,7 @@ const SHEET = "__SPRITE_SHEET__";
     if (q) list.sort((a, b) => (mons[b].s.some((s) => s.startsWith(q)) - mons[a].s.some((s) => s.startsWith(q))));
 
     if (matchedMoves.length) {
-      const showCard = matchedMoves.length <= 2 || norm(moves[matchedMoves[0]].name) === q || norm(moves[matchedMoves[0]].official || "") === q;
+      const showCard = matchedMoves.length <= 2 || moves[matchedMoves[0]].s.includes(q);
       html += `<div class="section-label">Moves</div>`;
       if (showCard) html += moveCard(matchedMoves[0]);
       const rest = showCard ? matchedMoves.slice(1) : matchedMoves;
@@ -418,6 +494,7 @@ const SHEET = "__SPRITE_SHEET__";
 
   function openMon(i) {
     const m = mons[i];
+    state.tabFilter = "";
     state.q = m.name; state.limit = 60; state.open = i;
     $("#q").value = m.name;
     if (!inMode(m)) state.mode = "";
@@ -443,7 +520,20 @@ const SHEET = "__SPRITE_SHEET__";
     if (mv) { e.preventDefault(); search(moves[mv.dataset.move].name); return; }
     const op = e.target.closest("[data-open]");
     if (op) { e.preventDefault(); openMon(+op.dataset.open); return; }
+    const tab = e.target.closest("[data-tab]");
+    if (tab) {
+      const box = tab.closest("[data-tabs]");
+      state.tab = tab.dataset.tab; state.tabFilter = "";
+      box.outerHTML = tabsBlock(+box.dataset.tabs);
+      return;
+    }
     if (e.target.closest("#more")) { state.limit += 120; render(); }
+  });
+  $("#out").addEventListener("input", (e) => {
+    if (!e.target.classList.contains("tabfilter")) return;
+    const box = e.target.closest("[data-tabs]");
+    state.tabFilter = e.target.value;
+    box.querySelector(".panel").innerHTML = panel(+box.dataset.tabs);
   });
   $("#out").addEventListener("toggle", (e) => {
     const d = e.target;
@@ -454,7 +544,7 @@ const SHEET = "__SPRITE_SHEET__";
         const prev = document.querySelector(`.mon[data-i="${state.open}"]`);
         if (prev) { prev.open = false; const det = prev.querySelector(".detail"); if (det) det.remove(); }
       }
-      state.open = i;
+      state.open = i; state.tabFilter = "";
       if (!d.querySelector(".detail")) d.insertAdjacentHTML("beforeend", detail(i));
     } else if (state.open === i) {
       state.open = null;
@@ -474,7 +564,7 @@ const SHEET = "__SPRITE_SHEET__";
     const h = decodeURIComponent(location.hash.slice(1)).replace(/-/g, " ").trim();
     if (!h) return false;
     const exact = mons.findIndex((m) => m.s.includes(norm(h)));
-    if (exact >= 0 && !moveSearch.some(([, a, b]) => a === norm(h) || b === norm(h))) openMon(exact);
+    if (exact >= 0 && !moveSearch.some(([, keys]) => keys.includes(norm(h)))) openMon(exact);
     else search(h);
     return true;
   };

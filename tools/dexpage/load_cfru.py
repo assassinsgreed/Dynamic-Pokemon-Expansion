@@ -23,6 +23,8 @@ def defines(p: Paths) -> dict[str, str]:
     """The #defines that decide which CFRU #ifdef branches are compiled."""
     return collect_defines(p.cfru / "src/config.h",
                            p.cfru / "include/constants/pokedex.h",
+                           p.cfru / "include/constants/species.h",
+                           p.cfru / "include/constants/items.h",
                            p.cfru / "src/defines.h")
 
 
@@ -55,8 +57,9 @@ def moves(p: Paths) -> dict[str, dict]:
     names = _positional_names(p, "strings/attack_name_table.string", ids)
     table = parse_designated_array(source(p, "src/Tables/battle_moves.c"), "gBattleMoves")
     result = {}
+    first_z = ids[collect_defines(p.cfru / "include/constants/moves.h")["FIRST_Z_MOVE"]]  # Z and Max moves can't be learned, and their names don't line up
     for const, body in table.items():
-        if const not in names or const == "MOVE_NONE":
+        if const not in names or const == "MOVE_NONE" or ids[const] >= first_z:
             continue
         f = parse_struct_fields(body)
         result[const] = {

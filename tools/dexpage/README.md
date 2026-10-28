@@ -1,7 +1,7 @@
 # Pokédex reference site
 
 Builds a single-page, searchable reference of every Pokémon in the Standard and Divergent dexes (plus supported
-forms and Megas): stats, abilities, evolutions, and every way to learn each move. Players can install it to their
+forms and Megas): stats, abilities, evolutions, locations, and every way to learn each move. Players can install it to their
 home screen or download one `.html` file, and both work offline.
 
 ## Regenerate
@@ -41,5 +41,12 @@ player opens it with a connection.
 | Evolutions | `src/Evolution Table.c`; trade and Gigantamax entries are left out |
 | Move data and names | CFRU `src/Tables/battle_moves.c`, `strings/attack_name_table.string` |
 | Item names | the built ROM |
+| Locations | `tools/dexpage/encounters.csv`, a copy of the Encounters tab of the "Where to Find Every Pokémon" sheet |
+
+## Updating locations
+
+Open the sheet, select the **Encounters** tab, choose File → Download → Comma-separated values, save it over
+`tools/dexpage/encounters.csv`, and rebuild. Rows are matched by Pokémon name, plus the form in parentheses
+(e.g. `Lycanroc (Midnight)`). The build lists any rows it couldn't match, so check its output after an update.
 
 Tests: `python -m pytest tests/dexpage`

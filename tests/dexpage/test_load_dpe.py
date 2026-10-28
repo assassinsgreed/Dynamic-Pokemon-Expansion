@@ -58,3 +58,15 @@ def test_species_names(paths):
     assert ids["SPECIES_KANGASKHAN"] == 0x73
     assert names["SPECIES_FARFETCHD"] == "Farfetch'd"
     assert names["SPECIES_NIDORAN_F"] == "Nidoran♀"
+
+
+def test_tm_number_comes_from_filename(paths):
+    # "77 - Psych Up.txt" has the header "TM55: Psych Up"; the game uses the filename number
+    mc = {(m["kind"], m["num"]): m for m in machine_compat(paths)}
+    assert mc[("TM", 77)]["move"] == "MOVE_PSYCHUP"
+    assert mc[("TM", 55)]["move"] != "MOVE_PSYCHUP"
+
+
+def test_duplicate_egg_entries_first_wins(paths):
+    # GetEggMoves stops at the first matching entry; Cufant's second copy adds Double-Edge
+    assert "MOVE_DOUBLEEDGE" not in egg_moves(paths)["SPECIES_CUFANT"]

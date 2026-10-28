@@ -88,3 +88,34 @@ def test_site_files(site):
     import json
     manifest = json.loads((site / "manifest.webmanifest").read_text())
     assert manifest["display"] == "standalone" and manifest["start_url"] == "./"
+
+
+def test_moves_searchable_by_full_name(data):
+    # The name-table label is itself truncated for these, so the constant supplies the full name
+    assert "poweruppunch" in data["moves"]["MOVE_POWERUPPUNCH"]["s"]
+    assert "dazzlinggleam" in data["moves"]["MOVE_DAZZLINGGLEAM"]["s"]
+
+
+def test_z_and_max_moves_left_out(data):
+    assert "MOVE_BREAKNECK_BLITZ_P" not in data["moves"]
+
+
+def test_form_names_are_searchable(data):
+    meowth_g = next(m for m in data["mons"] if m["key"] == "SPECIES_MEOWTH_G")
+    assert any("galarian" in s for s in meowth_g["s"])
+
+
+def test_locations_attached(data):
+    by = {m["key"]: m for m in data["mons"]}
+    bidoof = by["SPECIES_BIDOOF"]["loc"]
+    assert any(l["location"] == "Route 1" and l["levels"] == "2-4" and "Grass" in l["method"] for l in bidoof)
+    assert any(l["location"] == "Route 10" for l in by["SPECIES_LYCANROC_N"]["loc"])
+    assert data["unmatchedEncounters"] == []
+
+
+def test_title(html):
+    assert "<title>Pokemon Amethyst Pokedex</title>" in html
+
+
+def test_sw_only_caches_good_responses(site):
+    assert "res.ok" in (site / "sw.js").read_text()

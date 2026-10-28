@@ -2,6 +2,7 @@
 
 import re
 import unicodedata
+import warnings
 from functools import cache
 from pathlib import Path
 
@@ -34,6 +35,12 @@ def decode_text(text: str) -> str:
 def _source(p: Paths, rel: str) -> str:
     defines = collect_defines(p.dpe / "src/defines.h")
     return resolve_conditionals(strip_comments(read(p.dpe / rel)), defines)
+
+
+@cache
+def item_ids(p: Paths) -> dict[str, int]:
+    """Item constants as this repo's tables were compiled with them (includes DPE-only spellings)."""
+    return parse_int_defines(p.dpe / "include/items.h", "ITEM_")
 
 
 @cache
@@ -136,10 +143,12 @@ def egg_moves(p: Paths) -> dict[str, list[str]]:
     for m in re.finditer(r"egg_moves\(\s*(\w+)\s*,", text):
         start = text.index("(", m.start())
         args = split_top_level(text[start + 1:match_brace(text, start)])
-        result["SPECIES_" + args[0]] = [a for a in args[1:] if a.startswith("MOVE_")]
+        # GetEggMoves stops at the first entry for a species, so later duplicates never apply
+        result.setdefault("SPECIES_" + args[0], [a for a in args[1:] if a.startswith("MOVE_")])
     return result
 
 
+NUM_TMS = 100  # HM01 is file 101
 HEADER_RE = re.compile(r"^(TM|HM|[A-Za-z]+)\s*(\d+)\s*:\s*(.+)$")  # tutor headers include typos like "Tutour"
 
 
@@ -169,7 +178,13 @@ def machine_compat(p: Paths) -> list[dict]:
             if move is None:
                 raise ValueError(f"{path}: no move named {m.group(3)!r}")
             kind = "Tutor" if folder == "tutor_compatibility" else m.group(1)
-            result.append({"kind": kind, "num": int(m.group(2)), "move": move,
+            # The build script numbers machines by filename, so the header number is only a cross-check
+            num = int(path.name.split(" - ", 1)[0])
+            if kind == "HM":
+                num -= NUM_TMS
+            if num != int(m.group(2)):
+                warnings.warn(f"{path.name}: header says {lines[0]!r}; using the filename number")
+            result.append({"kind": kind, "num": num, "move": move,
                            "species": {"SPECIES_" + s for s in lines[1:]}})
     return result
 
