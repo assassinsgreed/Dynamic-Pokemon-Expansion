@@ -6,21 +6,23 @@
 <title>Pokemon Amethyst Pokedex</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Searchable Pokédex for Pokémon Amethyst: stats, evolutions, locations, and every way to learn each move in Standard and Divergent modes.">
-<meta name="theme-color" content="#c8203a">
+<meta name="theme-color" content="#5b2a9e">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
-/* Layout: one sticky search console over a single dense column of tap-to-expand rows; move matches surface above Pokémon. */
+/* Layout: one sticky search console over a list (or grid) of tap-to-expand Pokémon; move and place matches surface above them.
+   Palette: Amethyst purples from the game's label art (lavender #b27cfa over deep violet #320077). */
 :root {
-  --bg: #eef1f4;
+  --bg: #f3eff9;
   --surface: #ffffff;
-  --sunk: #f6f8fa;
-  --ink: #17212b;
-  --muted: #5a6876;
-  --line: #d8dee5;
-  --accent: #c8203a;
-  --accent-soft: #fbe6e9;
-  --focus: #2563eb;
+  --sunk: #f7f3fc;
+  --ink: #1f1631;
+  --muted: #65587a;
+  --line: #e1d8ee;
+  --accent: #6b35c4;
+  --accent-soft: #ece2fb;
+  --console: #faf7fe;
+  --focus: #7c4ddb;
   --font-display: "Bahnschrift", "DIN Alternate", "Avenir Next Condensed", "Roboto Condensed", "Arial Narrow", system-ui, sans-serif;
   --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --font-data: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
@@ -28,13 +30,13 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0e1318; --surface: #161d24; --sunk: #1b232b; --ink: #e5eaef; --muted: #94a1ae;
-    --line: #2a343e; --accent: #ff5a6e; --accent-soft: #3a1c22; --focus: #7aa7ff; color-scheme: dark;
+    --bg: #140f1d; --surface: #1c1528; --sunk: #231b32; --ink: #ece6f5; --muted: #a497b8;
+    --line: #342a46; --accent: #b27cfa; --accent-soft: #2e2145; --console: #1a1326; --focus: #c9a3ff; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0e1318; --surface: #161d24; --sunk: #1b232b; --ink: #e5eaef; --muted: #94a1ae;
-  --line: #2a343e; --accent: #ff5a6e; --accent-soft: #3a1c22; --focus: #7aa7ff; color-scheme: dark;
+  --bg: #140f1d; --surface: #1c1528; --sunk: #231b32; --ink: #ece6f5; --muted: #a497b8;
+  --line: #342a46; --accent: #b27cfa; --accent-soft: #2e2145; --console: #1a1326; --focus: #c9a3ff; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -43,17 +45,17 @@ body {
   font: 15px/1.45 var(--font-body);
   padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--console); }
 button { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .wrap { max-width: 980px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 
 /* Console */
-header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--console); border-bottom: 1px solid var(--line); }
 .console .wrap { padding-block: 12px; display: grid; gap: 10px; }
 .brand { display: flex; align-items: baseline; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
 .brand h1 { margin: 0; font: 600 22px/1 var(--font-display); letter-spacing: .02em; display: flex; align-items: center; gap: 8px; }
-.brand h1 .lens { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); flex: none; }
+.brand h1 .brand-icon { width: 34px; height: 34px; flex: none; margin: -6px 0 -6px -2px; }
 .brand .meta { color: var(--muted); font-size: 12.5px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
 .brand a { color: var(--accent); font-weight: 600; text-decoration: none; }
 .brand a:hover { text-decoration: underline; }
@@ -63,12 +65,15 @@ header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 
   background: var(--sunk); border: 1.5px solid var(--line); border-radius: 10px; padding: 11px 40px 11px 14px;
 }
 .search input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+.search input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; display: none; }
 .search .clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: 0; background: none; color: var(--muted); font-size: 20px; width: 32px; height: 32px; cursor: pointer; border-radius: 6px; }
 .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
 .seg button { border: 0; background: var(--surface); padding: 6px 11px; font-size: 13px; cursor: pointer; color: var(--muted); }
 .seg button + button { border-left: 1px solid var(--line); }
-.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.seg button svg { vertical-align: -2px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 select { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
 .count { margin-left: auto; color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
 
@@ -87,9 +92,32 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 
 /* Rows */
 .list { display: grid; gap: 6px; }
-.mon { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--console-h, 150px) + 8px); }
+.mon { background: var(--tint, none), var(--surface); border: 1px solid var(--line); border-radius: 10px; scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--console-h, 150px) + 8px); }
 .mon[open] { border-color: var(--muted); }
-.mon > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 12px 6px 6px; }
+.mon > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 12px 6px 6px; border-radius: 10px; }
+.mon > summary:hover { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.mon > summary:hover .chev { color: var(--accent); border-color: var(--accent); }
+.chev { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: var(--muted); border: 1px solid var(--line); background: var(--surface); }
+.mon[open] > summary .chev { transform: rotate(180deg); color: var(--accent); border-color: var(--accent); }
+.mode b { font-family: var(--font-data); font-weight: 600; margin-left: 4px; }
+.held { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+/* Grid view: compact cards; an opened card spans the full row */
+.list.grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.list.grid .mon > summary { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 10px 8px 12px; gap: 6px; position: relative; }
+.list.grid .mon > summary .sp { width: 72px; height: 72px; }
+.list.grid .mon > summary .sp i { transform: scale(1.125); }
+.list.grid .who { justify-items: center; }
+.list.grid .who .nm small { display: block; margin: 2px 0 0; }
+.list.grid .tags { justify-content: center; }
+.list.grid .chev { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; }
+.list.grid .mon[open] { grid-column: 1 / -1; }
+.list.grid .mon[open] > summary { grid-template-columns: 56px minmax(0, 1fr) auto; justify-items: start; text-align: left; }
+.list.grid .mon[open] > summary .sp { width: 56px; height: 56px; }
+.list.grid .mon[open] > summary .sp i { transform: scale(.875); }
+.list.grid .mon[open] .who { justify-items: start; }
+.list.grid .mon[open] .tags { justify-content: flex-start; }
+.list.grid .mon[open] .who .nm small { display: inline; margin-left: 6px; }
+.list.grid .mon[open] .chev { position: static; width: 28px; height: 28px; }
 .mon > summary::-webkit-details-marker { display: none; }
 .sp { width: 56px; height: 56px; overflow: hidden; flex: none; }
 .sp i { display: block; width: 64px; height: 64px; transform: scale(.875); transform-origin: 0 0; background-image: var(--sheet); background-repeat: no-repeat; image-rendering: pixelated; }
@@ -101,8 +129,6 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .tags { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
 .mode { font: 600 10.5px/1 var(--font-body); padding: 3px 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
 .mode.d { border-color: var(--accent); color: var(--accent); }
-.nums { text-align: right; font: 12px/1.35 var(--font-data); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.nums b { display: block; font: 600 16px var(--font-data); color: var(--ink); }
 
 /* Detail */
 .detail { border-top: 1px solid var(--line); padding: 14px; display: grid; gap: 18px; }
@@ -154,6 +180,12 @@ table.loc td { vertical-align: top; }
 table.loc td.meth { white-space: nowrap; font-size: 13px; }
 .groups { display: grid; gap: 16px; }
 
+/* Place card */
+.loccard { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px; display: grid; gap: 12px; }
+.loccard h2 { margin: 0; font: 600 24px/1.1 var(--font-display); }
+.loccard h2 small { font: 500 13px var(--font-body); color: var(--muted); margin-left: 8px; }
+.chip .sub { font-size: 11.5px; color: var(--muted); font-weight: 400; }
+
 /* Move card */
 .movecard { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px; display: grid; gap: 12px; }
 .movecard .top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -172,20 +204,22 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
 .empty { color: var(--muted); font-style: italic; }
 .moreoves { display: flex; gap: 6px; flex-wrap: wrap; }
 .moreoves button { border: 1px solid var(--line); background: var(--surface); padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 13.5px; display: inline-flex; gap: 6px; align-items: center; }
-#more { justify-self: center; border: 1px solid var(--line); background: var(--surface); padding: 8px 16px; border-radius: 8px; cursor: pointer; color: var(--muted); }
+/* Rows off screen skip layout and paint until scrolled to */
+.mon:not([open]) { content-visibility: auto; contain-intrinsic-size: auto 70px; }
 .nores { padding: 24px; text-align: center; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; }
-footer { color: var(--muted); font-size: 12px; text-align: center; padding-block: 0 24px; }
 @media (max-width: 520px) {
   .brand .meta .long { display: none; }
-  .mon > summary { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 8px; }
-  .mon > summary .sp { width: 48px; height: 48px; }
-  .mon > summary .sp i { transform: scale(.75); }
+  .list:not(.grid) .mon > summary { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 8px; }
+  .list.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .list:not(.grid) .mon > summary .sp { width: 48px; height: 48px; }
+  .list:not(.grid) .mon > summary .sp i { transform: scale(.75); }
   .who .nm { font-size: 16.5px; }
   .detail { padding: 12px 10px; }
   table.mv .hide-sm { display: none; }
 }
 @media (prefers-reduced-motion: no-preference) {
   .mon { transition: border-color .15s; }
+  .chev { transition: transform .15s; }
 }
 </style>
 </head>
@@ -193,11 +227,11 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding-block
 <header class="console">
   <div class="wrap">
     <div class="brand">
-      <h1><span class="lens" aria-hidden="true"></span>Pokemon Amethyst Pokedex</h1>
+      <h1><img class="brand-icon" src="__BRAND_ICON__" alt="" width="34" height="34">Pokemon Amethyst Pokedex</h1>
       <div class="meta"><span class="long">Stats, evolutions, locations &amp; every way to learn a move</span><a id="dl" href="dex.html" download="pokemon-amethyst-pokedex.html" hidden>Download for offline use</a></div>
     </div>
     <div class="search">
-      <input id="q" type="search" placeholder="Search Pokémon or moves — e.g. Rockruff, Ceaseless Edge" autocomplete="off" spellcheck="false" aria-label="Search Pokémon or moves">
+      <input id="q" type="search" placeholder="Search Pokémon, moves or places — e.g. Rockruff, Ceaseless Edge, Route 2" autocomplete="off" spellcheck="false" aria-label="Search Pokémon, moves or places">
       <button class="clear" id="clear" aria-label="Clear search" hidden>×</button>
     </div>
     <div class="filters">
@@ -207,12 +241,15 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding-block
         <button id="m-div" data-mode="Divergent" aria-pressed="false">Divergent</button>
       </div>
       <select id="type" aria-label="Filter by type"><option value="">All types</option></select>
+      <div class="seg" role="group" aria-label="Layout">
+        <button id="v-list" data-view="list" aria-pressed="true" title="List"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 3h12M2 8h12M2 13h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="vh">List</span></button>
+        <button id="v-grid" data-view="grid" aria-pressed="false" title="Grid"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z" fill="currentColor"/></svg><span class="vh">Grid</span></button>
+      </div>
       <span class="count" id="count"></span>
     </div>
   </div>
 </header>
 <main><div class="wrap" id="out"></div></main>
-<footer class="wrap">Generated from the game's source data. Locations come from the “Pokémon Amethyst: Where to Find Every Pokémon” sheet. Item locations aren't covered.</footer>
 
 <script>
 const DEX = __DEX_DATA__;
@@ -237,6 +274,15 @@ const SHEET = "__SPRITE_SHEET__";
     status: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#8b949e"/><path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="#c9d1d9"/></svg>',
   };
   const CAT_NAME = { physical: "Physical", special: "Special", status: "Status" };
+  const TYPE_COLOR = { NORMAL: "#9a9d9a", FIRE: "#e2562a", WATER: "#2f7fe6", GRASS: "#3c9a2d", ELECTRIC: "#f2bd16", ICE: "#3fc4e8",
+    FIGHTING: "#e07510", POISON: "#8f45c6", GROUND: "#946033", FLYING: "#6f9fdc", PSYCHIC: "#e8487d", BUG: "#8b9b1c", ROCK: "#a49a6c",
+    GHOST: "#6c4a74", DRAGON: "#5463d8", DARK: "#5b4b4c", STEEL: "#5f99ad", FAIRY: "#e06fe0", MYSTERY: "#5e8f86" };
+  // A faint wash of the Pokémon's type colours behind its row
+  const tint = (m) => {
+    const a = TYPE_COLOR[m.types[0]], b = TYPE_COLOR[m.types[1] || m.types[0]];
+    return `--tint: linear-gradient(100deg, ${a}26 0%, ${a}0d 38%, ${b}0d 70%, ${b}24 100%)`;
+  };
+  const CHEVRON = '<span class="chev" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
   const mons = DEX.mons, moves = DEX.moves;
   const moveKeys = Object.keys(moves);
 
@@ -247,27 +293,46 @@ const SHEET = "__SPRITE_SHEET__";
   mons.forEach((m, i) => m.evo.forEach(([to]) => { if (!parent.has(to)) parent.set(to, i); }));
   const moveSearch = moveKeys.map((k) => [k, moves[k].s]);  // in-game name, official name, constant name
 
-  const state = { q: "", mode: "", type: "", limit: 60, open: null, tab: "level", tabFilter: "" };
-  try { state.mode = localStorage.getItem("dex-mode") || ""; } catch (e) {}
+  const state = { q: "", mode: "", type: "", open: null, tab: "level", tabFilter: "", view: "list" };
+  try { state.mode = localStorage.getItem("dex-mode") || ""; state.view = localStorage.getItem("dex-view") || "list"; } catch (e) {}
+
+  // Sort keys per mode: that mode's dex number; unnumbered forms sit just after the entry before them (their base)
+  const order = { Standard: new Float64Array(mons.length), Divergent: new Float64Array(mons.length) };
+  for (const [mode, field] of [["Standard", "std"], ["Divergent", "div"]]) {
+    let last = 0, step = 0;
+    mons.forEach((m, i) => {
+      if (m.dex[field]) { last = m.dex[field]; step = 0; order[mode][i] = last; }
+      else order[mode][i] = last + ++step / 1000;
+    });
+  }
+
+  // Places: every location in the encounter data, with the Pokémon found there
+  const places = new Map();
+  mons.forEach((m, i) => m.loc.forEach((l) => {
+    const k = norm(l.location);
+    if (!places.has(k)) places.set(k, { name: l.location, rows: [] });
+    places.get(k).rows.push([i, l]);
+  }));
 
   const typeBadge = (t) => `<span class="type t-${t}">${t === "MYSTERY" ? "???" : t[0] + t.slice(1).toLowerCase()}</span>`;
   const sprite = (m, small) => `<span class="sp${small ? " sm" : ""}" aria-hidden="true"><i style="background-position:-${m.sp[0]}px -${m.sp[1]}px"></i></span>`;
   const formLabel = (m) => (m.form ? ` <small>${esc(m.form)}</small>` : "");
-  const modeBadge = (m) => m.modes.length === 2
-    ? '<span class="mode">Standard &amp; Divergent</span>'
-    : `<span class="mode${m.modes[0] === "Divergent" ? " d" : ""}">${m.modes[0]}</span>`;
   const pad = (n) => String(n).padStart(3, "0");
-  const dexNums = (m) => [m.dex.std ? `S#${pad(m.dex.std)}` : "", m.dex.div ? `D#${pad(m.dex.div)}` : ""].filter(Boolean).join(" ") || "—";
+  // One badge per mode, carrying that mode's dex number
+  const modeBadge = (m) => m.modes.map((mode) => {
+    const n = mode === "Standard" ? m.dex.std : m.dex.div;
+    return `<span class="mode${mode === "Divergent" ? " d" : ""}">${mode}${n ? `<b>#${pad(n)}</b>` : ""}</span>`;
+  }).join("");
   const bst = (m) => m.stats.reduce((a, b) => a + b, 0);
   const inMode = (m) => !state.mode || m.modes.includes(state.mode);
   const inType = (m) => !state.type || m.types.includes(state.type);
 
   function row(m, i) {
-    return `<details class="mon" data-i="${i}"${state.open === i ? " open" : ""}>
-      <summary>${sprite(m)}
+    return `<details class="mon" data-i="${i}" style="${tint(m)}"${state.open === i ? " open" : ""}>
+      <summary title="Show details">${sprite(m)}
         <span class="who"><span class="nm">${esc(m.name)}${formLabel(m)}</span>
           <span class="tags">${m.types.map(typeBadge).join("")}${modeBadge(m)}</span></span>
-        <span class="nums"><b>${bst(m)}</b>${dexNums(m)}</span>
+        ${CHEVRON}
       </summary>${state.open === i ? detail(i) : ""}</details>`;
   }
 
@@ -353,8 +418,7 @@ const SHEET = "__SPRITE_SHEET__";
   function locTable(rows) {
     return `<div class="moves"><table class="mv loc"><thead><tr><th>Location</th><th>Method</th><th style="text-align:right">Lv</th><th style="text-align:right">Rate</th><th class="hide-sm">Mode</th></tr></thead><tbody>${
       rows.map((l) => `<tr><td><b>${esc(l.location)}</b>${l.sub ? `<div class="note">${esc(l.sub)}</div>` : ""}${
-        l.variant ? `<div class="note">${esc(l.variant)}</div>` : ""}${l.notes ? `<div class="note">${esc(l.notes)}</div>` : ""}${
-        l.item ? `<div class="note">Holds: ${esc(l.item)}</div>` : ""}</td>
+        l.variant ? `<div class="note">${esc(l.variant)}</div>` : ""}${l.notes ? `<div class="note">${esc(l.notes)}</div>` : ""}</td>
         <td class="meth">${esc(l.method)}</td><td class="n">${esc(l.levels || "—")}</td><td class="n">${esc(l.rate || "—")}</td>
         <td class="hide-sm"><span class="mode${l.mode === "Divergent" ? " d" : ""}">${esc(l.mode)}</span></td></tr>`).join("")}</tbody></table></div>`;
   }
@@ -371,7 +435,7 @@ const SHEET = "__SPRITE_SHEET__";
     const m = mons[i];
     const f = norm(state.tabFilter);
     if (state.tab === "loc") {
-      const rows = locRows(i).filter((l) => !f || [l.location, l.sub || "", l.method, l.notes || "", l.item || "", l.variant || ""].some((s) => norm(s).includes(f)));
+      const rows = locRows(i).filter((l) => !f || [l.location, l.sub || "", l.method, l.notes || "", l.variant || ""].some((s) => norm(s).includes(f)));
       if (!locRows(i).length) return noLocations(i);
       return rows.length ? locTable(rows) : `<p class="note">No locations match “${esc(state.tabFilter)}”.</p>`;
     }
@@ -421,7 +485,7 @@ const SHEET = "__SPRITE_SHEET__";
           <dt>Catch rate</dt><dd>${m.catchRate}</dd>
           <dt>Growth</dt><dd>${esc(m.growth)}</dd>
           <dt>EV yield</dt><dd>${evs}</dd>
-          <dt>Dex</dt><dd>${m.dex.std ? `Standard #${pad(m.dex.std)}` : ""}${m.dex.std && m.dex.div ? " · " : ""}${m.dex.div ? `Divergent #${pad(m.dex.div)}` : ""}${!m.dex.std && !m.dex.div ? "Form — not numbered" : ""}</dd>
+          ${m.held.length ? `<dt>Wild held items</dt><dd class="held">${m.held.map((h) => `<span>${esc(h)}</span>`).join("")}</dd>` : ""}
         </dl></section>
       </div>
       <section><h3>Evolution</h3>${evoTree(i)}</section>
@@ -447,6 +511,18 @@ const SHEET = "__SPRITE_SHEET__";
       <div class="learners">${body}</div></article>`;
   }
 
+  function placeCard(p) {
+    const rows = p.rows.filter(([i, l]) => (!state.mode || l.mode === "Both" || l.mode === state.mode) && inType(mons[i]));
+    const methods = [];
+    rows.forEach((r) => { const g = methods.find(([mt]) => mt === r[1].method); g ? g[1].push(r) : methods.push([r[1].method, [r]]); });
+    const chip = ([i, l]) => `<button class="chip" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${formLabel(mons[i])}${
+      l.sub ? ` <span class="sub">${esc(l.sub)}</span>` : ""}</span><span class="hw">${esc([l.levels && `Lv ${l.levels}`, l.rate].filter(Boolean).join(" · "))}</span></button>`;
+    const body = methods.length
+      ? methods.map(([mt, l]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips">${l.map(chip).join("")}</div></div>`).join("")
+      : `<p class="empty">No ${esc(state.mode)} Pokémon are found here.</p>`;
+    return `<article class="loccard"><h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2><div class="learners">${body}</div></article>`;
+  }
+
   function render() {
     const q = norm(state.q);
     let html = "";
@@ -456,12 +532,18 @@ const SHEET = "__SPRITE_SHEET__";
       const partial = moveSearch.filter(([, keys]) => !keys.includes(q) && keys.some((x) => x.includes(q)));
       matchedMoves = exact.concat(partial).map(([k]) => k);
     }
+    let matchedPlaces = [];
+    if (q.length >= 3) {
+      const all = [...places.entries()];
+      matchedPlaces = all.filter(([k]) => k === q).concat(all.filter(([k]) => k !== q && k.includes(q))).map(([, p]) => p);
+    }
     const list = [];
     mons.forEach((m, i) => {
       if (!inMode(m) || !inType(m)) return;
       if (q && !m.s.some((s) => s.includes(q))) return;
       list.push(i);
     });
+    if (state.mode) list.sort((a, b) => order[state.mode][a] - order[state.mode][b]);
     if (q) list.sort((a, b) => (mons[b].s.some((s) => s.startsWith(q)) - mons[a].s.some((s) => s.startsWith(q))));
 
     if (matchedMoves.length) {
@@ -471,22 +553,30 @@ const SHEET = "__SPRITE_SHEET__";
       const rest = showCard ? matchedMoves.slice(1) : matchedMoves;
       if (rest.length) html += `<div class="moreoves">${rest.slice(0, 24).map((k) => `<button data-move="${k}">${typeBadge(moves[k].type)}${esc(moves[k].name)}</button>`).join("")}</div>`;
     }
-    if (list.length || !matchedMoves.length) {
-      if (matchedMoves.length) html += `<div class="section-label">Pokémon</div>`;
+    if (matchedPlaces.length) {
+      const exactPlace = places.get(q) || (matchedPlaces.length === 1 ? matchedPlaces[0] : null);
+      html += `<div class="section-label">Places</div>`;
+      if (exactPlace) html += placeCard(exactPlace);
+      const rest = matchedPlaces.filter((p) => p !== exactPlace);
+      if (rest.length) html += `<div class="moreoves">${rest.slice(0, 30).map((p) => `<button data-place="${esc(p.name)}">${esc(p.name)}</button>`).join("")}</div>`;
+    }
+    if (list.length || (!matchedMoves.length && !matchedPlaces.length)) {
+      if (matchedMoves.length || matchedPlaces.length) html += `<div class="section-label">Pokémon</div>`;
       html += list.length
-        ? `<div class="list">${list.slice(0, state.limit).map((i) => row(mons[i], i)).join("")}</div>`
+        ? `<div class="list${state.view === "grid" ? " grid" : ""}">${list.map((i) => row(mons[i], i)).join("")}</div>`
         : `<div class="nores">Nothing matches “${esc(state.q)}”${state.mode ? ` in ${state.mode} mode` : ""}.</div>`;
-      if (list.length > state.limit) html += `<button id="more">Show ${Math.min(120, list.length - state.limit)} more</button>`;
     }
     $("#out").innerHTML = html;
-    $("#count").textContent = `${list.length} Pokémon${matchedMoves.length ? ` · ${matchedMoves.length} move${matchedMoves.length > 1 ? "s" : ""}` : ""}`;
+    $("#count").textContent = `${list.length} Pokémon${matchedMoves.length ? ` · ${matchedMoves.length} move${matchedMoves.length > 1 ? "s" : ""}` : ""}${
+      matchedPlaces.length ? ` · ${matchedPlaces.length} place${matchedPlaces.length > 1 ? "s" : ""}` : ""}`;
     $("#clear").hidden = !state.q;
-    document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
+    document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
+    document.querySelectorAll(".seg button[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.view)));
     syncConsoleHeight();
   }
 
   function search(text) {
-    state.q = text; state.limit = 60; state.open = null;
+    state.q = text; state.open = null;
     $("#q").value = text;
     render();
     window.scrollTo({ top: 0 });
@@ -495,7 +585,7 @@ const SHEET = "__SPRITE_SHEET__";
   function openMon(i) {
     const m = mons[i];
     state.tabFilter = "";
-    state.q = m.name; state.limit = 60; state.open = i;
+    state.q = m.name; state.open = i;
     $("#q").value = m.name;
     if (!inMode(m)) state.mode = "";
     if (!inType(m)) { state.type = ""; $("#type").value = ""; }
@@ -507,17 +597,24 @@ const SHEET = "__SPRITE_SHEET__";
   // Wiring
   $("#type").insertAdjacentHTML("beforeend", TYPES.map((t) => `<option value="${t}">${t[0] + t.slice(1).toLowerCase()}</option>`).join(""));
   let timer;
-  $("#q").addEventListener("input", (e) => { clearTimeout(timer); timer = setTimeout(() => { state.q = e.target.value; state.limit = 60; state.open = null; render(); }, 120); });
+  $("#q").addEventListener("input", (e) => { clearTimeout(timer); timer = setTimeout(() => { state.q = e.target.value; state.open = null; render(); }, 120); });
   $("#clear").addEventListener("click", () => { search(""); $("#q").focus(); });
-  $("#type").addEventListener("change", (e) => { state.type = e.target.value; state.limit = 60; render(); });
-  document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
-    state.mode = b.dataset.mode; state.limit = 60;
+  $("#type").addEventListener("change", (e) => { state.type = e.target.value; render(); });
+  document.querySelectorAll(".seg button[data-view]").forEach((b) => b.addEventListener("click", () => {
+    state.view = b.dataset.view;
+    try { localStorage.setItem("dex-view", state.view); } catch (e) {}
+    render();
+  }));
+  document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.addEventListener("click", () => {
+    state.mode = b.dataset.mode;
     try { localStorage.setItem("dex-mode", state.mode); } catch (e) {}
     render();
   }));
   $("#out").addEventListener("click", (e) => {
     const mv = e.target.closest("[data-move]");
     if (mv) { e.preventDefault(); search(moves[mv.dataset.move].name); return; }
+    const pl = e.target.closest("[data-place]");
+    if (pl) { e.preventDefault(); search(pl.dataset.place); return; }
     const op = e.target.closest("[data-open]");
     if (op) { e.preventDefault(); openMon(+op.dataset.open); return; }
     const tab = e.target.closest("[data-tab]");
@@ -527,7 +624,6 @@ const SHEET = "__SPRITE_SHEET__";
       box.outerHTML = tabsBlock(+box.dataset.tabs);
       return;
     }
-    if (e.target.closest("#more")) { state.limit += 120; render(); }
   });
   $("#out").addEventListener("input", (e) => {
     if (!e.target.classList.contains("tabfilter")) return;

@@ -119,3 +119,13 @@ def test_title(html):
 
 def test_sw_only_caches_good_responses(site):
     assert "res.ok" in (site / "sw.js").read_text()
+
+
+def test_wild_held_items_on_profile(data):
+    by = {m["key"]: m for m in data["mons"]}
+    assert "Oran Berry (50%)" in by["SPECIES_BIBAREL"]["held"]
+    assert all("item" not in l for m in data["mons"] for l in m["loc"])   # moved out of location rows
+
+
+def test_header_icon_embedded(html):
+    assert 'class="brand-icon"' in html and "data:image/png;base64," in html

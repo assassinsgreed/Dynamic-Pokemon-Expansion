@@ -51,7 +51,7 @@ def _move_of(method: str, item: tuple | str) -> str:
     return item[0] if method == "special" else item[1]
 
 
-def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: list[dict]) -> dict:
+def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: list[dict], held: list[str]) -> dict:
     s = e.stats
     official = e.key.removeprefix("SPECIES_").replace("_", " ").title()
     return {
@@ -74,6 +74,7 @@ def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: 
         "s": search_keys(e.name, official, f"{e.form} {e.name}" if e.form else None),
         "movesOf": index.get(e.base) if e.battle_form else None,
         "loc": locations,
+        "held": held,
     }
 
 
@@ -94,24 +95,21 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
                 move = _move_of(method, item)
                 if move in moves:
                     moves[move]["learners"].append([i, _how(method, item)])
-    locations, unmatched = attach_encounters(load_encounters(), roster)
+    locations, held, unmatched = attach_encounters(load_encounters(), roster)
     return {
-        "mons": [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, [])) for e in roster],
+        "mons": [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, []), held.get(e.key, []))
+                 for e in roster],
         "moves": moves,
         "unmatchedEncounters": unmatched,
     }
 
 
 def _icon(size: int) -> bytes:
-    """The header's red lens as an app icon."""
-    img = Image.new("RGBA", (size, size), (22, 29, 36, 255))
-    d = ImageDraw.Draw(img)
-    r = size * 0.30
-    c = size / 2
-    d.ellipse((c - r * 1.25, c - r * 1.25, c + r * 1.25, c + r * 1.25), fill=(251, 230, 233, 255))
-    d.ellipse((c - r, c - r, c + r, c + r), fill=(200, 32, 58, 255))
-    h = r * 0.32
-    d.ellipse((c - r * 0.45 - h, c - r * 0.45 - h, c - r * 0.45 + h, c - r * 0.45 + h), fill=(255, 255, 255, 200))
+    """App icon: the Trozei Jirachi head on Amethyst purple."""
+    img = Image.new("RGBA", (size, size), (50, 0, 119, 255))
+    head = Image.open(BRAND_ICON).convert("RGBA").resize((int(size * 0.72),) * 2, Image.LANCZOS)
+    offset = (size - head.size[0]) // 2
+    img.alpha_composite(head, (offset, offset))
     out = io.BytesIO()
     img.save(out, "PNG")
     return out.getvalue()
@@ -123,8 +121,8 @@ MANIFEST = {
     "start_url": "./",
     "scope": "./",
     "display": "standalone",
-    "background_color": "#0e1318",
-    "theme_color": "#c8203a",
+    "background_color": "#1a1226",
+    "theme_color": "#5b2a9e",
     "icons": [{"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
               {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}],
 }
@@ -150,6 +148,13 @@ def build(paths: Paths, out: Path) -> None:
     (out / "sw.js").write_text(SW_TEMPLATE.read_text(encoding="utf-8").replace("__CACHE__", cache), encoding="utf-8")
 
 
+BRAND_ICON = Path(__file__).with_name("jirachi-trozei.png")  # Jirachi's Pokémon Trozei head (Bulbapedia BT385.png)
+
+
+def _brand_icon() -> str:
+    return "data:image/png;base64," + base64.b64encode(BRAND_ICON.read_bytes()).decode()
+
+
 def render(data: dict, sheet: bytes, offsets: dict) -> str:
     data = dict(data, mons=[dict(m, sp=offsets[m["key"]]) for m in data["mons"]])
     # Keys keep the move table compact and stable; the page only needs them as ids.
@@ -157,4 +162,5 @@ def render(data: dict, sheet: bytes, offsets: dict) -> str:
     sprites = "data:image/webp;base64," + base64.b64encode(sheet).decode()
     return (TEMPLATE.read_text(encoding="utf-8")
             .replace("__DEX_DATA__", blob)
-            .replace("__SPRITE_SHEET__", sprites))
+            .replace("__SPRITE_SHEET__", sprites)
+            .replace("__BRAND_ICON__", _brand_icon()))

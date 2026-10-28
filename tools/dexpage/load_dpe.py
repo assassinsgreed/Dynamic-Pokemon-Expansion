@@ -22,7 +22,7 @@ from .cparse import (
 from .paths import Paths
 
 # Game text escapes used in the .string files
-CHAR_ESCAPES = {"[B5]": "♂", "[B6]": "♀", "[.]": "…"}
+CHAR_ESCAPES = {"[B5]": "♂", "[B6]": "♀", "[.]": "…", "\e": "é"}
 
 
 def decode_text(text: str) -> str:

@@ -70,3 +70,7 @@ def test_tm_number_comes_from_filename(paths):
 def test_duplicate_egg_entries_first_wins(paths):
     # GetEggMoves stops at the first matching entry; Cufant's second copy adds Double-Edge
     assert "MOVE_DOUBLEEDGE" not in egg_moves(paths)["SPECIES_CUFANT"]
+
+
+def test_accented_names_decoded(paths):
+    assert species_names(paths)["SPECIES_FLABEBE"] == "Flabébé"

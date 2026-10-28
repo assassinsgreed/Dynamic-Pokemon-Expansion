@@ -45,13 +45,14 @@ def load_encounters(path: Path = ENCOUNTERS_CSV) -> list[dict]:
     return result
 
 
-def attach_encounters(rows: list[dict], entries: list) -> tuple[dict[str, list[dict]], list[str]]:
-    """Encounter rows per roster key, plus sheet names that matched no entry.
+def attach_encounters(rows: list[dict], entries: list) -> tuple[dict[str, list[dict]], dict[str, list[str]], list[str]]:
+    """Encounter rows per roster key, wild held items per key, and sheet names that matched no entry.
 
     "Name (Form)" matches the entry with that form label; a form the page has no row for (e.g. Pikachu's caps)
     falls back to the formless entry and keeps the form text as the row's variant."""
     by_name_form = {(_norm(e.name), _norm(e.form or "")): e.key for e in entries}
     by_key: dict[str, list[dict]] = {}
+    held_items: dict[str, list[str]] = {}
     unmatched: list[str] = []
     for r in rows:
         name, form = _norm(r["name"]), _norm(r["form"] or "")
@@ -64,8 +65,13 @@ def attach_encounters(rows: list[dict], entries: list) -> tuple[dict[str, list[d
             if label not in unmatched:
                 unmatched.append(label)
             continue
-        row = {k: v for k, v in r.items() if k not in ("name", "form") and v}
+        # Held items describe the Pokémon, not the place, so they go on the profile instead
+        row = {k: v for k, v in r.items() if k not in ("name", "form", "item") and v}
+        for held in filter(None, (h.strip() for h in r["item"].split(","))):
+            held_items.setdefault(key, [])
+            if held not in held_items[key]:
+                held_items[key].append(held)
         if variant:
             row["variant"] = variant
         by_key.setdefault(key, []).append(row)
-    return by_key, unmatched
+    return by_key, held_items, unmatched
