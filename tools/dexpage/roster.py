@@ -55,6 +55,7 @@ class Entry:
     stats: dict
     moves: dict = field(default_factory=dict)
     family: str = ""
+    battle_form: bool = False  # Mega/Primal/Ultra: exists only in battle, moves are its base's
 
 
 def _national_dex(p: Paths) -> dict[str, str]:
@@ -236,7 +237,7 @@ def build_roster(data: SourceData) -> list[Entry]:
             key=key, name=data.names.get(key, key), form=form,
             modes=[m for m in (STANDARD, DIVERGENT) if m in mode_set],
             dex={k: v for k, v in (("std", _index(data.std, key)), ("div", _index(data.div, key))) if v},
-            base=base, stats=data.stats[key], family=roots.get(key, root),
+            base=base, stats=data.stats[key], family=roots.get(key, root), battle_form=is_mega,
         )
         # Megas only exist in battle: they learn exactly what their base learns
         entry.moves = (_moves_for(data, base, base, root) if is_mega

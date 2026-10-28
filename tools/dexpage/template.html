@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shooting Stars Dex</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Searchable Pokédex for Standard and Divergent modes: stats, evolutions, and every way to learn each move.">
+<meta name="theme-color" content="#c8203a">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+/* Layout: one sticky search console over a single dense column of tap-to-expand rows; move matches surface above Pokémon. */
+:root {
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --sunk: #f6f8fa;
+  --ink: #17212b;
+  --muted: #5a6876;
+  --line: #d8dee5;
+  --accent: #c8203a;
+  --accent-soft: #fbe6e9;
+  --focus: #2563eb;
+  --font-display: "Bahnschrift", "DIN Alternate", "Avenir Next Condensed", "Roboto Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-data: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1318; --surface: #161d24; --sunk: #1b232b; --ink: #e5eaef; --muted: #94a1ae;
+    --line: #2a343e; --accent: #ff5a6e; --accent-soft: #3a1c22; --focus: #7aa7ff; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1318; --surface: #161d24; --sunk: #1b232b; --ink: #e5eaef; --muted: #94a1ae;
+  --line: #2a343e; --accent: #ff5a6e; --accent-soft: #3a1c22; --focus: #7aa7ff; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.45 var(--font-body);
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.wrap { max-width: 980px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Console */
+header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+.console .wrap { padding-block: 12px; display: grid; gap: 10px; }
+.brand { display: flex; align-items: baseline; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
+.brand h1 { margin: 0; font: 600 22px/1 var(--font-display); letter-spacing: .02em; display: flex; align-items: center; gap: 8px; }
+.brand h1 .lens { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); flex: none; }
+.brand .meta { color: var(--muted); font-size: 12.5px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.brand a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.brand a:hover { text-decoration: underline; }
+.search { position: relative; }
+.search input {
+  width: 100%; font: 500 17px/1.2 var(--font-body); color: var(--ink);
+  background: var(--sunk); border: 1.5px solid var(--line); border-radius: 10px; padding: 11px 40px 11px 14px;
+}
+.search input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+.search .clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: 0; background: none; color: var(--muted); font-size: 20px; width: 32px; height: 32px; cursor: pointer; border-radius: 6px; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface); padding: 6px 11px; font-size: 13px; cursor: pointer; color: var(--muted); }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+select { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
+.count { margin-left: auto; color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+
+main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
+.section-label { font: 600 12px/1 var(--font-display); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 6px 2px 0; }
+
+/* Types & categories */
+.type { display: inline-block; font: 600 11px/1 var(--font-display); text-transform: uppercase; letter-spacing: .06em; padding: 4px 7px 3px; border-radius: 4px; color: #fff; white-space: nowrap; }
+.t-NORMAL{background:#9a9d9a}.t-FIRE{background:#e2562a}.t-WATER{background:#2f7fe6}.t-GRASS{background:#3c9a2d}
+.t-ELECTRIC{background:#f2bd16;color:#2b2100}.t-ICE{background:#3fc4e8;color:#06252e}.t-FIGHTING{background:#e07510}
+.t-POISON{background:#8f45c6}.t-GROUND{background:#946033}.t-FLYING{background:#6f9fdc}.t-PSYCHIC{background:#e8487d}
+.t-BUG{background:#8b9b1c}.t-ROCK{background:#a49a6c}.t-GHOST{background:#6c4a74}.t-DRAGON{background:#5463d8}
+.t-DARK{background:#5b4b4c}.t-STEEL{background:#5f99ad}.t-FAIRY{background:#e06fe0}.t-MYSTERY{background:#5e8f86}
+.cat { display: inline-flex; width: 18px; height: 18px; vertical-align: middle; flex: none; }
+.cat svg { width: 100%; height: 100%; }
+
+/* Rows */
+.list { display: grid; gap: 6px; }
+.mon { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--console-h, 150px) + 8px); }
+.mon[open] { border-color: var(--muted); }
+.mon > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 12px 6px 6px; }
+.mon > summary::-webkit-details-marker { display: none; }
+.sp { width: 56px; height: 56px; overflow: hidden; flex: none; }
+.sp i { display: block; width: 64px; height: 64px; transform: scale(.875); transform-origin: 0 0; background-image: var(--sheet); background-repeat: no-repeat; image-rendering: pixelated; }
+.sp.sm { width: 36px; height: 36px; }
+.sp.sm i { transform: scale(.5625); }
+.who { min-width: 0; display: grid; gap: 4px; }
+.who .nm { font: 600 18px/1.1 var(--font-display); letter-spacing: .01em; }
+.who .nm small { font: 500 13px var(--font-body); color: var(--muted); margin-left: 6px; letter-spacing: 0; }
+.tags { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+.mode { font: 600 10.5px/1 var(--font-body); padding: 3px 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.mode.d { border-color: var(--accent); color: var(--accent); }
+.nums { text-align: right; font: 12px/1.35 var(--font-data); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.nums b { display: block; font: 600 16px var(--font-data); color: var(--ink); }
+
+/* Detail */
+.detail { border-top: 1px solid var(--line); padding: 14px; display: grid; gap: 18px; }
+.detail h3 { margin: 0 0 8px; font: 600 12px/1 var(--font-display); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.cols { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.cols > * { min-width: 0; }
+.stats { display: grid; grid-template-columns: 34px 32px minmax(0, 1fr); gap: 3px 8px; align-items: center; font: 12.5px var(--font-data); font-variant-numeric: tabular-nums; }
+.stats .lab { color: var(--muted); }
+.stats .val { text-align: right; font-weight: 600; }
+.bar { height: 8px; background: var(--sunk); border-radius: 4px; overflow: hidden; }
+.bar span { display: block; height: 100%; border-radius: 4px; }
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; font-size: 13.5px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+.hidden-ab { color: var(--muted); font-style: italic; }
+
+.evo { display: grid; gap: 6px; }
+.evo ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.evo ul ul { padding-left: 18px; border-left: 2px solid var(--line); margin-left: 17px; }
+.evo li > .node { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.evo .how { font-size: 12.5px; color: var(--ink); background: var(--sunk); border: 1px solid var(--line); padding: 2px 7px; border-radius: 999px; }
+.link { background: none; border: 0; padding: 2px 4px 2px 0; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border-radius: 6px; text-align: left; }
+.link:hover .ln { text-decoration: underline; }
+.link .ln { font-weight: 600; }
+.link .ln small { font-weight: 400; color: var(--muted); }
+.link.current .ln { color: var(--accent); }
+
+.moves { overflow-x: auto; }
+table.mv { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+table.mv th { text-align: left; font: 600 11px var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 4px 6px; border-bottom: 1px solid var(--line); }
+table.mv td { padding: 4px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+table.mv td.n { font-family: var(--font-data); font-variant-numeric: tabular-nums; text-align: right; color: var(--muted); white-space: nowrap; }
+table.mv td.h { font-family: var(--font-data); font-size: 12.5px; white-space: nowrap; }
+table.mv tr:last-child td { border-bottom: 0; }
+.mvname { background: none; border: 0; padding: 0; cursor: pointer; font-weight: 600; text-align: left; }
+.mvname:hover { text-decoration: underline; color: var(--accent); }
+.note { color: var(--muted); font-size: 12.5px; }
+.groups { display: grid; gap: 16px; }
+
+/* Move card */
+.movecard { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px; display: grid; gap: 12px; }
+.movecard .top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.movecard h2 { margin: 0; font: 600 24px/1.1 var(--font-display); }
+.movecard h2 small { font: 500 13px var(--font-body); color: var(--muted); margin-left: 6px; }
+.movecard .specs { display: flex; gap: 14px; font: 13px var(--font-data); color: var(--muted); font-variant-numeric: tabular-nums; }
+.movecard .specs b { color: var(--ink); }
+.learners { display: grid; gap: 10px; }
+.learners h4 { margin: 0 0 6px; font: 600 11.5px var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px 2px 2px; border: 1px solid var(--line); border-radius: 999px; background: var(--sunk); cursor: pointer; }
+.chip:hover { border-color: var(--muted); }
+.chip .ln { font-weight: 600; font-size: 13.5px; }
+.chip .ln small { color: var(--muted); font-weight: 400; }
+.chip .hw { font: 12px var(--font-data); color: var(--muted); }
+.empty { color: var(--muted); font-style: italic; }
+.moreoves { display: flex; gap: 6px; flex-wrap: wrap; }
+.moreoves button { border: 1px solid var(--line); background: var(--surface); padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 13.5px; display: inline-flex; gap: 6px; align-items: center; }
+#more { justify-self: center; border: 1px solid var(--line); background: var(--surface); padding: 8px 16px; border-radius: 8px; cursor: pointer; color: var(--muted); }
+.nores { padding: 24px; text-align: center; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; }
+footer { color: var(--muted); font-size: 12px; text-align: center; padding-block: 0 24px; }
+@media (max-width: 520px) {
+  .brand .meta .long { display: none; }
+  .mon > summary { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 8px; }
+  .mon > summary .sp { width: 48px; height: 48px; }
+  .mon > summary .sp i { transform: scale(.75); }
+  .who .nm { font-size: 16.5px; }
+  .detail { padding: 12px 10px; }
+  table.mv .hide-sm { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mon { transition: border-color .15s; }
+}
+</style>
+</head>
+<body>
+<header class="console">
+  <div class="wrap">
+    <div class="brand">
+      <h1><span class="lens" aria-hidden="true"></span>Shooting Stars Dex</h1>
+      <div class="meta"><span class="long">Stats, evolutions &amp; every way to learn a move</span><a id="dl" href="dex.html" download="shooting-stars-dex.html" hidden>Download for offline use</a></div>
+    </div>
+    <div class="search">
+      <input id="q" type="search" placeholder="Search Pokémon or moves — e.g. Rockruff, Ceaseless Edge" autocomplete="off" spellcheck="false" aria-label="Search Pokémon or moves">
+      <button class="clear" id="clear" aria-label="Clear search" hidden>×</button>
+    </div>
+    <div class="filters">
+      <div class="seg" role="group" aria-label="Mode">
+        <button id="m-all" data-mode="" aria-pressed="true">All</button>
+        <button id="m-std" data-mode="Standard" aria-pressed="false">Standard</button>
+        <button id="m-div" data-mode="Divergent" aria-pressed="false">Divergent</button>
+      </div>
+      <select id="type" aria-label="Filter by type"><option value="">All types</option></select>
+      <span class="count" id="count"></span>
+    </div>
+  </div>
+</header>
+<main><div class="wrap" id="out"></div></main>
+<footer class="wrap">Generated from the game's source data. Where to find Pokémon and items isn't covered.</footer>
+
+<script>
+const DEX = __DEX_DATA__;
+const SHEET = "__SPRITE_SHEET__";
+</script>
+<script>
+(() => {
+  "use strict";
+  document.documentElement.style.setProperty("--sheet", `url(${SHEET})`);
+  const consoleEl = document.querySelector("header.console");
+  const syncConsoleHeight = () => document.documentElement.style.setProperty("--console-h", `${consoleEl.offsetHeight}px`);
+  syncConsoleHeight();
+  window.addEventListener("resize", syncConsoleHeight);
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const norm = (s) => s.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const TYPES = ["NORMAL","FIRE","WATER","GRASS","ELECTRIC","ICE","FIGHTING","POISON","GROUND","FLYING","PSYCHIC","BUG","ROCK","GHOST","DRAGON","DARK","STEEL","FAIRY"];
+  const STAT_LABELS = ["HP", "Atk", "Def", "SpA", "SpD", "Spe"];
+  const CAT = {
+    physical: '<svg viewBox="0 0 20 20" aria-hidden="true"><path fill="#e2562a" d="M10 1l2.2 4.6 5-1.3-2.2 4.7 4 2.9-5 .8.4 5.1L10 15l-4.4 2.8.4-5.1-5-.8 4-2.9-2.2-4.7 5 1.3z"/></svg>',
+    special: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#2f7fe6"/><circle cx="10" cy="10" r="5.2" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="10" cy="10" r="2" fill="#fff"/></svg>',
+    status: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#8b949e"/><path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="#c9d1d9"/></svg>',
+  };
+  const CAT_NAME = { physical: "Physical", special: "Special", status: "Status" };
+  const mons = DEX.mons, moves = DEX.moves;
+  const moveKeys = Object.keys(moves);
+
+  // Per-Pokémon move lists, rebuilt from the move → learners table
+  const monMoves = mons.map(() => []);
+  for (const k of moveKeys) for (const [i, how] of moves[k].learners) monMoves[i].push([k, how]);
+  const parent = new Map();
+  mons.forEach((m, i) => m.evo.forEach(([to]) => { if (!parent.has(to)) parent.set(to, i); }));
+  const moveSearch = moveKeys.map((k) => [k, norm(moves[k].name), moves[k].official ? norm(moves[k].official) : ""]);
+
+  const state = { q: "", mode: "", type: "", limit: 60, open: null };
+  try { state.mode = localStorage.getItem("dex-mode") || ""; } catch (e) {}
+
+  const typeBadge = (t) => `<span class="type t-${t}">${t === "MYSTERY" ? "???" : t[0] + t.slice(1).toLowerCase()}</span>`;
+  const sprite = (m, small) => `<span class="sp${small ? " sm" : ""}" aria-hidden="true"><i style="background-position:-${m.sp[0]}px -${m.sp[1]}px"></i></span>`;
+  const formLabel = (m) => (m.form ? ` <small>${esc(m.form)}</small>` : "");
+  const modeBadge = (m) => m.modes.length === 2
+    ? '<span class="mode">Standard &amp; Divergent</span>'
+    : `<span class="mode${m.modes[0] === "Divergent" ? " d" : ""}">${m.modes[0]}</span>`;
+  const pad = (n) => String(n).padStart(3, "0");
+  const dexNums = (m) => [m.dex.std ? `S#${pad(m.dex.std)}` : "", m.dex.div ? `D#${pad(m.dex.div)}` : ""].filter(Boolean).join(" ") || "—";
+  const bst = (m) => m.stats.reduce((a, b) => a + b, 0);
+  const inMode = (m) => !state.mode || m.modes.includes(state.mode);
+  const inType = (m) => !state.type || m.types.includes(state.type);
+
+  function row(m, i) {
+    return `<details class="mon" data-i="${i}"${state.open === i ? " open" : ""}>
+      <summary>${sprite(m)}
+        <span class="who"><span class="nm">${esc(m.name)}${formLabel(m)}</span>
+          <span class="tags">${m.types.map(typeBadge).join("")}${modeBadge(m)}</span></span>
+        <span class="nums"><b>${bst(m)}</b>${dexNums(m)}</span>
+      </summary>${state.open === i ? detail(i) : ""}</details>`;
+  }
+
+  function statColor(v) {
+    if (v < 50) return "#e2562a"; if (v < 80) return "#f2a516"; if (v < 100) return "#c9c21b";
+    if (v < 120) return "#5fb83a"; return "#2aa198";
+  }
+
+  function genderText(g) {
+    if (g === null) return "Genderless";
+    if (g === 0) return "♂ only"; if (g === 100) return "♀ only";
+    return `♂ ${+(100 - g).toFixed(1)}% · ♀ ${+g.toFixed(1)}%`;
+  }
+
+  function monLink(i, current) {
+    const m = mons[i];
+    return `<button class="link${i === current ? " current" : ""}" data-open="${i}">${sprite(m, true)}<span class="ln">${esc(m.name)}${formLabel(m)}</span></button>`;
+  }
+
+  function evoTree(i) {
+    let root = i;
+    const seen = new Set();
+    while (parent.has(root) && !seen.has(root)) { seen.add(root); root = parent.get(root); }
+    const node = (n, how, depth) => {
+      const kids = mons[n].evo.filter(([to]) => to !== n);
+      return `<li><span class="node">${how ? `<span class="how">${esc(how)}</span>` : ""}${monLink(n, i)}</span>${
+        kids.length && depth < 6 ? `<ul>${kids.map(([to, h]) => node(to, h, depth + 1)).join("")}</ul>` : ""}</li>`;
+    };
+    if (root === i && !mons[i].evo.length) return '<p class="note">Does not evolve.</p>';
+    return `<div class="evo"><ul>${node(root, "", 0)}</ul></div>`;
+  }
+
+  function moveRow(k, how, showHow) {
+    const mv = moves[k];
+    return `<tr>${showHow ? `<td class="h">${esc(how)}</td>` : ""}
+      <td><button class="mvname" data-move="${k}">${esc(mv.name)}</button></td>
+      <td>${typeBadge(mv.type)}</td>
+      <td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td>
+      <td class="n">${mv.power || "—"}</td><td class="n hide-sm">${mv.acc || "—"}</td><td class="n hide-sm">${mv.pp}</td></tr>`;
+  }
+
+  function moveTable(title, list, howHeader, note) {
+    if (!list.length) return "";
+    return `<section><h3>${title}</h3>${note ? `<p class="note">${note}</p>` : ""}<div class="moves"><table class="mv"><thead><tr>${
+      howHeader ? `<th>${howHeader}</th>` : ""}<th>Move</th><th>Type</th><th>Cat</th><th style="text-align:right">Pow</th><th class="hide-sm" style="text-align:right">Acc</th><th class="hide-sm" style="text-align:right">PP</th></tr></thead><tbody>${
+      list.map(([k, how]) => moveRow(k, how, !!howHeader)).join("")}</tbody></table></div></section>`;
+  }
+
+  function movesSection(i) {
+    const m = mons[i];
+    if (m.movesOf !== null) {
+      return `<section><h3>Moves</h3><p class="note">Exists only in battle, so it knows whatever its base form knows: ${monLink(m.movesOf, i)}</p></section>`;
+    }
+    const all = monMoves[i];
+    const lvl = all.filter(([, h]) => h === "Evo" || h.startsWith("Lv "))
+      .map((x, n) => [x, n]).sort((a, b) => {
+        const la = a[0][1] === "Evo" ? 0 : +a[0][1].slice(3), lb = b[0][1] === "Evo" ? 0 : +b[0][1].slice(3);
+        return la - lb || a[1] - b[1];
+      }).map(([x]) => x);
+    const tm = all.filter(([, h]) => /^(TM|HM)\d/.test(h)).sort((a, b) => (a[1][0] === "H") - (b[1][0] === "H") || +a[1].slice(2) - +b[1].slice(2));
+    const tutor = all.filter(([, h]) => h.startsWith("Tutor")).sort((a, b) => +a[1].slice(6) - +b[1].slice(6));
+    const egg = all.filter(([, h]) => h === "Egg").sort((a, b) => moves[a[0]].name.localeCompare(moves[b[0]].name));
+    const special = all.filter(([, h]) => h.startsWith("Special:")).map(([k, h]) => [k, h.slice(9)]);
+    const hasEvo = lvl.some(([, h]) => h === "Evo");
+    return `<div class="groups">
+      ${moveTable("Level up", lvl, "Lv", hasEvo ? "<b>Evo</b> = learned on evolution, and also offered by the move relearner." : "")}
+      ${moveTable("TM / HM", tm, "No.")}
+      ${moveTable("Move tutor", tutor, "No.")}
+      ${moveTable("Special tutor", special, "Who")}
+      ${moveTable("Egg moves", egg, "")}
+      ${!all.length ? '<p class="note">Learns no moves.</p>' : ""}
+    </div>`;
+  }
+
+  function detail(i) {
+    const m = mons[i];
+    const abilities = m.abilities.map(esc).join(" / ") + (m.hidden ? ` <span class="hidden-ab">/ ${esc(m.hidden)} (hidden)</span>` : "");
+    const evs = m.evs.map((v, n) => (v ? `${v} ${STAT_LABELS[n]}` : "")).filter(Boolean).join(", ") || "—";
+    return `<div class="detail">
+      <div class="cols">
+        <section><h3>Base stats · ${bst(m)}</h3><div class="stats">${m.stats.map((v, n) =>
+          `<span class="lab">${STAT_LABELS[n]}</span><span class="val">${v}</span><span class="bar"><span style="width:${Math.min(100, v / 2.0)}%;background:${statColor(v)}"></span></span>`).join("")}</div></section>
+        <section><h3>Profile</h3><dl class="facts">
+          <dt>Abilities</dt><dd>${abilities || "—"}</dd>
+          <dt>Gender</dt><dd>${genderText(m.gender)}</dd>
+          <dt>Egg groups</dt><dd>${m.eggGroups.join(", ") || "—"}</dd>
+          <dt>Catch rate</dt><dd>${m.catchRate}</dd>
+          <dt>Growth</dt><dd>${esc(m.growth)}</dd>
+          <dt>EV yield</dt><dd>${evs}</dd>
+          <dt>Dex</dt><dd>${m.dex.std ? `Standard #${pad(m.dex.std)}` : ""}${m.dex.std && m.dex.div ? " · " : ""}${m.dex.div ? `Divergent #${pad(m.dex.div)}` : ""}${!m.dex.std && !m.dex.div ? "Form — not numbered" : ""}</dd>
+        </dl></section>
+      </div>
+      <section><h3>Evolution</h3>${evoTree(i)}</section>
+      ${movesSection(i)}
+    </div>`;
+  }
+
+  const GROUPS = [["Level up", (h) => h === "Evo" || h.startsWith("Lv ")], ["TM / HM", (h) => /^(TM|HM)\d/.test(h)],
+    ["Move tutor", (h) => h.startsWith("Tutor")], ["Special tutor", (h) => h.startsWith("Special:")], ["Egg move", (h) => h === "Egg"]];
+
+  function moveCard(k) {
+    const mv = moves[k];
+    const learners = mv.learners.filter(([i]) => inMode(mons[i]));
+    const groups = GROUPS.map(([title, test]) => [title, learners.filter(([, h]) => test(h))]).filter(([, l]) => l.length);
+    const chip = ([i, h]) => `<button class="chip" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${formLabel(mons[i])}</span><span class="hw">${esc(h.replace(/^Special: /, ""))}</span></button>`;
+    const body = groups.length
+      ? groups.map(([title, l]) => `<div><h4>${title} · ${l.length}</h4><div class="chips">${l.map(chip).join("")}</div></div>`).join("")
+      : `<p class="empty">${mv.learners.length ? `No ${esc(state.mode)} Pokémon learn this move.` : "No Pokémon learn this move."}</p>`;
+    return `<article class="movecard">
+      <div class="top">${typeBadge(mv.type)}<span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span>
+        <h2>${esc(mv.name)}${mv.official ? `<small>${esc(mv.official)}</small>` : ""}</h2></div>
+      <div class="specs"><span>${CAT_NAME[mv.split]}</span><span>Pow <b>${mv.power || "—"}</b></span><span>Acc <b>${mv.acc || "—"}</b></span><span>PP <b>${mv.pp}</b></span></div>
+      <div class="learners">${body}</div></article>`;
+  }
+
+  function render() {
+    const q = norm(state.q);
+    let html = "";
+    let matchedMoves = [];
+    if (q.length >= 2) {
+      const exact = moveSearch.filter(([, a, b]) => a === q || b === q);
+      const partial = moveSearch.filter(([, a, b]) => !(a === q || b === q) && (a.includes(q) || (b && b.includes(q))));
+      matchedMoves = exact.concat(partial).map(([k]) => k);
+    }
+    const list = [];
+    mons.forEach((m, i) => {
+      if (!inMode(m) || !inType(m)) return;
+      if (q && !m.s.some((s) => s.includes(q))) return;
+      list.push(i);
+    });
+    if (q) list.sort((a, b) => (mons[b].s.some((s) => s.startsWith(q)) - mons[a].s.some((s) => s.startsWith(q))));
+
+    if (matchedMoves.length) {
+      const showCard = matchedMoves.length <= 2 || norm(moves[matchedMoves[0]].name) === q || norm(moves[matchedMoves[0]].official || "") === q;
+      html += `<div class="section-label">Moves</div>`;
+      if (showCard) html += moveCard(matchedMoves[0]);
+      const rest = showCard ? matchedMoves.slice(1) : matchedMoves;
+      if (rest.length) html += `<div class="moreoves">${rest.slice(0, 24).map((k) => `<button data-move="${k}">${typeBadge(moves[k].type)}${esc(moves[k].name)}</button>`).join("")}</div>`;
+    }
+    if (list.length || !matchedMoves.length) {
+      if (matchedMoves.length) html += `<div class="section-label">Pokémon</div>`;
+      html += list.length
+        ? `<div class="list">${list.slice(0, state.limit).map((i) => row(mons[i], i)).join("")}</div>`
+        : `<div class="nores">Nothing matches “${esc(state.q)}”${state.mode ? ` in ${state.mode} mode` : ""}.</div>`;
+      if (list.length > state.limit) html += `<button id="more">Show ${Math.min(120, list.length - state.limit)} more</button>`;
+    }
+    $("#out").innerHTML = html;
+    $("#count").textContent = `${list.length} Pokémon${matchedMoves.length ? ` · ${matchedMoves.length} move${matchedMoves.length > 1 ? "s" : ""}` : ""}`;
+    $("#clear").hidden = !state.q;
+    document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
+    syncConsoleHeight();
+  }
+
+  function search(text) {
+    state.q = text; state.limit = 60; state.open = null;
+    $("#q").value = text;
+    render();
+    window.scrollTo({ top: 0 });
+  }
+
+  function openMon(i) {
+    const m = mons[i];
+    state.q = m.name; state.limit = 60; state.open = i;
+    $("#q").value = m.name;
+    if (!inMode(m)) state.mode = "";
+    if (!inType(m)) { state.type = ""; $("#type").value = ""; }
+    render();
+    const el = document.querySelector(`.mon[data-i="${i}"]`);
+    if (el) el.scrollIntoView({ block: "start" });
+  }
+
+  // Wiring
+  $("#type").insertAdjacentHTML("beforeend", TYPES.map((t) => `<option value="${t}">${t[0] + t.slice(1).toLowerCase()}</option>`).join(""));
+  let timer;
+  $("#q").addEventListener("input", (e) => { clearTimeout(timer); timer = setTimeout(() => { state.q = e.target.value; state.limit = 60; state.open = null; render(); }, 120); });
+  $("#clear").addEventListener("click", () => { search(""); $("#q").focus(); });
+  $("#type").addEventListener("change", (e) => { state.type = e.target.value; state.limit = 60; render(); });
+  document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
+    state.mode = b.dataset.mode; state.limit = 60;
+    try { localStorage.setItem("dex-mode", state.mode); } catch (e) {}
+    render();
+  }));
+  $("#out").addEventListener("click", (e) => {
+    const mv = e.target.closest("[data-move]");
+    if (mv) { e.preventDefault(); search(moves[mv.dataset.move].name); return; }
+    const op = e.target.closest("[data-open]");
+    if (op) { e.preventDefault(); openMon(+op.dataset.open); return; }
+    if (e.target.closest("#more")) { state.limit += 120; render(); }
+  });
+  $("#out").addEventListener("toggle", (e) => {
+    const d = e.target;
+    if (!d.classList || !d.classList.contains("mon")) return;
+    const i = +d.dataset.i;
+    if (d.open) {
+      if (state.open !== null && state.open !== i) {
+        const prev = document.querySelector(`.mon[data-i="${state.open}"]`);
+        if (prev) { prev.open = false; const det = prev.querySelector(".detail"); if (det) det.remove(); }
+      }
+      state.open = i;
+      if (!d.querySelector(".detail")) d.insertAdjacentHTML("beforeend", detail(i));
+    } else if (state.open === i) {
+      state.open = null;
+    }
+  }, true);
+
+  // Offline: installable app when served over http(s); the saved file already works offline.
+  if (/^https?:$/.test(location.protocol)) {
+    $("#dl").hidden = false;
+    document.head.insertAdjacentHTML("beforeend", '<link rel="manifest" href="manifest.webmanifest">');
+    if ("serviceWorker" in navigator) {
+      try { navigator.serviceWorker.register("sw.js").catch(() => {}); } catch (e) {}
+    }
+  }
+  // A link like #ceaseless-edge or #rockruff opens with that search filled in
+  const fromHash = () => {
+    const h = decodeURIComponent(location.hash.slice(1)).replace(/-/g, " ").trim();
+    if (!h) return false;
+    const exact = mons.findIndex((m) => m.s.includes(norm(h)));
+    if (exact >= 0 && !moveSearch.some(([, a, b]) => a === norm(h) || b === norm(h))) openMon(exact);
+    else search(h);
+    return true;
+  };
+  window.addEventListener("hashchange", fromHash);
+  if (!fromHash()) render();
+})();
+</script>
+</body>
+</html>
