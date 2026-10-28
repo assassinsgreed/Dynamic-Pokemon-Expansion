@@ -205,5 +205,8 @@ def front_pic(p: Paths) -> dict[str, Path]:
     for species, body in parse_designated_array(_source(p, "src/Front_Pic_Table.c"), "gMonFrontPicTable").items():
         m = re.match(r"(gFrontSprite\w+?)Tiles\b", body.strip())
         if m:
-            result[species] = p.dpe / "graphics/frontspr" / f"{m.group(1)}.png"
+            path = p.dpe / "graphics/frontspr" / f"{m.group(1)}.png"
+            if not path.exists():  # e.g. Castform keeps its sprites in graphics/castform
+                path = next((p.dpe / "graphics").rglob(f"{m.group(1)}.png"), path)
+            result[species] = path
     return result
