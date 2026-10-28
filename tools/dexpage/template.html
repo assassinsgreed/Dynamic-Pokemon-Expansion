@@ -216,12 +216,13 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
 .movecard .specs b { color: var(--ink); }
 .learners { display: grid; gap: 10px; }
 .learners h4 { margin: 0 0 6px; font: 600 11.5px var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px 2px 2px; border: 1px solid var(--line); border-radius: 999px; background: var(--sunk); cursor: pointer; }
+/* Equal-width pills in a grid: name on the left, detail right-aligned */
+.chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 232px), 1fr)); gap: 6px; }
+.chip { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 2px 12px 2px 2px; border: 1px solid var(--line); border-radius: 999px; background: var(--sunk); cursor: pointer; text-align: left; }
 .chip:hover { border-color: var(--muted); }
-.chip .ln { font-weight: 600; font-size: 13.5px; }
+.chip .ln { font-weight: 600; font-size: 13.5px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chip .ln small { color: var(--muted); font-weight: 400; }
-.chip .hw { font: 12px var(--font-data); color: var(--muted); }
+.chip .hw { font: 12px var(--font-data); color: var(--muted); margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .empty { color: var(--muted); font-style: italic; }
 .moreoves { display: flex; gap: 6px; flex-wrap: wrap; }
 .moreoves button { border: 1px solid var(--line); background: var(--surface); padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 13.5px; display: inline-flex; gap: 6px; align-items: center; }
