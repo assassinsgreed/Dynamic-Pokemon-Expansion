@@ -1,14 +1,21 @@
 """Turns the roster into the page: one JSON blob + sprite sheet embedded in template.html."""
 
 import base64
+import hashlib
+import io
 import json
 import re
 import unicodedata
 from pathlib import Path
 
-from .roster import Entry, SourceData
+from PIL import Image, ImageDraw
+
+from .paths import Paths
+from .roster import Entry, SourceData, build_roster, evolution_links, load_source_data
+from .sprites import build_sheet
 
 TEMPLATE = Path(__file__).with_name("template.html")
+SW_TEMPLATE = Path(__file__).with_name("sw.js")
 STAT_KEYS = ("hp", "atk", "def", "spa", "spd", "spe")
 
 
@@ -84,6 +91,51 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
         "mons": [_mon(data, e, index, evo_links.get(e.key, [])) for e in roster],
         "moves": moves,
     }
+
+
+def _icon(size: int) -> bytes:
+    """The header's red lens as an app icon."""
+    img = Image.new("RGBA", (size, size), (22, 29, 36, 255))
+    d = ImageDraw.Draw(img)
+    r = size * 0.30
+    c = size / 2
+    d.ellipse((c - r * 1.25, c - r * 1.25, c + r * 1.25, c + r * 1.25), fill=(251, 230, 233, 255))
+    d.ellipse((c - r, c - r, c + r, c + r), fill=(200, 32, 58, 255))
+    h = r * 0.32
+    d.ellipse((c - r * 0.45 - h, c - r * 0.45 - h, c - r * 0.45 + h, c - r * 0.45 + h), fill=(255, 255, 255, 200))
+    out = io.BytesIO()
+    img.save(out, "PNG")
+    return out.getvalue()
+
+
+MANIFEST = {
+    "name": "Shooting Stars Dex",
+    "short_name": "Dex",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "background_color": "#0e1318",
+    "theme_color": "#c8203a",
+    "icons": [{"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+              {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}],
+}
+
+
+def build(paths: Paths, out: Path) -> None:
+    data = load_source_data(paths)
+    roster = build_roster(data)
+    links = evolution_links(data, {e.key for e in roster})
+    sheet, offsets = build_sheet({e.key: data.sprites[e.key] for e in roster})
+    html = render(page_data(data, roster, links), sheet, offsets).encode("utf-8")
+
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "index.html").write_bytes(html)
+    (out / "dex.html").write_bytes(html)  # "Download for offline use" target
+    (out / "manifest.webmanifest").write_text(json.dumps(MANIFEST, indent=2), encoding="utf-8")
+    (out / "icon-192.png").write_bytes(_icon(192))
+    (out / "icon-512.png").write_bytes(_icon(512))
+    cache = "dex-" + hashlib.sha256(html).hexdigest()[:12]
+    (out / "sw.js").write_text(SW_TEMPLATE.read_text(encoding="utf-8").replace("__CACHE__", cache), encoding="utf-8")
 
 
 def render(data: dict, sheet: bytes, offsets: dict) -> str:

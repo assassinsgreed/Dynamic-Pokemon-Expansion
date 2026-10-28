@@ -64,3 +64,27 @@ def test_battle_forms_point_to_base_moves(data):
     assert mega["movesOf"] == mons["SPECIES_VENUSAUR"]
     learner_ids = {i for i, _ in data["moves"]["MOVE_VINEWHIP"]["learners"]}
     assert mons["SPECIES_VENUSAUR"] in learner_ids and mons["SPECIES_VENUSAUR_MEGA"] not in learner_ids
+
+
+@pytest.fixture(scope="module")
+def site(tmp_path_factory, paths):
+    from tools.dexpage.build import build
+    out = tmp_path_factory.mktemp("site")
+    build(paths, out)
+    return out
+
+
+def test_sw_cache_name_tracks_content(site):
+    import hashlib
+    sw = (site / "sw.js").read_text()
+    h = hashlib.sha256((site / "index.html").read_bytes()).hexdigest()[:12]
+    assert f"dex-{h}" in sw
+
+
+def test_site_files(site):
+    for f in ["index.html", "dex.html", "manifest.webmanifest", "sw.js", "icon-192.png", "icon-512.png"]:
+        assert (site / f).exists()
+    assert (site / "dex.html").read_bytes() == (site / "index.html").read_bytes()
+    import json
+    manifest = json.loads((site / "manifest.webmanifest").read_text())
+    assert manifest["display"] == "standalone" and manifest["start_url"] == "./"
