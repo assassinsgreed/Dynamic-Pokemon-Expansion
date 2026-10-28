@@ -123,9 +123,35 @@ def test_sw_only_caches_good_responses(site):
 
 def test_wild_held_items_on_profile(data):
     by = {m["key"]: m for m in data["mons"]}
-    assert "Oran Berry (50%)" in by["SPECIES_BIBAREL"]["held"]
+    assert "Oran Berry (50%)" in [h for h, _ in by["SPECIES_BIBAREL"]["held"]]
     assert all("item" not in l for m in data["mons"] for l in m["loc"])   # moved out of location rows
 
 
 def test_header_icon_embedded(html):
     assert 'class="brand-icon"' in html and "data:image/png;base64," in html
+
+
+def test_items_in_page(data):
+    items = {i["name"]: i for i in data["items"]}
+    stone = items["Fire Stone"]
+    assert stone["icon"] is not None and "Daimyn City Mall" in stone["where"]
+    assert items["Venusaurite-G"]["icon"] is not None
+
+
+def test_held_items_link_to_items(data):
+    by = {m["key"]: m for m in data["mons"]}
+    names = [data["items"][h[1]]["name"] for h in by["SPECIES_BIBAREL"]["held"] if h[1] is not None]
+    assert "Oran Berry" in names
+
+
+def test_tm_locations_on_moves(data):
+    assert data["moves"]["MOVE_DRAGONCLAW"]["tm"] == {"label": "TM02", "where": ["Rubarr Desert B1F"], "requires": "Strength, Rock Smash"}
+
+
+def test_ability_names_follow_cfru_overrides(data):
+    by = {m["key"]: m for m in data["mons"]}
+    cinderace = by["SPECIES_CINDERACE"]
+    assert "Libero" in cinderace["abilities"] + [cinderace["hidden"]]
+    assert "Protean" not in cinderace["abilities"] + [cinderace["hidden"]]
+    torkoal = by["SPECIES_TORKOAL"]
+    assert "White Smoke" in torkoal["abilities"] + [torkoal["hidden"]]

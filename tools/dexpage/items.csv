@@ -1,0 +1,540 @@
+Item,Category,Where,Use
+Cheri Berry,Berries,"Ferrox Village shop
+Tsarvosa City",Cures paralysis
+Chesto Berry,Berries,"Ferrox Village shop
+Tsarvosa City",Cures sleep
+Pecha Berry,Berries,"Ferrox Village shop
+Tsarvosa City",Cures poison
+Rawst Berry,Berries,"Ferrox Village shop
+Tsarvosa City",Cures burn
+Aspear Berry,Berries,"Ferrox Village shop
+Tsarvosa City",Cures frostbite
+Leppa Berry,Berries,"Ferrox Village shop
+Tsarvosa City",Recovers 10 PP
+Oran Berry,Berries,"Ferrox Village shop
+Tsarvosa City",Recovers 10 HP when below 50%
+Sitrus Berry,Berries,"Ferrox Village shop
+Tsarvosa City",Recovers 25% HP when below 50%
+Persim Berry,Berries,Ferrox Village shop,Cures confusion
+Lum Berry,Berries,"Hidden on Route 19
+Hidden in Daimyn Factory Overworld",Cures any status condition
+Pomeg Berry,Berries,"Stats Dojo
+Daimyn City Mall",Lowers HP EVs by 10
+Kelpsy Berry,Berries,"Stats Dojo
+Daimyn City Mall",Lowers attack EVs by 10
+Qualot Berry,Berries,"Stats Dojo
+Daimyn City Mall",Lowers defense EVs by 10
+Hondew Berry,Berries,"Stats Dojo
+Daimyn City Mall",Lowers special attack EVs by 10
+Grepa Berry,Berries,"Stats Dojo
+Daimyn City Mall",Lowers special defense EVs by 10
+Tamato Berry,Berries,"Stats Dojo
+Daimyn City Mall",Lowers speed EVs by 10
+Liechi Berry,Berries,Uteya Village,Raises attack when below 25% HP
+Ganlon Berry,Berries,Uteya Village,Raises defense when below 25% HP
+Petaya Berry,Berries,Uteya Village,Raises special attack when below 25% HP
+Apicot Berry,Berries,Uteya Village,Raises special defense when below 25% HP
+Salac Berry,Berries,Uteya Village,Raises speed when below 25% HP
+Lansat Berry,Berries,Uteya Village,Raises crit rate when below 25% HP
+Starf Berry,Berries,Uteya Village,Raises a random stat  when below 25% HP
+Kee Berry,Berries,Uteya Village,Raises defense when hit by a physical move
+Maranga Berry,Berries,Uteya Village,Raises special defense when hit by a special move
+Occa Berry,Berries,Daimyn City Mall,Reduces super effective fire damage
+Passho Berry,Berries,Daimyn City Mall,Reduces super effective water damage
+Wacan Berry,Berries,Daimyn City Mall,Reduces super effective electric damage
+Rindo Berry,Berries,Daimyn City Mall,Reduces super effective grass damage
+Yache Berry,Berries,Daimyn City Mall,Reduces super effective ice damage
+Chople Berry,Berries,"Daimyn City Mall
+Wild Buneary and Lopunny",Reduces super effective fighting damage
+Kebia Berry,Berries,"Daimyn City Mall
+Wild Shroomish and Breloom",Reduces super effective poison damage
+Shuca Berry,Berries,Daimyn City Mall,Reduces super effective ground damage
+Coba Berry,Berries,"Daimyn City Mall
+Wild Sunkern",Reduces super effective flying damage
+Payapa Berry,Berries,"Daimyn City Mall
+Wild Mankey and Primeape",Reduces super effective psychic damage
+Tanga Berry,Berries,Daimyn City Mall,Reduces super effective bug damage
+Charti Berry,Berries,Daimyn City Mall,Reduces super effective rock damage
+Kasib Berry,Berries,Daimyn City Mall,Reduces super effective ghost damage
+Haban Berry,Berries,"Daimyn City Mall
+Wild Gible, Gabite, and Garchomp",Reduces super effective dragon damage
+Colbur Berry,Berries,Daimyn City Mall,Reduces super effective dark damage
+Babiri Berry,Berries,"Daimyn City Mall
+Wild Froslass",Reduces super effective steel damage
+Chilan Berry,Berries,Daimyn City Mall,Reduces normal damage
+Roseli Berry,Berries,Daimyn City Mall,Reduces super effective fairy damage
+Micle Berry,Berries,Uteya Village (v1.4),Increases accuracy of next move by 1.2 when below 25% HP
+Custap Berry,Berries,Uteya Village (v1.4),Get priority on next move when below 25% HP
+Jaboca Berry,Berries,Uteya Village (v1.4),Reflect some physical damage back to opponent
+Rowap Berry,Berries,Uteya Village (v1.4),Reflect some special damage back to opponent
+Lax Incense,Breeding,"Route 2
+Daimyn City Mall",Wynaut
+Luck Incense,Breeding,"Heleo Ranch
+Daimyn City Mall",Happiny
+Odd Incense,Breeding,"Forgotten Manse
+Daimyn City Mall",Mime Jr.
+Rock Incense,Breeding,"Route 10
+Daimyn City Mall",Bonsly
+Rose Incense,Breeding,"Route 4
+Daimyn City Mall",Budew
+Full Incense,Breeding,Daimyn City Mall (v1.4+),Munchlax
+Max Revive,Consumables,"PokeChip Crusher
+Heleo City Shady Dealer",Heal a fainted Pokemon to 100% HP
+Fresh Water,Consumables,Vending Machines,Heal 50 HP
+Soda Pop,Consumables,Vending Machines,Heal 60 HP
+Lemonade,Consumables,Vending Machines,Heal 80 HP
+MooMoo Milk,Consumables,Heleo Ranch (Day),Heal 100 HP
+Ether,Consumables,Tsarvosa City Market,Heal 10 PP to one move
+Elixir,Consumables,Tsarvosa City Market,Heal 10 PP to every move
+Sacred Ash,Consumables,Uteyan Ruins (one time),Fully revive all Pokemon in party
+HP Up,Consumables,"Tsarvosa City Stats Dojo
+Daimyn City Mall",Give 10 HP EVs
+Protein,Consumables,"Tsarvosa City Stats Dojo
+Daimyn City Mall",Give 10 attack EVs
+Iron,Consumables,"Tsarvosa City Stats Dojo
+Daimyn City Mall",Give 10 defense EVs
+Calcium,Consumables,"Tsarvosa City Stats Dojo
+Daimyn City Mall",Give 10 special attack EVs
+Zinc,Consumables,"Tsarvosa City Stats Dojo
+Daimyn City Mall",Give 10 special defense EVs
+Carbos,Consumables,"Tsarvosa City Stats Dojo
+Daimyn City Mall",Give 10 speed EVs
+Rare Candy,Consumables,PokeChip Crusher,Raises a Pokemon’s level by 1
+PP Up,Consumables,Heleo City Shady Dealer,Raises PP for a move
+PP Max,Consumables,PokeChip Crusher,Raises PP to the max for a move
+Honey,Consumables,"Wild Combee and Vespiquen
+Pokemarts",Triggers a wild encounter with boosted PokeChip odds
+Guard Spec.,Consumables,"Laplaz Town
+Daimyn City Mall",Prevents stat reductions for 5 turns
+Dire Hit,Consumables,"Laplaz Town
+Daimyn City Mall",Raises crit rate
+X Attack,Consumables,"Laplaz Town
+Daimyn City Mall",Raises attack by 2 stages
+X Defend,Consumables,"Laplaz Town
+Daimyn City Mall",Raises defense by 2 stages
+X Special,Consumables,"Laplaz Town
+Daimyn City Mall",Raises special attack by 2 stages
+X Sp. Def,Consumables,"Laplaz Town
+Daimyn City Mall",Raises special defense by 2 stages
+X Speed,Consumables,"Laplaz Town
+Daimyn City Mall",Raises speed by 2 stages
+X Accuracy,Consumables,"Laplaz Town
+Daimyn City Mall",Raises accuracy
+Poke Doll,Consumables,PokeMarts,Escape from battle
+Escape Rope,Consumables,PokeMarts,Escape from battle
+Ability Patch,Consumables,PokeChip Crusher,Switches between a Pokemon’s hidden and regular abilities*
+Ability Capsule,Consumables,PokeChip Crusher,Switches between a Pokemon’s 2 regular abilities*
+Bottlecap,Consumables,PokeChip Crusher,Maxes a single IV at the Tsarvosa City Stats Dojo
+Gold Bottlecap,Consumables,PokeChip Crusher,Maxes all IVs at the Tsarvosa City Stats Dojo
+Zeromin,Consumables,Battle Frontier (v1.4),Resets all EVs on a Pokemon
+Health Wing,Consumables,Battle Frontier (v1.4),Raises a Pokemon’s HP IV by 1
+Muscle Wing,Consumables,Battle Frontier (v1.4),Raises a Pokemon’s Attack IV by 1
+Resist Wing,Consumables,Battle Frontier (v1.4),Raises a Pokemon’s Defense IV by 1
+Genius Wing,Consumables,Battle Frontier (v1.4),Raises a Pokemon’s Special Attack IV by 1
+Clever Wing,Consumables,Battle Frontier (v1.4),Raises a Pokemon’s Special Defense IV by 1
+Swift Wing,Consumables,Battle Frontier (v1.4),Raises a Pokemon’s Speed IV by 1
+Weak Wing,Consumables,Battle Frontier (v1.4.1),Reduce a Pokemon’s HP IV by 1
+Frail Wing,Consumables,Battle Frontier (v1.4.1),Reduce a Pokemon’s Attack IV by 1
+Exposed Wing,Consumables,Battle Frontier (v1.4.1),Reduce a Pokemon’s Defense IV by 1
+Dense Wing,Consumables,Battle Frontier (v1.4.1),Reduce a Pokemon’s Special Attack IV by 1
+Simple Wing,Consumables,Battle Frontier (v1.4.1),Reduce a Pokemon’s Special Defense IV by 1
+Slow Wing,Consumables,Battle Frontier (v1.4.1),Reduce a Pokemon’s Speed IV by 1
+ShimmerStone,Consumables,Battle Frontier (v1.4),Makes a Pokemon shiny (or reverts it if already shiny)
+Sun Stone,Evolution,"Daimyn City Mall
+Route 13 (one time)
+Rubarr Desert (hidden, one time)","Sunkern
+Cottonee
+Helioptile"
+Moon Stone,Evolution,"Daimyn City Mall
+Route 6 (hidden)",Nidorino
+Fire Stone,Evolution,"Daimyn City Mall
+Scalding Spa (one time)",Eevee
+Thunder Stone,Evolution,"Daimyn City Mall
+Route 9 (one time)
+Route 18 Cave (hidden, one time)","Pikachu
+Eevee
+Charjabug"
+Water Stone,Evolution,"Daimyn City Mall
+Route 6 (hidden)
+Route 15 North (hidden)
+Seppire Cove","Shellder
+Eevee"
+Leaf Stone,Evolution,"Daimyn City Mall
+Route 5 (hidden)",Eevee
+Dusk Stone,Evolution,"Daimyn City Mall
+Forgotten Manse",Misdreavus
+Dawn Stone,Evolution,"Daimyn City Mall
+Route 10 (hidden)","Kirlia (male)
+Snorunt (female)"
+Shiny Stone,Evolution,"Daimyn City Mall
+Route 13 (hidden)","Togetic
+Roselia
+Floette"
+Oval Stone,Evolution,"Daimyn City Mall
+Lake Laplaz
+Emraldin Quay (hidden)",Happiny
+Ice Stone,Evolution,"Daimyn City Mall
+Torma Cave B2F
+Route 12 West","Eevee
+Darumaka-G
+Crabrawler"
+Linking Cord,Evolution,"Route 6
+Route 12 East (hidden)
+Daimyn City Mall","Boldore
+Gurdurr
+Phantump"
+King’s Rock,Evolution,"Route 8
+Victory Road (hidden)",Slowpoke
+Dragon Scale,Evolution,"Route 10 (need surf & rock climb)
+Victory Road",Seadra
+Razor Claw,Evolution,Route 11 South,"(Must hold @ night)
+Sneasel"
+Reaper Cloth,Evolution,"Route 11 North (need surf)
+(Standard Pokemon encounters only)",Dusclops
+Sachet,Evolution,"Route 7, Tsarvosa City Market
+(Divergent Pokemon encounters only)",Spritzee
+Magmarizer,Evolution,"Tsarvosa City Market
+(Divergent Pokemon encounters only)",Magmar
+Electirizer,Evolution,"Tsarvosa City Market
+(Divergent Pokemon encounters only)",Electabuzz
+Protector,Evolution,"Tsarvosa City Market
+(Divergent Pokemon encounters only)",Rhydon
+Upgrade,Evolution,"Tsarvosa City Market
+(Divergent Pokemon encounters only)",Porygon
+Dubious Disc,Evolution,"Route 11 North, Tsarvosa City Market
+(Divergent Pokemon encounters only)",Porygon2
+Prism Scale,Evolution,"Tsarvosa City Market
+(Divergent Pokemon encounters only)",Feebas
+Cracked Pot,Evolution,"Tsarvosa City Market
+(Divergent Pokemon encounters only)",Sinistea
+Black Augurite,Evolution,"Emraldin Quay
+(Divergent Pokemon encounters only, added in v1.4)",Scyther
+Hisui Rock,Evolution,"Daimyn City Mall
+(Added in v1.4)",Many Pokemon. Must be held when triggering normal evolution requirements.
+Peat Block,Evolution,Not Available! Item data is present in game if you wish to hack it in.,Ursaring
+Venusaurite-G,Mega Stones,Bought from Mega Stone Refiner on Route 11,Both
+Charizardite-G,Mega Stones,Bought from Mega Stone Refiner on Route 11,Both
+Centiskorite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Standard
+Hatterite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Standard
+Copperite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Standard
+Duraludite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Standard
+Blastoisinite-G,Mega Stones,Bought from Mega Stone Refiner on Route 11,Both
+Laprasite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Standard
+Melmetalite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Standard
+Rillabite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Both
+Cinderite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Both
+Intelleite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Both
+Corviknite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Standard
+Orbeetlite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Standard
+Coalossite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Standard
+Toxtricite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Standard
+Venusaurite,Mega Stones,Mimmett Jungle,Both
+Charizardite X,Mega Stones,Hesson Pass BF1 (Requires Strength),Both
+Charizardite Y,Mega Stones,Carnelidge Volcano (Requires Lava Surfing),Both
+Blastoisinite,Mega Stones,Route 6 (Requires Surf),Both
+Slowbronite,Mega Stones,Route 12 West (Requires Surf),Standard
+Kangaskhanite,Mega Stones,Route 20 (Requires Rock Climb),Standard
+Gyaradosite,Mega Stones,"Team Pluto HQ Kurtis’ Room, after story event",Standard
+Ampharosite,Mega Stones,"Heleo Ranch, for pacifying the angry Ampharos",Standard
+Heracronite,Mega Stones,Peradon Forest (Requires Surf),Standard
+Houndoominite,Mega Stones,Carenlidge Volcano Peak,Standard
+Sceptilite,Mega Stones,Route 9 (Requires Cut),Both
+Blazikenite,Mega Stones,Scalding Spa (Requires Rock Smash),Both
+Swampertite,Mega Stones,Route 8 (Requires Surf),Both
+Gardevoirite,Mega Stones,Uteyan Ruins (Requires Rock Climb),Standard
+Sablenite,Mega Stones,Forgotten Manse,Standard
+Mawilite,Mega Stones,Route 11 South,Standard
+Sharpedonite,Mega Stones,Route 16 (Requires Surf),Standard
+Glalitite,Mega Stones,Torma Cave (Requires Strength),Standard
+Lopunnite,Mega Stones,Route 10,Standard
+Garchompite,Mega Stones,Rubarr Desert Caves (Requires Strength & Rock Smash),Standard
+Lucarionite,Mega Stones,Daimyn Factory Overworld (Requires Strength),Standard
+Galladite,Mega Stones,Route 18,Standard
+Butterfrite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Divergent
+Machampite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Divergent
+Gengarite-G,Mega Stones,Bought from Mega Stone Refiner on Route 11,Divergent
+Kinglerite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Divergent
+Snorlaxite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Divergent
+Garbodorite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Divergent
+Drednawite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Divergent
+Applite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Divergent
+Sandacondite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Divergent
+Grimmsnarite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Divergent
+Alcremite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Divergent
+Urshifite,Mega Stones,Bought from Mega Stone Refiner on Route 11,Divergent
+Beedrillite,Mega Stones,Route 11 North,Divergent
+Pidgeotite,Mega Stones,Heleo Ranch,Divergent
+Alakazite,Mega Stones,Uteyan Ruins (Requires Rock Climb),Divergent
+Gengarite,Mega Stones,"Team Pluto HQ, after story events",Divergent
+Pinsirite,Mega Stones,Peradon Forest (Requires Surf),Divergent
+Aerodactylite,Mega Stones,Rubarr Desert Caves (Requires Strength and Rock Smash),Divergent
+Steelixite,Mega Stones,Torma Cave (Requires Strength),Divergent
+Scizorite,Mega Stones,Route 20 (Requires Rock Climb),Divergent
+Tyranitarite,Mega Stones,Carnelidge Volcano Story Events,Divergent
+Aggronite,Mega Stones,Route 20 Cave,Divergent
+Medichamite,Mega Stones,Route 11 South,Divergent
+Manectite,Mega Stones,Route 10,Divergent
+Cameruptite,Mega Stones,Route 13,Divergent
+Altarinite,Mega Stones,Route 19,Divergent
+Banetite,Mega Stones,Forgotten Manse,Divergent
+Absolite,Mega Stones,Route 18,Divergent
+Salamencite,Mega Stones,Route 16 (Requires Surf),Divergent
+Metagrossite,Mega Stones,Daimyn Factory Overworld (Requires Strength),Divergent
+Abomasite,Mega Stones,Route 12 West (Requires Surf),Divergent
+Audinite,Mega Stones,Route 16 (Requires Surf),Divergent
+Red Orb,Primal Reversion,Uteyan Ruins,Groudon Questline
+Blue Orb,Primal Reversion,Uteyan Ruins,Kyogre Questline
+Gracidea,Forme Changing Items,"Route 18 flower girl, after catching Shaymin
+(Standard Mode only)",Shaymin (Reverts to Land forme in the PC)
+N-Solarizer,Forme Changing Items,IDF Researcher after catching Necrozma,Fuse or separate Solgaleo and Necrozma
+N-Lunarizer,Forme Changing Items,IDF Researcher after catching Necrozma,Fuse or separate Lunala and Necrozma
+Reveal Glass,Forme Changing Items,"Uteyan Ruins
+(Divergent mode only)","Tornadus, Thundurus, and Landorus"
+Prison Bottle,Forme Changing Items,"Uteyan Ruins
+(Divergent mode only)",Hoopa
+Red/Yellow/Pink/Purple Nectar,Forme Changing Items,"Daimyn City Mall Incense Shop 
+(Divergent Mode only)",Oricorio
+Focus Band,Held Items,"Route 16 Island
+Rubarr Desert Cave (hidden)",Sometimes withstand fatal damage at 1 HP
+Focus Sash,Held Items,"Rubarr Desert
+Daimyn City Game Corner",Survive OHKO moves at 1HP
+Life Orb,Held Items,"Daimyn City Game Corner
+Seppire Cove",Strengthen moves by 30% but take 10% damage when used
+Toxic Orb,Held Items,"Daimyn City Game Corner
+Tsarvosa City Market
+Route 9 (hidden)",Poisons holder after first turn
+Flame Orb,Held Items,"Daimyn City Game Corner
+Tsarvosa City Market
+Tsarvosa City NPC",Burns holder after first turn
+Black Sludge,Held Items,"Peradon Forest
+Daimyn City Mall
+Tsarvosa City Market",Holder heals self (if poison type) or takes damage (if not) after every turn
+Light Clay,Held Items,"Daimyn City Mall
+Route 18 Cave (hidden)
+Tsarvosa City Market",Extends reflect & light screen to last 8 turns
+Choice Band,Held Items,"Route 6 (need Strength)
+Daimyn City Game Corner",Attack increased by 50% but can only use first chosen move
+Choice Specs,Held Items,"Route 23 (need Cut)
+Daimyn City Game Corner",Special Attack increased by 50% but can only use first chosen move
+Choice Scarf,Held Items,"Route 2 (need Surf)
+Daimyn City Game Corner",Speed increased by 50% but can only use first chosen move
+BrightPowder,Held Items,"Route 15 South (need Surf)
+Daimyn City Mall
+Tsarvosa City Market",Decreases opponent’s accuracy by 10%
+White Herb,Held Items,"Route 6 (hidden)
+Mimmett Jungle (hidden)
+Daimyn City Mall
+Tsarvosa City Market",Holder is immune to first stat reduction
+Quick Claw,Held Items,"Route 4
+Tsarvosa City Market",May act first in battle
+Mental Herb,Held Items,"Emraldin Quay (hidden)
+Tsarvosa City Market",Cures infatuation
+Amulet Coin,Held Items,"Heleo City Shady Dealer
+Daimyn City Game Corner",Doubles money earned in battle when holder participates
+Leftovers,Held Items,"Daimyn City Restaurant
+Daimyn City Game Corner",Recover HP after each turn
+Scope Lens,Held Items,Daimyn City Mall (v1.3),Increases holder’s crit rate by +1
+Muscle Band,Held Items,Daimyn City Mall (v1.3),Increases physical damage by +10%
+Throat Spray,Held Items,Tsarvosa City Market (v1.3),Increases special attack by +1 when using a sound based move
+Metal Coat,Held Items,Route 13,Raises the power of steel moves
+Soft Sand,Held Items,Rubarr Desert,Raises the power of ground moves
+Hard Stone,Held Items,Route 12 East,Raises the power of rock moves
+Miracle Seed,Held Items,Heleo Ranch,Raises the power of grass moves
+Black Glasses,Held Items,Lake Laplaz,Raises the power of dark moves
+Black Belt,Held Items,Route 7,Raises the power of fighting moves
+Magnet,Held Items,Daimyn Factory Overworld,Raises the power of electric moves
+Mystic Water,Held Items,Rubarr Desert Oasis,Raises the power of water moves
+Sharp Beak,Held Items,Route 9,Raises the power of flying moves
+Poison Barb,Held Items,Route 8,Raises the power of poison moves
+Never Melt Ice,Held Items,Torma Cave B2F,Raises the power of ice moves
+Spell Tag,Held Items,Forgotten Manse 2F,Raises the power of ghost moves
+Twisted Spoon,Held Items,Route 22,Raises the power of psychic moves
+Charcoal,Held Items,Carnelidge Volcano,Raises the power of fire moves
+Dragon Fang,Held Items,Route 15 South (need Surf),Raises the power of dragon moves
+Silk Scarf,Held Items,Route 16 Island,Raises the power of normal moves
+Shell Bell,Held Items,Route 8,Restore HP when dealing damage
+Metal Powder,Held Items,Route 5,Increases Ditto’s DEF and SPDEF by 50%
+Metronome,Held Items,Daimyn City Mall,Increases the damage of consecutively used moves (v1.3)
+Stick,Held Items,"Route 7 (need Cut)
+Wild Farfetch’d & Farfetch’d-G (Farfetch’d-G only >v1.1.5)
+
+(Standard Pokemon encounters only)",Increases Farfetch’d and Sirfetch’d’s crit rate when held
+Rocky Helmet,Held Items,"Torma Cave B1F (need Surf)
+Daimyn City Mall
+Tsarvosa City Market",Opponent takes damage when dealing contact damage
+Weakness Policy,Held Items,"Daimyn City Game Corner
+Route 22",Increase ATK and SPATK by 100% when taking super effective damage
+Power Herb,Held Items,"Uteya Village (hidden)
+Tsarvosa City Market",Instantly use a charging move once
+Wide Lens,Held Items,"Wild Sableye
+Daimyn City Mall
+Tsarvosa City Market",Boost accuracy by 10%
+Destiny Knot,Held Items,Forgotten Manse,"Copy holder’s infatuation
+Share IVs during breeding"
+Smooth Rock,Held Items,"Torma Cave B1F
+Tsarvosa City Market",Extend sandstorm to 8 turns
+Damp Rock,Held Items,"Route 6 (need Surf)
+Tsarvosa City Market",Extend rain to 8 turns
+Heat Rock,Held Items,"Route 11 South
+Tsarvosa City Market",Extend harsh sunlight to 8 turns
+Icy Rock,Held Items,"Route 12 East
+Tsarvosa City Market",Extend hail to 8 turns
+Power Bracer,Held Items,Tsarvosa City Stats Dojo,"Increase Attack EV yield, upgradable"
+Power Belt,Held Items,Tsarvosa City Stats Dojo,"Increase Defense EV yield, upgradable"
+Power Lens,Held Items,Tsarvosa City Stats Dojo,"Increase Special Attack EV yield, upgradable"
+Power Band,Held Items,Tsarvosa City Stats Dojo,"Increase Special Defense EV yield, upgradable"
+Power Anklet,Held Items,Tsarvosa City Stats Dojo,"Increase Speed EV yield, upgradable"
+Power Weight,Held Items,Tsarvosa City Stats Dojo,"Increase HP EV yield, upgradable"
+Big Root,Held Items,"Wild Lileep and Cradily
+Route 6 (hidden)
+Daimyn City Mall
+Tsarvosa City Market",Holder restores more HP from draining attacks
+Safety Goggles,Held Items,Seppire Cove Overworld,Immune to weather damage and powder/spore moves
+Assault Vest,Held Items,"Daimyn City Game Corner
+Seppire Cove (need Rock Climb)",Special Defense raised by 50% but can only use attacking moves
+Eviolite,Held Items,"Orichelle Garden
+Daimyn City Game Corner",Raises Defense and Special Defense by 50% if holder is not fully evolved
+Absorb Bulb,Held Items,"Ferrox Village
+Mimmett Jungle
+Tsarvosa City Market","When hit by a water move, Special Attack is raised by 50%"
+Air Balloon,Held Items,"Jumping Kid in Heleo City
+Tsarvosa City Market",Holder is immune to Ground moves. Pops on damage taken
+Cell Battery,Held Items,"Wild Charjabug
+Heleo City
+Tsarvosa City Market","When hit by an electric attack, Attack is raised by 50%"
+Eject Button,Held Items,"Daimyn Factory Overworld
+Tsarvosa City Market","When holder is hit, they switch out immediately"
+Grip Claw,Held Items,Wild Sneasel and Weavile,Multi-turn attacks like wrap and bind last longer
+Iron Ball,Held Items,"Wild Mawile
+Secret Path (need Strength)
+Tsarvosa City Market",Ground moves hit flying and levitating Pokemon if they hold it
+Lagging Tail,Held Items,"Laplaz Town (need Cut)
+Tsarvosa City Market",Holder acts last in battle
+Quick Powder,Held Items,Route 22,Boosts Ditto’s speed when held
+Red Card,Held Items,"Route 11 North (need Cut)
+Tsarvosa City Market","When holder is hit, opponent must switch out"
+Shed Shell,Held Items,"Route 14
+Wild Scraggy and Scrafty
+Wild Goomy and Sliggoo
+Tsarvosa City Market",Allows the holder to switch out without fail
+Snowball,Held Items,"Wild Snom and Frosmoth
+Torma Cave B2F
+Tsarvosa City Market","When hit by an ice move, boosts holders attack by 50%"
+Sticky Barb,Held Items,"Wild Ferroseed and Ferrothorn
+Mimmett Jungle
+Tsarvosa City Market","Holder takes damage every turn, can be transferred to attackers"
+Terrain Extender,Held Items,"Heleo Ranch (need Surf)
+Tsarvosa City Market",Extend terrain to last 8 turns
+Electric Seed,Held Items,Route 11,Raise defense on electric terrain
+Grassy Seed,Held Items,Route 4,Raises defense on grassy terrain
+Misty Seed,Held Items,Route 8,Raises special defense on misty terrain
+Psychic Seed,Held Items,"Route 10
+Wild Dottler and Orbeetle",Raises special defense on psychic terrain
+Normal Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe
+Heleo City Shady Dealer",Consumes to increase damage of next normal move by 50%
+Fighting Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe",Consumes to increase damage of next fighting move by 50%
+Flying Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe",Consumes to increase damage of next flying move by 50%
+Poison Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe",Consumes to increase damage of next poison move by 50%
+Ground Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe
+Rubarr Desert Caves",Consumes to increase damage of next ground move by 50%
+Rock Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe
+Rubarr Desert Caves",Consumes to increase damage of next rock move by 50%
+Bug Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe",Consumes to increase damage of next bug move by 50%
+Ghost Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe",Consumes to increase damage of next ghost move by 50%
+Steel Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe",Consumes to increase damage of next steel move by 50%
+Fire Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe
+Carnelidge Volcano (need Surf)",Consumes to increase damage of next fire move by 50%
+Water Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe",Consumes to increase damage of next water move by 50%
+Grass Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe
+Route 20",Consumes to increase damage of next grass move by 50%
+Electric Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe",Consumes to increase damage of next electric move by 50%
+Psychic Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe",Consumes to increase damage of next psychic move by 50%
+Ice Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe",Consumes to increase damage of next ice move by 50%
+Dragon Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe",Consumes to increase damage of next dragon move by 50%
+Dark Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe",Consumes to increase damage of next dark move by 50%
+Fairy Gem,Held Items,"Daimyn City Mall
+Gym Trainee Cafe",Consumes to increase damage of next fairy move by 50%
+Heavy Duty Boots,Held Items,"Route 13
+Tsarvosa City Market",Holder is immune to entry hazards
+Utility Umbrella,Held Items,Daimyn City Restaurant (Iris & Stella battle),Holder is not impacted by rain or sunlight in battle
+Razor Fang,Held Items,"Tsarvosa City Market
+(Divergent Mode only, added in v1.4)",10% chance to make opponent flinch
+Expert Belt,Held Items,"Tsarvosa City Market
+(Added in v1.4)",Boosts super effective moves by 20%
+Ring Target,Held Items,"Tsarvosa City Market
+(Added in v1.4)",Holder can be targeted by moves they’re normally immune to
+Protective Pads,Held Items,"Tsarvosa City Market
+(Added in v1.4)",Protects holder from contact effects
+Float Stone,Held Items,"Tsarvosa City Market
+(Added in v1.4)",Halves holder’s weight
+Adrenaline Orb,Held Items,"Tsarvosa City Market
+(Added in v1.4)",Raises holder’s speed when intimidated
+Room Service,Held Items,"Tsarvosa City Market
+(Added in v1.4)",Lower’s holder’s speed in trick room
+Eject Pack,Held Items,"Tsarvosa City Market
+Daimyn City Mall
+(Added in v1.4)",Switches holder out when it’s stats are lowered
+Zoom Lens,Held Items,"Daimyn City Mall
+(Added in v1.4)",Raises accuracy of moves when holder moves after opponent
+Binding Band,Held Items,"Daimyn City Mall
+(Added in v1.4)",Binding moves deal more residual damage at ends of turns
+Wise Glasses,Held Items,"Daimyn City Mall
+(Added in v1.4)",Raises the holder’s special attack by 10%
+Blunder Policy,Held Items,"Battle Frontier
+(Added in v1.4)",Raises holder’s speed when an attack misses
+Running Shoes,Key Items,Receive at the start of the game,"Press B.
+Press L to toggle automatic off and on"
+Pokedex,Key Items,Professor Hawthorne,Track seen and caught Pokemon
+Exp. Share,Key Items,Casey on Route 10,"Share EXP to party with gen 6 rules.
+Toggled off and on from Key Items"
+Mach Bike,Key Items,Heleo City Trainer House,Hold B to go faster
+Coin Case,Key Items,Daimyn City Game Corner,Holds Game Corner coins
+Item Finder,Key Items,Emraldin Quay Trainer House,Find hidden items
+Old Rod,Key Items,Rhodanzi Fisherman,"Fish for weak Pokemon.
+Catches more than just Magikarp"
+Good Rod,Key Items,Route 8 Fisherman,Fish for decent Pokemon
+Super Rod,Key Items,Route 23,"Fish for great Pokemon.
+Need Old and Good rods to receive"
+Infinite Repel,Key Items,Hawthorne Researcher in postgame,Disables overworld encounters while active. Use from the Tools Menu (Start -> Right).
+Manse Key,Key Items,Outside the Forgotten Manse,Access the Forgotten Manse
+Storage Key,Key Items,Inside the Forgotten Manse,"Access the Forgotten Manse’s janitor closet, to change Rotom formes"
+PokeChip Charm,Key Items,Uteya Village Trainer House,Increase PokeChip drop rate from 20% to 45%
+Owl Key,Key Items,Pluto HQ,Needed to complete Pluto HQ
+Cypress Key,Key Items,Pluto HQ,Needed to complete Pluto HQ
+Serpent Key,Key Items,Pluto HQ,Needed to complete Pluto HQ
+Cerberus Key,Key Items,Pluto HQ,Needed to complete Pluto HQ
+Mega Ring,Key Items,Route 11 South (story events),Enables mega evolution and Z-moves (Start in battle when choosing moves)
+Factory Key,Key Items,Route 15 North Island (need Strength),Access Daimyn City Factory
+Rusted Data,Key Items,In Daimyn City Factory,Unlock Melmetallite at Mega Stone Refiner
+Decoder,Key Items,Laplaz Town Pokemon Center after talking to NPC at Uteyan Ruins,Decode braille
+Town Map,Key Items,Given at the start of the game,Get your bearings and track roaming Pokemon
+TM Case,Key Items,Given with first TM found,Use TMs
+Berry Pouch,Key Items,Given with first berry found,Use Berries
+Victory Flag,Key Items,Victory Road,Challenge Pokemon League
+ADM,Key Items,Hawthorne Researcher in Postgame,Use HMs without a compatible Pokemon (automatic)
+DexNav,Key Items,Route 3 (story events),"Search for Pokemon.
+Use from the Tools Menu (Start -> Right)"
+PortaPC,Key Items,Lana in postgame,"Access the PC from anywhere.
+Use from the Tools Menu (Start -> Right)"
+PokeVial,Key Items,Hawthorne Researcher in Postgame,"Heal party to full 3 times, refill at Pokemon Center.
+Use from the Tools Menu (Start -> Right)"
+Oval Charm,Key Items,Hatch 15 eggs,Increase chance for Daycare to have an egg
+Shiny Charm,Key Items,Complete 75% of Pokedex and talk to Hawthorne,Increase shiny rate to 1/100
+Catch Charm,Key Items,Heleo City NPC after performing 10 critical captures,Multiplies critical catch rate by 2

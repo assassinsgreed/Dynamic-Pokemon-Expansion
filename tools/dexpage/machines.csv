@@ -1,0 +1,107 @@
+Kind,Number,Move,Where,Requires
+TM,1,Work Up,Route 4,
+TM,2,Dragon Claw,Rubarr Desert B1F,"Strength, Rock Smash"
+TM,3,Psyshock,Route 11 North,Surf
+TM,4,Calm Mind,Uteyan Ruins,
+TM,5,Terrain Pulse,Rhodanzi City Gym Reward,
+TM,6,Toxic,Ferrox Village Gym Reward,
+TM,7,Hail,Heleo City Gym Reward,
+TM,8,Bulk Up,Lake Laplaz,
+TM,9,Venoshock,Route 7,
+TM,10,Hidden Power,Laplaz Town Gift,
+TM,11,Sunny Day,Heleo City Gym Reward,
+TM,12,Taunt,Route 3,Cut
+TM,13,Ice Beam,Route 12 West,
+TM,14,Blizzard,Calicin Bay,Surf
+TM,15,Hyper Beam,Route 23,Rock Climb
+TM,16,Light Screen,Daimyn City Mall,
+TM,17,Protect,Daimyn City Mall,
+TM,18,Rain Dance,Heleo City Gym Reward,
+TM,19,Roost,Route 20,Cut
+TM,20,Safeguard,Daimyn City Mall,
+TM,21,Knock Off,Tsarvosa City Gym Reward,
+TM,22,Solar Beam,Mimmett Jungle,
+TM,23,Smack Down,Route 10 Cave,
+TM,24,Thunderbolt,Route 23,
+TM,25,Thunder,Daimyn Factory,Strength
+TM,26,Earthquake,Uteya Village Gym Reward,
+TM,27,Return,Route 14,
+TM,28,Leech Life,Mimmett Jungle,Strength
+TM,29,Psychic,Uteyan Ruins,Surf
+TM,30,Shadow Ball,Uteay Village,Rock Climb
+TM,31,Brick Break,Route 18 Cave,Rock Smash
+TM,32,Double Team,Route 11 South,
+TM,33,Reflect,Daimyn City Mall,
+TM,34,Sludge Wave,Route 8,Rock Climb
+TM,35,Flamethrower,Scalding Spa,
+TM,36,Sludge Bomb,Daimyn Factory,
+TM,37,Sandstorm,Heleo City Gym Reward,
+TM,38,Fire Blast,Carnelidge Volcano,Surf (Lava Surfing)
+TM,39,Rock Tomb,Route 13,
+TM,40,Aerial Ace,Route 8,
+TM,41,Torment,Route 10,Cut
+TM,42,Facade,Daimyn City Restaurant (Iris and Stella battle),Tsarvosa City badge
+TM,43,Flame Charge,Rubarr Desert Overworld,
+TM,44,Rest,Daimyn City Mall,
+TM,45,Attract,Heleo Ranch,
+TM,46,Thief,Daimyn City (Pluto Hideout),Bruccie Village badge
+TM,47,Low Sweep,Route 11 North,Cut
+TM,48,Round,Route 8,Cut
+TM,49,Echoed Voice,Rhodanzi City,Cut
+TM,50,Overheat,Carnelidge Volcano,Rock Climb
+TM,51,Steel Wing,Route 11 South,
+TM,52,Focus Blast,Victory Road,
+TM,53,Energy Ball,Route 1,Surf
+TM,54,False Swipe,Daimyn City,Cut
+TM,55,Scald,Route 15 North,Surf
+TM,56,Fling,Route 21,
+TM,57,Charge Beam,Daimyn Factory Overworld,Cut
+TM,58,Endure,Route 5,Cut
+TM,59,Brutal Swing,Pluto HQ B1F,Bruccie Village badge
+TM,60,Hex,Forgotten Manse (2F),
+TM,61,Will-o-Wisp,Forgotten Manse (Basement),
+TM,62,Acrobatics,Route 9,
+TM,63,Drain Punch,Route 24,
+TM,64,Explosion,Route 10,Surf
+TM,65,Shadow Claw,Route 13 Cave,Surf
+TM,66,Payback,Route 9,
+TM,67,Smart Strike,Hesson Pass 2F,Strength
+TM,68,Giga Impact,Route 11 South,Rock Climb
+TM,69,Rock Polish,Route 20 Cave,Rock Smash
+TM,70,Aurora Veil,Daimyn City Mall,
+TM,71,Stone Edge,Route 4,Rock Climb
+TM,72,Volt Switch,Daimyn City Gym Reward,
+TM,73,Thunder Wave,Treasure Beach,
+TM,74,Gyro Ball,Route 22,Strength
+TM,75,Swords Dance,Laplaz Town Gym Reward,
+TM,76,Role Play,Bruccie Village Gym Reward,
+TM,77,Psych Up,Secret Path,Strength
+TM,78,Bulldoze,Route 6,
+TM,79,Frost Breath,Torma Cave B1F,Rock Smash
+TM,80,Rock Slide,Route 17,Surf
+TM,81,X-Scissor,Peradon Forest,"Cut, Rock Smash, Strength"
+TM,82,Dragon Tail,Victory Road,
+TM,83,Infestation,Route 2,
+TM,84,Poison Jab,Route 19,Strength
+TM,85,Dream Eater,Route 24,Surf
+TM,86,Grass Knot,Peradon Forest,
+TM,87,Swagger,Olenic Town,Cut
+TM,88,Stealth Rock,Route 6,Strength
+TM,89,U-Turn,Daimyn City Gym Reward,
+TM,90,Substitute,Route 22,
+TM,91,Flash Cannon,Rubarr Desert Caves,"Strength, Rock Smash"
+TM,92,Trick Room,Route 18,
+TM,93,Wild Charge,Daimyn Factory Overworld,Rock Climb
+TM,94,Flip Turn,Daimyn City Gym Reward,
+TM,95,Snarl,Route 12 East,
+TM,96,Nature Power,Route 2,Surf
+TM,97,Dark Pulse,Forgotten Manse,"Strength, Rock Smash"
+TM,98,Waterfall,Seppire Cove B1F,Surf
+TM,99,Dazzling Gleam,Route 18,
+TM,100,Confide,Pluto HQ B5F,Bruccie Village Badge
+HM,1,Cut,Ferrox Village Library (story events),
+HM,2,Fly,Route 11 South (story events),
+HM,3,Surf,Team Pluto HQ (story events) - Visit Calicin Bay to trigger this event,
+HM,4,Strength,Tsarvosa City Stats Dojo,
+HM,5,Rock Smash,Heleo City Foreman,
+HM,6,Rock Climb,Uteyan Ruins,

@@ -1,5 +1,6 @@
 """Loaders for data that lives in the sibling Complete-Fire-Red-Upgrade repo."""
 
+import re
 from functools import cache
 
 from .cparse import (
@@ -83,3 +84,61 @@ def ability_names(p: Paths) -> dict[str, str]:
 @cache
 def item_ids(p: Paths) -> dict[str, int]:
     return parse_int_defines(p.cfru / "include/constants/items.h", "ITEM_")
+
+
+def _labelled_strings(p: Paths, table: str) -> dict[str, str]:
+    """Text of every #org @label in a .string file, by label (for strings referenced by symbol, not position)."""
+    result, label = {}, None
+    for line in read(p.cfru / table).splitlines():
+        if line.startswith("#org"):
+            label = line.split("@", 1)[1].strip()
+        elif label and line.strip():
+            result[label] = decode_text(line.strip())
+            label = None
+    return result
+
+
+@cache
+def ability_name_overrides(p: Paths) -> list[tuple[str, str, frozenset, frozenset, frozenset]]:
+    """Rules from GetAbilityNameOverride (src/ability_util.c): (ABILITY_*, display name, species, national dex
+    numbers, types). The renamed ability applies when the species, its national dex number, or one of its types
+    matches."""
+    raw = strip_comments(read(p.cfru / "src/ability_util.c"))
+    names = _labelled_strings(p, "strings/ability_name_table.string")
+
+    def function(name: str) -> str:
+        m = re.search(rf"^\S[^\n]*\b{name}\s*\([^;{{]*\)\s*{{", raw, flags=re.M)
+        if not m:
+            raise ValueError(f"{name} not found in ability_util.c")
+        return resolve_conditionals(raw[m.start():raw.index("\n}", m.start())], defines(p))
+
+    def predicate_targets(name: str) -> tuple[frozenset, frozenset]:
+        body = function(name)
+        return frozenset(re.findall(r"species\s*==\s*(SPECIES_\w+)", body)), frozenset(re.findall(r"NATIONAL_DEX_\w+", body))
+
+    body = function("GetAbilityNameOverride")
+    rules = []
+    cases = re.split(r"\n\t\tcase\s+(ABILITY_\w+)\s*:", body)
+    for ability, block in zip(cases[1::2], cases[2::2]):
+        # switch (dexNum) { case NATIONAL_DEX_A: case NATIONAL_DEX_B: return gText_AbilityName_X; ... }
+        for dexes, label in re.findall(r"((?:case\s+NATIONAL_DEX_\w+\s*:\s*)+)return\s+(gText_AbilityName_\w+)", block):
+            rules.append((ability, names[label], frozenset(), frozenset(re.findall(r"NATIONAL_DEX_\w+", dexes)), frozenset()))
+        # if (Predicate(...)) return gText_AbilityName_X;
+        for call, label in re.findall(r"if\s*\((\w+\([^)]*\))\)\s*return\s+(gText_AbilityName_\w+)", block):
+            fn = call.split("(")[0]
+            if fn == "IsSpeciesOfType":
+                types = frozenset(t.removeprefix("TYPE_") for t in re.findall(r"TYPE_\w+", call))
+                rules.append((ability, names[label], frozenset(), frozenset(), types))
+            elif fn.startswith(("SpeciesHas", "Is")):
+                species, national = predicate_targets(fn)
+                rules.append((ability, names[label], species, national, frozenset()))
+            else:
+                raise ValueError(f"unsupported ability-name rule {call!r}")
+    return rules
+
+
+def ability_display_name(p: Paths, ability: str, species: str, national: str | None, types: list[str]) -> str:
+    for rule_ability, name, species_set, national_set, type_set in ability_name_overrides(p):
+        if rule_ability == ability and (species in species_set or national in national_set or set(types) & type_set):
+            return name
+    return ability_names(p).get(ability, ability)

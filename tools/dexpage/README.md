@@ -42,11 +42,25 @@ player opens it with a connection.
 | Move data and names | CFRU `src/Tables/battle_moves.c`, `strings/attack_name_table.string` |
 | Item names | the built ROM |
 | Locations | `tools/dexpage/encounters.csv`, a copy of the Encounters tab of the "Where to Find Every Pokémon" sheet |
+| Item and TM locations | `tools/dexpage/items.csv`, `machines.csv`, imported from the item tables of the feature list doc |
+| Item icons | the built ROM's item icon table |
+| Ability names | per-species renames (Protean → Libero) parsed from `GetAbilityNameOverride` in CFRU `src/ability_util.c` |
 
 ## Updating locations
 
 Open the sheet, select the **Encounters** tab, choose File → Download → Comma-separated values, save it over
 `tools/dexpage/encounters.csv`, and rebuild. Rows are matched by Pokémon name, plus the form in parentheses
 (e.g. `Lycanroc (Midnight)`). The build lists any rows it couldn't match, so check its output after an update.
+
+## Updating item locations
+
+Download the feature list doc as .docx (File → Download → Microsoft Word), then:
+
+```
+pip install python-docx
+python -m tools.dexpage.items path/to/feature-list.docx
+```
+
+This rewrites `items.csv` and `machines.csv` from the doc's item, berry, Mega Stone, TM and HM tables.
 
 Tests: `python -m pytest tests/dexpage`

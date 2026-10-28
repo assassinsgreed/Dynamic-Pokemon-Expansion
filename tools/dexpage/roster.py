@@ -45,6 +45,7 @@ class SourceData:
     national: dict
     moves: dict
     items: dict
+    item_ids: dict
     abilities: dict
 
 
@@ -69,6 +70,7 @@ def _national_dex(p: Paths) -> dict[str, str]:
 
 def load_source_data(p: Paths) -> SourceData:
     std, div = load_dpe.dex_lists(p)
+    item_ids = {**load_cfru.item_ids(p), **load_dpe.item_ids(p)}
     return SourceData(
         paths=p, ids=load_dpe.species_ids(p), std=std, div=div,
         habitat=load_dpe.habitat_forms(p), stats=load_dpe.base_stats(p),
@@ -76,7 +78,7 @@ def load_source_data(p: Paths) -> SourceData:
         machines=load_dpe.machine_compat(p), evolutions=load_dpe.evolutions(p),
         names=load_dpe.species_names(p), sprites=load_dpe.front_pic(p),
         national=_national_dex(p), moves=load_cfru.moves(p),
-        items=item_names(p.rom, {**load_cfru.item_ids(p), **load_dpe.item_ids(p)}), abilities=load_cfru.ability_names(p),
+        items=item_names(p.rom, item_ids), item_ids=item_ids, abilities=load_cfru.ability_names(p),
     )
 
 

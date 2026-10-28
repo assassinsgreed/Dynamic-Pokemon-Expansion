@@ -28,3 +28,13 @@ def test_mega_stone_names(names):
 def test_missing_rom_raises(tmp_path, item_ids):
     with pytest.raises(RomError):
         item_names(tmp_path / "nope.gba", item_ids)
+
+
+def test_item_icons(paths, item_ids):
+    if not paths.rom.exists():
+        pytest.skip("built ROM not found")
+    from tools.dexpage.rom import item_icons
+    icons = item_icons(paths.rom, {"ITEM_FIRE_STONE": item_ids["ITEM_FIRE_STONE"]})
+    icon = icons["ITEM_FIRE_STONE"]
+    assert icon.size == (24, 24)
+    assert icon.getpixel((0, 0))[3] == 0          # palette index 0 is transparent

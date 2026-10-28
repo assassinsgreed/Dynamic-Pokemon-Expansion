@@ -11,10 +11,13 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
+from .items import load_items, load_machine_locations
+from .load_cfru import ability_display_name
 from .locations import attach_encounters, load_encounters
 from .paths import Paths
 from .roster import Entry, SourceData, build_roster, evolution_links, load_source_data
-from .sprites import build_sheet
+from .rom import item_icons
+from .sprites import build_sheet, pack
 
 TEMPLATE = Path(__file__).with_name("template.html")
 SW_TEMPLATE = Path(__file__).with_name("sw.js")
@@ -51,8 +54,12 @@ def _move_of(method: str, item: tuple | str) -> str:
     return item[0] if method == "special" else item[1]
 
 
-def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: list[dict], held: list[str]) -> dict:
+def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: list[dict], held: list[str],
+         item_index: dict) -> dict:
     s = e.stats
+    national = data.national.get(e.key) or data.national.get(e.base)
+    # CFRU shows some abilities under another name for particular species (Protean is Libero on Cinderace)
+    ability = lambda a: ability_display_name(data.paths, a, e.key, national, s["types"])
     official = e.key.removeprefix("SPECIES_").replace("_", " ").title()
     return {
         "key": e.key,
@@ -62,8 +69,8 @@ def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: 
         "dex": e.dex,
         "types": s["types"],
         "stats": [s[k] for k in STAT_KEYS],
-        "abilities": [data.abilities.get(a, a) for a in s["abilities"]],
-        "hidden": data.abilities.get(s["hidden_ability"]) if s["hidden_ability"] else None,
+        "abilities": [ability(a) for a in s["abilities"]],
+        "hidden": ability(s["hidden_ability"]) if s["hidden_ability"] else None,
         "gender": s["gender"],
         "eggGroups": [g.replace("_", " ").title() for g in s["egg_groups"]],
         "catchRate": s["catch_rate"],
@@ -74,7 +81,7 @@ def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: 
         "s": search_keys(e.name, official, f"{e.form} {e.name}" if e.form else None),
         "movesOf": index.get(e.base) if e.battle_form else None,
         "loc": locations,
-        "held": held,
+        "held": [[h, item_index.get(_norm(h.split(" (")[0]))] for h in held],
     }
 
 
@@ -96,12 +103,55 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
                 if move in moves:
                     moves[move]["learners"].append([i, _how(method, item)])
     locations, held, unmatched = attach_encounters(load_encounters(), roster)
+    items, item_index, icon_sheet = _items(data, held)
+    _attach_machine_locations(data, moves)
     return {
-        "mons": [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, []), held.get(e.key, []))
+        "mons": [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, []), held.get(e.key, []), item_index)
                  for e in roster],
+        "items": items,
+        "itemSheet": icon_sheet,
         "moves": moves,
         "unmatchedEncounters": unmatched,
     }
+
+
+def _items(data: SourceData, held: dict[str, list[str]]) -> tuple[list[dict], dict[str, int], str]:
+    """Feature-list items (plus any wild held item it doesn't list), each matched to its ROM icon."""
+    const_for: dict[str, str] = {}
+    for const, name in data.items.items():
+        const_for.setdefault(_norm(name), const)
+    for const in data.item_ids:
+        const_for.setdefault(_norm(const.removeprefix("ITEM_")), const)  # full names the 12-char ROM name truncates
+
+    items: list[dict] = []
+    index: dict[str, int] = {}
+
+    def add(name: str, category: str, where: list[str], use: str) -> None:
+        if _norm(name) in index:
+            return
+        index[_norm(name)] = len(items)
+        items.append({"name": name, "category": category, "where": where, "use": use,
+                      "key": const_for.get(_norm(name))})
+
+    for item in load_items():
+        add(item["name"], item["category"], item["where"], item["use"])
+    for names in held.values():
+        for h in names:
+            add(h.split(" (")[0], "Held by wild Pokémon", [], "")
+
+    wanted = {i["key"]: data.item_ids[i["key"]] for i in items if i["key"]}
+    sheet, offsets = pack(item_icons(data.paths.rom, wanted), 24)
+    for item in items:
+        item["icon"] = offsets.get(item.pop("key"))
+    return items, index, "data:image/webp;base64," + base64.b64encode(sheet).decode()
+
+
+def _attach_machine_locations(data: SourceData, moves: dict) -> None:
+    where = load_machine_locations()
+    for m in data.machines:
+        loc = where.get((m["kind"], m["num"]))
+        if loc and m["kind"] != "Tutor" and m["move"] in moves:
+            moves[m["move"]]["tm"] = {"label": f"{m['kind']}{m['num']:02d}", "where": loc["where"], "requires": loc["requires"]}
 
 
 def _icon(size: int) -> bytes:

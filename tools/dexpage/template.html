@@ -145,11 +145,16 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .facts dd { margin: 0; }
 .hidden-ab { color: var(--muted); font-style: italic; }
 
-.evo { display: grid; gap: 6px; }
-.evo ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.evo ul ul { padding-left: 18px; border-left: 2px solid var(--line); margin-left: 17px; }
-.evo li > .node { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.evo .how { font-size: 12.5px; color: var(--ink); background: var(--sunk); border: 1px solid var(--line); padding: 2px 7px; border-radius: 999px; }
+/* Evolution: stages left to right; branches stack inside a stage; each node shows how it's reached */
+.evo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 6px; }
+.evo .stage { display: grid; gap: 6px; }
+/* Many branches (Eevee): lay the stage out as a wrapping grid so it stays a few rows tall */
+.evo .stage.many { flex: 1 1 420px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 6px 12px; }
+.evo .evnode { display: flex; align-items: center; gap: 6px; }
+.evo .arrow { color: var(--muted); font-size: 12px; display: inline-flex; align-items: center; gap: 4px; }
+.evo .how { font-size: 12px; color: var(--muted); max-width: 22ch; line-height: 1.25; }
+.evo .how::after { content: " →"; color: var(--accent); }
+.evo .sep { color: var(--accent); font-size: 15px; padding: 0 2px; }
 .link { background: var(--sunk); border: 1px solid var(--line); padding: 1px 10px 1px 1px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border-radius: 999px; text-align: left; }
 .link:hover { border-color: var(--muted); }
 .link:hover .ln { text-decoration: underline; }
@@ -179,6 +184,22 @@ table.mv tr:last-child td { border-bottom: 0; }
 table.loc td { vertical-align: top; }
 table.loc td.meth { white-space: nowrap; font-size: 13px; }
 .groups { display: grid; gap: 16px; }
+
+/* Item icons (24px cells in their own sheet) */
+.ii { display: inline-block; width: 24px; height: 24px; flex: none; background-image: var(--isheet); background-repeat: no-repeat; image-rendering: pixelated; vertical-align: middle; }
+.ii.none { background: none; }
+.itembtn { display: inline-flex; align-items: center; gap: 4px; background: none; border: 0; padding: 0 2px 0 0; cursor: pointer; text-align: left; border-radius: 6px; }
+.itembtn:hover .in { text-decoration: underline; color: var(--accent); }
+.itemcard { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px; display: grid; gap: 12px; }
+.itemcard .top { display: flex; align-items: center; gap: 10px; }
+.itemcard .top .ii { transform: scale(1.5); margin: 4px 8px 4px 4px; }
+.itemcard h2 { margin: 0; font: 600 24px/1.1 var(--font-display); }
+.itemcard h2 small { font: 500 13px var(--font-body); color: var(--muted); margin-left: 8px; }
+.itemcard .use { white-space: pre-line; }
+.itemcard h4 { margin: 0 0 6px; font: 600 11.5px var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.where { margin: 0; padding-left: 18px; display: grid; gap: 2px; }
+.tmloc { font-size: 13px; color: var(--muted); }
+.tmloc b { color: var(--ink); font-family: var(--font-data); }
 
 /* Place card */
 .loccard { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px; display: grid; gap: 12px; }
@@ -228,10 +249,10 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
   <div class="wrap">
     <div class="brand">
       <h1><img class="brand-icon" src="__BRAND_ICON__" alt="" width="34" height="34">Pokemon Amethyst Pokedex</h1>
-      <div class="meta"><span class="long">Stats, evolutions, locations &amp; every way to learn a move</span><a id="dl" href="dex.html" download="pokemon-amethyst-pokedex.html" hidden>Download for offline use</a></div>
+      <div class="meta"><span class="long">Pokémon, moves, items &amp; where to find them</span><a id="dl" href="dex.html" download="pokemon-amethyst-pokedex.html" hidden>Download for offline use</a></div>
     </div>
     <div class="search">
-      <input id="q" type="search" placeholder="Search Pokémon, moves or places — e.g. Rockruff, Ceaseless Edge, Route 2" autocomplete="off" spellcheck="false" aria-label="Search Pokémon, moves or places">
+      <input id="q" type="search" placeholder="Search Pokémon, moves, items or places — e.g. Rockruff, Fire Stone, Route 2" autocomplete="off" spellcheck="false" aria-label="Search Pokémon, moves, items or places">
       <button class="clear" id="clear" aria-label="Clear search" hidden>×</button>
     </div>
     <div class="filters">
@@ -306,6 +327,19 @@ const SHEET = "__SPRITE_SHEET__";
     });
   }
 
+  // Items: the feature list's tables plus wild held items, with icons from the game
+  const items = DEX.items;
+  document.documentElement.style.setProperty("--isheet", `url(${DEX.itemSheet})`);
+  const itemSearch = items.map((it, k) => [k, norm(it.name)]);
+  const itemIcon = (k) => {
+    const it = k === null || k === undefined ? null : items[k];
+    return it && it.icon ? `<span class="ii" style="background-position:-${it.icon[0]}px -${it.icon[1]}px" aria-hidden="true"></span>` : '<span class="ii none" aria-hidden="true"></span>';
+  };
+  const itemButton = (k, label) => `<button class="itembtn" data-item="${k}">${itemIcon(k)}<span class="in">${esc(label || items[k].name)}</span></button>`;
+  const escapeRe = (text) => text.replace(/[.*+?^$()|[\]\\{}]/g, "\\$&");
+  // "Route 2" must match "Route 2" and "Route 2 (hidden)" but not "Route 20"
+  const placeRe = (name) => new RegExp("(^|[^a-z0-9])" + escapeRe(name.toLowerCase()) + "($|[^a-z0-9])");
+
   // Places: every location in the encounter data, with the Pokémon found there
   const places = new Map();
   mons.forEach((m, i) => m.loc.forEach((l) => {
@@ -356,13 +390,20 @@ const SHEET = "__SPRITE_SHEET__";
     let root = i;
     const seen = new Set();
     while (parent.has(root) && !seen.has(root)) { seen.add(root); root = parent.get(root); }
-    const node = (n, how, depth) => {
-      const kids = mons[n].evo.filter(([to]) => to !== n);
-      return `<li><span class="node">${how ? `<span class="how">${esc(how)}</span>` : ""}${monLink(n, i)}</span>${
-        kids.length && depth < 6 ? `<ul>${kids.map(([to, h]) => node(to, h, depth + 1)).join("")}</ul>` : ""}</li>`;
-    };
     if (root === i && !mons[i].evo.length) return '<p class="note">Does not evolve.</p>';
-    return `<div class="evo"><ul>${node(root, "", 0)}</ul></div>`;
+    // Stage by stage, each node with the method that reaches it
+    const stages = [[[root, ""]]];
+    const placed = new Set([root]);
+    while (stages.length < 8) {
+      const next = [];
+      for (const [n] of stages[stages.length - 1]) {
+        for (const [to, how] of mons[n].evo) if (!placed.has(to)) { placed.add(to); next.push([to, how]); }
+      }
+      if (!next.length) break;
+      stages.push(next);
+    }
+    return `<div class="evo">${stages.map((stage, d) => `${d ? '<span class="sep" aria-hidden="true">›</span>' : ""}<div class="stage${stage.length > 3 ? " many" : ""}">${
+      stage.map(([n, how]) => `<div class="evnode">${how ? `<span class="how">${esc(how)}</span>` : ""}${monLink(n, i)}</div>`).join("")}</div>`).join("")}</div>`;
   }
 
   function moveRow(k, how, showHow) {
@@ -485,7 +526,7 @@ const SHEET = "__SPRITE_SHEET__";
           <dt>Catch rate</dt><dd>${m.catchRate}</dd>
           <dt>Growth</dt><dd>${esc(m.growth)}</dd>
           <dt>EV yield</dt><dd>${evs}</dd>
-          ${m.held.length ? `<dt>Wild held items</dt><dd class="held">${m.held.map((h) => `<span>${esc(h)}</span>`).join("")}</dd>` : ""}
+          ${m.held.length ? `<dt>Wild held items</dt><dd class="held">${m.held.map(([h, k]) => k === null ? `<span>${esc(h)}</span>` : itemButton(k, h)).join("")}</dd>` : ""}
         </dl></section>
       </div>
       <section><h3>Evolution</h3>${evoTree(i)}</section>
@@ -508,7 +549,35 @@ const SHEET = "__SPRITE_SHEET__";
       <div class="top">${typeBadge(mv.type)}<span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span>
         <h2>${esc(mv.name)}${mv.official ? `<small>${esc(mv.official)}</small>` : ""}</h2></div>
       <div class="specs"><span>${CAT_NAME[mv.split]}</span><span>Pow <b>${mv.power || "—"}</b></span><span>Acc <b>${mv.acc || "—"}</b></span><span>PP <b>${mv.pp}</b></span></div>
+      ${mv.tm ? `<div class="tmloc"><b>${mv.tm.label}</b> · ${mv.tm.where.map(esc).join(" · ")}${mv.tm.requires ? ` · needs ${esc(mv.tm.requires)}` : ""}</div>` : ""}
       <div class="learners">${body}</div></article>`;
+  }
+
+  function itemCard(k) {
+    const it = items[k];
+    const holders = [];
+    mons.forEach((m, i) => m.held.forEach(([h, hk]) => { if (hk === k && inMode(m)) holders.push([i, (h.match(/\(([^)]*)\)/) || [])[1] || ""]); }));
+    const evolves = [];
+    const name = norm(it.name);
+    mons.forEach((m, i) => m.evo.forEach(([to, how]) => { if (norm(how).includes(name) && inMode(mons[to])) evolves.push([i, to, how]); }));
+    const chip = (i, note) => `<button class="chip" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${formLabel(mons[i])}</span>${note ? `<span class="hw">${esc(note)}</span>` : ""}</button>`;
+    return `<article class="itemcard">
+      <div class="top">${itemIcon(k)}<h2>${esc(it.name)}<small>${esc(it.category)}</small></h2></div>
+      ${it.where.length ? `<div><h4>Where to find</h4><ul class="where">${it.where.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>` : ""}
+      ${it.use ? `<div><h4>${it.category === "Evolution" ? "Used on" : "Use"}</h4><div class="use">${esc(it.use)}</div></div>` : ""}
+      ${evolves.length ? `<div><h4>Evolves · ${evolves.length}</h4><div class="chips">${evolves.map(([i, to]) => chip(to, `from ${mons[i].name}`)).join("")}</div></div>` : ""}
+      ${holders.length ? `<div><h4>Held by wild Pokémon · ${holders.length}</h4><div class="chips">${holders.map(([i, pct]) => chip(i, pct)).join("")}</div></div>` : ""}
+    </article>`;
+  }
+
+  function placeItems(p) {
+    const re = placeRe(p.name);
+    const found = [];
+    items.forEach((it, k) => { const line = it.where.find((w) => re.test(w.toLowerCase())); if (line) found.push([k, line]); });
+    if (!found.length) return "";
+    return `<div><h4>Items · ${found.length}</h4><div class="chips">${found.map(([k, line]) =>
+      `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${
+        line.toLowerCase() !== p.name.toLowerCase() ? `<span class="hw">${esc(line)}</span>` : ""}</button>`).join("")}</div></div>`;
   }
 
   function placeCard(p) {
@@ -520,7 +589,7 @@ const SHEET = "__SPRITE_SHEET__";
     const body = methods.length
       ? methods.map(([mt, l]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips">${l.map(chip).join("")}</div></div>`).join("")
       : `<p class="empty">No ${esc(state.mode)} Pokémon are found here.</p>`;
-    return `<article class="loccard"><h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2><div class="learners">${body}</div></article>`;
+    return `<article class="loccard"><h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2><div class="learners">${body}${placeItems(p)}</div></article>`;
   }
 
   function render() {
@@ -531,6 +600,11 @@ const SHEET = "__SPRITE_SHEET__";
       const exact = moveSearch.filter(([, keys]) => keys.includes(q));
       const partial = moveSearch.filter(([, keys]) => !keys.includes(q) && keys.some((x) => x.includes(q)));
       matchedMoves = exact.concat(partial).map(([k]) => k);
+    }
+    let matchedItems = [];
+    if (q.length >= 3) {
+      const exactItems = itemSearch.filter(([, n]) => n === q), partialItems = itemSearch.filter(([, n]) => n !== q && n.includes(q));
+      matchedItems = exactItems.concat(partialItems).map(([k]) => k);
     }
     let matchedPlaces = [];
     if (q.length >= 3) {
@@ -553,6 +627,13 @@ const SHEET = "__SPRITE_SHEET__";
       const rest = showCard ? matchedMoves.slice(1) : matchedMoves;
       if (rest.length) html += `<div class="moreoves">${rest.slice(0, 24).map((k) => `<button data-move="${k}">${typeBadge(moves[k].type)}${esc(moves[k].name)}</button>`).join("")}</div>`;
     }
+    if (matchedItems.length) {
+      html += `<div class="section-label">Items</div>`;
+      const showItem = matchedItems.length <= 2 || itemSearch[matchedItems[0]][1] === q;
+      if (showItem) html += itemCard(matchedItems[0]);
+      const rest = showItem ? matchedItems.slice(1) : matchedItems;
+      if (rest.length) html += `<div class="moreoves">${rest.slice(0, 30).map((k) => `<button data-item="${k}">${itemIcon(k)}${esc(items[k].name)}</button>`).join("")}</div>`;
+    }
     if (matchedPlaces.length) {
       const exactPlace = places.get(q) || (matchedPlaces.length === 1 ? matchedPlaces[0] : null);
       html += `<div class="section-label">Places</div>`;
@@ -560,15 +641,17 @@ const SHEET = "__SPRITE_SHEET__";
       const rest = matchedPlaces.filter((p) => p !== exactPlace);
       if (rest.length) html += `<div class="moreoves">${rest.slice(0, 30).map((p) => `<button data-place="${esc(p.name)}">${esc(p.name)}</button>`).join("")}</div>`;
     }
-    if (list.length || (!matchedMoves.length && !matchedPlaces.length)) {
-      if (matchedMoves.length || matchedPlaces.length) html += `<div class="section-label">Pokémon</div>`;
+    const others = matchedMoves.length || matchedPlaces.length || matchedItems.length;
+    if (list.length || !others) {
+      if (others) html += `<div class="section-label">Pokémon</div>`;
       html += list.length
         ? `<div class="list${state.view === "grid" ? " grid" : ""}">${list.map((i) => row(mons[i], i)).join("")}</div>`
         : `<div class="nores">Nothing matches “${esc(state.q)}”${state.mode ? ` in ${state.mode} mode` : ""}.</div>`;
     }
     $("#out").innerHTML = html;
     $("#count").textContent = `${list.length} Pokémon${matchedMoves.length ? ` · ${matchedMoves.length} move${matchedMoves.length > 1 ? "s" : ""}` : ""}${
-      matchedPlaces.length ? ` · ${matchedPlaces.length} place${matchedPlaces.length > 1 ? "s" : ""}` : ""}`;
+      matchedPlaces.length ? ` · ${matchedPlaces.length} place${matchedPlaces.length > 1 ? "s" : ""}` : ""}${
+      matchedItems.length ? ` · ${matchedItems.length} item${matchedItems.length > 1 ? "s" : ""}` : ""}`;
     $("#clear").hidden = !state.q;
     document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
     document.querySelectorAll(".seg button[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.view)));
@@ -613,6 +696,8 @@ const SHEET = "__SPRITE_SHEET__";
   $("#out").addEventListener("click", (e) => {
     const mv = e.target.closest("[data-move]");
     if (mv) { e.preventDefault(); search(moves[mv.dataset.move].name); return; }
+    const itm = e.target.closest("[data-item]");
+    if (itm) { e.preventDefault(); search(items[+itm.dataset.item].name); return; }
     const pl = e.target.closest("[data-place]");
     if (pl) { e.preventDefault(); search(pl.dataset.place); return; }
     const op = e.target.closest("[data-open]");

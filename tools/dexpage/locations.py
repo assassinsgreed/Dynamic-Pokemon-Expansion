@@ -40,7 +40,8 @@ def load_encounters(path: Path = ENCOUNTERS_CSV) -> list[dict]:
             "rate": _rate(r["Rate"]) if r["Rate"] else "",
             "levels": r["Levels"],
             "item": r["Held item"],
-            "notes": r["Notes"],
+            # The sheet's other tabs don't exist on the page
+            "notes": re.sub(r"\s*Details on the \w+ tab\.", "", r["Notes"]).strip(),
         })
     return result
 
