@@ -159,5 +159,5 @@ def item_names(rom_path: Path, item_ids: dict[str, int]) -> dict[str, str]:
     for const, idx in item_ids.items():
         offset = base + idx * ITEM_STRUCT_SIZE
         if offset + ITEM_NAME_LENGTH <= len(rom):
-            names[const] = decode(rom[offset:offset + ITEM_NAME_LENGTH], charmap)
+            names[const] = decode(rom[offset:offset + ITEM_NAME_LENGTH], charmap).replace("\e", "é")
     return names

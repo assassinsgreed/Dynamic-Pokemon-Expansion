@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Pokemon Amethyst Pokedex</title>
+<title>Pokemon Amethyst Companion</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Searchable Pokédex for Pokémon Amethyst: stats, evolutions, locations, and every way to learn each move in Standard and Divergent modes.">
+<meta name="description" content="Pokémon Amethyst companion: every Pokémon, move, item and location in Standard and Divergent modes. Works offline.">
 <meta name="theme-color" content="#5b2a9e">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
-/* Layout: one sticky search console over a list (or grid) of tap-to-expand Pokémon; move and place matches surface above them.
+/* Layout: a sticky console (title, view tabs, search, filters) over one view at a time: Pokédex, Moves, Items or Locations.
    Palette: Amethyst purples from the game's label art (lavender #b27cfa over deep violet #320077). */
 :root {
   --bg: #f3eff9;
@@ -39,6 +39,7 @@
   --line: #342a46; --accent: #b27cfa; --accent-soft: #2e2145; --console: #1a1326; --focus: #c9a3ff; color-scheme: dark;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
@@ -59,6 +60,15 @@ header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 
 .brand .meta { color: var(--muted); font-size: 12.5px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
 .brand a { color: var(--accent); font-weight: 600; text-decoration: none; }
 .brand a:hover { text-decoration: underline; }
+.views { display: flex; align-items: center; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 0 -4px; }
+.views button { flex: none; border: 0; background: none; padding: 7px 12px; border-radius: 999px; font: 600 14px var(--font-display); letter-spacing: .03em; color: var(--muted); cursor: pointer; }
+.views button[aria-selected="true"] { background: var(--accent); color: #fff; }
+.views button:not([aria-selected="true"]):hover { background: var(--accent-soft); color: var(--ink); }
+.views .back { display: inline-flex; align-items: center; gap: 2px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); margin-right: 4px; padding: 6px 12px 6px 8px; }
+.offline-btn { border: 1px solid var(--line); background: var(--surface); color: var(--accent); font: 600 12.5px var(--font-body); padding: 5px 10px; border-radius: 999px; cursor: pointer; }
+.offline-help { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; font-size: 13.5px; display: grid; gap: 6px; }
+.offline-help p { margin: 0; }
+.offline-help a { color: var(--accent); font-weight: 600; }
 .search { position: relative; }
 .search input {
   width: 100%; font: 500 17px/1.2 var(--font-body); color: var(--ink);
@@ -74,7 +84,14 @@ header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 
 .seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
 .seg button svg { vertical-align: -2px; }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-select { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
+.typepick { position: relative; }
+.typepick > button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); padding: 5px 10px; border-radius: 8px; font-size: 13px; cursor: pointer; color: var(--ink); }
+.typepick > button svg { color: var(--muted); }
+.typepick .menu { position: absolute; z-index: 6; top: calc(100% + 6px); left: 0; width: min(330px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px; box-shadow: 0 10px 30px rgb(20 10 40 / .18); display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.typepick .menu button { border: 0; padding: 0; background: none; cursor: pointer; border-radius: 6px; }
+.typepick .menu .type { width: 100%; text-align: center; padding: 6px 4px 5px; }
+.typepick .menu .all { grid-column: 1 / -1; border: 1px solid var(--line); background: var(--sunk); padding: 6px; font-size: 13px; color: var(--ink); }
+.typepick .menu [aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: 1px; }
 .count { margin-left: auto; color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
 
 main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
@@ -92,11 +109,13 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 
 /* Rows */
 .list { display: grid; gap: 6px; }
-.mon { background: var(--tint, none), var(--surface); border: 1px solid var(--line); border-radius: 10px; scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--console-h, 150px) + 8px); }
+.mon { background: linear-gradient(var(--hl, transparent), var(--hl, transparent)), var(--tint, none), var(--surface); border: 1px solid var(--line); border-radius: 10px; scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--console-h, 150px) + 8px); }
 .mon[open] { border-color: var(--muted); }
 .mon > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 12px 6px 6px; border-radius: 10px; }
-.mon > summary:hover { background: color-mix(in srgb, var(--accent) 7%, transparent); }
-.mon > summary:hover .chev { color: var(--accent); border-color: var(--accent); }
+.mon:not([open]):hover { --hl: color-mix(in srgb, var(--accent) 8%, transparent); }
+.mon[open] > summary:hover { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.mon:hover > summary .chev { color: var(--accent); border-color: var(--accent); }
+.list.grid .mon:not([open]) { display: grid; }
 .chev { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: var(--muted); border: 1px solid var(--line); background: var(--surface); }
 .mon[open] > summary .chev { transform: rotate(180deg); color: var(--accent); border-color: var(--accent); }
 .mode b { font-family: var(--font-data); font-weight: 600; margin-left: 4px; }
@@ -143,28 +162,36 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; font-size: 13.5px; }
 .facts dt { color: var(--muted); }
 .facts dd { margin: 0; }
-.hidden-ab { color: var(--muted); font-style: italic; }
+.abilities { display: grid; gap: 4px; }
+.ab b { font-weight: 600; }
+.ab .hid { font: 500 10.5px var(--font-body); color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 1px 4px; margin-left: 4px; vertical-align: 1px; }
+.ab .desc { display: block; color: var(--muted); font-size: 12.5px; }
 
-/* Evolution: stages left to right; branches stack inside a stage; each node shows how it's reached */
-.evo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 6px; }
-.evo .stage { display: grid; gap: 6px; }
-/* Many branches (Eevee): lay the stage out as a wrapping grid so it stays a few rows tall */
-.evo .stage.many { flex: 1 1 420px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 6px 12px; }
-.evo .evnode { display: flex; align-items: center; gap: 6px; }
-.evo .arrow { color: var(--muted); font-size: 12px; display: inline-flex; align-items: center; gap: 4px; }
-.evo .how { font-size: 12px; color: var(--muted); max-width: 22ch; line-height: 1.25; }
-.evo .how::after { content: " →"; color: var(--accent); }
-.evo .sep { color: var(--accent); font-size: 15px; padding: 0 2px; }
+/* Evolution: stages left to right; each card is a Pokémon with the method that reaches it underneath.
+   A stage with several branches (Eevee, Rockruff) stacks its cards, wrapping into a grid when there are many. */
+.evo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.evo .stage { display: grid; gap: 6px; align-content: center; }
+.evo .stage.many { flex: 1 1 440px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.evo .sep { color: var(--accent); font-size: 18px; line-height: 1; }
+.evcard { display: grid; gap: 2px; padding: 4px 12px 6px 4px; border: 1px solid var(--line); border-radius: 12px; background: var(--sunk); min-width: 0; }
+.evcard.current { border-color: var(--accent); background: var(--accent-soft); }
+.evcard .link { background: none; border: 0; padding: 0; }
+.evcard .how { font-size: 12px; color: var(--muted); padding-left: 42px; line-height: 1.3; display: flex; flex-wrap: wrap; align-items: center; column-gap: 4px; }
+.evcard .how .itembtn .ii { width: 24px; height: 24px; margin: -4px 0 -6px; }
 .link { background: var(--sunk); border: 1px solid var(--line); padding: 1px 10px 1px 1px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border-radius: 999px; text-align: left; }
 .link:hover { border-color: var(--muted); }
 .link:hover .ln { text-decoration: underline; }
-.link.current { border-color: var(--accent); background: var(--accent-soft); cursor: default; }
+.link.current { border-color: var(--accent); background: var(--accent-soft); }
 .link .ln { font-weight: 600; }
 .link .ln small { font-weight: 400; color: var(--muted); }
 .link.current .ln { color: var(--accent); }
 
 .moves { overflow-x: auto; }
-table.mv { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+table.mv { border-collapse: collapse; width: 100%; font-size: 13.5px; table-layout: fixed; }
+table.mv .c-how { width: 104px; } table.mv .c-type { width: 92px; } table.mv .c-cat { width: 42px; }
+table.mv .c-num { width: 56px; text-align: right; } table.mv .c-tm { width: 64px; }
+table.loc { table-layout: auto; }
+table.mv td { overflow: hidden; text-overflow: ellipsis; }
 table.mv th { text-align: left; font: 600 11px var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 4px 6px; border-bottom: 1px solid var(--line); }
 table.mv td { padding: 4px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
 table.mv td.n { font-family: var(--font-data); font-variant-numeric: tabular-nums; text-align: right; color: var(--muted); white-space: nowrap; }
@@ -200,6 +227,15 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
 .where { margin: 0; padding-left: 18px; display: grid; gap: 2px; }
 .tmloc { font-size: 13px; color: var(--muted); }
 .tmloc b { color: var(--ink); font-family: var(--font-data); }
+
+/* Browse views */
+.cat-head { font: 600 12px/1 var(--font-display); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 10px 2px 6px; }
+.browse { display: grid; gap: 4px; }
+.movelist { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px 8px; overflow-x: auto; }
+.movelist tr { cursor: pointer; }
+.movelist tbody tr:hover td { background: var(--accent-soft); }
+.also { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
+.also button { border: 1px solid var(--line); background: var(--surface); padding: 4px 10px; border-radius: 999px; cursor: pointer; color: var(--accent); font-weight: 600; font-size: 13px; }
 
 /* Place card */
 .loccard { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px; display: grid; gap: 12px; }
@@ -238,6 +274,8 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
   .who .nm { font-size: 16.5px; }
   .detail { padding: 12px 10px; }
   table.mv .hide-sm { display: none; }
+  table.mv .c-how { width: 72px; } table.mv .c-type { width: 80px; }
+  .evcard .how { padding-left: 4px; }
 }
 @media (prefers-reduced-motion: no-preference) {
   .mon { transition: border-color .15s; }
@@ -249,9 +287,21 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
 <header class="console">
   <div class="wrap">
     <div class="brand">
-      <h1><img class="brand-icon" src="__BRAND_ICON__" alt="" width="34" height="34">Pokemon Amethyst Pokedex</h1>
-      <div class="meta"><span class="long">Pokémon, moves, items &amp; where to find them</span><a id="dl" href="dex.html" download="pokemon-amethyst-pokedex.html" hidden>Download for offline use</a></div>
+      <h1><img class="brand-icon" src="__BRAND_ICON__" alt="" width="34" height="34">Pokemon Amethyst Companion</h1>
+      <div class="meta"><span class="long">Pokémon, moves, items &amp; where to find them</span><button class="offline-btn" id="offline-btn" aria-expanded="false" aria-controls="offline-help">Use offline</button></div>
     </div>
+    <div class="offline-help" id="offline-help" hidden>
+      <p id="offline-web"><b>On a computer:</b> <a id="dl" href="dex.html" download="pokemon-amethyst-companion.html">download this page</a> and open the saved file in any browser. It works with no internet connection.</p>
+      <p id="offline-web2"><b>On a phone:</b> open this page in your browser, then choose <b>Add to Home Screen</b> (iPhone: Share button; Android: ⋮ menu → Install app). After one visit it opens offline like an app, and updates itself the next time you're online.</p>
+      <p id="offline-file" hidden>You're using the downloaded copy, so everything here already works offline.</p>
+    </div>
+    <nav class="views" role="tablist" aria-label="Views">
+      <button class="back" id="back" hidden aria-label="Back"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Back</button>
+      <button role="tab" data-viewtab="dex" aria-selected="true">Pokédex</button>
+      <button role="tab" data-viewtab="moves" aria-selected="false">Moves</button>
+      <button role="tab" data-viewtab="items" aria-selected="false">Items</button>
+      <button role="tab" data-viewtab="places" aria-selected="false">Locations</button>
+    </nav>
     <div class="search">
       <input id="q" type="search" placeholder="Search Pokémon, moves, items or places — e.g. Rockruff, Fire Stone, Route 2" autocomplete="off" spellcheck="false" aria-label="Search Pokémon, moves, items or places">
       <button class="clear" id="clear" aria-label="Clear search" hidden>×</button>
@@ -262,8 +312,11 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
         <button id="m-std" data-mode="Standard" aria-pressed="false">Standard</button>
         <button id="m-div" data-mode="Divergent" aria-pressed="false">Divergent</button>
       </div>
-      <select id="type" aria-label="Filter by type"><option value="">All types</option></select>
-      <div class="seg" role="group" aria-label="Layout">
+      <div class="typepick" id="typepick">
+        <button id="type-btn" aria-expanded="false" aria-haspopup="true"><span id="type-label">All types</span><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <div class="menu" id="type-menu" hidden></div>
+      </div>
+      <div class="seg" role="group" aria-label="Layout" id="layout-seg">
         <button id="v-list" data-view="list" aria-pressed="true" title="List"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 3h12M2 8h12M2 13h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="vh">List</span></button>
         <button id="v-grid" data-view="grid" aria-pressed="false" title="Grid"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z" fill="currentColor"/></svg><span class="vh">Grid</span></button>
       </div>
@@ -278,481 +331,7 @@ const DEX = __DEX_DATA__;
 const SHEET = "__SPRITE_SHEET__";
 </script>
 <script>
-(() => {
-  "use strict";
-  document.documentElement.style.setProperty("--sheet", `url(${SHEET})`);
-  const consoleEl = document.querySelector("header.console");
-  const syncConsoleHeight = () => document.documentElement.style.setProperty("--console-h", `${consoleEl.offsetHeight}px`);
-  syncConsoleHeight();
-  window.addEventListener("resize", syncConsoleHeight);
-  const $ = (s) => document.querySelector(s);
-  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const norm = (s) => s.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
-  const TYPES = ["NORMAL","FIRE","WATER","GRASS","ELECTRIC","ICE","FIGHTING","POISON","GROUND","FLYING","PSYCHIC","BUG","ROCK","GHOST","DRAGON","DARK","STEEL","FAIRY"];
-  const STAT_LABELS = ["HP", "Atk", "Def", "SpA", "SpD", "Spe"];
-  const CAT = {
-    physical: '<svg viewBox="0 0 20 20" aria-hidden="true"><path fill="#e2562a" d="M10 1l2.2 4.6 5-1.3-2.2 4.7 4 2.9-5 .8.4 5.1L10 15l-4.4 2.8.4-5.1-5-.8 4-2.9-2.2-4.7 5 1.3z"/></svg>',
-    special: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#2f7fe6"/><circle cx="10" cy="10" r="5.2" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="10" cy="10" r="2" fill="#fff"/></svg>',
-    status: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#8b949e"/><path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="#c9d1d9"/></svg>',
-  };
-  const CAT_NAME = { physical: "Physical", special: "Special", status: "Status" };
-  const TYPE_COLOR = { NORMAL: "#9a9d9a", FIRE: "#e2562a", WATER: "#2f7fe6", GRASS: "#3c9a2d", ELECTRIC: "#f2bd16", ICE: "#3fc4e8",
-    FIGHTING: "#e07510", POISON: "#8f45c6", GROUND: "#946033", FLYING: "#6f9fdc", PSYCHIC: "#e8487d", BUG: "#8b9b1c", ROCK: "#a49a6c",
-    GHOST: "#6c4a74", DRAGON: "#5463d8", DARK: "#5b4b4c", STEEL: "#5f99ad", FAIRY: "#e06fe0", MYSTERY: "#5e8f86" };
-  // A faint wash of the Pokémon's type colours behind its row
-  const tint = (m) => {
-    const a = TYPE_COLOR[m.types[0]], b = TYPE_COLOR[m.types[1] || m.types[0]];
-    return `--tint: linear-gradient(100deg, ${a}26 0%, ${a}0d 38%, ${b}0d 70%, ${b}24 100%)`;
-  };
-  const CHEVRON = '<span class="chev" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
-  const mons = DEX.mons, moves = DEX.moves;
-  const moveKeys = Object.keys(moves);
-
-  // Per-Pokémon move lists, rebuilt from the move → learners table
-  const monMoves = mons.map(() => []);
-  for (const k of moveKeys) for (const [i, how] of moves[k].learners) monMoves[i].push([k, how]);
-  const parent = new Map();
-  mons.forEach((m, i) => m.evo.forEach(([to]) => { if (!parent.has(to)) parent.set(to, i); }));
-  const moveSearch = moveKeys.map((k) => [k, moves[k].s]);  // in-game name, official name, constant name
-
-  const state = { q: "", mode: "", type: "", open: null, tab: "level", tabFilter: "", view: "list" };
-  try { state.mode = localStorage.getItem("dex-mode") || ""; state.view = localStorage.getItem("dex-view") || "list"; } catch (e) {}
-
-  // Sort keys per mode: that mode's dex number; unnumbered forms sit just after the entry before them (their base)
-  const order = { Standard: new Float64Array(mons.length), Divergent: new Float64Array(mons.length) };
-  for (const [mode, field] of [["Standard", "std"], ["Divergent", "div"]]) {
-    let last = 0, step = 0;
-    mons.forEach((m, i) => {
-      if (m.dex[field]) { last = m.dex[field]; step = 0; order[mode][i] = last; }
-      else order[mode][i] = last + ++step / 1000;
-    });
-  }
-
-  // Items: the feature list's tables plus wild held items, with icons from the game
-  const items = DEX.items;
-  document.documentElement.style.setProperty("--isheet", `url(${DEX.itemSheet})`);
-  const itemSearch = items.map((it, k) => [k, norm(it.name)]);
-  const itemIcon = (k) => {
-    const it = k === null || k === undefined ? null : items[k];
-    return it && it.icon ? `<span class="ii" style="background-position:-${it.icon[0]}px -${it.icon[1]}px" aria-hidden="true"></span>` : '<span class="ii none" aria-hidden="true"></span>';
-  };
-  const itemButton = (k, label) => `<button class="itembtn" data-item="${k}">${itemIcon(k)}<span class="in">${esc(label || items[k].name)}</span></button>`;
-  const escapeRe = (text) => text.replace(/[.*+?^$()|[\]\\{}]/g, "\\$&");
-  // "Route 2" must match "Route 2" and "Route 2 (hidden)" but not "Route 20"
-  const placeRe = (name) => new RegExp("(^|[^a-z0-9])" + escapeRe(name.toLowerCase()) + "($|[^a-z0-9])");
-
-  // Places: every location in the encounter data, with the Pokémon found there
-  const places = new Map();
-  mons.forEach((m, i) => m.loc.forEach((l) => {
-    const k = norm(l.location);
-    if (!places.has(k)) places.set(k, { name: l.location, rows: [] });
-    places.get(k).rows.push([i, l]);
-  }));
-
-  const typeBadge = (t) => `<span class="type t-${t}">${t === "MYSTERY" ? "???" : t[0] + t.slice(1).toLowerCase()}</span>`;
-  const sprite = (m, small) => `<span class="sp${small ? " sm" : ""}" aria-hidden="true"><i style="background-position:-${m.sp[0]}px -${m.sp[1]}px"></i></span>`;
-  const formLabel = (m) => (m.form ? ` <small>${esc(m.form)}</small>` : "");
-  const pad = (n) => String(n).padStart(3, "0");
-  // One badge per mode, carrying that mode's dex number
-  const modeBadge = (m) => m.modes.map((mode) => {
-    const n = mode === "Standard" ? m.dex.std : m.dex.div;
-    return `<span class="mode${mode === "Divergent" ? " d" : ""}">${mode}${n ? `<b>#${pad(n)}</b>` : ""}</span>`;
-  }).join("");
-  const bst = (m) => m.stats.reduce((a, b) => a + b, 0);
-  const inMode = (m) => !state.mode || m.modes.includes(state.mode);
-  const inType = (m) => !state.type || m.types.includes(state.type);
-
-  function row(m, i) {
-    return `<details class="mon" data-i="${i}" style="${tint(m)}"${state.open === i ? " open" : ""}>
-      <summary title="Show details">${sprite(m)}
-        <span class="who"><span class="nm">${esc(m.name)}${formLabel(m)}</span>
-          <span class="tags">${m.types.map(typeBadge).join("")}${modeBadge(m)}</span></span>
-        ${CHEVRON}
-      </summary>${state.open === i ? detail(i) : ""}</details>`;
-  }
-
-  function statColor(v) {
-    if (v < 50) return "#e2562a"; if (v < 80) return "#f2a516"; if (v < 100) return "#c9c21b";
-    if (v < 120) return "#5fb83a"; return "#2aa198";
-  }
-
-  function genderText(g) {
-    if (g === null) return "Genderless";
-    if (g === 0) return "♂ only"; if (g === 100) return "♀ only";
-    return `♂ ${+(100 - g).toFixed(1)}% · ♀ ${+g.toFixed(1)}%`;
-  }
-
-  function monLink(i, current) {
-    const m = mons[i];
-    return `<button class="link${i === current ? " current" : ""}" data-open="${i}">${sprite(m, true)}<span class="ln">${esc(m.name)}${formLabel(m)}</span></button>`;
-  }
-
-  function evoTree(i) {
-    let root = i;
-    const seen = new Set();
-    while (parent.has(root) && !seen.has(root)) { seen.add(root); root = parent.get(root); }
-    if (root === i && !mons[i].evo.length) return '<p class="note">Does not evolve.</p>';
-    // Stage by stage, each node with the method that reaches it
-    const stages = [[[root, ""]]];
-    const placed = new Set([root]);
-    while (stages.length < 8) {
-      const next = [];
-      for (const [n] of stages[stages.length - 1]) {
-        for (const [to, how] of mons[n].evo) if (!placed.has(to)) { placed.add(to); next.push([to, how]); }
-      }
-      if (!next.length) break;
-      stages.push(next);
-    }
-    return `<div class="evo">${stages.map((stage, d) => `${d ? '<span class="sep" aria-hidden="true">›</span>' : ""}<div class="stage${stage.length > 3 ? " many" : ""}">${
-      stage.map(([n, how]) => `<div class="evnode">${how ? `<span class="how">${esc(how)}</span>` : ""}${monLink(n, i)}</div>`).join("")}</div>`).join("")}</div>`;
-  }
-
-  function moveRow(k, how, showHow) {
-    const mv = moves[k];
-    return `<tr>${showHow ? `<td class="h">${esc(how)}</td>` : ""}
-      <td><button class="mvname" data-move="${k}">${esc(mv.name)}</button></td>
-      <td>${typeBadge(mv.type)}</td>
-      <td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td>
-      <td class="n">${mv.power || "—"}</td><td class="n hide-sm">${mv.acc || "—"}</td><td class="n hide-sm">${mv.pp}</td></tr>`;
-  }
-
-  function moveTable(title, list, howHeader, note) {
-    if (!list.length) return "";
-    return `<section>${title ? `<h3>${title}</h3>` : ""}${note ? `<p class="note">${note}</p>` : ""}<div class="moves"><table class="mv"><thead><tr>${
-      howHeader ? `<th>${howHeader}</th>` : ""}<th>Move</th><th>Type</th><th>Cat</th><th style="text-align:right">Pow</th><th class="hide-sm" style="text-align:right">Acc</th><th class="hide-sm" style="text-align:right">PP</th></tr></thead><tbody>${
-      list.map(([k, how]) => moveRow(k, how, !!howHeader)).join("")}</tbody></table></div></section>`;
-  }
-
-  // Move lists per tab, in game order
-  function moveLists(i) {
-    const all = monMoves[i];
-    const lvl = all.filter(([, h]) => h === "Evo" || h.startsWith("Lv "))
-      .map((x, n) => [x, n]).sort((a, b) => {
-        const la = a[0][1] === "Evo" ? 0 : +a[0][1].slice(3), lb = b[0][1] === "Evo" ? 0 : +b[0][1].slice(3);
-        return la - lb || a[1] - b[1];
-      }).map(([x]) => x);
-    const tm = all.filter(([, h]) => /^(TM|HM)\d/.test(h))
-      .sort((a, b) => (a[1][0] === "H") - (b[1][0] === "H") || parseInt(a[1].slice(2), 10) - parseInt(b[1].slice(2), 10));
-    const tutor = all.filter(([, h]) => h.startsWith("Tutor")).sort((a, b) => parseInt(a[1].slice(6), 10) - parseInt(b[1].slice(6), 10));
-    const special = all.filter(([, h]) => h.startsWith("Special:")).map(([k, h]) => [k, h.slice(9)]);
-    const egg = all.filter(([, h]) => h === "Egg").sort((a, b) => moves[a[0]].name.localeCompare(moves[b[0]].name));
-    return { level: lvl, egg, tm, tutor, special };
-  }
-
-  const TABS = [["level", "Level up"], ["egg", "Egg moves"], ["tm", "TM / HM"], ["tutor", "Tutor"], ["loc", "Locations"]];
-
-  function locRows(i) {
-    return mons[i].loc.filter((l) => !state.mode || l.mode === "Both" || l.mode === state.mode);
-  }
-
-  function tabCount(i, tab, lists) {
-    if (tab === "loc") return locRows(i).length;
-    if (tab === "tutor") return lists.tutor.length + lists.special.length;
-    return lists[tab].length;
-  }
-
-  const moveMatches = (f) => ([k, how]) => {
-    if (!f) return true;
-    const mv = moves[k];
-    return [mv.name, mv.official || "", mv.type, CAT_NAME[mv.split], how].some((s) => norm(s).includes(f));
-  };
-
-  function locTable(rows) {
-    return `<div class="moves"><table class="mv loc"><thead><tr><th>Location</th><th>Method</th><th style="text-align:right">Lv</th><th style="text-align:right">Rate</th><th class="hide-sm">Mode</th></tr></thead><tbody>${
-      rows.map((l) => `<tr><td><b>${esc(l.location)}</b>${l.sub ? `<div class="note">${esc(l.sub)}</div>` : ""}${
-        l.variant ? `<div class="note">${esc(l.variant)}</div>` : ""}${l.notes ? `<div class="note">${esc(l.notes)}</div>` : ""}</td>
-        <td class="meth">${esc(l.method)}</td><td class="n">${esc(l.levels || "—")}</td><td class="n">${esc(l.rate || "—")}</td>
-        <td class="hide-sm"><span class="mode${l.mode === "Divergent" ? " d" : ""}">${esc(l.mode)}</span></td></tr>`).join("")}</tbody></table></div>`;
-  }
-
-  function noLocations(i) {
-    const m = mons[i];
-    if (m.movesOf !== null) return `<p class="note">Mega Evolve or transform ${monLink(m.movesOf, i)} in battle.</p>`;
-    const from = parent.has(i) ? parent.get(i) : null;
-    return `<p class="note">Not found in the wild${state.mode ? ` in ${state.mode} mode` : ""}.${
-      from !== null ? ` Evolve it from ${monLink(from, i)}` : ""}</p>`;
-  }
-
-  function panel(i) {
-    const m = mons[i];
-    const f = norm(state.tabFilter);
-    if (state.tab === "loc") {
-      const rows = locRows(i).filter((l) => !f || [l.location, l.sub || "", l.method, l.notes || "", l.variant || ""].some((s) => norm(s).includes(f)));
-      if (!locRows(i).length) return noLocations(i);
-      return rows.length ? locTable(rows) : `<p class="note">No locations match “${esc(state.tabFilter)}”.</p>`;
-    }
-    const battleNote = m.movesOf !== null
-      ? `<p class="note">Exists only in battle, so it knows whatever ${monLink(m.movesOf, i)} knows.</p>` : "";
-    const lists = moveLists(m.movesOf ?? i);
-    const keep = moveMatches(f);
-    const empty = (what) => `${battleNote}<p class="note">${f ? `No ${what} match “${esc(state.tabFilter)}”.` : `No ${what}.`}</p>`;
-    if (state.tab === "tutor") {
-      const tutor = lists.tutor.filter(keep), special = lists.special.filter(keep);
-      if (!tutor.length && !special.length) return empty("tutor moves");
-      return `${battleNote}<div class="groups">${moveTable("Move tutor", tutor, "No.")}${moveTable("Special tutor", special, "Who")}</div>`;
-    }
-    const rows = lists[state.tab].filter(keep);
-    if (!rows.length) return empty({ level: "level-up moves", egg: "egg moves", tm: "TMs or HMs" }[state.tab]);
-    if (state.tab === "level") {
-      const hasEvo = rows.some(([, h]) => h === "Evo");
-      return battleNote + moveTable("", rows, "Lv", hasEvo ? "<b>Evo</b> = learned on evolution, and also offered by the move relearner." : "");
-    }
-    if (state.tab === "egg") return battleNote + moveTable("", rows, "", "Egg moves come from the first Pokémon in its evolution line.");
-    return battleNote + moveTable("", rows, "No.");
-  }
-
-  function tabsBlock(i) {
-    const lists = moveLists(mons[i].movesOf ?? i);
-    const placeholder = state.tab === "loc" ? "Filter locations, e.g. Route 10, Surf, Night" : "Filter moves, e.g. Fire, Physical, TM2";
-    return `<div class="tabs" data-tabs="${i}">
-      <div class="tablist" role="tablist">${TABS.map(([id, label]) =>
-        `<button role="tab" data-tab="${id}" aria-selected="${state.tab === id}">${label} <span class="c">${tabCount(i, id, lists)}</span></button>`).join("")}</div>
-      <input class="tabfilter" id="tabfilter-${i}" type="search" placeholder="${placeholder}" value="${esc(state.tabFilter)}" aria-label="Filter this tab" autocomplete="off">
-      <div class="panel" role="tabpanel">${panel(i)}</div>
-    </div>`;
-  }
-
-  function detail(i) {
-    const m = mons[i];
-    const abilities = m.abilities.map(esc).join(" / ") + (m.hidden ? ` <span class="hidden-ab">/ ${esc(m.hidden)} (hidden)</span>` : "");
-    const evs = m.evs.map((v, n) => (v ? `${v} ${STAT_LABELS[n]}` : "")).filter(Boolean).join(", ") || "—";
-    return `<div class="detail">
-      <div class="cols">
-        <section><h3>Base stats · ${bst(m)}</h3><div class="stats">${m.stats.map((v, n) =>
-          `<span class="lab">${STAT_LABELS[n]}</span><span class="val">${v}</span><span class="bar"><span style="width:${Math.min(100, v / 2.0)}%;background:${statColor(v)}"></span></span>`).join("")}</div></section>
-        <section><h3>Profile</h3><dl class="facts">
-          <dt>Abilities</dt><dd>${abilities || "—"}</dd>
-          <dt>Gender</dt><dd>${genderText(m.gender)}</dd>
-          <dt>Egg groups</dt><dd>${m.eggGroups.join(", ") || "—"}</dd>
-          <dt>Catch rate</dt><dd>${m.catchRate}</dd>
-          <dt>Growth</dt><dd>${esc(m.growth)}</dd>
-          <dt>EV yield</dt><dd>${evs}</dd>
-          ${m.held.length ? `<dt>Wild held items</dt><dd class="held">${m.held.map(([h, k]) => k === null ? `<span>${esc(h)}</span>` : itemButton(k, h)).join("")}</dd>` : ""}
-        </dl></section>
-      </div>
-      <section><h3>Evolution</h3>${evoTree(i)}</section>
-      ${tabsBlock(i)}
-    </div>`;
-  }
-
-  const GROUPS = [["Level up", (h) => h === "Evo" || h.startsWith("Lv ")], ["TM / HM", (h) => /^(TM|HM)\d/.test(h)],
-    ["Move tutor", (h) => h.startsWith("Tutor")], ["Special tutor", (h) => h.startsWith("Special:")], ["Egg move", (h) => h === "Egg"]];
-
-  function moveCard(k) {
-    const mv = moves[k];
-    const learners = mv.learners.filter(([i]) => inMode(mons[i]));
-    const groups = GROUPS.map(([title, test]) => [title, learners.filter(([, h]) => test(h))]).filter(([, l]) => l.length);
-    const chip = ([i, h]) => `<button class="chip" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${formLabel(mons[i])}</span><span class="hw">${esc(h.replace(/^Special: /, ""))}</span></button>`;
-    const body = groups.length
-      ? groups.map(([title, l]) => `<div><h4>${title} · ${l.length}</h4><div class="chips">${l.map(chip).join("")}</div></div>`).join("")
-      : `<p class="empty">${mv.learners.length ? `No ${esc(state.mode)} Pokémon learn this move.` : "No Pokémon learn this move."}</p>`;
-    return `<article class="movecard">
-      <div class="top">${typeBadge(mv.type)}<span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span>
-        <h2>${esc(mv.name)}${mv.official ? `<small>${esc(mv.official)}</small>` : ""}</h2></div>
-      <div class="specs"><span>${CAT_NAME[mv.split]}</span><span>Pow <b>${mv.power || "—"}</b></span><span>Acc <b>${mv.acc || "—"}</b></span><span>PP <b>${mv.pp}</b></span></div>
-      ${mv.tm ? `<div class="tmloc"><b>${mv.tm.label}</b> · ${mv.tm.where.map(esc).join(" · ")}${mv.tm.requires ? ` · needs ${esc(mv.tm.requires)}` : ""}</div>` : ""}
-      <div class="learners">${body}</div></article>`;
-  }
-
-  function itemCard(k) {
-    const it = items[k];
-    const holders = [];
-    mons.forEach((m, i) => m.held.forEach(([h, hk]) => { if (hk === k && inMode(m)) holders.push([i, (h.match(/\(([^)]*)\)/) || [])[1] || ""]); }));
-    const evolves = [];
-    const name = norm(it.name);
-    mons.forEach((m, i) => m.evo.forEach(([to, how]) => { if (norm(how).includes(name) && inMode(mons[to])) evolves.push([i, to, how]); }));
-    const chip = (i, note) => `<button class="chip" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${formLabel(mons[i])}</span>${note ? `<span class="hw">${esc(note)}</span>` : ""}</button>`;
-    return `<article class="itemcard">
-      <div class="top">${itemIcon(k)}<h2>${esc(it.name)}<small>${esc(it.category)}</small></h2></div>
-      ${it.where.length ? `<div><h4>Where to find</h4><ul class="where">${it.where.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>` : ""}
-      ${it.use ? `<div><h4>${it.category === "Evolution" ? "Used on" : "Use"}</h4><div class="use">${esc(it.use)}</div></div>` : ""}
-      ${evolves.length ? `<div><h4>Evolves · ${evolves.length}</h4><div class="chips">${evolves.map(([i, to]) => chip(to, `from ${mons[i].name}`)).join("")}</div></div>` : ""}
-      ${holders.length ? `<div><h4>Held by wild Pokémon · ${holders.length}</h4><div class="chips">${holders.map(([i, pct]) => chip(i, pct)).join("")}</div></div>` : ""}
-    </article>`;
-  }
-
-  function placeItems(p) {
-    const re = placeRe(p.name);
-    const found = [];
-    items.forEach((it, k) => { const line = it.where.find((w) => re.test(w.toLowerCase())); if (line) found.push([k, line]); });
-    if (!found.length) return "";
-    return `<div><h4>Items · ${found.length}</h4><div class="chips">${found.map(([k, line]) =>
-      `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${
-        line.toLowerCase() !== p.name.toLowerCase() ? `<span class="hw">${esc(line)}</span>` : ""}</button>`).join("")}</div></div>`;
-  }
-
-  function placeCard(p) {
-    const rows = p.rows.filter(([i, l]) => (!state.mode || l.mode === "Both" || l.mode === state.mode) && inType(mons[i]));
-    const methods = [];
-    rows.forEach((r) => { const g = methods.find(([mt]) => mt === r[1].method); g ? g[1].push(r) : methods.push([r[1].method, [r]]); });
-    const chip = ([i, l]) => `<button class="chip" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${formLabel(mons[i])}${
-      l.sub ? ` <span class="sub">${esc(l.sub)}</span>` : ""}</span><span class="hw">${esc([l.levels && `Lv ${l.levels}`, l.rate].filter(Boolean).join(" · "))}</span></button>`;
-    const body = methods.length
-      ? methods.map(([mt, l]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips">${l.map(chip).join("")}</div></div>`).join("")
-      : `<p class="empty">No ${esc(state.mode)} Pokémon are found here.</p>`;
-    return `<article class="loccard"><h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2><div class="learners">${body}${placeItems(p)}</div></article>`;
-  }
-
-  function render() {
-    const q = norm(state.q);
-    let html = "";
-    let matchedMoves = [];
-    if (q.length >= 2) {
-      const exact = moveSearch.filter(([, keys]) => keys.includes(q));
-      const partial = moveSearch.filter(([, keys]) => !keys.includes(q) && keys.some((x) => x.includes(q)));
-      matchedMoves = exact.concat(partial).map(([k]) => k);
-    }
-    let matchedItems = [];
-    if (q.length >= 3) {
-      const exactItems = itemSearch.filter(([, n]) => n === q), partialItems = itemSearch.filter(([, n]) => n !== q && n.includes(q));
-      matchedItems = exactItems.concat(partialItems).map(([k]) => k);
-    }
-    let matchedPlaces = [];
-    if (q.length >= 3) {
-      const all = [...places.entries()];
-      matchedPlaces = all.filter(([k]) => k === q).concat(all.filter(([k]) => k !== q && k.includes(q))).map(([, p]) => p);
-    }
-    const list = [];
-    mons.forEach((m, i) => {
-      if (!inMode(m) || !inType(m)) return;
-      if (q && !m.s.some((s) => s.includes(q))) return;
-      list.push(i);
-    });
-    if (state.mode) list.sort((a, b) => order[state.mode][a] - order[state.mode][b]);
-    if (q) list.sort((a, b) => (mons[b].s.some((s) => s.startsWith(q)) - mons[a].s.some((s) => s.startsWith(q))));
-
-    if (matchedMoves.length) {
-      const showCard = matchedMoves.length <= 2 || moves[matchedMoves[0]].s.includes(q);
-      html += `<div class="section-label">Moves</div>`;
-      if (showCard) html += moveCard(matchedMoves[0]);
-      const rest = showCard ? matchedMoves.slice(1) : matchedMoves;
-      if (rest.length) html += `<div class="moreoves">${rest.slice(0, 24).map((k) => `<button data-move="${k}">${typeBadge(moves[k].type)}${esc(moves[k].name)}</button>`).join("")}</div>`;
-    }
-    if (matchedItems.length) {
-      html += `<div class="section-label">Items</div>`;
-      const showItem = matchedItems.length <= 2 || itemSearch[matchedItems[0]][1] === q;
-      if (showItem) html += itemCard(matchedItems[0]);
-      const rest = showItem ? matchedItems.slice(1) : matchedItems;
-      if (rest.length) html += `<div class="moreoves">${rest.slice(0, 30).map((k) => `<button data-item="${k}">${itemIcon(k)}${esc(items[k].name)}</button>`).join("")}</div>`;
-    }
-    if (matchedPlaces.length) {
-      const exactPlace = places.get(q) || (matchedPlaces.length === 1 ? matchedPlaces[0] : null);
-      html += `<div class="section-label">Places</div>`;
-      if (exactPlace) html += placeCard(exactPlace);
-      const rest = matchedPlaces.filter((p) => p !== exactPlace);
-      if (rest.length) html += `<div class="moreoves">${rest.slice(0, 30).map((p) => `<button data-place="${esc(p.name)}">${esc(p.name)}</button>`).join("")}</div>`;
-    }
-    const others = matchedMoves.length || matchedPlaces.length || matchedItems.length;
-    if (list.length || !others) {
-      if (others) html += `<div class="section-label">Pokémon</div>`;
-      html += list.length
-        ? `<div class="list${state.view === "grid" ? " grid" : ""}">${list.map((i) => row(mons[i], i)).join("")}</div>`
-        : `<div class="nores">Nothing matches “${esc(state.q)}”${state.mode ? ` in ${state.mode} mode` : ""}.</div>`;
-    }
-    $("#out").innerHTML = html;
-    $("#count").textContent = `${list.length} Pokémon${matchedMoves.length ? ` · ${matchedMoves.length} move${matchedMoves.length > 1 ? "s" : ""}` : ""}${
-      matchedPlaces.length ? ` · ${matchedPlaces.length} place${matchedPlaces.length > 1 ? "s" : ""}` : ""}${
-      matchedItems.length ? ` · ${matchedItems.length} item${matchedItems.length > 1 ? "s" : ""}` : ""}`;
-    $("#clear").hidden = !state.q;
-    document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
-    document.querySelectorAll(".seg button[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.view)));
-    syncConsoleHeight();
-  }
-
-  function search(text) {
-    state.q = text; state.open = null;
-    $("#q").value = text;
-    render();
-    window.scrollTo({ top: 0 });
-  }
-
-  function openMon(i) {
-    const m = mons[i];
-    state.tabFilter = "";
-    state.q = m.name; state.open = i;
-    $("#q").value = m.name;
-    if (!inMode(m)) state.mode = "";
-    if (!inType(m)) { state.type = ""; $("#type").value = ""; }
-    render();
-    const el = document.querySelector(`.mon[data-i="${i}"]`);
-    if (el) el.scrollIntoView({ block: "start" });
-  }
-
-  // Wiring
-  $("#type").insertAdjacentHTML("beforeend", TYPES.map((t) => `<option value="${t}">${t[0] + t.slice(1).toLowerCase()}</option>`).join(""));
-  let timer;
-  $("#q").addEventListener("input", (e) => { clearTimeout(timer); timer = setTimeout(() => { state.q = e.target.value; state.open = null; render(); }, 120); });
-  $("#clear").addEventListener("click", () => { search(""); $("#q").focus(); });
-  $("#type").addEventListener("change", (e) => { state.type = e.target.value; render(); });
-  document.querySelectorAll(".seg button[data-view]").forEach((b) => b.addEventListener("click", () => {
-    state.view = b.dataset.view;
-    try { localStorage.setItem("dex-view", state.view); } catch (e) {}
-    render();
-  }));
-  document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.addEventListener("click", () => {
-    state.mode = b.dataset.mode;
-    try { localStorage.setItem("dex-mode", state.mode); } catch (e) {}
-    render();
-  }));
-  $("#out").addEventListener("click", (e) => {
-    const mv = e.target.closest("[data-move]");
-    if (mv) { e.preventDefault(); search(moves[mv.dataset.move].name); return; }
-    const itm = e.target.closest("[data-item]");
-    if (itm) { e.preventDefault(); search(items[+itm.dataset.item].name); return; }
-    const pl = e.target.closest("[data-place]");
-    if (pl) { e.preventDefault(); search(pl.dataset.place); return; }
-    const op = e.target.closest("[data-open]");
-    if (op) { e.preventDefault(); openMon(+op.dataset.open); return; }
-    const tab = e.target.closest("[data-tab]");
-    if (tab) {
-      const box = tab.closest("[data-tabs]");
-      state.tab = tab.dataset.tab; state.tabFilter = "";
-      box.outerHTML = tabsBlock(+box.dataset.tabs);
-      return;
-    }
-  });
-  $("#out").addEventListener("input", (e) => {
-    if (!e.target.classList.contains("tabfilter")) return;
-    const box = e.target.closest("[data-tabs]");
-    state.tabFilter = e.target.value;
-    box.querySelector(".panel").innerHTML = panel(+box.dataset.tabs);
-  });
-  $("#out").addEventListener("toggle", (e) => {
-    const d = e.target;
-    if (!d.classList || !d.classList.contains("mon")) return;
-    const i = +d.dataset.i;
-    if (d.open) {
-      if (state.open !== null && state.open !== i) {
-        const prev = document.querySelector(`.mon[data-i="${state.open}"]`);
-        if (prev) { prev.open = false; const det = prev.querySelector(".detail"); if (det) det.remove(); }
-      }
-      state.open = i; state.tabFilter = "";
-      if (!d.querySelector(".detail")) d.insertAdjacentHTML("beforeend", detail(i));
-    } else if (state.open === i) {
-      state.open = null;
-    }
-  }, true);
-
-  // Offline: installable app when served over http(s); the saved file already works offline.
-  if (/^https?:$/.test(location.protocol)) {
-    $("#dl").hidden = false;
-    document.head.insertAdjacentHTML("beforeend", '<link rel="manifest" href="manifest.webmanifest">');
-    if ("serviceWorker" in navigator) {
-      try { navigator.serviceWorker.register("sw.js").catch(() => {}); } catch (e) {}
-    }
-  }
-  // A link like #ceaseless-edge or #rockruff opens with that search filled in
-  const fromHash = () => {
-    const h = decodeURIComponent(location.hash.slice(1)).replace(/-/g, " ").trim();
-    if (!h) return false;
-    const exact = mons.findIndex((m) => m.s.includes(norm(h)));
-    if (exact >= 0 && !moveSearch.some(([, keys]) => keys.includes(norm(h)))) openMon(exact);
-    else search(h);
-    return true;
-  };
-  window.addEventListener("hashchange", fromHash);
-  if (!fromHash()) render();
-})();
+__APP_SCRIPT__
 </script>
 </body>
 </html>

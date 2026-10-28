@@ -1,0 +1,519 @@
+// Pokemon Amethyst Companion. Inlined into template.html by build.py; DEX and SHEET are defined just before it.
+(() => {
+  "use strict";
+  const $ = (s) => document.querySelector(s);
+  const root = document.documentElement;
+  root.style.setProperty("--sheet", `url(${SHEET})`);
+  root.style.setProperty("--isheet", `url(${DEX.itemSheet})`);
+  const consoleEl = $("header.console");
+  const syncConsoleHeight = () => root.style.setProperty("--console-h", `${consoleEl.offsetHeight}px`);
+  window.addEventListener("resize", syncConsoleHeight);
+
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const norm = (s) => s.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const slug = (s) => s.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const TYPES = ["NORMAL", "FIRE", "WATER", "GRASS", "ELECTRIC", "ICE", "FIGHTING", "POISON", "GROUND", "FLYING", "PSYCHIC", "BUG", "ROCK", "GHOST", "DRAGON", "DARK", "STEEL", "FAIRY"];
+  const STAT_LABELS = ["HP", "Atk", "Def", "SpA", "SpD", "Spe"];
+  const CAT = {
+    physical: '<svg viewBox="0 0 20 20" aria-hidden="true"><path fill="#e2562a" d="M10 1l2.2 4.6 5-1.3-2.2 4.7 4 2.9-5 .8.4 5.1L10 15l-4.4 2.8.4-5.1-5-.8 4-2.9-2.2-4.7 5 1.3z"/></svg>',
+    special: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#2f7fe6"/><circle cx="10" cy="10" r="5.2" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="10" cy="10" r="2" fill="#fff"/></svg>',
+    status: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#8b949e"/><path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="#c9d1d9"/></svg>',
+  };
+  const CAT_NAME = { physical: "Physical", special: "Special", status: "Status" };
+  const TYPE_COLOR = { NORMAL: "#9a9d9a", FIRE: "#e2562a", WATER: "#2f7fe6", GRASS: "#3c9a2d", ELECTRIC: "#f2bd16", ICE: "#3fc4e8",
+    FIGHTING: "#e07510", POISON: "#8f45c6", GROUND: "#946033", FLYING: "#6f9fdc", PSYCHIC: "#e8487d", BUG: "#8b9b1c", ROCK: "#a49a6c",
+    GHOST: "#6c4a74", DRAGON: "#5463d8", DARK: "#5b4b4c", STEEL: "#5f99ad", FAIRY: "#e06fe0", MYSTERY: "#5e8f86" };
+  const CHEVRON = '<span class="chev" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+
+  // ---------------------------------------------------------------- data
+  const mons = DEX.mons, moves = DEX.moves, items = DEX.items;
+  const moveKeys = Object.keys(moves).sort((a, b) => moves[a].name.localeCompare(moves[b].name));
+  const monMoves = mons.map(() => []);  // per-Pokémon move lists, rebuilt from the move → learners table
+  for (const k of moveKeys) for (const [i, how] of moves[k].learners) monMoves[i].push([k, how]);
+  const parent = new Map();
+  mons.forEach((m, i) => m.evo.forEach(([to]) => { if (!parent.has(to)) parent.set(to, i); }));
+  const itemKeys = items.map((it) => norm(it.name));
+
+  // Places: every location in the encounter data, with the Pokémon found there
+  const places = new Map();
+  mons.forEach((m, i) => m.loc.forEach((l) => {
+    const k = norm(l.location);
+    if (!places.has(k)) places.set(k, { name: l.location, rows: [] });
+    places.get(k).rows.push([i, l]);
+  }));
+  const placeList = [...places.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+  // Sort keys per mode: that mode's dex number; unnumbered forms sit just after the entry before them (their base)
+  const order = { Standard: new Float64Array(mons.length), Divergent: new Float64Array(mons.length) };
+  for (const [mode, field] of [["Standard", "std"], ["Divergent", "div"]]) {
+    let last = 0, step = 0;
+    mons.forEach((m, i) => {
+      if (m.dex[field]) { last = m.dex[field]; step = 0; order[mode][i] = last; } else order[mode][i] = last + ++step / 1000;
+    });
+  }
+  const monSlug = (i) => slug(mons[i].key.replace(/^SPECIES_/, ""));
+
+  // ---------------------------------------------------------------- state & navigation
+  // state.view: dex | moves | items | places; move/item/place name the open card; open is the expanded Pokémon
+  const state = { view: "dex", q: "", move: null, item: null, place: null, open: null, mode: "", type: "", layout: "list", tab: "level", tabFilter: "" };
+  try { state.mode = localStorage.getItem("dex-mode") || ""; state.layout = localStorage.getItem("dex-view") || "list"; } catch (e) {}
+  let depth = 0;  // how many in-page steps the Back button can undo
+
+  const snapshot = () => ({ view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, open: state.open });
+  function hashFor(st) {
+    if (st.view === "dex" && st.open !== null) return monSlug(st.open);
+    if (st.move) return "move-" + slug(moves[st.move].name);
+    if (st.item !== null) return "item-" + slug(items[st.item].name);
+    if (st.place) return "place-" + slug(st.place);
+    return { dex: "", moves: "moves", items: "items", places: "locations" }[st.view];
+  }
+  function navigate(change) {
+    const next = Object.assign({ view: state.view, q: "", move: null, item: null, place: null, open: null }, change);
+    Object.assign(state, next, { tabFilter: "" });
+    depth++;
+    try { history.pushState({ dex: snapshot(), depth }, "", "#" + hashFor(state)); } catch (e) {}
+    render(true);
+  }
+  function remember() {  // typing and expanding update the current entry instead of adding one
+    try { history.replaceState({ dex: snapshot(), depth }, "", "#" + hashFor(state)); } catch (e) {}
+  }
+  window.addEventListener("popstate", (e) => {
+    if (e.state && e.state.dex) { Object.assign(state, e.state.dex, { tabFilter: "" }); depth = e.state.depth || 0; render(true); }
+    else fromHash();
+  });
+
+  const openMon = (i) => navigate({ view: "dex", open: i, q: mons[i].name });
+  const openMove = (k) => navigate({ view: "moves", move: k });
+  const openItem = (k) => navigate({ view: "items", item: k });
+  const openPlace = (name) => navigate({ view: "places", place: name });
+
+  // ---------------------------------------------------------------- small pieces
+  const typeBadge = (t) => `<span class="type t-${t}">${t === "MYSTERY" ? "???" : t[0] + t.slice(1).toLowerCase()}</span>`;
+  const sprite = (m, small) => `<span class="sp${small ? " sm" : ""}" aria-hidden="true"><i style="background-position:-${m.sp[0]}px -${m.sp[1]}px"></i></span>`;
+  const formLabel = (m) => (m.form ? ` <small>${esc(m.form)}</small>` : "");
+  const pad = (n) => String(n).padStart(3, "0");
+  const modeBadge = (m) => m.modes.map((mode) => {  // one badge per mode, carrying that mode's dex number
+    const n = mode === "Standard" ? m.dex.std : m.dex.div;
+    return `<span class="mode${mode === "Divergent" ? " d" : ""}">${mode}${n ? `<b>#${pad(n)}</b>` : ""}</span>`;
+  }).join("");
+  const bst = (m) => m.stats.reduce((a, b) => a + b, 0);
+  const inMode = (m) => !state.mode || m.modes.includes(state.mode);
+  const inType = (m) => !state.type || m.types.includes(state.type);
+  const rowInMode = (l) => !state.mode || l.mode === "Both" || l.mode === state.mode;
+  const tint = (m) => {  // a faint wash of the Pokémon's type colours behind its row
+    const a = TYPE_COLOR[m.types[0]], b = TYPE_COLOR[m.types[1] || m.types[0]];
+    return `--tint: linear-gradient(100deg, ${a}26 0%, ${a}0d 38%, ${b}0d 70%, ${b}24 100%)`;
+  };
+  const itemIcon = (k) => {
+    const it = k === null || k === undefined ? null : items[k];
+    return it && it.icon ? `<span class="ii" style="background-position:-${it.icon[0]}px -${it.icon[1]}px" aria-hidden="true"></span>` : '<span class="ii none" aria-hidden="true"></span>';
+  };
+  const itemButton = (k, label) => `<button class="itembtn" data-item="${k}">${itemIcon(k)}<span class="in">${esc(label || items[k].name)}</span></button>`;
+  const monLink = (i, current) => `<button class="link${i === current ? " current" : ""}" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${formLabel(mons[i])}</span></button>`;
+  const monChip = (i, note, sub) => `<button class="chip" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${formLabel(mons[i])}${
+    sub ? ` <span class="sub">${esc(sub)}</span>` : ""}</span>${note ? `<span class="hw">${esc(note)}</span>` : ""}</button>`;
+  const escapeRe = (text) => text.replace(/[.*+?^$()|[\]\\{}]/g, "\\$&");
+  // "Route 2" must match "Route 2" and "Route 2 (hidden)" but not "Route 20"
+  const placeRe = (name) => new RegExp("(^|[^a-z0-9])" + escapeRe(name.toLowerCase()) + "($|[^a-z0-9])");
+  const statColor = (v) => (v < 50 ? "#e2562a" : v < 80 ? "#f2a516" : v < 100 ? "#c9c21b" : v < 120 ? "#5fb83a" : "#2aa198");
+  const genderText = (g) => (g === null ? "Genderless" : g === 0 ? "♂ only" : g === 100 ? "♀ only" : `♂ ${+(100 - g).toFixed(1)}% · ♀ ${+g.toFixed(1)}%`);
+
+  // ---------------------------------------------------------------- Pokémon detail
+  function row(m, i) {
+    return `<details class="mon" data-i="${i}" style="${tint(m)}"${state.open === i ? " open" : ""}>
+      <summary title="Show details">${sprite(m)}
+        <span class="who"><span class="nm">${esc(m.name)}${formLabel(m)}</span>
+          <span class="tags">${m.types.map(typeBadge).join("")}${modeBadge(m)}</span></span>
+        ${CHEVRON}
+      </summary>${state.open === i ? detail(i) : ""}</details>`;
+  }
+
+  // Method text with its item made clickable ("Use Fire Stone" → Fire Stone links to the item)
+  function howText(how, k, written) {
+    if (k === null || k === undefined) return esc(how);
+    const name = written && how.includes(written) ? written : items[k].name, at = how.indexOf(name);
+    if (at < 0) return `${esc(how)} ${itemButton(k)}`;
+    return `<span>${esc(how.slice(0, at))}</span>${itemButton(k, name)}<span>${esc(how.slice(at + name.length))}</span>`;
+  }
+
+  function evoTree(i) {
+    let first = i;
+    const seen = new Set();
+    while (parent.has(first) && !seen.has(first)) { seen.add(first); first = parent.get(first); }
+    if (first === i && !mons[i].evo.length) return '<p class="note">Does not evolve.</p>';
+    const stages = [[[first, "", null]]];
+    const placed = new Set([first]);
+    while (stages.length < 8) {
+      const next = [];
+      for (const [n] of stages[stages.length - 1]) for (const [to, how, k, written] of mons[n].evo) if (!placed.has(to)) { placed.add(to); next.push([to, how, k, written]); }
+      if (!next.length) break;
+      stages.push(next);
+    }
+    const card = ([n, how, k, written]) => `<div class="evcard${n === i ? " current" : ""}">${monLink(n, i)}${how ? `<span class="how">${howText(how, k, written)}</span>` : ""}</div>`;
+    return `<div class="evo">${stages.map((stage, d) => `${d ? '<span class="sep" aria-hidden="true">›</span>' : ""}<div class="stage${stage.length > 3 ? " many" : ""}">${stage.map(card).join("")}</div>`).join("")}</div>`;
+  }
+
+  function moveRow(k, how, showHow) {
+    const mv = moves[k];
+    return `<tr>${showHow ? `<td class="h">${esc(how)}</td>` : ""}
+      <td><button class="mvname" data-move="${k}">${esc(mv.name)}</button></td>
+      <td>${typeBadge(mv.type)}</td>
+      <td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td>
+      <td class="n">${mv.power || "—"}</td><td class="n hide-sm">${mv.acc || "—"}</td><td class="n hide-sm">${mv.pp}</td></tr>`;
+  }
+
+  function moveTable(title, list, howHeader, note) {
+    if (!list.length) return "";
+    return `<section>${title ? `<h3>${title}</h3>` : ""}${note ? `<p class="note">${note}</p>` : ""}<div class="moves"><table class="mv"><thead><tr>${
+      howHeader !== null ? `<th class="c-how">${howHeader}</th>` : ""}<th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num">Pow</th><th class="c-num hide-sm">Acc</th><th class="c-num hide-sm">PP</th></tr></thead><tbody>${
+      list.map(([k, how]) => moveRow(k, how, howHeader !== null)).join("")}</tbody></table></div></section>`;
+  }
+
+  function moveLists(i) {  // per tab, in game order
+    const all = monMoves[i];
+    const lvlKey = (h) => (h === "Evo" ? 0 : +h.slice(3));
+    const level = all.filter(([, h]) => h === "Evo" || h.startsWith("Lv ")).map((x, n) => [x, n])
+      .sort((a, b) => lvlKey(a[0][1]) - lvlKey(b[0][1]) || a[1] - b[1]).map(([x]) => x);
+    const tm = all.filter(([, h]) => /^(TM|HM)\d/.test(h)).sort((a, b) => (a[1][0] === "H") - (b[1][0] === "H") || parseInt(a[1].slice(2), 10) - parseInt(b[1].slice(2), 10));
+    const tutor = all.filter(([, h]) => h.startsWith("Tutor")).sort((a, b) => parseInt(a[1].slice(6), 10) - parseInt(b[1].slice(6), 10));
+    const special = all.filter(([, h]) => h.startsWith("Special:")).map(([k, h]) => [k, h.slice(9)]);
+    const egg = all.filter(([, h]) => h === "Egg").sort((a, b) => moves[a[0]].name.localeCompare(moves[b[0]].name));
+    return { level, egg, tm, tutor, special };
+  }
+
+  const TABS = [["level", "Level up"], ["egg", "Egg moves"], ["tm", "TM / HM"], ["tutor", "Tutor"], ["loc", "Locations"]];
+  const locRows = (i) => mons[i].loc.filter(rowInMode);
+  const tabCount = (i, tab, lists) => (tab === "loc" ? locRows(i).length : tab === "tutor" ? lists.tutor.length + lists.special.length : lists[tab].length);
+  const moveMatches = (f) => ([k, how]) => !f || [moves[k].name, moves[k].official || "", moves[k].type, CAT_NAME[moves[k].split], how].some((s) => norm(s).includes(f));
+
+  function locTable(rows) {
+    return `<div class="moves"><table class="mv loc"><thead><tr><th>Location</th><th>Method</th><th class="c-num">Lv</th><th class="c-num">Rate</th><th class="hide-sm">Mode</th></tr></thead><tbody>${
+      rows.map((l) => `<tr><td><button class="mvname" data-place="${esc(l.location)}">${esc(l.location)}</button>${l.sub ? `<div class="note">${esc(l.sub)}</div>` : ""}${
+        l.variant ? `<div class="note">${esc(l.variant)}</div>` : ""}${l.notes ? `<div class="note">${esc(l.notes)}</div>` : ""}</td>
+        <td class="meth">${esc(l.method)}</td><td class="n">${esc(l.levels || "—")}</td><td class="n">${esc(l.rate || "—")}</td>
+        <td class="hide-sm"><span class="mode${l.mode === "Divergent" ? " d" : ""}">${esc(l.mode)}</span></td></tr>`).join("")}</tbody></table></div>`;
+  }
+
+  function panel(i) {
+    const m = mons[i];
+    const f = norm(state.tabFilter);
+    if (state.tab === "loc") {
+      if (!locRows(i).length) {
+        if (m.movesOf !== null) return `<p class="note">Appears in battle from ${monLink(m.movesOf, i)}.</p>`;
+        const from = parent.has(i) ? parent.get(i) : null;
+        return `<p class="note">Not found in the wild${state.mode ? ` in ${state.mode} mode` : ""}.${from !== null ? ` Evolve it from ${monLink(from, i)}` : ""}</p>`;
+      }
+      const rows = locRows(i).filter((l) => !f || [l.location, l.sub || "", l.method, l.notes || "", l.variant || ""].some((s) => norm(s).includes(f)));
+      return rows.length ? locTable(rows) : `<p class="note">No locations match “${esc(state.tabFilter)}”.</p>`;
+    }
+    const battleNote = m.movesOf !== null ? `<p class="note">Exists only in battle, so it knows whatever ${monLink(m.movesOf, i)} knows.</p>` : "";
+    const lists = moveLists(m.movesOf ?? i);
+    const keep = moveMatches(f);
+    const empty = (what) => `${battleNote}<p class="note">${f ? `No ${what} match “${esc(state.tabFilter)}”.` : `No ${what}.`}</p>`;
+    if (state.tab === "tutor") {
+      const tutor = lists.tutor.filter(keep), special = lists.special.filter(keep);
+      if (!tutor.length && !special.length) return empty("tutor moves");
+      return `${battleNote}<div class="groups">${moveTable("Move tutor", tutor, "No.")}${moveTable("Special tutor", special, "Who")}</div>`;
+    }
+    const rows = lists[state.tab].filter(keep);
+    if (!rows.length) return empty({ level: "level-up moves", egg: "egg moves", tm: "TMs or HMs" }[state.tab]);
+    if (state.tab === "level") return battleNote + moveTable("", rows, "Lv", rows.some(([, h]) => h === "Evo") ? "<b>Evo</b> = learned on evolution, and also offered by the move relearner." : "");
+    if (state.tab === "egg") return battleNote + moveTable("", rows, null, "Egg moves come from the first Pokémon in its evolution line.");
+    return battleNote + moveTable("", rows, "No.");
+  }
+
+  function tabsBlock(i) {
+    const lists = moveLists(mons[i].movesOf ?? i);
+    const placeholder = state.tab === "loc" ? "Filter locations, e.g. Route 10, Surf, Night" : "Filter moves, e.g. Fire, Physical, TM2";
+    return `<div class="tabs" data-tabs="${i}">
+      <div class="tablist" role="tablist">${TABS.map(([id, label]) =>
+        `<button role="tab" data-tab="${id}" aria-selected="${state.tab === id}">${label} <span class="c">${tabCount(i, id, lists)}</span></button>`).join("")}</div>
+      <input class="tabfilter" id="tabfilter-${i}" type="search" placeholder="${placeholder}" value="${esc(state.tabFilter)}" aria-label="Filter this tab" autocomplete="off">
+      <div class="panel" role="tabpanel">${panel(i)}</div>
+    </div>`;
+  }
+
+  function detail(i) {
+    const m = mons[i];
+    const ab = ([name, desc], hidden) => `<div class="ab"><b>${esc(name)}</b>${hidden ? '<span class="hid">Hidden</span>' : ""}${desc ? `<span class="desc">${esc(desc)}</span>` : ""}</div>`;
+    const evs = m.evs.map((v, n) => (v ? `${v} ${STAT_LABELS[n]}` : "")).filter(Boolean).join(", ") || "—";
+    return `<div class="detail">
+      <div class="cols">
+        <section><h3>Base stats · ${bst(m)}</h3><div class="stats">${m.stats.map((v, n) =>
+          `<span class="lab">${STAT_LABELS[n]}</span><span class="val">${v}</span><span class="bar"><span style="width:${Math.min(100, v / 2)}%;background:${statColor(v)}"></span></span>`).join("")}</div></section>
+        <section><h3>Profile</h3><dl class="facts">
+          <dt>Abilities</dt><dd class="abilities">${m.abilities.map((a) => ab(a, false)).join("")}${m.hidden ? ab(m.hidden, true) : ""}</dd>
+          <dt>Gender</dt><dd>${genderText(m.gender)}</dd>
+          <dt>Egg groups</dt><dd>${m.eggGroups.join(", ") || "—"}</dd>
+          <dt>Catch rate</dt><dd>${m.catchRate}</dd>
+          <dt>Growth</dt><dd>${esc(m.growth)}</dd>
+          <dt>EV yield</dt><dd>${evs}</dd>
+          ${m.held.length ? `<dt>Wild held items</dt><dd class="held">${m.held.map(([h, k]) => (k === null ? `<span>${esc(h)}</span>` : itemButton(k, h))).join("")}</dd>` : ""}
+        </dl></section>
+      </div>
+      <section><h3>Evolution</h3>${evoTree(i)}</section>
+      <section><h3>Moves &amp; locations</h3>${tabsBlock(i)}</section>
+    </div>`;
+  }
+
+  // ---------------------------------------------------------------- cards
+  const GROUPS = [["Level up", (h) => h === "Evo" || h.startsWith("Lv ")], ["TM / HM", (h) => /^(TM|HM)\d/.test(h)],
+    ["Move tutor", (h) => h.startsWith("Tutor")], ["Special tutor", (h) => h.startsWith("Special:")], ["Egg move", (h) => h === "Egg"]];
+
+  function moveCard(k) {
+    const mv = moves[k];
+    const learners = mv.learners.filter(([i]) => inMode(mons[i]) && inType(mons[i]));
+    const groups = GROUPS.map(([title, test]) => [title, learners.filter(([, h]) => test(h))]).filter(([, l]) => l.length);
+    const body = groups.length
+      ? groups.map(([title, l]) => `<div><h4>${title} · ${l.length}</h4><div class="chips">${l.map(([i, h]) => monChip(i, h.replace(/^Special: /, ""))).join("")}</div></div>`).join("")
+      : `<p class="empty">${mv.learners.length ? "No Pokémon match the current filters." : "No Pokémon learn this move."}</p>`;
+    return `<article class="movecard">
+      <div class="top">${typeBadge(mv.type)}<span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span>
+        <h2>${esc(mv.name)}${mv.official ? `<small>${esc(mv.official)}</small>` : ""}</h2></div>
+      <div class="specs"><span>${CAT_NAME[mv.split]}</span><span>Pow <b>${mv.power || "—"}</b></span><span>Acc <b>${mv.acc || "—"}</b></span><span>PP <b>${mv.pp}</b></span></div>
+      ${mv.tm ? `<div class="tmloc"><b>${mv.tm.label}</b> · ${mv.tm.where.map(esc).join(" · ")}${mv.tm.requires ? ` · needs ${esc(mv.tm.requires)}` : ""}</div>` : ""}
+      <div class="learners">${body}</div></article>`;
+  }
+
+  function itemCard(k) {
+    const it = items[k];
+    const holders = [];
+    mons.forEach((m, i) => m.held.forEach(([h, hk]) => { if (hk === k && inMode(m)) holders.push([i, (h.match(/\(([^)]*)\)/) || [])[1] || ""]); }));
+    const evolves = [];
+    mons.forEach((m, i) => m.evo.forEach(([to, how, ik]) => { if ((ik === k || norm(how).includes(itemKeys[k])) && inMode(mons[to])) evolves.push([i, to]); }));
+    // "Used on" repeats Evolves for evolution items; form-changing items (Gracidea, Drives, Nectars) still need it
+    const showUse = it.use && !(evolves.length && it.category === "Evolution");
+    const useTitle = /Forme|Primal|Evolution/.test(it.category) ? "Used on" : "Effect";
+    return `<article class="itemcard">
+      <div class="top">${itemIcon(k)}<h2>${esc(it.name)}<small>${esc(it.category)}</small></h2></div>
+      ${it.where.length ? `<div><h4>Where to find</h4><ul class="where">${it.where.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>` : '<p class="note">No known location.</p>'}
+      ${showUse ? `<div><h4>${useTitle}</h4><div class="use">${esc(it.use)}</div></div>` : ""}
+      ${evolves.length ? `<div><h4>Evolves · ${evolves.length}</h4><div class="chips">${evolves.map(([i, to]) => monChip(to, `from ${mons[i].name}`)).join("")}</div></div>` : ""}
+      ${holders.length ? `<div><h4>Held by wild Pokémon · ${holders.length}</h4><div class="chips">${holders.map(([i, pct]) => monChip(i, pct)).join("")}</div></div>` : ""}
+    </article>`;
+  }
+
+  function placeCard(p) {
+    const rows = p.rows.filter(([i, l]) => rowInMode(l) && inType(mons[i]));
+    const methods = [];
+    rows.forEach((r) => { const g = methods.find(([mt]) => mt === r[1].method); g ? g[1].push(r) : methods.push([r[1].method, [r]]); });
+    const re = placeRe(p.name);
+    const found = [];
+    items.forEach((it, k) => { const line = it.where.find((w) => re.test(w.toLowerCase())); if (line) found.push([k, line]); });
+    const body = (methods.length
+      ? methods.map(([mt, l]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips">${l.map(([i, e]) => monChip(i, [e.levels && `Lv ${e.levels}`, e.rate].filter(Boolean).join(" · "), e.sub)).join("")}</div></div>`).join("")
+      : `<p class="empty">No Pokémon match the current filters here.</p>`) +
+      (found.length ? `<div><h4>Items · ${found.length}</h4><div class="chips">${found.map(([k, line]) =>
+        `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line.toLowerCase() !== p.name.toLowerCase() ? `<span class="hw">${esc(line.replace(p.name, "").replace(/^[\s·(-]+|\)$/g, "") || line)}</span>` : ""}</button>`).join("")}</div></div>` : "");
+    return `<article class="loccard"><h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2><div class="learners">${body}</div></article>`;
+  }
+
+  // ---------------------------------------------------------------- views
+  const matchMoves = (q) => (q ? moveKeys.filter((k) => moves[k].s.some((x) => x.includes(q))) : moveKeys);
+  const matchItems = (q) => items.map((_, k) => k).filter((k) => !q || itemKeys[k].includes(q) || norm(items[k].category).includes(q));
+  const matchPlaces = (q) => placeList.filter((p) => !q || norm(p.name).includes(q));
+  const exactFirst = (list, isExact) => list.filter(isExact).concat(list.filter((x) => !isExact(x)));
+
+  function alsoLine(q) {  // from the Pokédex, point at matching moves, items and places
+    if (q.length < 3) return "";
+    const counts = [["moves", matchMoves(q).length, "move"], ["items", matchItems(q).length, "item"], ["places", matchPlaces(q).length, "location"]].filter(([, n]) => n);
+    return counts.length ? `<div class="also">Also matching: ${counts.map(([v, n, w]) => `<button data-goto="${v}">${n} ${w}${n > 1 ? "s" : ""}</button>`).join("")}</div>` : "";
+  }
+
+  function dexView(q) {
+    const list = [];
+    mons.forEach((m, i) => { if (inMode(m) && inType(m) && (!q || m.s.some((s) => s.includes(q)))) list.push(i); });
+    if (state.mode) list.sort((a, b) => order[state.mode][a] - order[state.mode][b]);
+    if (q) list.sort((a, b) => mons[b].s.some((s) => s.startsWith(q)) - mons[a].s.some((s) => s.startsWith(q)));
+    const html = alsoLine(q) + (list.length
+      ? `<div class="list${state.layout === "grid" ? " grid" : ""}">${list.map((i) => row(mons[i], i)).join("")}</div>`
+      : `<div class="nores">No Pokémon match “${esc(state.q)}”${state.mode ? ` in ${state.mode} mode` : ""}.</div>`);
+    return [html, `${list.length} Pokémon`];
+  }
+
+  function movesView(q) {
+    if (state.move) return [moveCard(state.move), moves[state.move].name];
+    const list = exactFirst(matchMoves(q), (k) => moves[k].s.includes(q)).filter((k) => !state.type || moves[k].type === state.type);
+    const top = q && list.length && moves[list[0]].s.includes(q) ? moveCard(list[0]) : "";
+    const rows = list.map((k) => {
+      const mv = moves[k];
+      return `<tr data-move="${k}"><td><span class="mvname">${esc(mv.name)}</span>${mv.official ? ` <span class="note">${esc(mv.official)}</span>` : ""}</td><td>${typeBadge(mv.type)}</td>
+        <td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td><td class="n">${mv.power || "—"}</td>
+        <td class="n hide-sm">${mv.acc || "—"}</td><td class="n hide-sm">${mv.pp}</td><td class="n hide-sm">${mv.tm ? mv.tm.label : ""}</td></tr>`;
+    }).join("");
+    const table = list.length ? `<div class="movelist"><table class="mv"><thead><tr><th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num">Pow</th><th class="c-num hide-sm">Acc</th><th class="c-num hide-sm">PP</th><th class="c-tm hide-sm">TM</th></tr></thead><tbody>${rows}</tbody></table></div>`
+      : `<div class="nores">No moves match “${esc(state.q)}”.</div>`;
+    return [top + table, `${list.length} moves`];
+  }
+
+  function itemsView(q) {
+    if (state.item !== null) return [itemCard(state.item), items[state.item].name];
+    const list = exactFirst(matchItems(q), (k) => itemKeys[k] === q);
+    const top = q && list.length && itemKeys[list[0]] === q ? itemCard(list[0]) : "";
+    const cats = [];
+    list.forEach((k) => { const c = items[k].category; const g = cats.find(([n]) => n === c); g ? g[1].push(k) : cats.push([c, [k]]); });
+    const html = cats.map(([c, ks]) => `<div class="cat-head">${esc(c)} · ${ks.length}</div><div class="chips">${ks.map((k) =>
+      `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span></button>`).join("")}</div>`).join("");
+    return [top + (html || `<div class="nores">No items match “${esc(state.q)}”.</div>`), `${list.length} items`];
+  }
+
+  function placesView(q) {
+    if (state.place) {
+      const p = places.get(norm(state.place));
+      return [p ? placeCard(p) : `<div class="nores">No encounters recorded for ${esc(state.place)}.</div>`, state.place];
+    }
+    const list = exactFirst(matchPlaces(q), (p) => norm(p.name) === q);
+    const top = q && list.length && norm(list[0].name) === q ? placeCard(list[0]) : "";
+    const html = list.length ? `<div class="chips">${list.map((p) => `<button class="chip" data-place="${esc(p.name)}"><span class="ln" style="padding-left:10px">${esc(p.name)}</span><span class="hw">${p.rows.filter(([, l]) => rowInMode(l)).length}</span></button>`).join("")}</div>`
+      : `<div class="nores">No locations match “${esc(state.q)}”.</div>`;
+    return [top + html, `${list.length} locations`];
+  }
+
+  const PLACEHOLDER = {
+    dex: "Search Pokémon — e.g. Rockruff, Galarian, Fire",
+    moves: "Search moves or TMs — e.g. Ceaseless Edge, TM02",
+    items: "Search items — e.g. Fire Stone, Berries",
+    places: "Search locations — e.g. Route 2, Lake Laplaz",
+  };
+
+  function render(scroll) {
+    const q = norm(state.q);
+    const [html, count] = { dex: dexView, moves: movesView, items: itemsView, places: placesView }[state.view](q);
+    $("#out").innerHTML = html;
+    $("#count").textContent = count;
+    $("#q").value = state.move || state.item !== null || state.place ? "" : state.q;
+    $("#q").placeholder = PLACEHOLDER[state.view];
+    $("#clear").hidden = !$("#q").value;
+    $("#back").hidden = depth <= 0;
+    $("#layout-seg").hidden = state.view !== "dex";
+    document.querySelectorAll("[data-viewtab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.viewtab === state.view)));
+    document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
+    document.querySelectorAll(".seg button[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.layout)));
+    $("#type-label").innerHTML = state.type ? typeBadge(state.type) : "All types";
+    syncConsoleHeight();
+    if (scroll) {
+      const el = state.open !== null && document.querySelector(`.mon[data-i="${state.open}"]`);
+      if (el) el.scrollIntoView({ block: "start" }); else window.scrollTo({ top: 0 });
+    }
+  }
+
+  // ---------------------------------------------------------------- wiring
+  let timer;
+  $("#q").addEventListener("input", (e) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { Object.assign(state, { q: e.target.value, open: null, move: null, item: null, place: null }); remember(); render(); }, 120);
+  });
+  $("#clear").addEventListener("click", () => { Object.assign(state, { q: "", open: null, move: null, item: null, place: null }); remember(); render(); $("#q").focus(); });
+  $("#back").addEventListener("click", () => history.back());
+  document.querySelectorAll("[data-viewtab]").forEach((b) => b.addEventListener("click", () => navigate({ view: b.dataset.viewtab, q: state.view === b.dataset.viewtab ? "" : state.q })));
+  document.querySelectorAll(".seg button[data-view]").forEach((b) => b.addEventListener("click", () => {
+    state.layout = b.dataset.view;
+    try { localStorage.setItem("dex-view", state.layout); } catch (e) {}
+    render();
+  }));
+  document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.addEventListener("click", () => {
+    state.mode = b.dataset.mode;
+    try { localStorage.setItem("dex-mode", state.mode); } catch (e) {}
+    render();
+  }));
+
+  // Type picker: a popover of type badges
+  const menu = $("#type-menu");
+  const drawTypeMenu = () => {
+    menu.innerHTML = `<button class="all" data-type="" aria-pressed="${!state.type}">All types</button>` +
+      TYPES.map((t) => `<button data-type="${t}" aria-pressed="${state.type === t}">${typeBadge(t)}</button>`).join("");
+  };
+  const closeMenu = () => { menu.hidden = true; $("#type-btn").setAttribute("aria-expanded", "false"); };
+  $("#type-btn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (menu.hidden) { drawTypeMenu(); menu.hidden = false; $("#type-btn").setAttribute("aria-expanded", "true"); } else closeMenu();
+  });
+  menu.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-type]");
+    if (!b) return;
+    state.type = b.dataset.type;
+    closeMenu();
+    render();
+  });
+  document.addEventListener("click", (e) => { if (!menu.hidden && !e.target.closest("#typepick")) closeMenu(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenu(); });
+
+  $("#out").addEventListener("click", (e) => {
+    const t = e.target;
+    const go = t.closest("[data-goto]");
+    if (go) { navigate({ view: go.dataset.goto, q: state.q }); return; }
+    const itm = t.closest("[data-item]");
+    if (itm) { e.preventDefault(); openItem(+itm.dataset.item); return; }
+    const mv = t.closest("[data-move]");
+    if (mv) { e.preventDefault(); openMove(mv.dataset.move); return; }
+    const pl = t.closest("[data-place]");
+    if (pl) { e.preventDefault(); openPlace(pl.dataset.place); return; }
+    const op = t.closest("[data-open]");
+    if (op) { e.preventDefault(); if (+op.dataset.open !== state.open) openMon(+op.dataset.open); return; }
+    const tab = t.closest("[data-tab]");
+    if (tab) {
+      const box = tab.closest("[data-tabs]");
+      state.tab = tab.dataset.tab; state.tabFilter = "";
+      box.outerHTML = tabsBlock(+box.dataset.tabs);
+    }
+  });
+  $("#out").addEventListener("input", (e) => {
+    if (!e.target.classList.contains("tabfilter")) return;
+    const box = e.target.closest("[data-tabs]");
+    state.tabFilter = e.target.value;
+    box.querySelector(".panel").innerHTML = panel(+box.dataset.tabs);
+  });
+  $("#out").addEventListener("toggle", (e) => {
+    const d = e.target;
+    if (!d.classList || !d.classList.contains("mon")) return;
+    const i = +d.dataset.i;
+    if (d.open) {
+      if (state.open !== null && state.open !== i) {
+        const prev = document.querySelector(`.mon[data-i="${state.open}"]`);
+        if (prev) { prev.open = false; const det = prev.querySelector(".detail"); if (det) det.remove(); }
+      }
+      state.open = i; state.tabFilter = "";
+      if (!d.querySelector(".detail")) d.insertAdjacentHTML("beforeend", detail(i));
+    } else if (state.open === i) {
+      state.open = null;
+    }
+    remember();
+  }, true);
+
+  // Offline: on the website, offer the download and register the installable app; the saved file already works offline
+  $("#offline-btn").addEventListener("click", () => {
+    const help = $("#offline-help");
+    help.hidden = !help.hidden;
+    $("#offline-btn").setAttribute("aria-expanded", String(!help.hidden));
+    syncConsoleHeight();
+  });
+  if (/^https?:$/.test(location.protocol)) {
+    document.head.insertAdjacentHTML("beforeend", '<link rel="manifest" href="manifest.webmanifest">');
+    if ("serviceWorker" in navigator) { try { navigator.serviceWorker.register("sw.js").catch(() => {}); } catch (e) {} }
+  } else {
+    $("#offline-web").hidden = true; $("#offline-web2").hidden = true; $("#offline-file").hidden = false;
+  }
+
+  // Links: #rockruff, #move-crunch, #item-fire-stone, #place-route-2, #items … (older #ceaseless-edge style still works)
+  function fromHash() {
+    const h = decodeURIComponent(location.hash.slice(1));
+    const views = { "": "dex", pokedex: "dex", moves: "moves", items: "items", locations: "places" };
+    Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, open: null });
+    if (h in views) state.view = views[h];
+    else if (h.startsWith("move-")) { const k = moveKeys.find((x) => slug(moves[x].name) === h.slice(5)); Object.assign(state, k ? { view: "moves", move: k } : { view: "moves", q: h.slice(5).replace(/-/g, " ") }); }
+    else if (h.startsWith("item-")) { const k = items.findIndex((it) => slug(it.name) === h.slice(5)); Object.assign(state, k >= 0 ? { view: "items", item: k } : { view: "items", q: h.slice(5).replace(/-/g, " ") }); }
+    else if (h.startsWith("place-")) { const p = placeList.find((x) => slug(x.name) === h.slice(6)); Object.assign(state, { view: "places", place: p ? p.name : h.slice(6).replace(/-/g, " ") }); }
+    else {
+      const bySlug = mons.findIndex((_, i) => monSlug(i) === h);
+      const text = norm(h);
+      const byName = bySlug >= 0 ? bySlug : mons.findIndex((m) => m.s.includes(text));
+      const mv = moveKeys.find((k) => moves[k].s.includes(text));
+      if (byName >= 0 && !mv) Object.assign(state, { open: byName, q: mons[byName].name });
+      else if (mv) Object.assign(state, { view: "moves", move: mv });
+      else state.q = h.replace(/-/g, " ");
+    }
+    remember();
+    render(true);
+  }
+  fromHash();
+})();

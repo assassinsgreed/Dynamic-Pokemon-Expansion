@@ -23,6 +23,7 @@ from .sprites import build_sheet, pack
 
 TEMPLATE = Path(__file__).with_name("template.html")
 SW_TEMPLATE = Path(__file__).with_name("sw.js")
+APP_SCRIPT = Path(__file__).with_name("app.js")  # the page's script, inlined so the page stays one file
 STAT_KEYS = ("hp", "atk", "def", "spa", "spd", "spe")
 
 
@@ -79,7 +80,8 @@ def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: 
         "growth": s["growth"].replace("_", " ").title(),
         "evs": [s["ev_yield"][k] for k in STAT_KEYS],
         "family": e.family,
-        "evo": [[index[l["to"]], l["text"], item_by_const.get(l.get("item"))] for l in links],
+        # [target, method text, item index, the item's name as written in that text]
+        "evo": [[index[l["to"]], l["text"], item_by_const.get(l.get("item")), data.items.get(l.get("item"))] for l in links],
         "s": search_keys(e.name, official, f"{e.form} {e.name}" if e.form else None),
         "movesOf": index.get(e.base) if e.battle_form else None,
         "loc": locations,
@@ -130,6 +132,8 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
 
     def add(name: str, category: str, where: list[str], use: str) -> None:
         const = const_for.get(_norm(name))
+        if const is None and not category:
+            return  # prize-table rows that aren't items (the Game Corner also trades Pokémon)
         if const is None:
             # Small spelling slips in the doc ("Banetite") resolve to the game's own spelling
             close = difflib.get_close_matches(_norm(name), list(const_for), n=1, cutoff=0.88)
@@ -138,8 +142,11 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
                 fixed = data.items.get(const, name)
                 print(f"note: item {name!r} matched to the game's {fixed!r}", file=sys.stderr)
                 name = fixed
-        if _norm(name) in index:  # the same item in several tables: merge what each adds
-            item = items[index[_norm(name)]]
+        same = index.get(_norm(name))
+        if same is None and const:
+            same = next((k for k, it in enumerate(items) if it["key"] == const), None)
+        if same is not None:  # the same item in several tables: merge what each adds
+            item = items[same]
             item["where"] += [w for w in where if w not in item["where"]]
             item["category"] = item["category"] or category
             item["use"] = item["use"] or use
@@ -152,12 +159,12 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
     for mart in marts(data.paths):
         for const in mart["items"]:
             if const in data.items:
-                add(data.items[const], "", [mart["where"]], "")
+                add(_full_item_name(data, const), "", [mart["where"]], "")
     for item in items:
         # "Daimyn City Mall" from the doc is redundant next to "Daimyn City Mall · Gems shop"
         places = {w.split(" · ")[0] for w in item["where"] if " · " in w}
         item["where"] = [w for w in item["where"] if w not in places]
-        item["category"] = item["category"] or "Other"
+        item["category"] = item["category"] or "Other items"
     for names in held.values():
         for h in names:
             add(h.split(" (")[0], "Held by wild Pokémon", [], "")
@@ -180,6 +187,16 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
     for item in items:
         item["icon"] = offsets.get(item.pop("key"))
     return items, index, by_const, "data:image/webp;base64," + base64.b64encode(sheet).decode()
+
+
+def _full_item_name(data: SourceData, const: str) -> str:
+    """The ROM caps names at 12 characters ("BlundrPolicy"); the constant spells them out (Blunder Policy)."""
+    rom_name = data.items[const]
+    spelled = const.removeprefix("ITEM_").replace("_", " ").title()
+    short, full = _norm(rom_name), _norm(spelled)
+    letters = iter(full)
+    abbreviated = len(rom_name) >= 11 and short != full and all(c in letters for c in short)
+    return spelled if abbreviated else rom_name  # a renamed item (Link Stone → Linking Cord) keeps its game name
 
 
 def _attach_machine_locations(data: SourceData, moves: dict) -> None:
@@ -207,8 +224,8 @@ def _icon(size: int) -> bytes:
 
 
 MANIFEST = {
-    "name": "Pokemon Amethyst Pokedex",
-    "short_name": "Amethyst Dex",
+    "name": "Pokemon Amethyst Companion",
+    "short_name": "Amethyst",
     "start_url": "./",
     "scope": "./",
     "display": "standalone",
@@ -254,4 +271,5 @@ def render(data: dict, sheet: bytes, offsets: dict) -> str:
     return (TEMPLATE.read_text(encoding="utf-8")
             .replace("__DEX_DATA__", blob)
             .replace("__SPRITE_SHEET__", sprites)
-            .replace("__BRAND_ICON__", _brand_icon()))
+            .replace("__BRAND_ICON__", _brand_icon())
+            .replace("__APP_SCRIPT__", APP_SCRIPT.read_text(encoding="utf-8").replace("</", "<\/")))

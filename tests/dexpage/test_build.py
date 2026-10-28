@@ -46,7 +46,7 @@ def test_learner_labels(data):
 def test_evolution_links_use_indices(data):
     mons = {m["key"]: i for i, m in enumerate(data["mons"])}
     kadabra = data["mons"][mons["SPECIES_KADABRA"]]
-    assert [mons["SPECIES_ALAKAZAM"], "Use Linking Cord", next(i for i, it in enumerate(data["items"]) if it["name"] == "Linking Cord")] in kadabra["evo"]
+    assert [mons["SPECIES_ALAKAZAM"], "Use Linking Cord", next(i for i, it in enumerate(data["items"]) if it["name"] == "Linking Cord"), "Linking Cord"] in kadabra["evo"]
 
 
 def test_page_is_self_contained(html):
@@ -114,7 +114,7 @@ def test_locations_attached(data):
 
 
 def test_title(html):
-    assert "<title>Pokemon Amethyst Pokedex</title>" in html
+    assert "<title>Pokemon Amethyst Companion</title>" in html
 
 
 def test_sw_only_caches_good_responses(site):
@@ -188,3 +188,10 @@ def test_shop_stock_merged_into_item_locations(data):
     assert "Lake Laplaz" in glasses
     assert any(w.startswith("Daimyn City Mall · ") for w in glasses)
     assert any(w.startswith("Daimyn City Game Corner") for w in items["Life Orb"]["where"])
+
+
+def test_item_list_is_only_items(data):
+    names = {i["name"] for i in data["items"]}
+    assert "Joltik" not in names and "Mudbray" not in names       # Game Corner Pokémon prizes
+    assert "Poké Ball" in names and "Pok\e Ball" not in names
+    assert "Blunder Policy" in names and "BlundrPolicy" not in names
