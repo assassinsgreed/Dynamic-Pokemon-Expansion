@@ -66,6 +66,12 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
 - Look: Amethyst purple palette (game label art: #b27cfa / #320077), Trozei Jirachi header icon
   (`jirachi-trozei.png`, embedded), type-colour tints, equal-width chips, offline help for PC and phone.
 - Everything must work from the single downloaded file: no network, no CDNs, no fonts.
+- Performance: never put the sprite/icon data URLs in a CSS custom property (`url(var(--sheet))`) — every element
+  re-parses the multi-hundred-KB string on each style recalc (Items tab went 195 ms → 13 ms when moved into a
+  plain stylesheet rule in app.js). Time changes with a load-event probe that clicks tabs and logs
+  `performance.now()` deltas (run without `--virtual-time-budget`, which freezes the clock).
+- Every TM/HM is an item ("TM02 Dragon Claw", category TMs/HMs) linking to its move; typing a type name in the
+  Pokédex lists that type.
 
 ## Known gaps / ideas not done yet
 

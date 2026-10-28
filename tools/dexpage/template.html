@@ -139,7 +139,7 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .list.grid .mon[open] .chev { position: static; width: 28px; height: 28px; }
 .mon > summary::-webkit-details-marker { display: none; }
 .sp { width: 56px; height: 56px; overflow: hidden; flex: none; }
-.sp i { display: block; width: 64px; height: 64px; transform: scale(.875); transform-origin: 0 0; background-image: var(--sheet); background-repeat: no-repeat; image-rendering: pixelated; }
+.sp i { display: block; width: 64px; height: 64px; transform: scale(.875); transform-origin: 0 0; background-repeat: no-repeat; image-rendering: pixelated; }
 .sp.sm { width: 36px; height: 36px; }
 .sp.sm i { transform: scale(.5625); }
 .who { min-width: 0; display: grid; gap: 4px; }
@@ -213,7 +213,7 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
 .groups { display: grid; gap: 16px; }
 
 /* Item icons (24px cells in their own sheet) */
-.ii { display: inline-block; width: 24px; height: 24px; flex: none; background-image: var(--isheet); background-repeat: no-repeat; image-rendering: pixelated; vertical-align: middle; }
+.ii { display: inline-block; width: 24px; height: 24px; flex: none; background-repeat: no-repeat; image-rendering: pixelated; vertical-align: middle; }
 .ii.none { background: none; }
 .itembtn { display: inline-flex; align-items: center; gap: 4px; background: none; border: 0; padding: 0 2px 0 0; cursor: pointer; text-align: left; border-radius: 6px; }
 .itembtn:hover .in { text-decoration: underline; color: var(--accent); }
@@ -288,7 +288,7 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
   <div class="wrap">
     <div class="brand">
       <h1><img class="brand-icon" src="__BRAND_ICON__" alt="" width="34" height="34">Pokemon Amethyst Companion</h1>
-      <div class="meta"><span class="long">Pokémon, moves, items &amp; where to find them</span><button class="offline-btn" id="offline-btn" aria-expanded="false" aria-controls="offline-help">Use offline</button></div>
+      <div class="meta"><span class="long">Pokémon, moves, items &amp; where to find them</span><button class="offline-btn" id="offline-btn" aria-expanded="false" aria-controls="offline-help">Download for Offline Use</button></div>
     </div>
     <div class="offline-help" id="offline-help" hidden>
       <p id="offline-web"><b>On a computer:</b> <a id="dl" href="dex.html" download="pokemon-amethyst-companion.html">download this page</a> and open the saved file in any browser. It works with no internet connection.</p>

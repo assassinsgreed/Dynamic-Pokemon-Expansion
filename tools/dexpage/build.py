@@ -156,6 +156,19 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
 
     for item in load_items():
         add(item["name"], item["category"], item["where"], item["use"])
+    # Every TM and HM, named with its move, before shop lists add the bare "TM16" entries
+    machine_where = load_machine_locations()
+    for m in sorted(data.machines, key=lambda m: (m["kind"], m["num"])):
+        if m["kind"] == "Tutor" or m["move"] not in data.moves:
+            continue
+        label = f"{m['kind']}{m['num']:02d}"
+        loc = machine_where.get((m["kind"], m["num"]), {})
+        const = f"ITEM_{label}"
+        need = f"Needs {loc['requires']} to reach." if loc.get("requires") else ""
+        name = f"{label} {data.moves[m['move']]['name']}"
+        index[_norm(name)] = len(items)
+        items.append({"name": name, "category": f"{m['kind']}s", "where": list(loc.get("where", [])), "use": need,
+                      "key": const if const in data.item_ids else None, "move": m["move"]})
     for mart in marts(data.paths):
         for const in mart["items"]:
             if const in data.items:

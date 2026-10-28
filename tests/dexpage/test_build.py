@@ -195,3 +195,11 @@ def test_item_list_is_only_items(data):
     assert "Joltik" not in names and "Mudbray" not in names       # Game Corner Pokémon prizes
     assert "Poké Ball" in names and "Pok\e Ball" not in names
     assert "Blunder Policy" in names and "BlundrPolicy" not in names
+
+
+def test_every_tm_and_hm_is_an_item(data):
+    tms = {i["name"]: i for i in data["items"] if i["category"] in ("TMs", "HMs")}
+    assert len([n for n in tms if n.startswith("TM")]) == 100 and len([n for n in tms if n.startswith("HM")]) == 6
+    claw = tms["TM02 Dragon Claw"]
+    assert claw["where"] == ["Rubarr Desert B1F"] and claw["move"] == "MOVE_DRAGONCLAW" and claw["icon"] is not None
+    assert not any(i["name"] == "TM16" for i in data["items"])        # shop TMs merge into the full entry

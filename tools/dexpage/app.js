@@ -3,8 +3,10 @@
   "use strict";
   const $ = (s) => document.querySelector(s);
   const root = document.documentElement;
-  root.style.setProperty("--sheet", `url(${SHEET})`);
-  root.style.setProperty("--isheet", `url(${DEX.itemSheet})`);
+  // The sheets go in one stylesheet rule each: a data URL in a CSS variable is re-parsed for every sprite on the page
+  const sheets = document.createElement("style");
+  sheets.textContent = `.sp i { background-image: url("${SHEET}"); } .ii:not(.none) { background-image: url("${DEX.itemSheet}"); }`;
+  document.head.appendChild(sheets);
   const consoleEl = $("header.console");
   const syncConsoleHeight = () => root.style.setProperty("--console-h", `${consoleEl.offsetHeight}px`);
   window.addEventListener("resize", syncConsoleHeight);
@@ -287,7 +289,8 @@
     return `<article class="itemcard">
       <div class="top">${itemIcon(k)}<h2>${esc(it.name)}<small>${esc(it.category)}</small></h2></div>
       ${it.where.length ? `<div><h4>Where to find</h4><ul class="where">${it.where.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>` : '<p class="note">No known location.</p>'}
-      ${showUse ? `<div><h4>${useTitle}</h4><div class="use">${esc(it.use)}</div></div>` : ""}
+      ${it.move ? `<div><h4>Teaches</h4><div class="chips"><button class="chip" data-move="${it.move}">${typeBadge(moves[it.move].type)}<span class="ln">${esc(moves[it.move].name)}</span><span class="hw">${moves[it.move].learners.filter(([, h]) => /^(TM|HM)\d/.test(h)).length} Pokémon</span></button></div></div>` : ""}
+      ${showUse ? `<div><h4>${it.move ? "Note" : useTitle}</h4><div class="use">${esc(it.use)}</div></div>` : ""}
       ${evolves.length ? `<div><h4>Evolves · ${evolves.length}</h4><div class="chips">${evolves.map(([i, to]) => monChip(to, `from ${mons[i].name}`)).join("")}</div></div>` : ""}
       ${holders.length ? `<div><h4>Held by wild Pokémon · ${holders.length}</h4><div class="chips">${holders.map(([i, pct]) => monChip(i, pct)).join("")}</div></div>` : ""}
     </article>`;
@@ -310,7 +313,8 @@
 
   // ---------------------------------------------------------------- views
   const matchMoves = (q) => (q ? moveKeys.filter((k) => moves[k].s.some((x) => x.includes(q))) : moveKeys);
-  const matchItems = (q) => items.map((_, k) => k).filter((k) => !q || itemKeys[k].includes(q) || norm(items[k].category).includes(q));
+  const matchItems = (q) => items.map((_, k) => k).filter((k) => !q || itemKeys[k].includes(q) || norm(items[k].category).includes(q)
+    || (items[k].move && moves[items[k].move].s.includes(q)));
   const matchPlaces = (q) => placeList.filter((p) => !q || norm(p.name).includes(q));
   const exactFirst = (list, isExact) => list.filter(isExact).concat(list.filter((x) => !isExact(x)));
 
@@ -322,7 +326,8 @@
 
   function dexView(q) {
     const list = [];
-    mons.forEach((m, i) => { if (inMode(m) && inType(m) && (!q || m.s.some((s) => s.includes(q)))) list.push(i); });
+    const typeQ = TYPES.find((t) => norm(t) === q);  // "fire" lists every Fire type, as well as names containing it
+    mons.forEach((m, i) => { if (inMode(m) && inType(m) && (!q || m.s.some((s) => s.includes(q)) || (typeQ && m.types.includes(typeQ)))) list.push(i); });
     if (state.mode) list.sort((a, b) => order[state.mode][a] - order[state.mode][b]);
     if (q) list.sort((a, b) => mons[b].s.some((s) => s.startsWith(q)) - mons[a].s.some((s) => s.startsWith(q)));
     const html = alsoLine(q) + (list.length
