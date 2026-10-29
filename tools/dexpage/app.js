@@ -348,24 +348,36 @@
   const matchPlaces = (q) => placeList.filter((p) => !q || norm(p.name).includes(q));
   const exactFirst = (list, isExact) => list.filter(isExact).concat(list.filter((x) => !isExact(x)));
 
-  function alsoLine(q) {  // from the Pokédex, point at matching moves, items and places
-    if (q.length < 3) return "";
-    const counts = [["moves", matchMoves(q).length, "move"], ["items", matchItems(q).length, "item"], ["places", matchPlaces(q).length, "location"],
-      ["abilities", abilityKeys.filter((k) => k.includes(q)).length, "ability"], ["docs", docTopics.filter((t) => t.s.includes(q)).length, "doc topic"]]
-      .filter(([, n]) => n).map(([v, n, w]) => [v, n, n > 1 && w === "ability" ? "abilitie" : w]);
-    return counts.length ? `<div class="also">Also matching: ${counts.map(([v, n, w]) => `<button data-goto="${v}">${n} ${w}${n > 1 ? "s" : ""}</button>`).join("")}</div>` : "";
-  }
-
-  function dexView(q) {
+  function matchMons(q) {
     const list = [];
     const typeQ = TYPES.find((t) => norm(t) === q);  // "fire" lists every Fire type, as well as names containing it
     // "16" or "#016" is a dex number in the chosen mode (either on All), with the unnumbered forms listed after it
     const num = /^\d+$/.test(q) ? +q : 0;
     const hasNum = (m, i) => (state.mode ? [state.mode] : m.modes).some((mode) => m.modes.includes(mode) && Math.floor(order[mode][i]) === num);
     mons.forEach((m, i) => { if (inMode(m) && inType(m) && (num ? hasNum(m, i) : !q || m.s.some((s) => s.includes(q)) || (typeQ && m.types.includes(typeQ)))) list.push(i); });
+    return list;
+  }
+  const matchTutors = (q) => DEX.tutors.filter((t) => (!q || moves[t.move].s.some((x) => x.includes(q)) || norm(t.where).includes(q) || norm(t.note).includes(q))
+    && (!state.type || moves[t.move].type === state.type));
+  const matchAbilities = (q) => abilities.filter((a, n) => (!q || abilityKeys[n].includes(q) || norm(a.desc).includes(q) || norm(a.detail).includes(q))
+    && a.mons.some(([i]) => inMode(mons[i]) && inType(mons[i])));
+  const matchDocs = (q) => docTopics.filter((t) => !q || t.s.includes(q));
+
+  // Above every view: how many results the same search has in the other tabs, each a chip that goes there
+  const ALSO = [["dex", (q) => matchMons(q).length, "Pokémon", "Pokémon"], ["moves", (q) => matchMoves(q).filter((k) => !state.type || moves[k].type === state.type).length, "move", "moves"],
+    ["tutors", (q) => matchTutors(q).length, "tutor move", "tutor moves"], ["abilities", (q) => matchAbilities(q).length, "ability", "abilities"],
+    ["items", (q) => matchItems(q).length, "item", "items"], ["places", (q) => matchPlaces(q).length, "location", "locations"], ["docs", (q) => matchDocs(q).length, "doc topic", "doc topics"]];
+  function alsoLine(q, here) {
+    if (q.length < 3) return "";
+    const counts = ALSO.filter(([v]) => v !== here).map(([v, count, one, many]) => [v, count(q), one, many]).filter(([, n]) => n);
+    return counts.length ? `<div class="also">Also matching: ${counts.map(([v, n, one, many]) => `<button data-goto="${v}">${n} ${n === 1 ? one : many}</button>`).join("")}</div>` : "";
+  }
+
+  function dexView(q) {
+    const list = matchMons(q);
     if (state.mode) list.sort((a, b) => order[state.mode][a] - order[state.mode][b]);
     if (q) list.sort((a, b) => mons[b].s.some((s) => s.startsWith(q)) - mons[a].s.some((s) => s.startsWith(q)));
-    const html = alsoLine(q) + (list.length
+    const html = (list.length
       ? `<div class="list${state.layouts.dex === "grid" ? " grid" : ""}">${list.map((i) => row(mons[i], i)).join("")}</div>`
       : `<div class="nores">No Pokémon match “${esc(state.q)}”${state.mode ? ` in ${state.mode} mode` : ""}.</div>`);
     return [html, `${list.length} Pokémon`];
@@ -436,8 +448,7 @@
   }
 
   function tutorsView(q) {
-    const rows = DEX.tutors.filter((t) => (!q || moves[t.move].s.some((x) => x.includes(q)) || norm(t.where).includes(q) || norm(t.note).includes(q))
-      && (!state.type || moves[t.move].type === state.type));
+    const rows = matchTutors(q);
     if (!rows.length) return [`<div class="nores">No tutors match “${esc(state.q)}”.</div>`, "0 tutor moves"];
     const open = state.move || (q && rows.find((t) => moves[t.move].s.includes(q)) || {}).move || null;
     let opened = false;  // a move taught in two places opens under the first
@@ -487,8 +498,7 @@
   }
 
   function abilitiesView(q) {
-    const list = exactFirst(abilities.filter((a, n) => !q || abilityKeys[n].includes(q) || norm(a.desc).includes(q) || norm(a.detail).includes(q)), (a) => norm(a.name) === q || (a.official && norm(a.official) === q))
-      .filter((a) => a.mons.some(([i]) => inMode(mons[i]) && inType(mons[i])));
+    const list = exactFirst(matchAbilities(q), (a) => norm(a.name) === q || (a.official && norm(a.official) === q));
     if (!list.length) return [`<div class="nores">No abilities match “${esc(state.q)}”.</div>`, "0 abilities"];
     const open = state.ability || (q && [list[0].name, list[0].official || ""].some((s) => norm(s) === q) ? list[0].name : null);
     const isOpen = (a) => a.name === open;
@@ -509,7 +519,7 @@
   }
 
   function docsView(q) {
-    const list = docTopics.filter((t) => !q || t.s.includes(q));
+    const list = matchDocs(q);
     if (!list.length) return [`<div class="nores">No topics mention “${esc(state.q)}”.</div>`, "0 topics"];
     const open = state.doc || (q && (list.find((t) => norm(t.title) === q) || {}).title) || null;
     const isOpen = (t) => t.title === open;
@@ -535,7 +545,7 @@
   function render(scroll) {
     const q = norm(state.q);
     const [html, count] = { dex: dexView, moves: movesView, tutors: tutorsView, abilities: abilitiesView, items: itemsView, places: placesView, docs: docsView }[state.view](q);
-    $("#out").innerHTML = html;
+    $("#out").innerHTML = alsoLine(q, state.view) + html;
     $("#count").textContent = count;
     $("#q").value = state.q;
     $("#q").placeholder = PLACEHOLDER[state.view];
