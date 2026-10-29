@@ -10,7 +10,7 @@ def test_modes(roster, paths):
     both = next(s for s in std if s in div)
     assert by[both].modes == ["Standard", "Divergent"]
     assert by["SPECIES_VENUSAUR_MEGA"].modes == by["SPECIES_VENUSAUR"].modes
-    assert "SPECIES_LYCANROC_DUSK" in by and "SPECIES_ROTOM_HEAT" not in by
+    assert "SPECIES_LYCANROC_DUSK" in by   # habitat form; Rotom's appliance forms come from extra_forms.csv instead
 
 
 def test_form_labels(roster):
