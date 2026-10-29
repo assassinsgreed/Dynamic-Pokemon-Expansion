@@ -57,27 +57,14 @@
   }));
   const placeList = [...places.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
 
-  // Sort keys per mode: that mode's dex number; unnumbered forms sit just after the entry before them (their base).
-  // Swarm Pokémon (no number in that mode) come after every numbered entry, on All too.
-  // Their unnumbered relatives (Raticate, Mime Jr.) join them, after the family's first swarm entry.
-  const SWARM = 1e6;
-  const order = { Standard: new Float64Array(mons.length), Divergent: new Float64Array(mons.length), All: new Float64Array(mons.length) };
-  const swarmPos = (mode, m, field) => {  // where an entry goes in the swarm section, or -1 if it isn't in it
-    const first = mons.findIndex((x) => x.family === m.family && x.swarm.includes(mode));
-    return m.swarm.includes(mode) || (first >= 0 && !m.dex[field] && m.modes.includes(mode)) ? SWARM + first * 100 : -1;
-  };
+  // Sort keys per mode: that mode's dex number; unnumbered forms sit just after the entry before them (their base)
+  const order = { Standard: new Float64Array(mons.length), Divergent: new Float64Array(mons.length) };
   for (const [mode, field] of [["Standard", "std"], ["Divergent", "div"]]) {
     let last = 0, step = 0;
     mons.forEach((m, i) => {
-      const sw = swarmPos(mode, m, field);
-      if (sw >= 0) order[mode][i] = sw + i / 1e4;
-      else if (m.dex[field]) { last = m.dex[field]; step = 0; order[mode][i] = last; } else order[mode][i] = last + ++step / 1000;
+      if (m.dex[field]) { last = m.dex[field]; step = 0; order[mode][i] = last; } else order[mode][i] = last + ++step / 1000;
     });
   }
-  mons.forEach((m, i) => {
-    const sw = m.modes.map((mode) => swarmPos(mode, m, mode === "Standard" ? "std" : "div"));
-    order.All[i] = sw.every((p) => p >= 0) ? Math.min(...sw) + i / 1e4 : i;
-  });
   const monSlug = (i) => slug(mons[i].key.replace(/^SPECIES_/, ""));
 
   // ---------------------------------------------------------------- state & navigation
@@ -376,7 +363,7 @@
     const num = /^\d+$/.test(q) ? +q : 0;
     const hasNum = (m, i) => (state.mode ? [state.mode] : m.modes).some((mode) => m.modes.includes(mode) && Math.floor(order[mode][i]) === num);
     mons.forEach((m, i) => { if (inMode(m) && inType(m) && (num ? hasNum(m, i) : !q || m.s.some((s) => s.includes(q)) || (typeQ && m.types.includes(typeQ)))) list.push(i); });
-    list.sort((a, b) => order[state.mode || "All"][a] - order[state.mode || "All"][b]);
+    if (state.mode) list.sort((a, b) => order[state.mode][a] - order[state.mode][b]);
     if (q) list.sort((a, b) => mons[b].s.some((s) => s.startsWith(q)) - mons[a].s.some((s) => s.startsWith(q)));
     const html = alsoLine(q) + (list.length
       ? `<div class="list${state.layouts.dex === "grid" ? " grid" : ""}">${list.map((i) => row(mons[i], i)).join("")}</div>`

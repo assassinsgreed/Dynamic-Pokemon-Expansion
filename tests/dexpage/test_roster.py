@@ -104,3 +104,14 @@ def test_unknown_item_raises(source_data):
     from tools.dexpage.roster import evolution_text
     with pytest.raises(ValueError):
         evolution_text(source_data, "EVO_ITEM", "ITEM_DOES_NOT_EXIST", "SPECIES_BULBASAUR", "0")
+
+
+def test_unnumbered_forms_sit_with_relatives(roster):
+    keys = [e.key for e in roster]
+    at = keys.index
+    assert at("SPECIES_FARFETCHD") == at("SPECIES_FARFETCHD_G") + 1     # same name, numbered form first
+    assert at("SPECIES_RATICATE_A") < at("SPECIES_RATICATE") < at("SPECIES_RATICATE_A") + 3
+    assert at("SPECIES_MIME_JR") == at("SPECIES_MIME_JR_G") + 1
+    assert at("SPECIES_KOFFING") == at("SPECIES_KOFFING_G") + 1
+    assert at("SPECIES_ZORUA") < at("SPECIES_ZORUA_H") < at("SPECIES_ZOROARK")
+    assert at("SPECIES_MEOWTH_G") < at("SPECIES_MEOWTH") < at("SPECIES_MEOWTH_A") < at("SPECIES_PERRSERKER")

@@ -311,21 +311,33 @@ def _ordered(data: SourceData, entries: dict, bases: dict, roots: dict) -> list[
         for method, _, target, _ in evos:
             if method not in DROPPED_METHODS:
                 pre_evo.setdefault(target, src)
-    for key in entries:
-        if key in placed:
-            continue
-        anchor = bases.get(key, (None,))[0]
-        if anchor not in placed or anchor == key:
-            anchor = pre_evo.get(key)
-        if anchor in placed:
-            # after the anchor and any forms already placed after it
-            i = order.index(anchor) + 1
-            while i < len(order) and bases.get(order[i], (None,))[0] == anchor:
-                i += 1
-            order.insert(i, key)
-        else:
-            order.append(key)
-        placed.add(key)
+    def place(key: str) -> bool:
+        # After its base form, a same-named entry (Kanto Farfetch'd after Galarian Farfetch'd #063) or what it
+        # evolves from
+        name = data.names.get(key)
+        base = bases.get(key, (None,))[0]
+        if base in entries and base not in placed and base != key:
+            return False  # a form waits for its base (Alolan Meowth goes after Kanto Meowth)
+        for anchor in (base,
+                       next((k for k in order if k != key and data.names.get(k) == name), None),
+                       pre_evo.get(key)):
+            if anchor in placed and anchor != key:
+                # after the anchor and any forms already placed after it
+                i = order.index(anchor) + 1
+                while i < len(order) and bases.get(order[i], (None,))[0] == anchor:
+                    i += 1
+                order.insert(i, key)
+                return True
+        return False
+
+    pending = [k for k in entries if k not in placed]
+    while pending:  # repeat while anything moves: an anchor may only get placed in a later pass
+        left = [k for k in pending if not place(k)]
+        placed.update(k for k in pending if k not in left)
+        if len(left) == len(pending):
+            order.extend(left)
+            break
+        pending = left
     return [entries[k] for k in order]
 
 
