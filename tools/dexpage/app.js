@@ -146,7 +146,7 @@
   };
   const itemButton = (k, label) => `<button class="itembtn" data-item="${k}">${itemIcon(k)}<span class="in">${esc(label || items[k].name)}</span></button>`;
   const monLink = (i, current) => `<button class="link${i === current ? " current" : ""}" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${formLabel(mons[i])}</span></button>`;
-  const monChip = (i, note, sub) => `<button class="chip" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${formLabel(mons[i])}${
+  const monChip = (i, note, sub, bare) => `<button class="chip" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${bare ? "" : formLabel(mons[i])}${
     sub ? ` <span class="sub">${esc(sub)}</span>` : ""}</span>${note ? `<span class="hw">${esc(note)}</span>` : ""}</button>`;
   const escapeRe = (text) => text.replace(/[.*+?^$()|[\]\\{}]/g, "\\$&");
   // "Route 2" must match "Route 2" and "Route 2 (hidden)" but not "Route 20"
@@ -335,7 +335,7 @@
       ${it.where.length ? `<div><h4>Where to find</h4><ul class="where">${it.where.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>` : '<p class="note">No known location.</p>'}
       ${it.move ? `<div><h4>Teaches</h4><div class="chips"><button class="chip" data-move="${it.move}">${typeBadge(moves[it.move].type)}<span class="ln">${esc(moves[it.move].name)}</span><span class="hw">${moves[it.move].learners.filter(([, h]) => /^(TM|HM)\d/.test(h)).length} Pokémon</span></button></div></div>` : ""}
       ${showUse ? `<div><h4>${it.move ? "Note" : useTitle}</h4><div class="use">${esc(it.use)}</div></div>` : ""}
-      ${evolves.length ? `<div><h4>Evolves · ${evolves.length}</h4><div class="chips">${evolves.map(([i, to]) => monChip(to, `from ${mons[i].name}`)).join("")}</div></div>` : ""}
+      ${evolves.length ? `<div><h4>Evolves · ${evolves.length}</h4><div class="chips">${evolves.map(([i, to]) => monChip(to, "", "", it.category === "Mega Stones")).join("")}</div></div>` : ""}
       ${holders.length ? `<div><h4>Held by wild Pokémon · ${holders.length}</h4><div class="chips">${holders.map(([i, pct]) => monChip(i, pct)).join("")}</div></div>` : ""}
     </article>`;
   }

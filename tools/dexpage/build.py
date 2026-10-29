@@ -248,6 +248,12 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
     for item in items:
         item["category"] = _item_category(item, fields)
     for item in items:
+        # The Refiner is the one place to get a Mega Stone; the shop rows from the ROM just repeat it
+        if item["category"] == "Mega Stones":
+            refiner = [w for w in item["where"] if w.startswith("Bought from Mega Stone Refiner")]
+            if refiner:
+                item["where"] = refiner[:1]
+    for item in items:
         # Poké Mart stock only grows with badges: "after 6 badges" covers 7 and 8 (plain "Poké Marts" covers all)
         stock = [w for w in item["where"] if re.fullmatch(r"Poké Marts( \(after \d+ badges?\))?", w)]
         if len(stock) > 1:
