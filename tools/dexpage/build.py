@@ -248,6 +248,11 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
     for item in items:
         item["category"] = _item_category(item, fields)
     for item in items:
+        # Poké Mart stock only grows with badges: "after 6 badges" covers 7 and 8 (plain "Poké Marts" covers all)
+        stock = [w for w in item["where"] if re.fullmatch(r"Poké Marts( \(after \d+ badges?\))?", w)]
+        if len(stock) > 1:
+            first = min(stock, key=lambda w: int(re.sub(r"\D", "", w) or 0))
+            item["where"] = [w for w in item["where"] if w not in stock or w == first]
         # "Daimyn City Mall" from the doc is redundant next to "Daimyn City Mall · Gems shop"
         places = {w.split(" · ")[0] for w in item["where"] if " · " in w}
         # …and "PokeChip Crusher" next to "PokeChip Crusher (5 chips)"

@@ -369,6 +369,10 @@ body.sheet-open { overflow: hidden; }
 @media (max-width: 520px) {
   .sheet { padding: 0; place-items: stretch; }
   .sheet-panel { max-height: none; height: 100%; border: 0; border-radius: 0; }
+  /* Full-screen on phones: the pinned header reaches up under the status bar / notch */
+  .sheet-body .mon > summary { padding-top: calc(6px + env(safe-area-inset-top, 0px)); }
+  .sheet-body > article > .top, .sheet-body > :is(.loccard, .abilcard, .doccard) > h2 { padding-top: calc(14px + env(safe-area-inset-top, 0px)); }
+  .sheet-close { top: calc(12px + env(safe-area-inset-top, 0px)); }
   .list:not(.grid) .mon > summary .dexline, .list.grid .mon[open] > summary .dexline { top: auto; bottom: 11px; transform: none; right: 50px; }
   .mon > summary .who { padding-right: 0; }
   .brand .meta .long { display: none; }
