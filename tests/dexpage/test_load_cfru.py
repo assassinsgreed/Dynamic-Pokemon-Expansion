@@ -52,3 +52,12 @@ def test_ability_effect_chances(paths):
     assert chances[ids["ABILITY_STATIC"]] == 33        # umodsi(Random(), 3) == 0
     assert chances[ids["ABILITY_STENCH"]] == 10
     assert ids["ABILITY_LEVITATE"] not in chances
+
+
+def test_divergent_species_ability_renames(paths):
+    from tools.dexpage.load_cfru import ability_display
+    assert ability_display(paths, "ABILITY_DAZZLING", "SPECIES_TSAREENA", None, ["GRASS"])[0] == "Queenly Majesty"
+    assert ability_display(paths, "ABILITY_GOOEY", "SPECIES_DIGLETT_A", None, ["GROUND", "STEEL"])[0] == "Tangling Hair"
+    assert ability_display(paths, "ABILITY_HUGEPOWER", "SPECIES_MEDICHAM", None, ["FIGHTING", "PSYCHIC"])[0] == "Pure Power"
+    assert ability_display(paths, "ABILITY_EMERGENCYEXIT", "SPECIES_WIMPOD", None, ["BUG", "WATER"])[0] == "Wimp Out"
+    assert ability_display(paths, "ABILITY_RECEIVER", "SPECIES_GRIMER_A", "NATIONAL_DEX_GRIMER", ["POISON", "DARK"])[0] == "Alchemic Power"

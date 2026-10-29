@@ -184,6 +184,9 @@ def ability_name_overrides(p: Paths) -> list[tuple[str, str, frozenset, frozense
         # switch (dexNum) { case NATIONAL_DEX_A: case NATIONAL_DEX_B: return gText_AbilityName_X; ... }
         for dexes, label in re.findall(r"((?:case\s+NATIONAL_DEX_\w+\s*:\s*)+)return\s+(gText_AbilityName_\w+)", block):
             rules.append((ability, label, frozenset(), frozenset(re.findall(r"NATIONAL_DEX_\w+", dexes)), frozenset()))
+        # if (species == SPECIES_A || species == SPECIES_B) return gText_AbilityName_X;  (Divergent-only species)
+        for cond, label in re.findall(r"if\s*\(([^()]*\bspecies\s*==[^()]*)\)\s*return\s+(gText_AbilityName_\w+)", block):
+            rules.append((ability, label, frozenset(re.findall(r"SPECIES_\w+", cond)), frozenset(), frozenset()))
         # if (Predicate(...)) return gText_AbilityName_X;
         for call, label in re.findall(r"if\s*\((\w+\([^)]*\))\)\s*return\s+(gText_AbilityName_\w+)", block):
             fn = call.split("(")[0]
