@@ -497,7 +497,7 @@
     const affects = a.moves.length ? `<div><h4>Affected moves · ${a.moves.length}</h4><div class="chips">${a.moves.map((k) =>
       `<button class="chip" data-move="${k}">${typeBadge(moves[k].type)}<span class="ln">${esc(moves[k].name)}</span></button>`).join("")}</div></div>` : "";
     return `<article class="abilcard">${COLLAPSE}<h2>${esc(a.name)}${a.official ? `<small>${esc(a.official)}</small>` : ""}</h2>${a.desc ? `<div class="gamedesc">${esc(a.desc)}</div>` : ""}
-      <p class="abildetail">${esc(a.detail)}</p>${a.chance ? `<div class="specs"><span>Effect chance <b>${a.chance}%</b></span></div>` : ""}
+      <div class="abildetail">${a.detail.split(/ (?=Outside battle)/).map((p) => `<p>${esc(p)}</p>`).join("")}</div>${a.chance ? `<div class="specs"><span>Effect chance <b>${a.chance}%</b></span></div>` : ""}
       <div class="learners">${group(0, "Ability") + group(1, "Hidden ability") || '<p class="empty">No Pokémon match the current filters.</p>'}${affects}</div></article>`;
   }
 
