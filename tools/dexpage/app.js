@@ -368,13 +368,16 @@
     return out;
   };
 
+  // A move card's corner says how to teach it: its TM/HM number, or "Tutor" (tutor numbers mean nothing to players)
+  const howTaught = (k) => (moves[k].tm ? moves[k].tm.label : moves[k].tutor ? "Tutor" : "");
+
   function movesView(q) {
     const list = exactFirst(matchMoves(q), (k) => moves[k].s.includes(q)).filter((k) => !state.type || moves[k].type === state.type);
     if (!list.length) return [`<div class="nores">No moves match “${esc(state.q)}”.</div>`, "0 moves"];
     const open = state.move || (q && moves[list[0]].s.includes(q) ? list[0] : null);  // an exact match opens by itself
     let html;
     if (state.layouts.moves === "grid") {
-      html = chipsWithOpen(list, (k) => `<button class="chip${k === open ? " on" : ""}" data-move="${k}">${typeBadge(moves[k].type)}<span class="ln">${esc(moves[k].name)}</span><span class="hw">${moves[k].tm ? moves[k].tm.label : moves[k].power || ""}</span></button>`,
+      html = chipsWithOpen(list, (k) => `<button class="chip${k === open ? " on" : ""}" data-move="${k}">${typeBadge(moves[k].type)}<span class="ln">${esc(moves[k].name)}</span><span class="hw">${howTaught(k)}</span></button>`,
         (k) => k === open, (k) => moveCard(k, true));
     } else {
       const rows = list.map((k) => {
