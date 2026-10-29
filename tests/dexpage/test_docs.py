@@ -63,3 +63,12 @@ def test_type_chips():
 def test_bold_cells_keep_bold_unless_they_are_types():
     assert type_chips("<b>Grass</b>", whole_cell=True) == '<span class="type t-GRASS">Grass</span>'
     assert type_chips("<b>Venusaur</b>", whole_cell=True) == "<b>Venusaur</b>"
+
+
+def test_numeric_table_columns_right_aligned():
+    from tools.dexpage.docs import render_topic
+    topic = {"blocks": [{"t": "table", "rows": [["<b>Pokemon</b>", "<b>HP</b>", "<b>Info</b>"],
+                                                ["<b>Venusaur</b>", "80", "Even Bulkier"], ["Lapras", "130", "Less speed"]]}]}
+    html = render_topic(topic, images={})
+    assert '<th class="n"><b>HP</b></th>' in html and '<td class="n">80</td>' in html
+    assert "<td>Even Bulkier</td>" in html

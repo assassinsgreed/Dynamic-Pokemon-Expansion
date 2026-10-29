@@ -131,9 +131,17 @@ def _block_html(block: dict, images: dict[str, str]) -> str:
         out.append("</ul>" * (depth + 1))
         return "".join(out)
     if kind == "table":
+        import re
         rows = block["rows"]
-        head = "".join(f"<th>{c}</th>" for c in rows[0])
-        body = "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows[1:])
+        # Right-align columns whose filled cells are all numbers ("80", "1,000", "20%", "5-10") so digits line up
+        number = re.compile(r"[$¥]?\d[\d,.]*\s*(?:%|x|×)?(?:\s*[-–]\s*\d[\d,.]*\s*%?)?")
+        width = max(len(r) for r in rows)
+        numeric = [bool(cells) and all(number.fullmatch(c) for c in cells)
+                   for cells in ([re.sub(r"<[^>]+>", "", r[i]).strip() for r in rows[1:] if i < len(r) and re.sub(r"<[^>]+>", "", r[i]).strip()]
+                                 for i in range(width))]
+        cls = lambda i: ' class="n"' if i < width and numeric[i] else ""
+        head = "".join(f"<th{cls(i)}>{c}</th>" for i, c in enumerate(rows[0]))
+        body = "".join("<tr>" + "".join(f"<td{cls(i)}>{c}</td>" for i, c in enumerate(r)) + "</tr>" for r in rows[1:])
         return f'<div class="doctable"><table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>'
     raise ValueError(f"unknown doc block {kind!r}")
 
