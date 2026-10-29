@@ -118,10 +118,14 @@
   const sprite = (m, small) => `<span class="sp${small ? " sm" : ""}" aria-hidden="true"><i style="background-position:-${m.sp[0]}px -${m.sp[1]}px"></i></span>`;
   const formLabel = (m) => (m.form ? ` <small>${esc(m.form)}</small>` : "");
   const pad = (n) => String(n).padStart(3, "0");
-  const modeBadge = (m) => m.modes.map((mode) => {  // one badge per mode, carrying that mode's dex number
-    const n = mode === "Standard" ? m.dex.std : m.dex.div;
-    return `<span class="mode${mode === "Divergent" ? " d" : ""}">${mode}${n ? `<b>#${pad(n)}</b>` : m.swarm.includes(mode) ? "<b>Swarm</b>" : ""}</span>`;
-  }).join("");
+  // One tag for the dex it's in ("Both" for the two), and its number on its own: a Pokémon in both dexes has the same
+  // number in each. Swarm Pokémon have no number; unnumbered forms show none.
+  const modeBadge = (m) => m.modes.length > 1 ? '<span class="mode b">Both</span>'
+    : `<span class="mode${m.modes[0] === "Divergent" ? " d" : ""}">${m.modes[0]}</span>`;
+  const dexNo = (m) => {
+    const n = m.dex.std || m.dex.div;
+    return n ? `<span class="dexno">#${pad(n)}</span>` : m.swarm.length ? '<span class="dexno">Swarm</span>' : "";
+  };
   const bst = (m) => m.stats.reduce((a, b) => a + b, 0);
   const inMode = (m) => !state.mode || m.modes.includes(state.mode);
   const inType = (m) => !state.type || m.types.includes(state.type);
@@ -147,7 +151,7 @@
   // ---------------------------------------------------------------- Pokémon detail
   function row(m, i) {
     return `<details class="mon" data-i="${i}" style="${tint(m)}"${state.open === i ? " open" : ""}>
-      <summary title="Show details">${sprite(m)}
+      <summary title="Show details">${dexNo(m)}${sprite(m)}
         <span class="who"><span class="nm">${esc(m.name)}${formLabel(m)}</span>
           <span class="tags">${m.types.map(typeBadge).join("")}${modeBadge(m)}</span></span>
         ${CHEVRON}
