@@ -356,7 +356,7 @@
 
   // ---------------------------------------------------------------- views
   const matchMoves = (q) => (q ? moveKeys.filter((k) => moves[k].s.some((x) => x.includes(q))) : moveKeys);
-  const matchItems = (q) => items.map((_, k) => k).filter((k) => !q || itemKeys[k].includes(q) || norm(items[k].category).includes(q)
+  const matchItems = (q) => items.map((_, k) => k).filter((k) => !q || itemKeys[k].includes(q)
     || (items[k].move && moves[items[k].move].s.includes(q)));
   const matchPlaces = (q) => placeList.filter((p) => !q || norm(p.name).includes(q));
   const exactFirst = (list, isExact) => list.filter(isExact).concat(list.filter((x) => !isExact(x)));
