@@ -63,10 +63,12 @@ header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 
 .brand .meta { color: var(--muted); font-size: 12.5px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
 .brand a { color: var(--accent); font-weight: 600; text-decoration: none; }
 .brand a:hover { text-decoration: underline; }
-.views { display: flex; align-items: center; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 0 -4px; }
-.views button { flex: none; border: 0; background: none; padding: 7px 12px; border-radius: 999px; font: 600 14px var(--font-display); letter-spacing: .03em; color: var(--muted); cursor: pointer; }
-.views button[aria-selected="true"] { background: var(--accent); color: #fff; }
-.views button:not([aria-selected="true"]):hover { background: var(--accent-soft); color: var(--ink); }
+/* View tabs: underlined tabs on a baseline, so they don't read as one more pill button like the filters below */
+.views { display: flex; align-items: flex-end; gap: 2px; overflow-x: auto; scrollbar-width: none; align-self: stretch; box-shadow: inset 0 -1px var(--line); }
+.views::-webkit-scrollbar { display: none; }
+.views button { flex: none; border: 0; border-bottom: 3px solid transparent; background: none; padding: 8px 14px 7px; border-radius: 8px 8px 0 0; font: 600 14px var(--font-display); letter-spacing: .03em; color: var(--muted); cursor: pointer; }
+.views button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); background: linear-gradient(transparent, var(--accent-soft)); }
+.views button:not([aria-selected="true"]):hover { color: var(--ink); border-bottom-color: var(--line); }
 /* Tabs scroll sideways on narrow screens; Back/Forward stay put on the right */
 .viewrow { display: flex; align-items: center; gap: 8px; }
 .viewrow .views { flex: 1 1 auto; min-width: 0; }
@@ -196,6 +198,10 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .link.current .ln { color: var(--accent); }
 
 .moves { overflow-x: auto; }
+/* Sideways scrollers fade out on the side that has more (app.js sets more-l / more-r) */
+.more-r { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); }
+.more-l { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 36px), transparent); }
+.more-l.more-r { -webkit-mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent); }
 table.mv { border-collapse: collapse; width: 100%; font-size: 13.5px; table-layout: fixed; }
 table.mv .c-how { width: 128px; } table.mv .c-type { width: 92px; } table.mv .c-cat { width: 42px; }
 table.mv .c-num { width: 56px; text-align: right; } table.mv .c-tm { width: 64px; text-align: right; }

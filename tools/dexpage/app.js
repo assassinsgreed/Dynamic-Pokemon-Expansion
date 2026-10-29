@@ -10,6 +10,18 @@
   const consoleEl = $("header.console");
   const syncConsoleHeight = () => root.style.setProperty("--console-h", `${consoleEl.offsetHeight}px`);
   window.addEventListener("resize", syncConsoleHeight);
+  // Strips and tables that scroll sideways fade out on the side with more to see (phones hide scrollbars)
+  const SCROLLERS = ".views, .tablist, .moves, .movelist, .listtable, .doctable";
+  const cue = (el) => {
+    const max = el.scrollWidth - el.clientWidth;
+    el.classList.toggle("more-l", max > 1 && el.scrollLeft > 1);
+    el.classList.toggle("more-r", max > 1 && el.scrollLeft < max - 1);
+  };
+  const cueAll = () => document.querySelectorAll(SCROLLERS).forEach(cue);
+  document.addEventListener("scroll", (e) => { if (e.target.matches?.(SCROLLERS)) cue(e.target); }, { capture: true, passive: true });
+  window.addEventListener("resize", cueAll);
+  let cueFrame = 0;  // views, opened entries and their tabs all change #out; re-check once per frame
+  const cueSoon = () => { if (!cueFrame) cueFrame = requestAnimationFrame(() => { cueFrame = 0; cueAll(); }); };
 
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const norm = (s) => s.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -642,6 +654,9 @@
     state.tabFilter = e.target.value;
     box.querySelector(".panel").innerHTML = panel(+box.dataset.tabs);
   });
+  new MutationObserver(cueSoon).observe($("#out"), { childList: true, subtree: true });
+  cueSoon();
+
   $("#out").addEventListener("toggle", (e) => {
     const d = e.target;
     if (!d.classList || !d.classList.contains("mon")) return;
