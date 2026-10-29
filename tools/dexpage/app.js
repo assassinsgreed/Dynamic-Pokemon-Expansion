@@ -58,23 +58,24 @@
   // ---------------------------------------------------------------- state & navigation
   // state.view: dex | moves | items | places; move/item/place name the open card; open is the expanded Pokémon
   const state = { view: "dex", q: "", move: null, item: null, place: null, open: null, mode: "", type: "", tab: "level", tabFilter: "",
-    layouts: { dex: "list", moves: "list", tutors: "list", items: "grid", places: "grid" } };  // list or cards, per view
+    doc: null, layouts: { dex: "list", moves: "list", tutors: "list", items: "grid", places: "grid", docs: "list" } };  // list or cards, per view
   try {
     state.mode = localStorage.getItem("dex-mode") || "";
     Object.assign(state.layouts, JSON.parse(localStorage.getItem("dex-layouts") || "{}"));
   } catch (e) {}
   let depth = 0, top = 0;  // position in this page's history, and how far Forward can go
 
-  const snapshot = () => ({ view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, open: state.open });
+  const snapshot = () => ({ view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, doc: state.doc, open: state.open });
   function hashFor(st) {
     if (st.view === "dex" && st.open !== null) return monSlug(st.open);
     if (st.move) return "move-" + slug(moves[st.move].name);
     if (st.item !== null) return "item-" + slug(items[st.item].name);
     if (st.place) return "place-" + slug(st.place);
-    return { dex: "", moves: "moves", tutors: "tutors", items: "items", places: "locations" }[st.view];
+    if (st.doc) return "doc-" + slug(st.doc);
+    return { dex: "", moves: "moves", tutors: "tutors", items: "items", places: "locations", docs: "docs" }[st.view];
   }
   function navigate(change) {
-    const next = Object.assign({ view: state.view, q: "", move: null, item: null, place: null, open: null }, change);
+    const next = Object.assign({ view: state.view, q: "", move: null, item: null, place: null, doc: null, open: null }, change);
     Object.assign(state, next, { tabFilter: "" });
     depth++;
     top = depth;  // a new step discards anything Forward could have returned to
@@ -332,7 +333,8 @@
 
   function alsoLine(q) {  // from the Pokédex, point at matching moves, items and places
     if (q.length < 3) return "";
-    const counts = [["moves", matchMoves(q).length, "move"], ["items", matchItems(q).length, "item"], ["places", matchPlaces(q).length, "location"]].filter(([, n]) => n);
+    const counts = [["moves", matchMoves(q).length, "move"], ["items", matchItems(q).length, "item"], ["places", matchPlaces(q).length, "location"],
+      ["docs", docTopics.filter((t) => t.s.includes(q)).length, "doc topic"]].filter(([, n]) => n);
     return counts.length ? `<div class="also">Also matching: ${counts.map(([v, n, w]) => `<button data-goto="${v}">${n} ${w}${n > 1 ? "s" : ""}</button>`).join("")}</div>` : "";
   }
 
@@ -441,17 +443,39 @@
     return [html, `${rows.length} tutor moves`];
   }
 
+  // Docs: the feature list's topics, grouped by its top-level headings
+  const docTopics = DEX.docs.flatMap((g) => g.topics.map((t) => Object.assign({ group: g.title }, t)));
+
+  function docCard(t) {
+    return `<article class="doccard">${COLLAPSE}<h2>${esc(t.title)}</h2><div class="doc">${t.html}</div></article>`;
+  }
+
+  function docsView(q) {
+    const list = docTopics.filter((t) => !q || t.s.includes(q));
+    if (!list.length) return [`<div class="nores">No topics mention “${esc(state.q)}”.</div>`, "0 topics"];
+    const open = state.doc || (q && (list.find((t) => norm(t.title) === q) || {}).title) || null;
+    const isOpen = (t) => t.title === open;
+    const groups = [];
+    list.forEach((t) => { const g = groups.find(([n]) => n === t.group); g ? g[1].push(t) : groups.push([t.group, [t]]); });
+    const html = groups.map(([g, ts]) => `<div class="cat-head">${esc(g)} · ${ts.length}</div>${state.layouts.docs === "grid"
+      ? chipsWithOpen(ts, (t) => `<button class="chip${isOpen(t) ? " on" : ""}" data-doc="${esc(t.title)}"><span class="ln" style="padding-left:10px">${esc(t.title)}</span></button>`, isOpen, docCard)
+      : `<div class="listtable"><table class="mv"><tbody>${ts.map((t) => `<tr data-doc="${esc(t.title)}"${isOpen(t) ? ' class="on"' : ""}><td><span class="mvname">${esc(t.title)}</span></td></tr>${
+          isOpen(t) ? expandRow(1, docCard(t)) : ""}`).join("")}</tbody></table></div>`}`).join("");
+    return [html, `${list.length} topics`];
+  }
+
   const PLACEHOLDER = {
     dex: "Search Pokémon — e.g. Rockruff, Galarian, Fire",
     moves: "Search moves or TMs — e.g. Ceaseless Edge, TM02",
     tutors: "Search tutor moves or towns — e.g. Draco Meteor, Ferrox Village",
     items: "Search items — e.g. Fire Stone, Berries",
     places: "Search locations — e.g. Route 2, Lake Laplaz",
+    docs: "Search the docs — e.g. Frostbite, Battle Frontier, shiny",
   };
 
   function render(scroll) {
     const q = norm(state.q);
-    const [html, count] = { dex: dexView, moves: movesView, tutors: tutorsView, items: itemsView, places: placesView }[state.view](q);
+    const [html, count] = { dex: dexView, moves: movesView, tutors: tutorsView, items: itemsView, places: placesView, docs: docsView }[state.view](q);
     $("#out").innerHTML = html;
     $("#count").textContent = count;
     $("#q").value = state.q;
@@ -459,14 +483,15 @@
     $("#clear").hidden = !$("#q").value;
     $("#back").disabled = depth <= 0;
     $("#fwd").disabled = depth >= top;
-    $("#typepick").hidden = state.view === "items" || state.view === "places";  // items and places have no type
+    $("#typepick").hidden = ["items", "places", "docs"].includes(state.view);  // these have no type
+    $("#mode-seg").hidden = state.view === "docs";
     document.querySelectorAll("[data-viewtab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.viewtab === state.view)));
     document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
     document.querySelectorAll(".seg button[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.layouts[state.view])));
     $("#type-label").innerHTML = state.type ? typeBadge(state.type) : "All types";
     syncConsoleHeight();
     if (scroll) {
-      const el = (state.open !== null && document.querySelector(`.mon[data-i="${state.open}"]`)) || ((state.move || state.item !== null || state.place) && document.querySelector("tr.on, .chip.on"));
+      const el = (state.open !== null && document.querySelector(`.mon[data-i="${state.open}"]`)) || ((state.move || state.item !== null || state.place || state.doc) && document.querySelector("tr.on, .chip.on"));
       if (el) el.scrollIntoView({ block: "start" }); else window.scrollTo({ top: 0 });
     }
   }
@@ -536,6 +561,12 @@
       else openMove(k);
       return;
     }
+    const dc = t.closest("[data-doc]");
+    if (dc && inList) {
+      e.preventDefault();
+      navigate({ view: "docs", q: state.q, doc: state.doc === dc.dataset.doc ? null : dc.dataset.doc });
+      return;
+    }
     const pl = t.closest("[data-place]");
     if (pl) {
       e.preventDefault();
@@ -593,11 +624,12 @@
   // Links: #rockruff, #move-crunch, #item-fire-stone, #place-route-2, #items … (older #ceaseless-edge style still works)
   function fromHash() {
     const h = decodeURIComponent(location.hash.slice(1));
-    const views = { "": "dex", pokedex: "dex", moves: "moves", tutors: "tutors", items: "items", locations: "places" };
-    Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, open: null });
+    const views = { "": "dex", pokedex: "dex", moves: "moves", tutors: "tutors", items: "items", locations: "places", docs: "docs" };
+    Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, doc: null, open: null });
     if (h in views) state.view = views[h];
     else if (h.startsWith("move-")) { const k = moveKeys.find((x) => slug(moves[x].name) === h.slice(5)); Object.assign(state, k ? { view: "moves", move: k } : { view: "moves", q: h.slice(5).replace(/-/g, " ") }); }
     else if (h.startsWith("item-")) { const k = items.findIndex((it) => slug(it.name) === h.slice(5)); Object.assign(state, k >= 0 ? { view: "items", item: k } : { view: "items", q: h.slice(5).replace(/-/g, " ") }); }
+    else if (h.startsWith("doc-")) { const t = docTopics.find((x) => slug(x.title) === h.slice(4)); Object.assign(state, { view: "docs", doc: t ? t.title : null }); }
     else if (h.startsWith("place-")) { const p = placeList.find((x) => slug(x.name) === h.slice(6)); Object.assign(state, { view: "places", place: p ? p.name : h.slice(6).replace(/-/g, " ") }); }
     else {
       const bySlug = mons.findIndex((_, i) => monSlug(i) === h);

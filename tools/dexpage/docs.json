@@ -1,0 +1,5748 @@
+[
+ {
+  "title": "Overview",
+  "topics": [
+   {
+    "title": "Credits",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "I am the sole developer of Pokemon Amethyst with testing support from Crystal, but this project absolutely would not be possible without the wonderful open source contributions of the following. In general, these are all free to use in hacks with proper accreditation (but you should of course double check!)"
+     },
+     {
+      "t": "p",
+      "html": "<b>Look and Feel</b>"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "<a href=\"https://github.com/Skeli789/Dynamic-Pokemon-Expansion\" target=\"_blank\" rel=\"noopener\">Dynamic Pokemon Expansion</a> and <a href=\"https://github.com/Skeli789/Complete-Fire-Red-Upgrade\" target=\"_blank\" rel=\"noopener\">Complete Fire Red Upgrade</a> by Skeli and Ghoulslash (See CFRU credits for all contributors!)"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/showthread.php?t=438646\" target=\"_blank\" rel=\"noopener\">Decapitalization</a> by Leon Dias"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/showthread.php?t=333996\" target=\"_blank\" rel=\"noopener\">Diamond/Pearl/Platinum font face</a> by Sierraffinity"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/showthread.php?t=414022\" target=\"_blank\" rel=\"noopener\">BW style party screen</a> by Kiy, usigusom, (), and 黒インク"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/showthread.php?t=399121\" target=\"_blank\" rel=\"noopener\">BW style summary screen</a> by Againsts"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/showthread.php?t=410584\" target=\"_blank\" rel=\"noopener\">BW style message boxes</a> by Green Jerry"
+       ],
+       [
+        0,
+        "<a href=\"https://github.com/Greenphx9/Complete-Fire-Red-Upgrade/tree/master/graphics/DexNav\" target=\"_blank\" rel=\"noopener\">BW style dexnav</a> by Greenphx"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/showthread.php?t=488444\" target=\"_blank\" rel=\"noopener\">BW2 style battle HUD</a> by Verloren 5"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/showthread.php?t=402253\" target=\"_blank\" rel=\"noopener\">BW &amp; BW2 music</a> by LukeeGD, GoGoJJTech, Wobbu, and ipatix"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/threads/b2w2-styled-bag-tm-case-and-berry-pouch-2020s-edition.486329/)%20and%20%5BMart%5D(https://www.pokecommunity.com/threads/b2w2-styled-pok%C3%A9mon-mart-menu-2020s-edition.491299/\" target=\"_blank\" rel=\"noopener\">BW style bag</a> by Enn, Froosty, and VentZX"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "<b>Overworld Sprites</b>"
+     },
+     {
+      "t": "p",
+      "html": "Most overworld sprites have been modified and adapted to fit the game. This typically means resizing the sprite and changing some dimensions to fit within a GBA game (for example, if they were created for DS)"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/showthread.php?p=10119266#post10119266\" target=\"_blank\" rel=\"noopener\">Gen 8 Overworld sprites</a> by SageDeoxys"
+       ],
+       [
+        0,
+        "<a href=\"https://reliccastle.com/resources/952/\" target=\"_blank\" rel=\"noopener\">Gen 8 Pack</a> by SageDeoxys, Wolfgang62, Larryturbo, and tammyclaydon"
+       ],
+       [
+        1,
+        "Relic Castle has been shut down"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/threads/splashs-snow-patch.371147/\" target=\"_blank\" rel=\"noopener\">Winter overworld tiles</a> by Fanking Omega (tiles) and Splash (Insertion)"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/aveontrainer/art/Skier-F-971158514\" target=\"_blank\" rel=\"noopener\">Female Skier overworld sprite</a> by aveontrainer"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/aveontrainer/art/Pryce-851223552\" target=\"_blank\" rel=\"noopener\">Pryce overworld sprite</a> by aveontrainer"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/larryturbo/art/Mega-Evolution-Pokemon-Overworld-Sprites-809876921\" target=\"_blank\" rel=\"noopener\">Groudon and Kyogre overworld sprites (dormant, regular, and primal)</a> by Kidkatt, Larryturbo, and Princess-Phoenix"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/j-treecko252/art/Palm-Tree-Tiles-898198236\" target=\"_blank\" rel=\"noopener\">Palm Tree sprite</a> by J-Treecko252"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/clara-dragon/art/Zeraora-Overworld-Sprite-858789362\" target=\"_blank\" rel=\"noopener\">Zeraora sprite</a> by Clara-Dragon"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/wolfang62/art/Meltan-Overworld-789786784\" target=\"_blank\" rel=\"noopener\">Meltan Sprite</a> by Larryturbo and Wolfgang62"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/threads/hgss-overworld-sprite-in-fr-style.408123/\" target=\"_blank\" rel=\"noopener\">HGSS Ace Trainer sprites</a> by Delta231"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/stash/01j9toqt9fcu\" target=\"_blank\" rel=\"noopener\">BW Lass</a> by Kalarie"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/aveontrainer/art/Volkner-885638384\" target=\"_blank\" rel=\"noopener\">Volkner</a> by aveontrainer"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/ulithiumdragon/art/Sprite-Roxie-Custom-Overworld-Gen-III-Style-697405599\" target=\"_blank\" rel=\"noopener\">Roxie</a> by UlithiumDragon"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/aveontrainer/art/Darach-966459642\" target=\"_blank\" rel=\"noopener\">Darach</a> by aveontrainer and Diego_WT"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/clara-dragon/art/UltraWormhole-for-Pokemon-Essentials-858790730\" target=\"_blank\" rel=\"noopener\">Ultra Wormholes</a> by Clara-Dragon"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/shadowurshifu/art/Ultra-necrozma-overworld-1032109036\" target=\"_blank\" rel=\"noopener\">Ultra Necrozma</a> and <a href=\"https://www.deviantart.com/shadowurshifu/art/Necrozma-dawn-wings-overworld-1032399977\" target=\"_blank\" rel=\"noopener\">Dawn Wings Necrozma</a> by shadowurshifu"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "<b>Battle Backgrounds</b>"
+     },
+     {
+      "t": "p",
+      "html": "Much like overworld sprites, these have sometimes been modified to fit the GBA resolution or to slide in as gracefully as possible."
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/kwharever/art/Battle-Backgrounds-v-2-FREE-TO-USE-768031287\" target=\"_blank\" rel=\"noopener\">General backgrounds</a> by KWharever, Zeo254, and WesleyFG"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/carchagui/art/Cave-background-801963976\" target=\"_blank\" rel=\"noopener\">Cave background</a>, <a href=\"https://www.deviantart.com/carchagui/art/Mountain-background-816916215\" target=\"_blank\" rel=\"noopener\">Mountain background</a>, and <a href=\"https://www.deviantart.com/carchagui/art/Lake-background-V2-630226314\" target=\"_blank\" rel=\"noopener\">pond background</a> by charchagui"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/princess-phoenix/art/Some-Battle-Backgrounds-811856812\" target=\"_blank\" rel=\"noopener\">Gym background</a> by Princess-Phoenix"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/aveontrainer/art/battlebgSwamp2-790658486\" target=\"_blank\" rel=\"noopener\">Swamp background</a> by aveontrainer, 44Tim44 (water reference), Tacoma29 (reeds) and adrix89 (lily pad &amp; trees)"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/aveontrainer/art/battlebgLava-812335908\" target=\"_blank\" rel=\"noopener\">Volcano background</a> by aveontrainer, Cyangmou, Saint11, charcagui, and ThanatosIXII"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/threads/rom-hacking-sprites-pack-overworlds-trainer-sprites-tilesets-and-more.527581/\" target=\"_blank\" rel=\"noopener\">Space background</a> by LibertyTwins"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "<b>Battle Sprites</b>"
+     },
+     {
+      "t": "p",
+      "html": "Like other graphics, these were sometimes modified by me to fit within GBA dimensions. In many cases, I modified details of the sprites to fit the characters in the story."
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/baysenahiru427/art/Pokemon-Nurse-Joy-sprite-357205318\" target=\"_blank\" rel=\"noopener\">Nurse Joy</a> by BaysenAhiru427"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/threads/the-ds-style-64x64-trainer-sprite-resource.308798/\" target=\"_blank\" rel=\"noopener\">HGSS Ace Trainers</a> by Rizon and Falsever"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/threads/the-ds-style-64x64-trainer-sprite-resource.308798/\" target=\"_blank\" rel=\"noopener\">BW Lass</a> and <a href=\"https://www.pokecommunity.com/threads/the-ds-style-64x64-trainer-sprite-resource.308798/\" target=\"_blank\" rel=\"noopener\">BW Guitarist</a> by Sky High"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/threads/gba-64x64-16-colour-trainer-sprites.463927/\" target=\"_blank\" rel=\"noopener\">Darach</a> by Greenphx"
+       ],
+       [
+        0,
+        "<a href=\"https://www.deviantart.com/sacredgbc123/art/GBA-Formatted-Hilda-Battle-Sprite-from-BW-951896655\" target=\"_blank\" rel=\"noopener\">Hilda</a> by Sacredgbc123"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/threads/gba-64x64-16-colour-trainer-sprites.463927/\" target=\"_blank\" rel=\"noopener\">Palmer</a> and Cheryl by Greenphx"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "<b>Gameplay Features</b>"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/showthread.php?p=10359306\" target=\"_blank\" rel=\"noopener\">Functional Sunny Weather</a> by vinylfantasy and Mr.Pkmn"
+       ],
+       [
+        0,
+        "Custom egg code by Greenphx"
+       ],
+       [
+        0,
+        "Enhanced TM Case design by Greenphx"
+       ],
+       [
+        0,
+        "CFRU-Injectible trainers by Stevebel"
+       ],
+       [
+        0,
+        "<a href=\"https://github.com/BluRosie/firegold-code/tree/continue-screen-icons\" target=\"_blank\" rel=\"noopener\">Continue Screen icons</a> by BluRosie"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/showthread.php?t=252704\" target=\"_blank\" rel=\"noopener\">RSE Tall Grass</a> by knizz"
+       ],
+       [
+        0,
+        "<a href=\"https://discord.com/channels/246335518369906689/599692096479166485/1140365979080196137\" target=\"_blank\" rel=\"noopener\">Nature Changing</a> by André Freitas"
+       ],
+       [
+        0,
+        "<a href=\"https://www.pokecommunity.com/threads/some-patch-for-firered.501531/\" target=\"_blank\" rel=\"noopener\">No Save Confirmation</a> by Yave Yu<br>"
+       ]
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "title": "Quality of Life Changes",
+  "topics": [
+   {
+    "title": "Shiny Rate",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The base shiny rate is 1/4096. When the Shiny Charm is held, this increases to 1/100. The shiny charm is given by Professor Hawthorne when assassing your Pokedex in person, if 75%+ of the dex is filled."
+     },
+     {
+      "t": "p",
+      "html": "The Masuda breeding method and chain fishing are in the game. Masuda breeding will be challenging because there are limited in game trades and no external trades."
+     },
+     {
+      "t": "p",
+      "html": "If you attempt to run from a shiny, you will be asked to confirm so you don’t accidentally mispress. If the <b>All Shinies</b> game modifier is on, this confirmation will not happen."
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "title": "Pokemon Changes",
+  "topics": [
+   {
+    "title": "Evolutions",
+    "blocks": [
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Gurdurr, Boldore, and Phantump evolve with a Linking Cord, which can be bought from Daimyn City Mall"
+       ],
+       [
+        0,
+        "Farfetch’d (Galarian) now evolves with friendship, to be less strenuous"
+       ],
+       [
+        1,
+        "In v1.3 it can also evolve by getting 3+ crits in a single battle"
+       ],
+       [
+        0,
+        "Meltan evolves when an electric type is in the party"
+       ],
+       [
+        0,
+        "Yamask-G evolves at level 35"
+       ],
+       [
+        0,
+        "Charjabug can evolve by levelling up at Daimyn Factory, or when using a Thunder Stone"
+       ],
+       [
+        0,
+        "Crabrawler can evolve by levelling up on Route 12 West, or when using an Ice Stone"
+       ],
+       [
+        0,
+        "Cosmoem evolves into either Solgaleo or Lunala depending on the time of day. The other form is not missable"
+       ],
+       [
+        0,
+        "Slowpoke/Seadra/Dusclops evolve by using King’s Rock/Dragon Scale/Reaper Cloth on them respectively from the bag"
+       ],
+       [
+        0,
+        "Sneasel still evolves by holding a Razor Claw and levelling up at night"
+       ],
+       [
+        0,
+        "Toxel evolves into Amped or Low Key form based on its underlying personality traits, like Cascoon and Silcoon."
+       ],
+       [
+        0,
+        "Rockruff evolves into Lycanroc-Dusk during the evening timeslot (5pm-8pm). Own Tempo is not required."
+       ],
+       [
+        0,
+        "Nosepass can evolve by levelling up in Hesson Pass or with a Metal Coat"
+       ],
+       [
+        0,
+        "Sinistea only evolves with a Cracked Pot"
+       ],
+       [
+        0,
+        "Cubone evolves into Marowak during the morning/day and Alolan Marowak during evening/night"
+       ],
+       [
+        0,
+        "Pokemon that evolve into a Hisuian form (ex. Starters, Lilligant, etc.) will only evolve into their Hisuian form if they hold a Hisui Rock when triggering their normal evolution method (ex. Level, Sun Stone, etc.). Hisuian forms are introduced in v1.4."
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Moves",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Some Pokemon have had movesets expanded somewhat, to better utilize their new megas."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Pokemon</b>",
+        "<b>New Moves</b>"
+       ],
+       [
+        "Grookey’s line",
+        "Rock Tomb (TM)<br>Smack Down (TM)<br>Rock Slide (TM, Thwacky &amp; Rillaboom only)"
+       ],
+       [
+        "Butterfree",
+        "Draining Kiss (lvl 10)<br>Dazzling Gleam (lvl 38, TM)"
+       ],
+       [
+        "Blastoise",
+        "Iron Head (TM)"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "Additionally, more pokemon can use Terrain Pulse now, to make its TM reward more useful."
+     }
+    ]
+   },
+   {
+    "title": "Fossil Pokemon",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Fossil resurrection is not present in the game. They are instead found in the wild like normal Pokemon."
+     }
+    ]
+   },
+   {
+    "title": "Beast Ball",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The beast ball has a 0.1x rate on all non-Ultra Beast Pokemon. Necrozma and its forms are considered Ultra Beasts for PokeBall checks."
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "title": "Battle Changes",
+  "topics": [
+   {
+    "title": "Type Icons",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Prior to choosing an action (attacking, switching, etc.), type icons will pop up in battle for both you and your opponent(s). While the game will always show the effectiveness of moves when choosing to attack, this can be helpful when deciding what to switch to."
+     },
+     {
+      "t": "img",
+      "src": "image3.png"
+     }
+    ]
+   },
+   {
+    "title": "Frostbite",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The Freeze status has been replaced with Frostbite. When afflicted, Pokemon lose 1/16th of their HP each turn and their special attack is halved. It’s functionally special-burn."
+     }
+    ]
+   },
+   {
+    "title": "Dark Grass",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "When starting an encounter in dark grass (right in screenshot), there is a 50% chance to trigger a wild double battle. Pokemon cannot be caught unless the other found Pokemon has fainted."
+     },
+     {
+      "t": "img",
+      "src": "image8.png"
+     }
+    ]
+   },
+   {
+    "title": "Critical Captures",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "As the player’s Pokedex entries fill up with caught Pokemon, the player is increasingly likely to perform a Critical Capture. When this happens, the ball shakes in midair and only has to shake once for a capture to be performed. The chance of this occurring is driven by the Pokedex’s completion rate, as well as the catch rate of the Pokemon (modified based on their hp, status, and the ball being used)."
+     },
+     {
+      "t": "p",
+      "html": "Holding the Catching Charm (given by an NPC in Heleo City’s Pokemon Center after successfully completing 5 critical captures) doubles the likelihood of triggering a critical capture."
+     },
+     {
+      "t": "p",
+      "html": "<i>Likelihood for a full HP Pokemon, catch rate of 30, no status, with a Poke Ball:</i>"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Unique Species Caught</b>",
+        "<b>Likelihood</b>",
+        "<b>Likelihood With Catch Charm</b>"
+       ],
+       [
+        "&lt;= 30",
+        "0%",
+        "0%"
+       ],
+       [
+        "&lt;= 75",
+        "0%",
+        "0.4%"
+       ],
+       [
+        "&lt;= 150",
+        "0.4%",
+        "1.2%"
+       ],
+       [
+        "&lt;= 225",
+        "0.8%",
+        "2.0%"
+       ],
+       [
+        "&lt;= 300",
+        "1.2%",
+        "2.3%"
+       ],
+       [
+        "&lt;= 350",
+        "1.6%",
+        "3.1%"
+       ],
+       [
+        "&gt; 350",
+        "2.0%",
+        "3.9%"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "<i>Likelihood for a 1 HP Pokemon, catch rate of 30, sleeping, with an Ultra Ball:</i>"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Unique Species Caught</b>",
+        "<b>Likelihood</b>",
+        "<b>Likelihood With Catch Charm</b>"
+       ],
+       [
+        "&lt;= 30",
+        "0%",
+        "0%"
+       ],
+       [
+        "&lt;= 75",
+        "4.7%",
+        "9.4%"
+       ],
+       [
+        "&lt;= 150",
+        "9.4%",
+        "19.1%"
+       ],
+       [
+        "&lt;= 225",
+        "14.1%",
+        "28.5%"
+       ],
+       [
+        "&lt;= 300",
+        "19.1%",
+        "38.3%"
+       ],
+       [
+        "&lt;= 350",
+        "23.8%",
+        "47.7%"
+       ],
+       [
+        "&gt; 350",
+        "28.5%",
+        "57.4%"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Trainer Mugshots and Slide-Ins",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Important trainers like gym leaders and rivals will trigger mugshots before their battles, for dramatic effect:<br>"
+     },
+     {
+      "t": "img",
+      "src": "image16.png"
+     },
+     {
+      "t": "p",
+      "html": "<br><br>When battling these trainers, they will also slide in during the battle to remark on the following events:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Their first Pokemon faints"
+       ],
+       [
+        0,
+        "Their last Pokemon is sent in"
+       ],
+       [
+        0,
+        "Their last Pokemon is at low HP"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "Furthermore, Gym Leaders’ battle music will change when they send out their last Pokemon, leading to a thrilling finale to the fight!"
+     }
+    ]
+   },
+   {
+    "title": "Partner Battles",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "During certain points in the story, the player will team up with another trainer to battle for a bit. The player brings the first 3 Pokemon in their party, and the other trainer does the same. <br><br>"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>When</b>",
+        "<b>What</b>",
+        "<b>Who</b>"
+       ],
+       [
+        "Rubarr Desert Team Pluto Events",
+        "2 back to back battles",
+        "Rival"
+       ],
+       [
+        "Route 11 South Team Pluto Events",
+        "Overworld exploration and battles",
+        "Rival or Alistair, player can swap at will"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "<br>When travelling with another trainer during the Route 11 South Team Pluto event, the player will be healed after each battle."
+     }
+    ]
+   },
+   {
+    "title": "Mega Pokemon",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "All Pokemon in the Pokedex have mega stones, which can either be found in the overworld or through exploration. Mega Stones can be collected any time, but can only be used after Team Pluto is thwarted on Route 11."
+     },
+     {
+      "t": "p",
+      "html": "See <b>Locations &gt; Mega Stones</b> for where Mega Stones can be found. As a reminder, mega Pokemon availability depends on the mode you are playing (Standard or Divergent) as of v1.3."
+     },
+     {
+      "t": "p",
+      "html": "<br>All official mega Pokemon are unchanged (re: their stats, types, and abilities), while Pokemon with Gigantamax forms have had those forms converted into Megas, complete with stat, ability, and type changes that I felt were reflective of their new forms."
+     },
+     {
+      "t": "p",
+      "html": "The breakdown for Gigantamax-&gt;Mega conversions is:"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Pokemon</b>",
+        "<b>Types</b>",
+        "<b>Ability</b>",
+        "<b>HP</b>",
+        "<b>Atk</b>",
+        "<b>Def</b>",
+        "<b>Sp.Atk</b>",
+        "<b>Sp.Def</b>",
+        "<b>Spd</b>",
+        "<b>Info</b>"
+       ],
+       [
+        "<b>Venusaur</b>",
+        "Grass/<br>Poison",
+        "Triage",
+        "80",
+        "90",
+        "133",
+        "112",
+        "130",
+        "80",
+        "Even Bulkier"
+       ],
+       [
+        "<b>Charizard</b>",
+        "Fire/<br>Ground",
+        "Turboblaze",
+        "78",
+        "129",
+        "88",
+        "149",
+        "110",
+        "80",
+        "Less speed for more bulk"
+       ],
+       [
+        "<b>Blastoise</b>",
+        "Water/<br>Steel",
+        "Shell Armor",
+        "79",
+        "133",
+        "120",
+        "95",
+        "125",
+        "78",
+        "Physically offensive version of M-Blastoise"
+       ],
+       [
+        "<b>Lapras</b>",
+        "Water/<br>Dragon",
+        "Liquid Voice",
+        "130",
+        "105",
+        "120",
+        "135",
+        "115",
+        "30",
+        "Less speed for higher stats"
+       ],
+       [
+        "<b>Melmetal</b>",
+        "Steel",
+        "Iron Fist",
+        "135",
+        "168",
+        "163",
+        "110",
+        "90",
+        "34",
+        "Play to strength"
+       ],
+       [
+        "<b>Rillaboom</b>",
+        "Grass/<br>Rock",
+        "Moxie",
+        "100",
+        "135",
+        "115",
+        "75",
+        "95",
+        "90",
+        "More offensive"
+       ],
+       [
+        "<b>Cinderace</b>",
+        "Fire",
+        "Libero",
+        "80",
+        "146",
+        "95",
+        "90",
+        "85",
+        "134",
+        "Faster &amp; more physically offensive"
+       ],
+       [
+        "<b>Intelleon</b>",
+        "Water/<br>Ghost",
+        "Sniper",
+        "70",
+        "105",
+        "65",
+        "155",
+        "85",
+        "150",
+        "Faster &amp; hits harder"
+       ],
+       [
+        "<b>Corviknight</b>",
+        "Flying/<br>Steel",
+        "Gale Wings",
+        "98",
+        "127",
+        "125",
+        "43",
+        "115",
+        "87",
+        "Physically oriented and a bit faster"
+       ],
+       [
+        "<b>Orbeetle</b>",
+        "Bug/<br>Psychic",
+        "Infiltrator",
+        "60",
+        "55",
+        "130",
+        "130",
+        "140",
+        "90",
+        "Bump the special attack up to usable levels"
+       ],
+       [
+        "<b>Coalossal</b>",
+        "Rock/<br>Fire",
+        "Solid Rock",
+        "110",
+        "110",
+        "160",
+        "100",
+        "100",
+        "30",
+        "Physically tanky"
+       ],
+       [
+        "<b>Toxtricity</b>",
+        "Electric/<br>Poison",
+        "Punk Rock",
+        "75",
+        "113",
+        "85",
+        "144",
+        "100",
+        "85",
+        "Continuing it’s rounded stat distro"
+       ],
+       [
+        "<b>Centiskorch</b>",
+        "Fire/<br>Bug",
+        "Strong Jaw",
+        "100",
+        "145",
+        "85",
+        "100",
+        "100",
+        "95",
+        "Buff up physical capabilities"
+       ],
+       [
+        "<b>Hatterene</b>",
+        "Psycic/<br>Fairy",
+        "Magic Guard",
+        "57",
+        "100",
+        "125",
+        "166",
+        "143",
+        "19",
+        "Buff up defenses and special attack"
+       ],
+       [
+        "<b>Copperajah</b>",
+        "Steel/<br>Fighting",
+        "Analytic",
+        "122",
+        "160",
+        "109",
+        "90",
+        "89",
+        "30",
+        "More physical offense and better defenses"
+       ],
+       [
+        "<b>Duraludon</b>",
+        "Steel/<br>Dragon",
+        "Mirror Armor",
+        "70",
+        "115",
+        "150",
+        "140",
+        "85",
+        "75",
+        "Shore up defenses and bump special attack"
+       ],
+       [
+        "<b>Butterfree</b>",
+        "Bug/<br>Fairy",
+        "Tinted Lens",
+        "60",
+        "25",
+        "75",
+        "150",
+        "100",
+        "85",
+        "Buff it up similar to Beedrill"
+       ],
+       [
+        "<b>Machamp</b>",
+        "Fighting",
+        "Iron Fist",
+        "90",
+        "170",
+        "115",
+        "55",
+        "105",
+        "70",
+        "Emphasize its strengths"
+       ],
+       [
+        "<b>Gengar</b>",
+        "Ghost/<br>Dark",
+        "Shadow Shield",
+        "60",
+        "35",
+        "110",
+        "160",
+        "135",
+        "100",
+        "A bulky spin on Gengar’s other mega"
+       ],
+       [
+        "<b>Kingler</b>",
+        "Water",
+        "Tough Claws",
+        "55",
+        "170",
+        "125",
+        "40",
+        "75",
+        "110",
+        "Capitalise on its heavy hitting attacks"
+       ],
+       [
+        "<b>Snorlax</b>",
+        "Normal/<br>Ground",
+        "Triage",
+        "160",
+        "130",
+        "105",
+        "65",
+        "150",
+        "30",
+        "Bump up that bulk"
+       ],
+       [
+        "<b>Garbodor</b>",
+        "Poison",
+        "Poison Touch",
+        "80",
+        "130",
+        "117",
+        "70",
+        "112",
+        "65",
+        "Leaning into its bulky new size"
+       ],
+       [
+        "<b>Drednaw</b>",
+        "Water/<br>Rock",
+        "Stamina",
+        "90",
+        "140",
+        "120",
+        "48",
+        "103",
+        "84",
+        "Building up physical prowess"
+       ],
+       [
+        "<b>Flapple</b>",
+        "Grass/<br>Dragon",
+        "Regenerator",
+        "70",
+        "150",
+        "90",
+        "115",
+        "60",
+        "100",
+        "The more offensive one"
+       ],
+       [
+        "<b>Appletun</b>",
+        "Grass/<br>Dragon",
+        "Gooey",
+        "110",
+        "95",
+        "100",
+        "130",
+        "110",
+        "40",
+        "The bulkier one"
+       ],
+       [
+        "<b>Sandaconda</b>",
+        "Ground/<br>Flying",
+        "Sand Spit (v1.3) or Aeriliate (v1.4+)",
+        "72",
+        "137",
+        "150",
+        "85",
+        "80",
+        "86",
+        "Building on it’s strengths while pairing with sandstorm for allies"
+       ],
+       [
+        "<b>Grimmsnarl</b>",
+        "Dark/<br>Fairy",
+        "Defiant",
+        "95",
+        "150",
+        "85",
+        "115",
+        "95",
+        "70",
+        "All-rounder upgrade"
+       ],
+       [
+        "<b>Alcremie</b>",
+        "Fairy",
+        "Fairy Aura",
+        "65",
+        "70",
+        "95",
+        "140",
+        "141",
+        "84",
+        "Rounding out its stats"
+       ],
+       [
+        "<b>Urshifu-S</b>",
+        "Fighting/<br>Dark",
+        "Sheer Force",
+        "100",
+        "170",
+        "110",
+        "73",
+        "70",
+        "127",
+        "Leaning into heavy hits"
+       ],
+       [
+        "<b>Urshifu-R</b>",
+        "Fighting/<br>Water",
+        "Technician",
+        "100",
+        "150",
+        "120",
+        "63",
+        "80",
+        "137",
+        "Pairs nicely with Surging Strikes"
+       ]
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "title": "Gameplay Features",
+  "topics": [
+   {
+    "title": "PokeChips",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "PokeChips are a new currency introduced in Pokemon Amethyst, which are used at various vendors such as Move Tutors. They are randomly received after wild battles with the following criteria:"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "Rate",
+        "Criteria"
+       ],
+       [
+        "20%",
+        "Base Rate"
+       ],
+       [
+        "45%",
+        "PokeChip Charm held"
+       ],
+       [
+        "+15%",
+        "Battle started with Sweet Scent or Honey"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "For example, if you have the PokeChip Charm and used Sweet Scent to start the battle, your chance of finding a PokeChip is 60%. In double wild battles, each Pokemon has a chance to drop a PokeChip."
+     }
+    ]
+   },
+   {
+    "title": "Game Modifiers",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Game Modifiers allow the player to tweak the way the game works, and can be freely toggled off and on at the PC in the player’s room. Each can be unlocked by completing postgame criteria (each of which is mentioned by the modifier itself) or with a code (to allow it to be used in new games). <br><br>The codes are provided here, which can be copy-pasted to a text editor to reveal. While I recommend playing Pokemon Amethyst for the first time without modifiers to get the intended experience, it’s ultimately your decision and you can choose what’s fun for you!"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Modifier</b>",
+        "<b>What it does</b>",
+        "<b>Code</b>"
+       ],
+       [
+        "Randomizer (Species)",
+        "Allows players to randomize all Pokemon encountered in the game. The player may choose to randomize with Pokemon found in Kulure or all from gens 1-8.<br>This is a 1:1 replacement based on a unique seed on the save. If Rattata is replaced by Jirachi, all Rattata will become Jirachis.<br>Note: this is fully supported as of v1.4. Some items are present in game data but otherwise inaccessible (ex. DNA Splicers), in case you want to hack them in.",
+        "DITTOMODE"
+       ],
+       [
+        "Randomizer (Movesets)",
+        "Pokemon movesets are randomized.",
+        "SHAKEITUP"
+       ],
+       [
+        "Randomizer (Abilities)",
+        "Pokemon abilities are randomized.",
+        "ADAPTABLE"
+       ],
+       [
+        "Inverse Battles",
+        "All battles use the Inverse battle ruleset, where type effectiveness is reversed.<br>This is not disabled by the Heleo City Trainer House.",
+        "OPPOSITEDAY"
+       ],
+       [
+        "Camomon Battles",
+        "All battles use the Camomon battle ruleset, where a Pokemon’s type is dedicated by the types of its first two moves.<br>This is not disabled by the Emraldin Quay Trainer House.",
+        "CHAMELEON"
+       ],
+       [
+        "Double Battles",
+        "All battles (whenever possible) are double battles. This requires both trainers to have 2+ healthy Pokemon.",
+        "TWOFORONE"
+       ],
+       [
+        "Guaranteed Captures",
+        "Every Pokeball works without fail.",
+        "TOOSKILLED"
+       ],
+       [
+        "Catch Trainer Pokemon",
+        "The player can attempt to catch any trainer’s Pokemon. The battle will end immediately after.<br>The Pokemon’s OT and IVs are dependent on the trainer and their trainer class, respectively.",
+        "SNAGEM"
+       ],
+       [
+        "Scale Wild Pokemon Levels",
+        "Wild Pokemon always scale to the highest level in the player’s party.",
+        "STRONGWILD"
+       ],
+       [
+        "Scale Trainer Pokemon Levels",
+        "Trainer Pokemons’ levels are always scaled to the highest level in the player’s party.<br>Some trainers already do this in the game. If this modifier is active, the scaling is not disabled after those battles.",
+        "WELLTRAINED"
+       ],
+       [
+        "Always Hidden Abilities",
+        "All Pokemon are generated with their hidden abilities, if they have one.",
+        "REVEALALL"
+       ],
+       [
+        "Shiny Pokemon",
+        "All Pokemon appear shiny.",
+        "GLITTERING"
+       ],
+       [
+        "Move Reminder Teaches All Moves",
+        "The move reminder in Daimyn City will teach level up moves regardless of the Pokemon’s current level.",
+        "ENLIGHTENED"
+       ],
+       [
+        "Keep Held Items After Battle",
+        "If a held item is consumed or otherwise lost in battle, it is restored afterward.",
+        "MINEMINEMINE"
+       ],
+       [
+        "Show All Pokmeon in DexNav",
+        "The player can see all Pokemon on a route in the DexNav interface, without the need to have seen it already.",
+        "FOUNDYOU"
+       ],
+       [
+        "Instant Weather in Battle",
+        "All battles start with a chosen weather. This is not overridden by overworld locations but can be by a Pokemon’s ability or move.",
+        "FORECAST"
+       ],
+       [
+        "Instant Terrain in Battle",
+        "All battles start with a chosen terrain. This is not overridden by overworld locations but can be by a Pokemon’s ability or move.",
+        "ALLTERRAIN"
+       ],
+       [
+        "Instant Friendship",
+        "All Pokemon are generated with max friendship.",
+        "BFFS"
+       ],
+       [
+        "Perfect Wild IVs",
+        "All wild Pokemon have perfect IVs once caught. Introduced in v1.4",
+        "PRETTYGOOD"
+       ],
+       [
+        "Enable EV/IV Viewer",
+        "The EV/IV Viewer can be accessed from a Pokemon’s Stats Screen. Introduced in v1.3.",
+        "OVER9000"
+       ],
+       [
+        "Repeated Mega Evolution",
+        "Mega Evolution can be used multiple times per battle. Introduced in v1.4",
+        "UPTOELEVEN"
+       ],
+       [
+        "Toggle Divergent Species",
+        "Adds the ability to flip between Standard and Divergent Species modes in the Options menu. Introduced in v1.3.",
+        "MIRRORMODE"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "As of v1.4.3 you may enter the Konami Code while in the player’s room to unlock all remaining game modifiers. This is provided to make challenge runners’ lives a bit easier."
+     }
+    ]
+   },
+   {
+    "title": "Special Poke Balls",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Apricorn balls can be bought in Laplaz Town for 2 PokeChips, once per day. All apricorn balls are available (Fast Ball, Level Ball, Lure Ball, Heavy Ball, Love Ball, Friend Ball, and Moon Ball)."
+     },
+     {
+      "t": "p",
+      "html": "Additionally, a traveller in Daimyn City’s Pokemon Center will sell a random special ball once per day. This can be a Safari Ball, Sport Ball, Park Ball, or Dream Ball."
+     }
+    ]
+   },
+   {
+    "title": "Poke Ball Swapping",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Players can change the Poke Ball a Pokemon is in in Bruccie Village. This will cost 2 PokeChips and can be used for any ball except for Dynamax (which are not available in game; this would come from cheats) and Cherish balls."
+     },
+     {
+      "t": "p",
+      "html": "<br>The original ball is lost until the worker becomes skilled after performing 5 jobs, after which you’ll receive the original ball back."
+     }
+    ]
+   },
+   {
+    "title": "PokeChip Crusher",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "In Tsarvosa City, the player can crush excess PokeChips to craft items from. This is a great way to convert unneeded chips into useful items, especially in the postgame when tutoring becomes less impactful."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Chip Cost</b>",
+        "<b>Item</b>"
+       ],
+       [
+        "5",
+        "Max Revive"
+       ],
+       [
+        "10",
+        "PPMax"
+       ],
+       [
+        "10",
+        "Rare Candy"
+       ],
+       [
+        "15",
+        "Bottle Cap"
+       ],
+       [
+        "15",
+        "Ability Capsule"
+       ],
+       [
+        "25",
+        "Ability Patch"
+       ],
+       [
+        "35",
+        "Gold Bottle Cap"
+       ],
+       [
+        "50",
+        "Master Ball"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Friendship",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "A Pokemon’s friendship is represented by a heart in their summary screen, which fills as affection grows. Friendship can grow by walking, staying in the daycare, using items on the Pokemon, or by using the Pokemon Groomer’s services in Heleo City."
+     },
+     {
+      "t": "p",
+      "html": "Pokemon with 220 (or more) out of 255 friendship points will gain 1.2x EXP in battle."
+     },
+     {
+      "t": "img",
+      "src": "image6.png"
+     }
+    ]
+   },
+   {
+    "title": "Gyms",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The Kulure region’s gyms focus on battle mechanics instead of type specialty."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>#</b>",
+        "<b>Location</b>",
+        "<b>Specialty</b>"
+       ],
+       [
+        "1",
+        "Rhodanzi City",
+        "Battle terrains"
+       ],
+       [
+        "2",
+        "Ferrox Village",
+        "Status effects"
+       ],
+       [
+        "3",
+        "Heleo City",
+        "Weather"
+       ],
+       [
+        "4",
+        "Daimyn City",
+        "Gimmicky / Momentum changing moves"
+       ],
+       [
+        "5",
+        "Laplaz Town",
+        "Stat changes"
+       ],
+       [
+        "6",
+        "Bruccie Village",
+        "Abilities"
+       ],
+       [
+        "7",
+        "Tsarvosa City",
+        "Held items"
+       ],
+       [
+        "8",
+        "Uteya Village",
+        "Double battles"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Gym Trainees & Z-Crystals",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The Gym Trainees, found in a house in Tsarvosa City, fill the conventional type-focused gap left by gyms with a trainee for each type. When entering the house, 3-5 of the available 18 types are chosen at random. Saving is disabled here, due to how trainees are loaded into the map."
+     },
+     {
+      "t": "p",
+      "html": "When a trainee is defeated, they will give the player items related to their type specialty:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "The type-raising item (ex. Charcoal, Mystic Water, etc.)"
+       ],
+       [
+        0,
+        "The type-specific gem (ex. Fire Gem, Water Gem, etc.)"
+       ],
+       [
+        0,
+        "The super-effective damage reducing berry (ex. Occa Berry, Passho Berry, etc.)"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "Afterward, they will offer to teach any Pokemon of their specialty type 1 of 3 moves, chosen at random. See <b>Move Tutors</b>’ <b>Special</b> section for more details."
+     },
+     {
+      "t": "p",
+      "html": "After clearing the postgame Ultra Episode, they will also give the player their respective Z-Crystal, if the player beats them with a team containing only their specialty type (dual-types are permitted)."
+     },
+     {
+      "t": "p",
+      "html": "In v1.4, species-specific Z-Crystals can be purchased at the Battle Frontier. Some Z-Crystals are unavailable due to their species not being found through normal play (ex. Mew); their item data is present in the game and fully tested in case you want to hack the item in yourself."
+     }
+    ]
+   },
+   {
+    "title": "Move Relearner and Deleter",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The Move Relearner and Deleter are both found in Daimyn City, north of the Interdimensional Research Facility. Their services include:"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Person</b>",
+        "<b>Service</b>",
+        "<b>Cost</b>"
+       ],
+       [
+        "Deleter",
+        "Delete a move, including HMs",
+        "Free"
+       ],
+       [
+        "Reminder",
+        "Learn a level up move",
+        "1 PokeChip"
+       ],
+       [
+        "Reminder",
+        "Learn an egg move (even if not learned previously)",
+        "10 PokeChips"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "IVs, EVs, Abilities, and Nature Management",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Pokemon Amethyst provides services for managing a Pokemon’s stats and natures, so you can continue to play with the Pokemon found during your journey without replacing them for an “optimal” alternative. Please note that the following <b>are not </b>necessary to complete the game."
+     },
+     {
+      "t": "h",
+      "html": "IV Gradings"
+     },
+     {
+      "t": "p",
+      "html": "Speaking to a psychic in Laplaz Town will allow the player to toggle IV grades in the summary screen on and off. The grades are defined as:"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>IV Values</b>",
+        "<b>Grade</b>"
+       ],
+       [
+        "0-1",
+        "F"
+       ],
+       [
+        "2-4",
+        "E"
+       ],
+       [
+        "5-6",
+        "E+"
+       ],
+       [
+        "7-8",
+        "D"
+       ],
+       [
+        "9-11",
+        "D+"
+       ],
+       [
+        "12-14",
+        "C"
+       ],
+       [
+        "15-17",
+        "C+"
+       ],
+       [
+        "18-20",
+        "B"
+       ],
+       [
+        "21-23",
+        "B+"
+       ],
+       [
+        "24-26",
+        "A"
+       ],
+       [
+        "27-29",
+        "A+"
+       ],
+       [
+        "30",
+        "S"
+       ],
+       [
+        "31",
+        "S+"
+       ]
+      ]
+     },
+     {
+      "t": "h",
+      "html": "Enhancing IVs"
+     },
+     {
+      "t": "p",
+      "html": "A Pokemon’s IVs can be enhanced to 31 at the Tsarvosa City Dojo.  Decreasing an IV to 0 is not possible. You must invest in the dojo’s IV research to be able to use their services."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Level</b>",
+        "<b>Investment Cost</b>",
+        "<b>Can Maximize</b>"
+       ],
+       [
+        "1",
+        "Free",
+        "Nothing"
+       ],
+       [
+        "2",
+        "$40,000",
+        "1 stat for bottlecap"
+       ],
+       [
+        "3",
+        "$60,000",
+        "1 stat for bottlecap<br>All stats for gold bottlecap"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "Bottlecaps and Gold Bottlecaps can be received from the following sources:"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Item</b>",
+        "<b>Where Found</b>"
+       ],
+       [
+        "Bottlecap",
+        "Emraldin Quay rival event (missable)<br>Heleo City (per swarming species shown)<br>Treasure Beach<br>PokeChip Crushing"
+       ],
+       [
+        "Gold Bottlecap",
+        "Heleo City (when all swarming species are shown)<br>Treasure BEach<br>PokeChip Crushing"
+       ]
+      ]
+     },
+     {
+      "t": "h",
+      "html": "EVs"
+     },
+     {
+      "t": "p",
+      "html": "EVs are earned in battles as usual, but can be manipulated in the following ways:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Reducing them with berries bought at Daimyn City Mall and Tsarvosa City (-10 per)"
+       ],
+       [
+        0,
+        "Vitamins bought at Daimyn City Mall and Tsarvosa City Stats Dojo (+10 per)"
+       ],
+       [
+        0,
+        "Battling disciples at the Tsarvosa City Stats Dojo"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "The disciples are key to efficient EV training. There is a disciple for each stat, each of which can be battled repeatedly to earn EVs. Like IVs, the player can invest in these disciples to unlock higher tier teams with higher EV yields."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Disciple Level</b>",
+        "<b>Investment Cost</b>",
+        "<b>EVs each Pokemon gives</b>"
+       ],
+       [
+        "1",
+        "Free",
+        "1"
+       ],
+       [
+        "2",
+        "$30,000",
+        "2"
+       ],
+       [
+        "3",
+        "$60,000",
+        "3"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "Furthermore, the player can buy and level up Power Items from the stats dojo which give EVs per Pokemon defeated. Note that you must invest in the dojo’s shops twice ($70,000 total) to unlock power items. "
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Power Item Level</b>",
+        "<b>Item Cost</b>",
+        "<b>Investment Cost</b>",
+        "<b>EV Yield</b>"
+       ],
+       [
+        "1",
+        "$3,000",
+        "Free",
+        "8"
+       ],
+       [
+        "2",
+        "$3,000",
+        "$40,000",
+        "16"
+       ],
+       [
+        "3",
+        "$3,000",
+        "$60,000",
+        "24"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "<br>Pokerus can be caught anywhere in the game with the usual rate (3 in 65,536). In Mimmett Jungle, this rate is increased to 6x it’s usual rate(to 18 in 65,536). Pokemon with Pokerus earn double EVs and can spread it to other Pokemon as usual."
+     },
+     {
+      "t": "p",
+      "html": "When combining these factors, you can level up EVs extremely quickly. Even when factoring out pokerus, the rates in a single trainee fight can become:<br><br><i>(3 per pokemon + 24 from max level power item) * 3 pokemon = 81 EVs per battle</i>"
+     },
+     {
+      "t": "p",
+      "html": "With a per-stat cap of 252, it only takes 3.5 battles to max a stat."
+     },
+     {
+      "t": "h",
+      "html": "Abilities"
+     },
+     {
+      "t": "p",
+      "html": "A Pokemon’s ability can be changed with Ability Capsules and Ability Patches. Both items can be created by crushing PokeChips in Tsarvosa City."
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Ability Capsule: Change from Hidden -&gt; Standard, or Standard -&gt; Standard"
+       ],
+       [
+        0,
+        "Ability Patch: Standard -&gt; Hidden, or Hidden -&gt; Standard"
+       ]
+      ]
+     },
+     {
+      "t": "h",
+      "html": "Greninja and Battle Bond"
+     },
+     {
+      "t": "p",
+      "html": "Greninja cannot have its ability changed to Battle Bond in this way! It must be done by talking to Selene in the postgame on route 19 and showing her a Greninja with max friendship."
+     },
+     {
+      "t": "h",
+      "html": "Natures"
+     },
+     {
+      "t": "p",
+      "html": "A pokemon’s stat color will change in the summary, depending on whether it is affected by their nature or not:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Black: no change"
+       ],
+       [
+        0,
+        "Red: +10%"
+       ],
+       [
+        0,
+        "Blue: -10%"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "A Pokemon’s nature can be changed with Clancy in Uteya Village for 10 PokeChips."
+     }
+    ]
+   },
+   {
+    "title": "Daycare",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The Daycare on Route 5 works like most Pokemon games, where you can leave up to 2 Pokemon and have a chance for an egg to be laid. There’s a nice long road spanning from Ferrox Village through Routes 5 and 6 without interruption to support egg runs."
+     },
+     {
+      "t": "p",
+      "html": "<br>If the player has hatched 10 eggs, they can get the Oval Charm, increasing the chances of an egg being laid:"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Condition</b>",
+        "<b>Without Oval Charm</b>",
+        "<b>With Oval Charm</b>"
+       ],
+       [
+        "Different Species, Same OT",
+        "20%",
+        "40%"
+       ],
+       [
+        "Same Species and OT or Different Species and OT",
+        "50%",
+        "80%"
+       ],
+       [
+        "Same Species, Different OT",
+        "70%",
+        "88%"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Mining Minigame",
+    "blocks": [
+     {
+      "t": "img",
+      "src": "image13.png"
+     },
+     {
+      "t": "p",
+      "html": "The popular mining minigame from Diamond/Pearl/Platinum is available in the game, in Ferrox Village. It costs $1000 per play unless you have the ADM.<br><br>"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Prize</b>",
+        "<b>Chance to Find</b>"
+       ],
+       [
+        "Hard Stone",
+        "20%"
+       ],
+       [
+        "Everstone",
+        "20%"
+       ],
+       [
+        "Red/Blue/Green/Yellow Shard",
+        "10%"
+       ],
+       [
+        "Evo Stone",
+        "9%"
+       ],
+       [
+        "Heart Scale",
+        "6%"
+       ],
+       [
+        "Revive",
+        "5%"
+       ],
+       [
+        "Star Piece",
+        "15%"
+       ],
+       [
+        "Fossil",
+        "10%"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "<br><br>Because fossils aren’t in the game, the play`er will instead receive 1 PokeChip per."
+     }
+    ]
+   },
+   {
+    "title": "Gameplay Stats",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "As you play, the game will track various statistics. Upon becoming the Pokemon Champion, these can be reviewed by talking with the Champion Fanatic waiting outside the player’s home.<br><br>These largely don’t serve a gameplay purpose but are neat to look at. Can you beat the game without using Pokemon Centers, for example?"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Stat</b>",
+        "<b>Notes</b>"
+       ],
+       [
+        "Times the game has been saved",
+        ""
+       ],
+       [
+        "Steps taken",
+        "Rolls over after 65, 535.<br>Will track how many times the roll-over has happened."
+       ],
+       [
+        "PokeChips found",
+        ""
+       ],
+       [
+        "Number of battles completed",
+        "Includes both wild &amp; trainer battles."
+       ],
+       [
+        "Tutor moves taught",
+        ""
+       ],
+       [
+        "Times entering the Hall of Fame",
+        ""
+       ],
+       [
+        "Game time on first Hall of Fame",
+        ""
+       ],
+       [
+        "Times the Pokedex was checked",
+        ""
+       ],
+       [
+        "Pokemon Caught (Total)",
+        ""
+       ],
+       [
+        "Pokemon Caught (Today)",
+        ""
+       ],
+       [
+        "Critical Captures Performed",
+        ""
+       ],
+       [
+        "# of Pokemon Evolved",
+        ""
+       ],
+       [
+        "# of Pokemon hooked while fishing",
+        ""
+       ],
+       [
+        "EXP earned (Today)",
+        ""
+       ],
+       [
+        "Pokemon trades completed",
+        ""
+       ],
+       [
+        "Items found via Pickup ability",
+        ""
+       ],
+       [
+        "# of hidden items found",
+        ""
+       ],
+       [
+        "Times the Item Finder was used",
+        ""
+       ],
+       [
+        "Apricorn Balls made",
+        ""
+       ],
+       [
+        "# of Poke Balls swapped",
+        ""
+       ],
+       [
+        "# of PokeChip items crafted",
+        ""
+       ],
+       [
+        "# of Pokemon left at the daycare",
+        ""
+       ],
+       [
+        "# of eggs hatched",
+        ""
+       ],
+       [
+        "Pokemon Center &amp; Nurse heals",
+        "Includes both. Forced heals are not included."
+       ],
+       [
+        "Times rested at home",
+        ""
+       ],
+       [
+        "Times entering a hotspring",
+        ""
+       ],
+       [
+        "Times Cut was used in the field",
+        ""
+       ],
+       [
+        "Times Rock Smash was used in the field",
+        ""
+       ],
+       [
+        "Times Surf was used in the field",
+        "Includes Lava Surfing."
+       ],
+       [
+        "Restaurant meals eaten",
+        ""
+       ],
+       [
+        "Times Trainer Houses were cleared",
+        ""
+       ],
+       [
+        "Lucky Draw wins",
+        ""
+       ],
+       [
+        "IVs and Natures changed",
+        ""
+       ],
+       [
+        "Rare Candies used",
+        "Includes candies used at level 100 to trigger evolutions."
+       ],
+       [
+        "Jackpots at the casino",
+        ""
+       ],
+       [
+        "Times went shopping",
+        ""
+       ],
+       [
+        "Times Splash was used",
+        ""
+       ],
+       [
+        "Times Struggle was used",
+        ""
+       ],
+       [
+        "Ledges jumped off of",
+        ""
+       ],
+       [
+        "Times the player was rained on",
+        "Only in the overworld, when weather is triggered."
+       ],
+       [
+        "Times the player went mining",
+        ""
+       ],
+       [
+        "Times items were found while mining",
+        ""
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Extra Options Pages",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "You can access additional options pages by opening Options from the menu, then pressing L/R. The layout described below references v1.4’s layout; previous releases had all available options on page 2."
+     },
+     {
+      "t": "p",
+      "html": "This menu contains the following options, each of which are described further in other sections:"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Page</b>",
+        "<b>Option</b>",
+        "<b>Use</b>",
+        "<b>Notes</b>"
+       ],
+       [
+        "2",
+        "Auto-Sort Bag",
+        "Automatically sorts the bag by:<br>By Name<br>By Type<br>By Amount",
+        ""
+       ],
+       [
+        "2",
+        "Skip Story Cutscenes",
+        "Skips cutscenes when enabled. Intended for challenge runs",
+        ""
+       ],
+       [
+        "2",
+        "Skip Nickname Prompt",
+        "When catching a Pokemon, skips the offer to nickname it",
+        ""
+       ],
+       [
+        "2",
+        "Ball Shortcut",
+        "Either Optimal or Last Used.<br>Last used is remembered after reloading.",
+        "Introduced in v1.4"
+       ],
+       [
+        "2",
+        "Nurse Healing",
+        "Either Default or Short.<br>Applies to Pokemon Centers and nurses on routes",
+        "Introduced in v1.4"
+       ],
+       [
+        "2",
+        "Pokemon Selection",
+        "Either Standard or Divergent",
+        "Only shown when a game modifier is on"
+       ],
+       [
+        "3",
+        "Difficulty",
+        "Standard, Hard, or Extra Hard",
+        ""
+       ],
+       [
+        "3",
+        "Level Caps",
+        "Soft, Hard, or Extra Hard",
+        ""
+       ],
+       [
+        "3",
+        "Overworld Speed",
+        "1x to 4x",
+        "Introduced in v1.4<br><b>See below</b>"
+       ],
+       [
+        "3",
+        "Battle Speed",
+        "1x to 4x",
+        "Introduced in v1.4<br><b>See below</b>"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "These can be changed at any time without penalty; there is no reward or incentive to keep difficulty or level cap settings as-is if it isn’t enjoyable for you!"
+     },
+     {
+      "t": "img",
+      "src": "image4.png"
+     },
+     {
+      "t": "p",
+      "html": "Overworld and battle speed are constrained by the hardware you are playing on - emulators tend to do fine but physical devices may struggle at 3x and 4x. These features are provided for convenience and cannot be optimized much further."
+     },
+     {
+      "t": "p",
+      "html": "Battle speedup plays music and cries at full speed; a cry must complete before the battle continues. Text speeds up too, and can be fine tuned by adjusting the global text speed setting."
+     },
+     {
+      "t": "p",
+      "html": "Overworld speed affects just the player and followers. It is temporarily disabled whenever precision is required: DexNav scans and certain gym puzzles. <b>NOTE:</b> Depending on how quickly you move through map transitions, you may briefly see graphical glitches. That is a byproduct of this feature."
+     }
+    ]
+   },
+   {
+    "title": "Pokemon Donations",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Starting in v1.3, players who have become champion can donate unneeded Pokemon to a researcher outside of Tsarvosa City’s Pokemon Center. The player receives PokeChips based on the quality of their donation, with the following rules in place:"
+     },
+     {
+      "t": "p",
+      "html": "Base   = round( √(Level × BST) ÷ 50 )        (minimum 1)"
+     },
+     {
+      "t": "p",
+      "html": "Level  : +1 per 10 levels starting at 60      (+1 at 60, +2 at 70 … +5 at 100)"
+     },
+     {
+      "t": "p",
+      "html": "IVs    : +1 if total IVs ≥ 140, −1 if ≤ 46"
+     },
+     {
+      "t": "p",
+      "html": "EVs    : +1 if total EVs ≥ 400"
+     },
+     {
+      "t": "p",
+      "html": "Shiny  : ×2 (applied last)"
+     },
+     {
+      "t": "p",
+      "html": "Some example payouts are:"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Pokemon</b>",
+        "<b>Base</b>",
+        "<b>Bonus</b>",
+        "<b>Total</b>"
+       ],
+       [
+        "Lv 47 Sunflora, fresh catch (425 BST)",
+        "3",
+        "n/a",
+        "3"
+       ],
+       [
+        "Lv 47 Sunflora, 140+ IVs",
+        "3",
+        "+1",
+        "4"
+       ],
+       [
+        "Lv 47 Sunflora, &lt;=46 IVs",
+        "3",
+        "-1",
+        "2"
+       ],
+       [
+        "Lv 73, fully EV trained",
+        "4",
+        "+2 (level), +1 (EVs)",
+        "7"
+       ],
+       [
+        "Lv 100 pseudo-legendary, fully EV trained",
+        "5",
+        "+5 (level), +1 (EVs)",
+        "11"
+       ],
+       [
+        "Above, with 140+ Ivs, and also shiny",
+        "5",
+        "+5 (level), +1 (IVs) +1 (Evs), then *2",
+        "24"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "EV/IV Viewer",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "In v1.3, the ability to view EV/IV information for each Pokemon was introduced. This is hidden behind a game modifier to not disrupt the core gameplay loop. By pressing A on a Pokemon’s stats screen, the viewer is launched."
+     },
+     {
+      "t": "img",
+      "src": "image11.png"
+     }
+    ]
+   },
+   {
+    "title": "PC Options",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "For convenience, in v1.3 the Pokemon Storage options at the PC have been reordered so the most commonly used options are first:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Move Pokemon"
+       ],
+       [
+        0,
+        "Move Items"
+       ],
+       [
+        0,
+        "Withdraw Pokemon"
+       ],
+       [
+        0,
+        "Deposit Pokemon"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "Trainer Card Progress"
+     },
+     {
+      "t": "p",
+      "html": "Starting in v1.4, the player can upgrade their trainer card by achieving various feats in the game. For each accomplishment, a star is added and the card’s colour upgrades. The back of the card now features statistics about the player’s journey, and the player can print their current party on the card by visiting an NPC in Ascension Tower.<br><br>Requirements:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Become champion"
+       ],
+       [
+        0,
+        "Earn a 50+ streak in any facility &amp; format at the Battle Frontier"
+       ],
+       [
+        0,
+        "Catch every Pokemon in either the Standard or Divergent Pokedex"
+       ],
+       [
+        0,
+        "Acquire every typed Z-Crystal from the Gym Trainees"
+       ],
+       [
+        0,
+        "Acquire every TM and HM"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "The colour upgrades according to your star count:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "0: Blue"
+       ],
+       [
+        0,
+        "1: Teal"
+       ],
+       [
+        0,
+        "2: Bronze"
+       ],
+       [
+        0,
+        "3: Silver"
+       ],
+       [
+        0,
+        "4: Gold"
+       ],
+       [
+        0,
+        "5: Black"
+       ]
+      ]
+     },
+     {
+      "t": "img",
+      "src": "image1.png"
+     },
+     {
+      "t": "p",
+      "html": "Breeding"
+     },
+     {
+      "t": "p",
+      "html": "Pokemon can be bred at the daycare on Route 5. Breeding has been enhanced to be more convenient in Amethyst:<br>"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Any Pokemon with a different OT from the player triggers Masuda breeding shiny odds. This is especially helpful with v1.4+ Ditto trade"
+       ],
+       [
+        0,
+        "If any Pokemon has the Magma Armor, Flame Body, or Steam Engine ability, each step counts as double for the hatch timer. These Pokemon do not need to be at the front of the party!"
+       ],
+       [
+        0,
+        "If the player has the Magma Stone in their inventory, (introduced in v1.4), an additional step is counted"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "Because Amethyst features curated Pokedexes, many Pokemon have egg moves that cannot normally be accessed - these are offered to be taught at the Move Reminder in Daiymn City."
+     },
+     {
+      "t": "p",
+      "html": "Using the stretch of land from Ferrox Village to Route 6, you can expect egg count hatches like the following:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "No Magma Stone, no flame body (36 passes)"
+       ],
+       [
+        0,
+        "No Magma Stone, with flame body in party (18 passes)"
+       ],
+       [
+        0,
+        "Has Magma Stone, no flame body (17.5 passes)"
+       ],
+       [
+        0,
+        "Has Magma Stone, with flame body in party (12 passes)"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "Multiple Rare Candies"
+     },
+     {
+      "t": "p",
+      "html": "As of v1.4.3 you can now use multiple rare candies at once. The following rules apply:<br>"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "You only use a single candy when you only have one, are one level away from the next hard cap (when enabled), or are already at level 100. You can use a candy at level 100 to trigger evolutions"
+       ],
+       [
+        0,
+        "You can use candies up to the number required to reach the next level cap (when enabled), level 100, or however many you’re holding, whichever is lowest"
+       ],
+       [
+        0,
+        "The stat window shows the final stat change after all levels are applied"
+       ],
+       [
+        0,
+        "You are prompted to learn level up moves in order, <b>before</b> evolution"
+       ],
+       [
+        0,
+        "If multiple evolutions can occur, you are prompted for each"
+       ]
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "title": "Overworld / Exploration Changes",
+  "topics": [
+   {
+    "title": "New Tools",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The game provides new tools to ease gameplay, all of which are usable from the Tools Menu. They are available in the postgame, unless you are playing with QoL ite"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Tool</b>",
+        "<b>Usage</b>",
+        "<b>How to Get</b>"
+       ],
+       [
+        "<b>PokeVial</b>",
+        "Heals the party to full up to 3 times. Refills at Pokemon Centers and when whiting out.",
+        "Olenic Town researcher"
+       ],
+       [
+        "<b>Pocket PC</b>",
+        "Use the PC from anywhere",
+        "Lana in Daimyn City"
+       ],
+       [
+        "<b>Infinite Repel</b>",
+        "Turn wild encounters off/on",
+        "Olenic Town researcher"
+       ],
+       [
+        "<b>ADM</b>",
+        "Use any HM without needing a compatible Pokemon. The badge is still required.",
+        "Olenic Town researcher"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "<br>The EXP Share is given to the player to the east of Daimyn City, and works like the EXP Share from gen 6 and onward (i.e. it splits EXP to all participating pokemon).  It can be toggled off and on from the Key Items pocket."
+     },
+     {
+      "t": "p",
+      "html": "<i><b>Note: The game is balanced around not using the Exp Share.</b></i>"
+     },
+     {
+      "t": "h",
+      "html": "DexNav"
+     },
+     {
+      "t": "p",
+      "html": "The DexNav allows you to find specific Pokemon in the environment. It is used via the Tools menu (Start -&gt; Right). When scanning for a Pokemon, you’ll see patches of grass shake, bubbles form, or dust clouds get kicked up. Walking toward one will trigger a battle against that Pokemon."
+     },
+     {
+      "t": "p",
+      "html": "When encountering a Pokemon in water or caves, it has a chance to jump to another tile when approached (40% for first time, 20% for second)."
+     },
+     {
+      "t": "img",
+      "src": "image12.png"
+     },
+     {
+      "t": "p",
+      "html": "By defeating Pokemon found via the dexnav, you can increase its search level and enhance the Pokemon you find with it. These levels are:"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Effect</b>",
+        "<b>Level Needed</b>",
+        "<b>% Chance</b>"
+       ],
+       [
+        "<b>Egg Moves</b>",
+        "<b>0</b>",
+        "<b>0</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>5</b>",
+        "<b>21</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>10</b>",
+        "<b>46</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>25</b>",
+        "<b>58</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>50</b>",
+        "<b>63</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>100</b>",
+        "<b>83</b>"
+       ],
+       [
+        "<b>Hidden Abilities</b>",
+        "<b>0</b>",
+        "<b>0</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>5</b>",
+        "<b>10</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>10</b>",
+        "<b>15</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>25</b>",
+        "<b>20</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>50</b>",
+        "<b>25</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>100</b>",
+        "<b>30</b>"
+       ],
+       [
+        "<b>Held Items</b>",
+        "<b>0</b>",
+        "<b>0</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>5</b>",
+        "<b>0</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>10</b>",
+        "<b>1</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>25</b>",
+        "<b>6</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>50</b>",
+        "<b>9</b>"
+       ],
+       [
+        "<b>-</b>",
+        "<b>100</b>",
+        "<b>12</b>"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "As well, as the search level increases, the odds of finding Pokemon with perfect IVs increases. Each star level represents one stat at 31."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Search Level</b>",
+        "<b>1 Star Chance</b>",
+        "<b>2 Star Chance</b>",
+        "<b>3 Star Chance</b>"
+       ],
+       [
+        "<b>0</b>",
+        "<b>0</b>",
+        "<b>0</b>",
+        "<b>0</b>"
+       ],
+       [
+        "<b>5</b>",
+        "<b>14</b>",
+        "<b>1</b>",
+        "<b>0</b>"
+       ],
+       [
+        "<b>10</b>",
+        "<b>17</b>",
+        "<b>9</b>",
+        "<b>1</b>"
+       ],
+       [
+        "<b>25</b>",
+        "<b>17</b>",
+        "<b>16</b>",
+        "<b>7</b>"
+       ],
+       [
+        "<b>50</b>",
+        "<b>15</b>",
+        "<b>17</b>",
+        "<b>6</b>"
+       ],
+       [
+        "<b>100</b>",
+        "<b>8</b>",
+        "<b>24</b>",
+        "<b>12</b>"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "The DexNav UI will show a badge when all Pokemon on that route are caught. This is purely cosmetic outside of an optional rival event."
+     },
+     {
+      "t": "img",
+      "src": "image5.png"
+     },
+     {
+      "t": "p",
+      "html": "Increasing your chain to different thresholds increases the likelihood of getting a shiny. The game makes additional checks against the 1/4196 (base odds) or 1/100 (Shiny Charm odds) depending on your chain. Once you hit a chain of 100, the count no longer increases to indicate you are at maximum odds."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Chain Level</b>",
+        "<b>Shiny Rolls</b>"
+       ],
+       [
+        "<b>1-49</b>",
+        "<b>1</b>"
+       ],
+       [
+        "<b>50-99</b>",
+        "<b>6*</b>"
+       ],
+       [
+        "<b>100+</b>",
+        "<b>11*</b>"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "<br>Prior to version 1.4, the increased shiny odds occurred only at chain 50 &amp; 100. As of 1.4, it applies to every chain level afterward."
+     }
+    ]
+   },
+   {
+    "title": "Pickup",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Each Pokemon with Pickup has a 10% chance to find an item after battle. For convenience, these items are sent directly to the bag. You have a 98% chance to find an item from the Common Pool and a 2% chance from the Rare Pool."
+     },
+     {
+      "t": "p",
+      "html": "<b>Common Pool</b>"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Item</b>",
+        "<b>Lv 1-10</b>",
+        "<b>Lv 11-20</b>",
+        "<b>Lv 21-30</b>",
+        "<b>Lv 31-40</b>",
+        "<b>Lv 41-50</b>",
+        "<b>Lv 51-60</b>",
+        "<b>Lv 61-70</b>",
+        "<b>Lv 71-80</b>",
+        "<b>Lv 81-90</b>",
+        "<b>Lv 91-100</b>"
+       ],
+       [
+        "Potion",
+        "30%",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+       ],
+       [
+        "Antidote",
+        "10%",
+        "30%",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+       ],
+       [
+        "Super Potion",
+        "10%",
+        "10%",
+        "30%",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+       ],
+       [
+        "Great Ball",
+        "10%",
+        "10%",
+        "10%",
+        "30%",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+       ],
+       [
+        "Repel",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "30%",
+        "",
+        "",
+        "",
+        "",
+        ""
+       ],
+       [
+        "Escape Rope",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "30%",
+        "",
+        "",
+        "",
+        ""
+       ],
+       [
+        "Full Heal",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "30%",
+        "",
+        "",
+        ""
+       ],
+       [
+        "Hyper Potion",
+        "4%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "30%",
+        "",
+        ""
+       ],
+       [
+        "Ultra Ball",
+        "4%",
+        "4%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "30%",
+        ""
+       ],
+       [
+        "Revive",
+        "",
+        "4%",
+        "4%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "30%"
+       ],
+       [
+        "Rare Candy",
+        "",
+        "",
+        "4%",
+        "4%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "10%"
+       ],
+       [
+        "Sun Stone",
+        "",
+        "",
+        "",
+        "4%",
+        "4%",
+        "10%",
+        "10%",
+        "10%",
+        "10%",
+        "10%"
+       ],
+       [
+        "Moon Stone",
+        "",
+        "",
+        "",
+        "",
+        "4%",
+        "4%",
+        "10%",
+        "10%",
+        "10%",
+        "10%"
+       ],
+       [
+        "Heart Scale",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "4%",
+        "4%",
+        "10%",
+        "10%",
+        "10%"
+       ],
+       [
+        "Full Restore",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "4%",
+        "4%",
+        "10%",
+        "10%"
+       ],
+       [
+        "Max Revive",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "4%",
+        "4%",
+        "10%"
+       ],
+       [
+        "PP Up",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "4%",
+        "4%"
+       ],
+       [
+        "Max Elixir",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "4%"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "<b>Rare Pool</b>"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Item</b>",
+        "<b>Lv 1-10</b>",
+        "<b>Lv 11-20</b>",
+        "<b>Lv 21-30</b>",
+        "<b>Lv 31-40</b>",
+        "<b>Lv 41-50</b>",
+        "<b>Lv 51-60</b>",
+        "<b>Lv 61-70</b>",
+        "<b>Lv 71-80</b>",
+        "<b>Lv 81-90</b>",
+        "<b>Lv 91-100</b>"
+       ],
+       [
+        "Hyper Potion",
+        "1%",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+       ],
+       [
+        "Nugget",
+        "1%",
+        "1%",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+       ],
+       [
+        "Ether",
+        "",
+        "1%",
+        "1%",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+       ],
+       [
+        "Destiny Knot",
+        "",
+        "",
+        "1%",
+        "1%",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+       ],
+       [
+        "Full Restore",
+        "",
+        "",
+        "",
+        "1%",
+        "1%",
+        "",
+        "",
+        "",
+        "",
+        ""
+       ],
+       [
+        "Elixir",
+        "",
+        "",
+        "",
+        "",
+        "1%",
+        "1%",
+        "",
+        "",
+        "",
+        ""
+       ],
+       [
+        "King’s Rock",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1%",
+        "1%",
+        "",
+        "",
+        ""
+       ],
+       [
+        "Bottlecap",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1%",
+        "1%",
+        "",
+        ""
+       ],
+       [
+        "Big Nugget",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1%",
+        "1%",
+        ""
+       ],
+       [
+        "Leftovers",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1%",
+        "1%"
+       ],
+       [
+        "Ability Capsule",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1%"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Rival Events",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Because the player and rival are taking the same journey, they’ll often cross paths. By interacting, the player and rival can support each other in different ways to receive rewards. There is no penalty or risk of missing something permanently when skipping a Rival Event."
+     },
+     {
+      "t": "p",
+      "html": "Each event is available until the next gym badge is collected."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Before Badge</b>",
+        "<b>Where</b>",
+        "<b>Request</b>",
+        "<b>Reward</b>"
+       ],
+       [
+        "<b>1</b>",
+        "Between Varisi Forest and Rhodanzi City",
+        "Give 5 Poke Balls",
+        "$1500 <br>(1.5x the cost of 5 Pokeballs)"
+       ],
+       [
+        "<b>2</b>",
+        "In Torma Cave B2F",
+        "Give Revive",
+        "3 Ultra Balls"
+       ],
+       [
+        "<b>3</b>",
+        "In daycare on Route 5",
+        "Trade an egg",
+        "Another egg with egg moves. Can be Litleo, Shellos, or Scraggy"
+       ],
+       [
+        "<b>4</b>",
+        "Beach Rest House west of Daimyn City",
+        "Catch 10 Pokemon while fishing (total)",
+        "5 Net Balls"
+       ],
+       [
+        "<b>5</b>",
+        "Route 11 North, at the lake",
+        "Catch all Pokemon in the area during the day or night",
+        "3 Rare Candies"
+       ],
+       [
+        "<b>6</b>",
+        "Scalding Spa",
+        "Trade any Pokemon",
+        "Boldore, Gurdurr, or Phantump, chosen at random, with its hidden ability"
+       ],
+       [
+        "<b>7</b>",
+        "Emraldin Quay",
+        "Win an optional battle against a harder team",
+        "3 Bottlecaps"
+       ],
+       [
+        "<b>8</b>",
+        "Outside Uteyan Ruins",
+        "Show a Pokemon that knows Return",
+        "Max friendship on the shown Pokemon"
+       ],
+       [
+        "<b>After Victory Road</b>",
+        "Outside Pokemon League",
+        "Daily recurring battle",
+        "Renewable EXP and money"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Swarms",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Pokemon swarms are events where a Pokemon normally found on a route may be replaced by a regional variant. When on one of these routes, you have a 50% chance to encounter the swarming Pokemon. The swarming species changes each day and can be revealed by talking to the Swarm Swami in Heleo City."
+     },
+     {
+      "t": "p",
+      "html": "When catching a swarming Pokemon, its Kulure-native equivalent is registered as caught. For example, catching Rattata will mark Rattata-A as caught."
+     },
+     {
+      "t": "p",
+      "html": "If the player shows a regional variant or its evolutions to the Swami’s assistant, they will receive a bottlecap (first time only). This only applies to swarm-based evolutions (ex. Goomy offers no reward, but Hisuian Sliggoo and Goodra do). After showing all, they will receive a gold bottlecap.<br>"
+     },
+     {
+      "t": "p",
+      "html": "The following variants cannot be found:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Deviating evolutions (eg. Purrzerker)"
+       ],
+       [
+        0,
+        "Kantonian birds"
+       ],
+       [
+        0,
+        "Yamask and Yamask-G since they are part of the core Pokedex"
+       ]
+      ]
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Pokemon</b>",
+        "<b>Location</b>",
+        "<b>Comment</b>",
+        "<b>Mode (v1.3+)</b>"
+       ],
+       [
+        "Rattata",
+        "Route 3",
+        "",
+        "Standard"
+       ],
+       [
+        "Raticate",
+        "Forgotten Manse Exterior",
+        "Removed from pool in v1.4",
+        "Standard"
+       ],
+       [
+        "Raichu-A",
+        "Route 14 Islands",
+        "Represents surfing",
+        "Standard"
+       ],
+       [
+        "Grimer",
+        "Daimyn City",
+        "",
+        "Standard"
+       ],
+       [
+        "Muk",
+        "Route 24",
+        "Removed from pool in v1.4",
+        "Standard"
+       ],
+       [
+        "Slowpoke-G",
+        "Route 8",
+        "",
+        "Standard"
+       ],
+       [
+        "Slowbro-G",
+        "Route 22",
+        "Can also receive by trade in Tsarvosa City.<br>Removed from pool in v1.4",
+        "Standard"
+       ],
+       [
+        "Slowking-G",
+        "Seppire Cove",
+        "Removed from pool in v1.4",
+        "Standard"
+       ],
+       [
+        "Farfetch’d",
+        "Route 7",
+        "",
+        "Standard"
+       ],
+       [
+        "Koffing",
+        "Daimyn City",
+        "Removed from pool in v1.4",
+        "Standard"
+       ],
+       [
+        "Weezing",
+        "Victory Road",
+        "",
+        "Standard"
+       ],
+       [
+        "Mime Jr.",
+        "Route 6",
+        "Functionally the same as Mime Jr-G, but evolves into Kantonian Mr. Mime.<br>Removed from pool in v1.4",
+        "Standard"
+       ],
+       [
+        "Mr. Mime",
+        "Route 9",
+        "",
+        "Standard"
+       ],
+       [
+        "Corsola",
+        "Route 16",
+        "Land in v1.3.<br>Surf or good/super rod in v1.4.",
+        "Standard"
+       ],
+       [
+        "Darumaka",
+        "Torma Cave B1F",
+        "",
+        "Standard"
+       ],
+       [
+        "Darmanitan",
+        "Route 12 West",
+        "Removed from pool in v1.4",
+        "Standard"
+       ],
+       [
+        "Stunfisk",
+        "Route 11 South",
+        "",
+        "Standard"
+       ],
+       [
+        "Sneasel-H",
+        "Route 12 West",
+        "Introduced in v1.4",
+        "Standard"
+       ],
+       [
+        "Zorua-H",
+        "Forgotten Manse",
+        "Introduced in v1.4",
+        "Standard"
+       ],
+       [
+        "Sliggoo-H",
+        "Route 8",
+        "Introduced in v1.4",
+        "Standard"
+       ],
+       [
+        "Avalugg-H",
+        "Calicin Bay",
+        "Introduced in v1.4",
+        "Standard"
+       ],
+       [
+        "Zigzagoon",
+        "Route 1",
+        "",
+        "Divergent"
+       ],
+       [
+        "Linoone",
+        "Route 8",
+        "Removed from pool in v1.4",
+        "Divergent"
+       ],
+       [
+        "Diglett",
+        "Rubarr Desert",
+        "",
+        "Divergent"
+       ],
+       [
+        "Dugtrio",
+        "Hesson Pass",
+        "Removed from pool in v1.4",
+        "Divergent"
+       ],
+       [
+        "Meowth",
+        "Route 9",
+        "",
+        "Divergent"
+       ],
+       [
+        "Persian",
+        "Route 23",
+        "Removed from pool in v1.4",
+        "Divergent"
+       ],
+       [
+        "Geodude",
+        "Route 3",
+        "",
+        "Divergent"
+       ],
+       [
+        "Graveler",
+        "Route 11 South",
+        "Removed from pool in v1.4",
+        "Divergent"
+       ],
+       [
+        "Golem",
+        "Route 21",
+        "Removed from pool in v1.4",
+        "Divergent"
+       ],
+       [
+        "Sandshrew",
+        "Torma Cave",
+        "",
+        "Divergent"
+       ],
+       [
+        "Sandslash",
+        "Route 12 West",
+        "Removed from pool in v1.4",
+        "Divergent"
+       ],
+       [
+        "Vulpix-A",
+        "Route 13",
+        "",
+        "Divergent"
+       ],
+       [
+        "Ninetales-A",
+        "Scalding Spa",
+        "Removed from pool in v1.4",
+        "Divergent"
+       ],
+       [
+        "Meowth-A",
+        "Forgotten Manse Exterior",
+        "",
+        "Divergent"
+       ],
+       [
+        "Exeggutor",
+        "Route 19",
+        "Removed from pool in v1.4",
+        "Divergent"
+       ],
+       [
+        "Ponyta-G",
+        "Route 10",
+        "",
+        "Divergent"
+       ],
+       [
+        "Rapidash-G",
+        "Carnelidge Volcano",
+        "Removed from pool in v1.4",
+        "Divergent"
+       ],
+       [
+        "Growlithe-H",
+        "Daimyn City",
+        "Introduced in v1.4",
+        "Divergent"
+       ],
+       [
+        "Voltorb-H",
+        "Varisi Forest",
+        "Introduced in v1.4",
+        "Divergent"
+       ],
+       [
+        "Qwilfish-H",
+        "Route 8",
+        "Surf or good/super rod.<br>Introduced in v1.4",
+        "Divergent"
+       ],
+       [
+        "Lilligant-H",
+        "Orichelle Garden",
+        "Introduced in v1.4",
+        "Divergent"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "Because of the Slowpoke family, Galaric Cuffs and Wreaths can be bought in Emraldin Quay. Black Augurites can also be bought there in divergent mode, for Kleavor evolutions."
+     }
+    ]
+   },
+   {
+    "title": "Roamers and Legendaries",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Roaming Pokemon appear on the Town Map to make them easier to track. Roamers change locations whenever the player enters/exits buildings, changes named locations, or flies."
+     },
+     {
+      "t": "p",
+      "html": "All roamers and other legendaries are created with 3 perfect IVs. You have a 25% chance of triggering a roamer fight while on their route. Roamers cannot leave the islands they spawn on."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Roamer Trigger Location</b>",
+        "<b>Pokemon</b>"
+       ],
+       [
+        "Lake Laplaz (mainland)",
+        "Galarian Articuno, Zapdos, Moltres"
+       ],
+       [
+        "Mimmett Jungle (island)",
+        "Zeraora"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "If a roamer or legendary has fainted, it will reappear the next time the player enters the Hall of Fame."
+     }
+    ]
+   },
+   {
+    "title": "Day-Night Cycle (DNS)",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "This game features the popular DNS system by utilizing the Real-Type Clock (RTC) system. The following time ranges apply:<br><br>"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Morning: 4AM - 8AM"
+       ],
+       [
+        0,
+        "Day: 8AM - 5PM"
+       ],
+       [
+        0,
+        "Evening: 5PM - 8PM"
+       ],
+       [
+        0,
+        "Night: 8PM - 4AM"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "Functionally, Morning/Day and Evening/Night are the same when it comes to things like wild encounters and evolutions, with one minor difference: Rockruff can only evolve into Lycanroc Dusk in the Evening timeframe."
+     },
+     {
+      "t": "p",
+      "html": "The Pokedex’s catch map will also update to reflect the current time. For example, checking Varisi Forest for Hoothoot during the day will result in it not being found, but at night it will appear on the catch map. Many trainers will also hint at these kinds of encounters."
+     },
+     {
+      "t": "p",
+      "html": "In certain environments, the DNS is flipped so night occurs during the day."
+     }
+    ]
+   },
+   {
+    "title": "Battle Backgrounds",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Battle backgrounds are provided for all encounters. These also change based on the time of day, in outdoor maps!"
+     },
+     {
+      "t": "img",
+      "src": "image2.png"
+     }
+    ]
+   },
+   {
+    "title": "Nurses",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "In many maps, you may talk to nurses to heal your party without needing to return to a Pokemon Center. Just be careful - they may want to battle first!"
+     },
+     {
+      "t": "img",
+      "src": "image15.png"
+     }
+    ]
+   },
+   {
+    "title": "Trap Pokemon",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "In some locations, you may encounter static Pokemon posing as traps!"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "",
+        "Sandygast and Palossand pretend to be sandcastles"
+       ],
+       [
+        "",
+        "Foongus and Amoonguss pretend to be Pokeballs (they appear slightly smaller)"
+       ],
+       [
+        "",
+        "Stunfisk waits to snare unsuspecting trainers (they appear as tiny pokeball icons surrounded by teeth)"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Weather / Terrain Maps",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Some maps have variable weather or permanent terrain set in battle. These are overridden by any active game modifiers."
+     },
+     {
+      "t": "p",
+      "html": "<br>Weather is set when entering the map or walking onto specific tiles, so you can exit and enter repeatedly to get the weather you want. Somewhere, Groudon and Kyogre are crying."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Map</b>",
+        "<b>Weather</b>",
+        "<b>Terrain</b>"
+       ],
+       [
+        "Rubarr Desert",
+        "40% Sunny (only during day)<br>40% Sandstorm<br>20% Clear (60% at night)",
+        "-"
+       ],
+       [
+        "Route 8",
+        "55% Rainy<br>30% Clear<br>15% Misty",
+        ""
+       ],
+       [
+        "Route 12 West",
+        "60% Hail<br>30% Snow<br>10% Clear",
+        ""
+       ],
+       [
+        "Orichelle Gardens",
+        "",
+        "Grassy Terrain (Always)"
+       ],
+       [
+        "Forgotten Manse Basement",
+        "",
+        "Misty Terrain (Always)"
+       ],
+       [
+        "Uteyan Ruins overworld and sealed chambers",
+        "",
+        "Psychic Terrain (Always)"
+       ],
+       [
+        "Daimyn Factory Interior",
+        "",
+        "Electic Terrain (Only when power is on)"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Open Ended Exploration",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Oftentimes, the game will present you with multiple paths through a route when heading to your destination. In some cases, you may even have the option of taking completely separate routes!"
+     },
+     {
+      "t": "p",
+      "html": "Notably, the game opens up after gym 2, then funnels back in before you can challenge gym 6. This means you can tackle exploration and gyms 3-5 in any order you choose. Earlier gym leaders will receive buffed teams if they are battled out of order, but later gym leaders will always have the same team.  In practice, this means Casey has 1 team while Raine has 3, depending on whether she’s fought 3rd, 4th or 5th."
+     }
+    ]
+   },
+   {
+    "title": "Game Corner",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The Daimyn City gym doubles as the game’s Game Corner. After beating the gym, you can trade coins for the following Pokemon prizes:"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Prize</b>",
+        "<b>Coin Cost</b>"
+       ],
+       [
+        "Joltik",
+        "500"
+       ],
+       [
+        "Mudbray",
+        "500"
+       ],
+       [
+        "Mankey",
+        "500"
+       ],
+       [
+        "Minior",
+        "1,000"
+       ],
+       [
+        "Turtonator",
+        "2,000"
+       ],
+       [
+        "Dratini",
+        "3,000"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "And the following items:"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Prize</b>",
+        "<b>Coin Cost</b>"
+       ],
+       [
+        "Toxic Orb",
+        "1,000"
+       ],
+       [
+        "Flame Orb",
+        "1,000"
+       ],
+       [
+        "Rare Candy",
+        "1,500"
+       ],
+       [
+        "Life Orb",
+        "2,000"
+       ],
+       [
+        "Assault Vest",
+        "2,000"
+       ],
+       [
+        "Weakness Policy",
+        "2,000"
+       ],
+       [
+        "Focus Sash",
+        "2,000"
+       ],
+       [
+        "Choice Band",
+        "2,500"
+       ],
+       [
+        "Choice Specs",
+        "2,500"
+       ],
+       [
+        "Choice Scarf",
+        "2,500"
+       ],
+       [
+        "Leftovers",
+        "3,000"
+       ],
+       [
+        "Eviolite",
+        "3,000"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Daimyn City Restaurant",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The Daimyn City restaurant lets you prepare meals that strengthen the entire party for a limited number of battles. You can invest money and PokeChips into the shop to increase the meals available and their durations. The effects of meals do not stack."
+     },
+     {
+      "t": "p",
+      "html": "By investing money, you can make meals last longer. Buying any meal will contribute to these thresholds. This is a straight upgrade path and all meals are prepped with the longest duration."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Meal Level</b>",
+        "<b>How Many Battles</b>",
+        "<b>Total Investment</b>"
+       ],
+       [
+        "1",
+        "1",
+        "0, default level"
+       ],
+       [
+        "2",
+        "2",
+        "$5,000"
+       ],
+       [
+        "3",
+        "3",
+        "$15,000"
+       ],
+       [
+        "4",
+        "4",
+        "$30,000"
+       ],
+       [
+        "5",
+        "5",
+        "$50,000"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "By investing PokeChips, you can unlock new meals and make existing meals more potent. PokeChip investment is not cumulative; to reach tier 3 you must spend 75 PokeChips. New tiers of dishes do not replace the old; you may choose which is prepared."
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Level 1: Unlocked by default"
+       ],
+       [
+        0,
+        "Level 2: 25 PokeChips"
+       ],
+       [
+        0,
+        "Level 3: 50 PokeChips (75 total)"
+       ]
+      ]
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Meal</b>",
+        "<b>Cost Per Lv</b>",
+        "<b>Lv 1</b>",
+        "<b>Lv 2</b>",
+        "<b>Lv 3</b>",
+        "<b>Notes</b>"
+       ],
+       [
+        "Apricorn Tart",
+        "$1,500",
+        "Atk +1",
+        "Atk +2",
+        "Atk +3<br>Def -1",
+        ""
+       ],
+       [
+        "Ganlon Berry Cookies",
+        "$1,500",
+        "Def +1",
+        "Def +2",
+        "Def +3<br>Atk -1",
+        ""
+       ],
+       [
+        "Poffin Parfait",
+        "$1,500",
+        "Sp Atk +1",
+        "Sp Atk +2",
+        "Sp Atk + 3<br>Sp Def -1",
+        ""
+       ],
+       [
+        "Whipped Ice Dream",
+        "$1,500",
+        "Sp Def +1",
+        "Sp Def +2",
+        "Sp Def +3<br>Sp Atk -1",
+        ""
+       ],
+       [
+        "Sweet Apple Pie",
+        "$1,500",
+        "Spd +1",
+        "Spd +2",
+        "Spd +3<br>Acc -1",
+        ""
+       ],
+       [
+        "Honey Snaps",
+        "$2,000",
+        "Acc +1",
+        "Acc +2",
+        "Acc +3<br>Spd -1",
+        ""
+       ],
+       [
+        "Clover Sweets",
+        "$2,000",
+        "Eva +1",
+        "Eva +2",
+        "–",
+        "Not available at level 3"
+       ],
+       [
+        "Rare Candy Cake",
+        "$10,000",
+        "All +1",
+        "–",
+        "–",
+        "Only available at level 1.<br>Only unlocked when full PokeChip investment reached."
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Lava Surfing",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The player can surf on lava within Carnelidge Volcano, as long as they have Surf and a fire type Pokemon (or Groudon) with them."
+     }
+    ]
+   },
+   {
+    "title": "Treasure Beach",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "West of Emraldin Quay, players can find Treasure Beach. This area provides renewing hidden items that can be used or sold for extra cash. This incentivizes the Item Finder obtainable nearby as well as prevents the player from getting soft-locked on the island (because they can then buy Pokeballs and catch a flying or water type to leave)."
+     },
+     {
+      "t": "p",
+      "html": "The beach houses 61 hidden item locations. 5 of these are enabled when first entering, after which they may randomly respawn after every 1,500 steps taken."
+     },
+     {
+      "t": "p",
+      "html": "Items are split into different spawn groups:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Group A: 60%"
+       ],
+       [
+        0,
+        "Group B: 30%"
+       ],
+       [
+        0,
+        "Group C: 10%"
+       ]
+      ]
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Item</b>",
+        "<b>Group A Count</b>",
+        "<b>Group B Count</b>",
+        "<b>Group C Count</b>"
+       ],
+       [
+        "Ultra Ball",
+        "1",
+        "3",
+        ""
+       ],
+       [
+        "Hyper Potion",
+        "1",
+        "2",
+        "1"
+       ],
+       [
+        "Full Restore",
+        "",
+        "1",
+        "1"
+       ],
+       [
+        "PokeChip",
+        "2",
+        "3",
+        "1"
+       ],
+       [
+        "Revive",
+        "",
+        "2",
+        ""
+       ],
+       [
+        "Max Revive",
+        "",
+        "",
+        "1"
+       ],
+       [
+        "HP Up",
+        "",
+        "1",
+        ""
+       ],
+       [
+        "Protein",
+        "",
+        "1",
+        ""
+       ],
+       [
+        "Iron",
+        "",
+        "1",
+        ""
+       ],
+       [
+        "Carbos",
+        "",
+        "1",
+        ""
+       ],
+       [
+        "Calcium",
+        "",
+        "1",
+        ""
+       ],
+       [
+        "Zinc",
+        "",
+        "1",
+        ""
+       ],
+       [
+        "PP Up",
+        "",
+        "1",
+        ""
+       ],
+       [
+        "Rare Candy",
+        "",
+        "",
+        "1"
+       ],
+       [
+        "Bottlecap",
+        "",
+        "2",
+        "1"
+       ],
+       [
+        "Gold Bottlecap",
+        "",
+        "",
+        "1"
+       ],
+       [
+        "Quick Ball",
+        "",
+        "1",
+        ""
+       ],
+       [
+        "Dusk Ball",
+        "",
+        "1",
+        ""
+       ],
+       [
+        "Timer Ball",
+        "",
+        "1",
+        ""
+       ],
+       [
+        "Luxury Ball",
+        "",
+        "",
+        "1"
+       ],
+       [
+        "Tiny Mushroom",
+        "2",
+        "2",
+        ""
+       ],
+       [
+        "Pearl",
+        "1",
+        "1",
+        "1"
+       ],
+       [
+        "Stardust",
+        "2",
+        "1",
+        "1"
+       ],
+       [
+        "Rare Bone",
+        "",
+        "2",
+        "1"
+       ],
+       [
+        "Big Mushroom",
+        "",
+        "1",
+        "1"
+       ],
+       [
+        "Big Pearl",
+        "",
+        "1",
+        "1"
+       ],
+       [
+        "Star Piece",
+        "",
+        "1",
+        "1"
+       ],
+       [
+        "Nugget",
+        "",
+        "1",
+        "1"
+       ],
+       [
+        "Balm Mushroom",
+        "",
+        "1",
+        ""
+       ],
+       [
+        "Pearl String",
+        "",
+        "1",
+        ""
+       ],
+       [
+        "Comet Shard",
+        "",
+        "",
+        "1"
+       ],
+       [
+        "Big Nugget",
+        "",
+        "",
+        "1"
+       ],
+       [
+        "Max Revive",
+        "",
+        "",
+        "1"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Trainer Houses",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Throughout the Kulure region, players will find Trainer Houses, which challenge the player to complete 3 back-to-back battles with unique rules. Each Trainer House can be challenged once per day and serves as a means of renewable EXP and money. Players will randomly receive rewards based on how far they progress, with a grand prize at each Trainer House the first time all 3 battles are cleared."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Location</b>",
+        "<b>Ruleset</b>",
+        "<b>1 Win</b>",
+        "<b>2 Wins</b>",
+        "<b>3 Wins</b>",
+        "<b>Grand Prize</b>"
+       ],
+       [
+        "Heleo City",
+        "Inverse",
+        "Potion<br>Pokeball",
+        "Super Potion<br>Great Ball<br>Repel",
+        "MooMoo Milk<br>Ultra Ball<br>Full Heal",
+        "Mach Bike"
+       ],
+       [
+        "Laplaz Town",
+        "Sky Battle",
+        "Super Potion<br>Great Ball",
+        "MooMoo Milk<br>Ultra Ball<br>Full Heal",
+        "Hyper Potion<br>Revive<br>Quick Ball",
+        "Lucky Egg"
+       ],
+       [
+        "Emraldin Quay",
+        "Camomons",
+        "Ultra Ball<br>Hyper Potion",
+        "Ultra Ball<br>Max Potion<br>Revive",
+        "Full Restore<br>Revive<br>Quick Ball",
+        "Item Finder"
+       ],
+       [
+        "Uteya Village",
+        "Benjamin Butterfree",
+        "Ultra Ball<br>Max Potion",
+        "Ultra Ball<br>Full Restore<br>Revive",
+        "Full Restore<br>Max Revive<br>PP Max",
+        "PokeChip Charm"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "The rulesets for the above Trainer Houses are:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Inverse: All type advantages are reversed"
+       ],
+       [
+        0,
+        "Sky Battle: Only Flying type or Pokemon with Levitate may participate"
+       ],
+       [
+        0,
+        "Camomons: The first two moves’ types dictate a Pokemon’s types"
+       ],
+       [
+        0,
+        "Benjamin Butterfree: Pokemon temporarily devolve when fainting"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Braille Puzzles",
+    "blocks": [
+     {
+      "t": "img",
+      "src": "image19.png"
+     },
+     {
+      "t": "p",
+      "html": "The Uteyan Ruins host braille puzzles that need to be solved to get access to special rewards. After talking to an NPC at the entrance, the player can talk to an NPC in the Laplaz Town Pokemon Center to receive a translator. The riddles will be presented in English to simplify their solutions. If you just want to see the solutions, you can copy and paste the redacted text into a text editor.<br><br>"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Where</b>",
+        "<b>Riddle</b>",
+        "<b>Solution</b>",
+        "<b>Item</b>"
+       ],
+       [
+        "A",
+        "Understand the past to face the future",
+        "Read the 4 tablets in the cave in the correct order",
+        "Rock Climb"
+       ],
+       [
+        "B",
+        "Down right right down left Seek enlightenment at the end",
+        "Follow the path indicated and press A (must be facing the correct direction)",
+        "Gardevoirite"
+       ],
+       [
+        "C",
+        "Present that which finds strength in its newfound weakness**",
+        "Show a Shedinja (it’s BST is lower than it’s pre-evolution)",
+        "Sacred Ash"
+       ],
+       [
+        "D",
+        "Five* stones bow before the rising sun",
+        "Push boulders so they line up",
+        "Red Orb"
+       ],
+       [
+        "E",
+        "Clear your mind reduce cluttering to two",
+        "Break all but two rocks near the tower",
+        "Blue Orb"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "<i>* In v1.1.5, this will be Four stones</i>"
+     },
+     {
+      "t": "p",
+      "html": "<i><br>** In v1.3’s Divergent mode, this is “It withholds furious souls within” with a solution of presenting Spiritomb</i>"
+     }
+    ]
+   },
+   {
+    "title": "Daily Events",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Pokemon Amethyst has many daily events that reset at midnight each night. If you’re already at the location, you may have to leave and return for them to trigger."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Location</b>",
+        "<b>Event</b>"
+       ],
+       [
+        "Route 1",
+        "Static Sandygast encounter"
+       ],
+       [
+        "Varisi Forest",
+        "Static Foongus encounter (x2)"
+       ],
+       [
+        "Torma Cave",
+        "Static Stunfisk-G encounter (x3)"
+       ],
+       [
+        "Ferrox Village",
+        "Free random berry"
+       ],
+       [
+        "Heleo Ranch",
+        "Mareeps out during the day, hidden at night.<br>MooMoo Milk seller out during the day, inside at night."
+       ],
+       [
+        "Heleo City",
+        "Shady Deals seller, Pokemon groomer, and Trainer House."
+       ],
+       [
+        "Route 8",
+        "Static Sandygast encounter (x2)"
+       ],
+       [
+        "Daimyn City Mall",
+        "Lucky Draw and Daily Deal"
+       ],
+       [
+        "Laplaz Town",
+        "Apricorn Ball purchase and Trainer House"
+       ],
+       [
+        "Peradon Forest",
+        "Static Amoonguss encounter (x5)"
+       ],
+       [
+        "Bruccie Village",
+        "Wingull Gift"
+       ],
+       [
+        "Route 19",
+        "Static Palossand encounter"
+       ],
+       [
+        "Emraldin Quay",
+        "Trainer House"
+       ],
+       [
+        "Route 23",
+        "Static Palossand encounter (x2)"
+       ],
+       [
+        "Tsarvosa City",
+        "Dev Team and Gym Trainee battles"
+       ],
+       [
+        "Uteya Village",
+        "Slowpoke News"
+       ],
+       [
+        "Daimyn City",
+        "Special Pokeball purchase"
+       ],
+       [
+        "Daimyn City",
+        "Pre-E4 Rival training battle (can choose between main and Emraldin Quay teams)"
+       ],
+       [
+        "Various",
+        "Postgame Gym Leader rematches (each has 1 of 4 teams chosen at random)"
+       ],
+       [
+        "Heleo City Pokemon Fan Club",
+        "Blissey Trainer (Postgame only)"
+       ],
+       [
+        "Battle Frontier",
+        "Relic seller (v1.4+)"
+       ],
+       [
+        "Battle Frontier",
+        "Wonder Pick discounted pull (25 PokeChips for first) (v1.4+)"
+       ]
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "title": "Game Customization",
+  "topics": [
+   {
+    "title": "Difficulty Modes",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "<i>This option can be changed any time from the second Options Page!<br></i>"
+     },
+     {
+      "t": "p",
+      "html": "On starting a new save, you can choose between 2 game modes:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Standard, the default mode and intended for a first playthrough"
+       ],
+       [
+        0,
+        "Hard, where all boss trainers have strengthened teams with held items"
+       ],
+       [
+        0,
+        "Extra Hard (v1.3), where all trainers get perfect IVs and max EVs in their 2 best stats"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "In Standard, you can expect the following:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Trainers have Pokemon that are reasonably evolved"
+       ],
+       [
+        1,
+        "i.e. a Pokemon at/above it’s evolution level will be evolved"
+       ],
+       [
+        1,
+        "Pokemon with stone evolutions won’t necessarily be evolved depending on how far you are (no early game Jolteons)"
+       ],
+       [
+        0,
+        "Trainers have IVs based on their class. A bug catcher has few IVs and a champion has maxed, for example"
+       ],
+       [
+        0,
+        "Trainers do not have any EVs or natures"
+       ],
+       [
+        0,
+        "Some Pokemon may have items, but this is not the norm"
+       ],
+       [
+        0,
+        "Trainers have AI flags according to their class"
+       ],
+       [
+        1,
+        "Eg. Blackbelts will be risky, gym leaders smart, etc."
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "In Hard, you can expect all the rules above with the following exceptions for <a href=\"https://shorturl.at/8bZrp\" target=\"_blank\" rel=\"noopener\">boss trainers</a>:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "All Pokemon hold items (with the exception of the first rival fight)"
+       ],
+       [
+        0,
+        "All Trainers have 1 extra Pokemon, if their roster isn’t filled"
+       ],
+       [
+        0,
+        "Each Pokemon gains +1 levels (sometimes +2 for their ace)"
+       ],
+       [
+        0,
+        "Boss trainers have better AI"
+       ],
+       [
+        0,
+        "(v1.4.3+) Opponent Pokemon receive beneficial natures based on their stats and movesets"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "In Extra Hard (available in v1.3+), the rules above all apply in addition to the following for <i>all</i> trainers:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Every IV is maxed at 31"
+       ],
+       [
+        0,
+        "Each Pokemon’s best 2 stats have max EVs"
+       ],
+       [
+        0,
+        "Hard mode trainer teams are used"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Soft and Hard Level Caps",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "<i>This option can be changed any time from the second Options Page!</i>"
+     },
+     {
+      "t": "p",
+      "html": "Soft level caps (the default) allow you to level freely, but your Pokemon will disobey you if you surpass the threshold set by the number of badges you have. This should almost always give you more than enough room to level up when facing challenges, without Pokemon disobeying."
+     },
+     {
+      "t": "p",
+      "html": "In v1.3, you are informed of the current cap when changing your preference in the options menu.<br><br>"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Badges</b>",
+        "<b>Soft Level Cap</b>"
+       ],
+       [
+        "0",
+        "15"
+       ],
+       [
+        "1",
+        "25"
+       ],
+       [
+        "2",
+        "35"
+       ],
+       [
+        "3",
+        "45"
+       ],
+       [
+        "4",
+        "55"
+       ],
+       [
+        "5",
+        "65"
+       ],
+       [
+        "6",
+        "75"
+       ],
+       [
+        "7",
+        "85"
+       ],
+       [
+        "8",
+        "100"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "When hard level caps are set, Pokemon can gain EXP freely until the cap, after which they will start to gain 1 EXP. You cannot use Rare Candies to level above the current cap. "
+     },
+     {
+      "t": "p",
+      "html": "In v1.3, hard caps are split into 2 options:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Hard: cap is set to the level of the next boss’s ace"
+       ],
+       [
+        0,
+        "Extra Hard: cap is set to the level of the next boss’s ace minus 2"
+       ],
+       [
+        1,
+        "Prior to v1.3, this is the only hard cap option"
+       ]
+      ]
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Updates after</b>",
+        "<b>Hard Cap<br>(Standard)*</b>",
+        "<b>Hard Cap<br>(Hard/Extra Hard)*</b>"
+       ],
+       [
+        "New Game",
+        "13",
+        "13"
+       ],
+       [
+        "Gym Leader Terrence",
+        "15",
+        "16"
+       ],
+       [
+        "Pluto Admin Irene",
+        "17",
+        "17"
+       ],
+       [
+        "Casey",
+        "20",
+        "21"
+       ],
+       [
+        "Gym Leader Stella",
+        "26",
+        "27"
+       ],
+       [
+        "Gym Leader Raine",
+        "33",
+        "34"
+       ],
+       [
+        "Gym Leader Chance",
+        "37",
+        "39"
+       ],
+       [
+        "Pluto Admin Ronald",
+        "41",
+        "42"
+       ],
+       [
+        "Casey 2",
+        "47",
+        "48"
+       ],
+       [
+        "Gym Leader Abby",
+        "50",
+        "52"
+       ],
+       [
+        "Pluto Leader Kurtis",
+        "58",
+        "58"
+       ],
+       [
+        "Alistair",
+        "63",
+        "64"
+       ],
+       [
+        "Leaders Dennis and Dee",
+        "66",
+        "68"
+       ],
+       [
+        "Rival (Victory Road)",
+        "74",
+        "75"
+       ],
+       [
+        "Becoming champion",
+        "100",
+        "100"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "* When playing with Extra Hard caps, each cap is reduced by 2 except for the final cap"
+     }
+    ]
+   },
+   {
+    "title": "Player Starter Generations",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "By default, the game will randomize starter choices across gens 1-8 on each new save. If you’d prefer, you can lock your starter choices to a specific generation to choose your favorite."
+     },
+     {
+      "t": "p",
+      "html": "The generation each starter is from influences certain things in the game. These events are available regardless of the starter you choose; it is just their generation that dictates how the event works.<br>"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Starter Type</b>",
+        "<b>Impacts</b>",
+        "<b>Breakdown</b>"
+       ],
+       [
+        "<b>Grass</b>",
+        "The Daycare Pokemon freebie egg",
+        "1 - Pichu<br>2 - Togepi<br>3 - Wynaut<br>4 - Riolu<br>5 - Larvesta<br>6 - Happiny<br>7 - Eevee<br>8 - Toxel"
+       ],
+       [
+        "<b>Fire</b>",
+        "A trade available in Daimyn City",
+        "<b>Standard Mode:</b><br>1 - Farfetch’d -&gt; Mr. Mime<br>2 - Bonsly -&gt; Dratini<br>3 - Slakoth -&gt; Corsola-G<br>4 - Magikarp -&gt; Frillish (Female)<br>5 - Boldore -&gt; Emolga<br>6 - Riolu -&gt; Eevee<br>7 - Lillipup -&gt; Noibat<br>8 - Cacnea -&gt; Hattena<br><br><b>Divergent Mode:</b><br>1 - Poliwhirl -&gt; Jynx<br>2 - Haunter -&gt; Xatu<br>3 - Sentret -&gt; Makuhita<br>4 - Medicham -&gt; Haunter<br>5 - Ditto -&gt; Munchlax<br>6 - Vileplume -&gt; Steelix<br>7 - Granbull -&gt; Steenee<br>8 - Meowth-G -&gt; Meowth"
+       ],
+       [
+        "<b>Water</b>",
+        "Which eeveelution the rival evolves into",
+        "1 - Vaporeon<br>2 - Jolteon<br>3 - Flareon<br>4 - Espeon<br>5 - Umbreon<br>6 - Leafeon<br>7 - Glaceon<br>8 - Sylveon"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Skip Cutscenes",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "<i>This option can be changed any time from the second Options Page!</i>"
+     },
+     {
+      "t": "p",
+      "html": "This option skips all long running story cutscenes, replacing them with a short reminder of what to do next. It’s only recommended to use on repeat playthroughs and challenge runs (ex. Nuzlockes)."
+     }
+    ]
+   },
+   {
+    "title": "Battle and Catching Tutorials",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "By default, Pokemon Amethyst assumes the player is familiar with core Pokemon mechanics and will not present them during the game. These can be optionally turned on with this setting."
+     }
+    ]
+   },
+   {
+    "title": "QoL Options",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "In v1.2.0, you can now choose to start any difficulty with Quality of Life (QoL) items from the start of the game. Remember, some items are used from the Tools menu under Start -&gt; Right.<br>"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Exp Share"
+       ],
+       [
+        0,
+        "Portable PC"
+       ],
+       [
+        0,
+        "Poke Vial"
+       ],
+       [
+        0,
+        "Infinite Repel"
+       ],
+       [
+        0,
+        "ADM"
+       ],
+       [
+        0,
+        "Mach Bike"
+       ],
+       [
+        0,
+        "Item Finder"
+       ],
+       [
+        0,
+        "PokeChip Charm"
+       ],
+       [
+        0,
+        "$2000 extra ($5000 total)"
+       ],
+       [
+        0,
+        "Shiny Charm (in v1.4)"
+       ],
+       [
+        0,
+        "Oval Charm (in v1.4)"
+       ],
+       [
+        0,
+        "Catching Charm (in v1.4)  "
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "<br>As a note, some tools are briefly disabled at certain points of the story."
+     }
+    ]
+   },
+   {
+    "title": "Pokemon Species Selection",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "In v1.3, players can choose to play the game with the Standard Pokemon list or the Divergent Pokemon list. Standard is recommended for a first playthrough, with Divergent mode offered for players looking for a fresh experience. <i>Generally</i> speaking, Divergent mode is easier due to having less flexibility when designing boss trainer teams."
+     },
+     {
+      "t": "p",
+      "html": "When Divergent mode is enabled, the Pokedex updates to replace all Pokemon from entries 1-300 with a new, hand-curated set (excluding Rotom, Ditto, Jirachi, and Victini). This is not a 1:1 swap; all wild Pokemon, trainer teams, legendaries, shop stock, and trades are replaced with fresh lists of Pokemon that make sense for the location and trainer theme. The only thing that does not change are gift Pokemon given to the player."
+     },
+     {
+      "t": "h",
+      "html": "New Game Modifier"
+     },
+     {
+      "t": "p",
+      "html": "The modes were implemented as separate options to not dilute Pokemon selection in either mode, while still providing a way for players to use their favorites and experience a fresh take on the game. While Divergent mode is intended to be set-and-forget, I do understand the appeal of being able to play with your favorites. A new Game Modifier is added that allows the player to swap between modes via the Options menu, unlocked when completing the game in Divergent mode.<br><br>When swapping, the following occurs:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Wild Pokemon and trainers update automatically"
+       ],
+       [
+        0,
+        "The Pokedex, DexNav, and PokeDex Assessment all update to reflect the current mode"
+       ],
+       [
+        1,
+        "This means you can aim for dex completion in both modes"
+       ],
+       [
+        0,
+        "The Pokedex’s Habitat list includes all caught Pokemon from the alternate mode, presented as #000 (This is a technical limitation, but it is nice to see everything in one place anyways)"
+       ],
+       [
+        0,
+        "Shops refresh their inventory for mode-specific items (Mega Stones and evolution items in Tsarvosa City)"
+       ],
+       [
+        0,
+        "Legendary Pokemon are refreshed"
+       ],
+       [
+        0,
+        "Roaming legendaries swap automatically. For roamers that have fainted, the player must enter the Hall of Fame to get them to roam again"
+       ],
+       [
+        0,
+        "Certain mode-specific overworld items are refreshed"
+       ],
+       [
+        1,
+        "Stick / Sachet on Route 7"
+       ],
+       [
+        1,
+        "Blue Orb / Reveal Glass in Uteyan Ruins"
+       ],
+       [
+        1,
+        "Red Orb / Prison Bottle in Uteyan Ruins"
+       ],
+       [
+        1,
+        "Rusted Data / Genesect Drives in Daimyn City Factory"
+       ],
+       [
+        1,
+        "All Mega Stones (also serves as a way to restore lost mega stones)"
+       ],
+       [
+        0,
+        "After clearing the Carnelidge Volcano story sequence, the player also receives the Houndoominite / Tyranitarite when swapping, if they aren’t in the bag<br>"
+       ]
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "title": "Postgame Content",
+  "topics": [
+   {
+    "title": "Ultra Episode",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The Ultra Episode can be started immediately upon entering the postgame. In this event, you must investigate and close Ultra Wormholes by capturing the Ultra Beasts within them. This culminates in a final story section where you encounter the Ultra Beast causing the wormholes to appear."
+     },
+     {
+      "t": "p",
+      "html": "Some high level notes:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "You must catch and evolve Cosmog into either Solgaleo (day) or Lunala (night) to enter the final area. The alternative form will be accessible"
+       ],
+       [
+        0,
+        "Type: Null must be brought to wormholes, and will not evolve until the ultra episode’s conclusion"
+       ],
+       [
+        0,
+        "After the Ultra Episode’s conclusion you can…"
+       ],
+       [
+        1,
+        "Get Silvally memory discs from a researcher at the Interdimensional Research Facility"
+       ],
+       [
+        1,
+        "Become Silvally’s trainer &amp; nickname it"
+       ],
+       [
+        1,
+        "Fuse/Unfuse Necrozma with Solgaleo or Lunala"
+       ],
+       [
+        1,
+        "Obtain  Z-Crystals (see <b>Gym Trainees &amp; Z-Crystals</b> for more details)."
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "Ultra wormholes are only closed when the Ultra Beast inside of them is captured, to ensure you can complete the Pokedex. The clues and their respective locations can be found below."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Clue</b>",
+        "<b>Where to Find</b>",
+        "<b>Ultra Beast</b>"
+       ],
+       [
+        "This reading is coming from a flooded cavern in a secluded corner of the ocean.",
+        "Seppire Cove’s side room",
+        "Nihilego"
+       ],
+       [
+        "This reading is coming from a lush jungle teeming with wildlife.",
+        "Mimmett Jungle’s center room",
+        "Buzzwole"
+       ],
+       [
+        "This reading is coming from an arid sea of sand.",
+        "Southern Rubarr Desert",
+        "Pheromosa"
+       ],
+       [
+        "This reading is coming from a place surging with electricity.",
+        "Daimyn City Factory",
+        "Xurkitree"
+       ],
+       [
+        "This reading is coming from a volcanic peak covered in craters.",
+        "Mount Carnelidge Exterior",
+        "Celesteela"
+       ],
+       [
+        "This reading is coming from a forest flush with verdant leaves.",
+        "Varisi Forest, east side",
+        "Kartana"
+       ],
+       [
+        "This reading is coming from… Within the city? If no one has seen it, perhaps it is underground…",
+        "Team Pluto HQ, outside of Kurtis’ hallway",
+        "Guzzlord"
+       ],
+       [
+        "This reading is coming from the ruins of a long lost civilization.",
+        "Uteyan Ruins exterior",
+        "Stakataka"
+       ],
+       [
+        "This reading is coming from a mansion forgotten to time.",
+        "Forgotten Manse",
+        "Blacephalon"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Champion Fanatic",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The champion fanatic will appear outside the player’s house and share the player’s stats with them (see <b>Gameplay Stats</b>)."
+     }
+    ]
+   },
+   {
+    "title": "New Legendaries",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The player is now able to encounter and capture the following legendary Pokemon:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Glastrier, in the back of Scalding Spa"
+       ],
+       [
+        0,
+        "Volcanion, in Carnelidge Volcano"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Gym Leader Rematches",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Each gym leader can be challenged to a rematch in the postgame once per day, with a game modifier unlocking when all 8 are completed in a single day. These gym leaders have fully levelled up and fleshed out teams that center around the following mechanics, with one of the four teams chosen at random when the match starts."
+     },
+     {
+      "t": "p",
+      "html": "<br>At this time, the specifics of each team are not documented.<br>"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Leader</b>",
+        "<b>Team 1</b>",
+        "<b>Team 2</b>",
+        "<b>Team 3</b>",
+        "<b>Team 4</b>"
+       ],
+       [
+        "<b>Terrence</b>",
+        "Grassy Terrain",
+        "Electric Terrain",
+        "Psychic Terrain",
+        "Misty Terrain"
+       ],
+       [
+        "<b>Stella</b>",
+        "Burn",
+        "Paralysis",
+        "Sleep",
+        "Poison"
+       ],
+       [
+        "<b>Raine</b>",
+        "Sun",
+        "Rain",
+        "Sand",
+        "Hail"
+       ],
+       [
+        "<b>Chance</b>",
+        "Team Buffs",
+        "Trick Room",
+        "Perish Trap",
+        "Unpredictable"
+       ],
+       [
+        "<b>Casey</b>",
+        "Stats Up and Down",
+        "Baton Passing",
+        "Psych Up",
+        "Stat Abilities"
+       ],
+       [
+        "<b>Abby</b>",
+        "Limiting Abilities",
+        "Immunity Abilities",
+        "Unpredictable Abilities",
+        "Synergystic Abilities"
+       ],
+       [
+        "<b>Iris</b>",
+        "Weakness Items",
+        "Held Item Management",
+        "Limiting Item Use",
+        "Detrimental Items"
+       ],
+       [
+        "<b>Dennis &amp; Dee</b>",
+        "Team Immunities",
+        "Team Support",
+        "Complimentary Abilities",
+        "Multi-Targetting Moves"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Team Pluto Epilogue",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The player can find Kurtis hiding out in a cave on Route 13. Beating him again will cause him to once again go into hiding and will unlock a game modifier."
+     }
+    ]
+   },
+   {
+    "title": "Rival Rematches",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The rival can continue to be battled outside of the Pokemon League, with enhanced teams to provide a better challenge."
+     }
+    ]
+   },
+   {
+    "title": "Champion Selene’s Gifts",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The player can find the former Champion Selene vacationing on Route 19, east of Emraldin Quay. When spoken to, she’ll offer to gift the player her Victini. After accepting, she’ll offer to convert any Greninja’s ability to Battle Bond, so long as it’s friendship is maxed."
+     }
+    ]
+   },
+   {
+    "title": "Blissey Trainer",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "Once per day, a trainer will appear in the Heleo City Pokemon Center. She has a team of 6 Blisseys that scale with the player’s party. The player can also lose without penalty."
+     },
+     {
+      "t": "p",
+      "html": "These factors make her very lucrative for quickly levelling up in the postgame."
+     }
+    ]
+   },
+   {
+    "title": "E4 Rematches & Title Defense",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The Elite Four’s teams will grow stronger in the postgame to provide a greater challenge. Upon reaching the Champion’s Room, the player will take their place at the back of the room and face a challenger chosen at random from the following."
+     },
+     {
+      "t": "p",
+      "html": "See <a href=\"https://docs.google.com/spreadsheets/d/1JQmtrTiNesjyf3_UQWrUmGrxiccM2Nq9_CY86vUd6so/edit?usp=drive_link\" target=\"_blank\" rel=\"noopener\">the boss encounter list</a> (WIP) for the details on each team."
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Character</b>",
+        "<b>Unlock Requirements</b>"
+       ],
+       [
+        "Rival (team depends on eeveelution)",
+        ""
+       ],
+       [
+        "Youngster Joey",
+        ""
+       ],
+       [
+        "Selene (team for both before &amp; after accepting her Victini)",
+        ""
+       ],
+       [
+        "Alistair",
+        ""
+       ],
+       [
+        "Professor Hawthorne",
+        ""
+       ],
+       [
+        "Clancy",
+        ""
+       ],
+       [
+        "Ena",
+        ""
+       ],
+       [
+        "Copycat",
+        ""
+       ],
+       [
+        "Foreigner",
+        ""
+       ],
+       [
+        "Developer Collin",
+        ""
+       ],
+       [
+        "Developer Crystal",
+        ""
+       ],
+       [
+        "Team Pluto Admin Irene",
+        "Only after completing the Team Pluto epilogue"
+       ],
+       [
+        "Team Pluto Admin Ronald",
+        "Only after completing the Team Pluto epilogue"
+       ],
+       [
+        "Team Pluto Leader Kurtis",
+        "Only after completing the Team Pluto epilogue"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Professor’s Conservatory",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The player can exit Professor Hawthorne’s lab out the back door to access his conservatory, where every starter Pokemon can be caught in the wild. They are split across 3 themed zones and their encounter rates depend on the time of day."
+     },
+     {
+      "t": "p",
+      "html": "See the <a href=\"https://docs.google.com/spreadsheets/d/1Yz9d8S1Jw6KRKRuUR2cswZhD41rfAHQh/edit?usp=sharing&amp;ouid=103765261558399840489&amp;rtpof=true&amp;sd=true\" target=\"_blank\" rel=\"noopener\">encounter list</a> for more details."
+     }
+    ]
+   },
+   {
+    "title": "Battle Frontier",
+    "blocks": [
+     {
+      "t": "p",
+      "html": "The Battle Frontier is introduced in v1.4 and becomes accessible to players after becoming the champion, by visiting the Tsarvosa City Pier. After arriving, they are free to fly to/from the frontier at any time. This facility features both Singles and Doubles battles at 8 different facilities, each with its own spin on battling. The player can customize the battle background and music used when battling at any facility."
+     },
+     {
+      "t": "p",
+      "html": "The player can also arrive at the Frontier if they interact with the dresser in their bedroom prior to receiving their starter. This is a one-way trip and is meant to be used for demoing purposes, or if you are just interested in enjoying tough battles. When taking this route, the player is given 30 Singles-ready and Doubles-ready Pokemon in their PC box."
+     },
+     {
+      "t": "h",
+      "html": "Shared Ruleset"
+     },
+     {
+      "t": "p",
+      "html": "The frontier is made up of 8 different facilities described in greater detail below, but all share the same rules:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Pokemon and movesets from other regions may appear"
+       ],
+       [
+        0,
+        "Pokemon scale to level 50 and do not gain exp"
+       ],
+       [
+        0,
+        "Consumed held items are returned after battle"
+       ],
+       [
+        0,
+        "Difficulty settings don’t apply; all opponents are EV and IV trained"
+       ],
+       [
+        0,
+        "Resetting once a battle has begun results in a forfeit"
+       ],
+       [
+        0,
+        "Game Modifiers and Meal Effects are temporarily disabled while in a frontier battle"
+       ],
+       [
+        0,
+        "A streak may be paused at any time and resumed later. You may bring a different team when resuming, with the exception of the Battle Factory which restores the party you had. Both Singles and Doubles can be paused at the same time."
+       ]
+      ]
+     },
+     {
+      "t": "h",
+      "html": "Rewards"
+     },
+     {
+      "t": "p",
+      "html": "Players earn PokeChips for each win, with growing streaks giving additional chips. When beating an Ace or Brain at streak 20 and 50 respectively, 20 and 50 chips are given instead:"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Streak</b>",
+        "<b>Chips Given</b>"
+       ],
+       [
+        "0-10",
+        "2"
+       ],
+       [
+        "11-20",
+        "3"
+       ],
+       [
+        "21-30",
+        "4"
+       ],
+       [
+        "etc.",
+        "etc."
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "As the player hits max streak milestones, they earn stars on their Battle Record:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Bronze star: 20"
+       ],
+       [
+        0,
+        "Silver star: 50"
+       ],
+       [
+        0,
+        "Gold star: 100"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "When a streak of 50+ has been reached at any facility, a star is added to the player’s Trainer Card. All other rewards (held items, Z-Crystals, tutor moves, etc.) can be received without participating in a single Battle Frontier battle, if the player wishes."
+     },
+     {
+      "t": "h",
+      "html": "Opponent Teambuilding"
+     },
+     {
+      "t": "p",
+      "html": "Opponents are randomly built from a pool of 2,033 different builds. Each species can only appear once (prior to streak 31) and typically has 4-6 spreads. This means there are billions of unique team combinations; you’ll almost never face the same twice. The opponent’s team is generated just before a battle occurs and factors your current team into its teambuilding process. The <a href=\"https://github.com/assassinsgreed/Complete-Fire-Red-Upgrade/blob/dev/src/Tables/battle_tower_spreads.h#L24\" target=\"_blank\" rel=\"noopener\">pool for these</a> is genuinely massive."
+     },
+     {
+      "t": "p",
+      "html": "Aces and Brains have smaller teambuilding pools with species specific to that trainer. For example, your rival brings Pokemon he acquires in the standard and divergent modes."
+     },
+     {
+      "t": "p",
+      "html": "Opponent team building adheres to the following rules:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "The opponent cannot bring major legendaries (ex. Mewtwo, Giratina, etc.) unless the player does. Minor legendaries (ex. Kami trio, Manaphy, etc.) can appear any time"
+       ],
+       [
+        0,
+        "Opponents can only bring megas at streak 20+, but Z-Crystals any time"
+       ],
+       [
+        0,
+        "Opponent BST ramps up based on current streak:"
+       ],
+       [
+        1,
+        "0-10: 520 BST max"
+       ],
+       [
+        1,
+        "11-20: 540 BST max"
+       ],
+       [
+        1,
+        "21-30: 570 BST max"
+       ],
+       [
+        1,
+        "31-50: 570 BST max, and duplicate species can be rolled"
+       ]
+      ]
+     },
+     {
+      "t": "h",
+      "html": "Wonder Picks"
+     },
+     {
+      "t": "p",
+      "html": "The player can participate in a Wonder Pick feature at the Battle Frontier Pokemon Center. This gives them a Pokemon from the Frontier spreads pool (i.e. the pool opponents, the Battle Factory, and Battle Maze pull from) in exchange for PokeChips. This pool <b>does not</b> include major legendaries. The first pull of the day costs 25 PokeChips, then 50 afterward."
+     },
+     {
+      "t": "h",
+      "html": "Battle Tower"
+     },
+     {
+      "t": "p",
+      "html": "The Battle Tower provides standard battles with no additional gimmicks and rulesets. It’s the perfect place to enjoy some traditional battles."
+     },
+     {
+      "t": "h",
+      "html": "Battle Quarry"
+     },
+     {
+      "t": "p",
+      "html": "In this facility, 2 out of 4 move slots are randomly disabled for every Pokemon on the field, both the player and opponent. Moves cannot be reordered while in this facility."
+     },
+     {
+      "t": "h",
+      "html": "Battle Sands"
+     },
+     {
+      "t": "p",
+      "html": "In the Battle Sands, the same AI that controls Frontier opponents controls the player’s party. The player chooses whether to battle, switch, or forfeit and the AI chooses which move to use. Every Pokemon gets a random stat buff when they enter the field. The intensity of the buff depends on the player’s streak:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Streak &lt; 20:  1 stat stage"
+       ],
+       [
+        0,
+        "Streak &lt;40:   2 stat stages"
+       ],
+       [
+        0,
+        "Streak &lt;60:   3 stat stages"
+       ],
+       [
+        0,
+        "Streak &lt;80:   4 stat stages"
+       ],
+       [
+        0,
+        "Streak &lt;100:  5 stat stages"
+       ]
+      ]
+     },
+     {
+      "t": "h",
+      "html": "Battle Maze"
+     },
+     {
+      "t": "p",
+      "html": "In this facility, the player is given a random party before every battle, made up of the same Pokemon spread pool the opponent can pull from."
+     },
+     {
+      "t": "h",
+      "html": "Battle Isle"
+     },
+     {
+      "t": "p",
+      "html": "In this facility, all Pokemon battle with battle behaviours similar to generation 1:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Held items are disabled"
+       ],
+       [
+        0,
+        "Abilities are disabled"
+       ],
+       [
+        0,
+        "A move is physical/special based on it’s type (with fairy being special)"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "The following generation 1 style rules are not applied:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Crits are not speed based"
+       ],
+       [
+        0,
+        "Moves do not have a 1/256 chance to miss"
+       ],
+       [
+        0,
+        "Type matchups are not changed"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "Moves that have dynamic physical/special splits (such as Photon Geyser and Shell Side-Arm) also match their move type every time."
+     },
+     {
+      "t": "h",
+      "html": "Battle Sim"
+     },
+     {
+      "t": "p",
+      "html": "The Battle Sim applies a random effect to every battle, from the following pool:"
+     },
+     {
+      "t": "table",
+      "rows": [
+       [
+        "<b>Effect</b>",
+        "<b>Effect</b>",
+        "<b>Effect</b>"
+       ],
+       [
+        "Permanent electric terrain",
+        "Permanent grassy terrain",
+        "Permanent misty terrain"
+       ],
+       [
+        "Permanent psychic terrain",
+        "Permanent rain",
+        "Permanent sun"
+       ],
+       [
+        "Permanent sandstorm",
+        "Permanent hail",
+        "Permanent fog"
+       ],
+       [
+        "Permanent trick room",
+        "Permanent magic room",
+        "Permanent wonder room"
+       ],
+       [
+        "Permanent gravity effect",
+        "Permanent ion deluge",
+        "Permanent fairy lock"
+       ],
+       [
+        "Permanent mud sport",
+        "Permanent water sport",
+        "Permanent safeguard"
+       ],
+       [
+        "Permanent mist",
+        "Permanent sea of fire",
+        "Permanent rainbow"
+       ],
+       [
+        "Permanent confusion",
+        "Permanent taunt",
+        "Permanent torment"
+       ],
+       [
+        "Permanent heal block",
+        "Permanent throat chop",
+        "Permanent ability suppression"
+       ],
+       [
+        "All hits land crits",
+        "No hits can crit",
+        "Inverse battle"
+       ],
+       [
+        "Swap random pokemon on each side",
+        "",
+        ""
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "The number of effects applied depends on the player’s current streak:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Streak &lt; 20:     1 effect"
+       ],
+       [
+        0,
+        "Streak 20-29:   2 effects (doubles only)"
+       ],
+       [
+        0,
+        "Streak 30-39:   2 effects"
+       ],
+       [
+        0,
+        "Streak 40-49:   3 effects"
+       ],
+       [
+        0,
+        "Streak 50-70:   4 effects"
+       ],
+       [
+        0,
+        "Streak 71+:      5 effects"
+       ]
+      ]
+     },
+     {
+      "t": "h",
+      "html": "Battle Factory"
+     },
+     {
+      "t": "p",
+      "html": "The Battle Factory tasks the player with renting a party of Pokemon from the same pool an opponent can. After each battle, the player can choose to swap one of their Pokemon with one their opponent just used, with the ability to view the summary of each team before committing."
+     },
+     {
+      "t": "h",
+      "html": "Battle Observatory"
+     },
+     {
+      "t": "p",
+      "html": "In the battle observatory, the player brings a team of 3 (4 in doubles) Pokemon. The player and opponent reveal their entire teams before choosing 1 (2 in doubles) to duel each other with. The player can view the full summary of their opponent’s team and is encouraged to do so - the AI will read the player’s party to find the best Pokemon to bring in response. In this facility, megas and Z-Crystals are disabled."
+     },
+     {
+      "t": "p",
+      "html": "New Game Plus"
+     },
+     {
+      "t": "p",
+      "html": "After completing the game, the player will have the option to restart the game as either a traditional New Game, or a New Game Plus from the main menu. New Game Plus carries the following forward into a new save:<br>"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Pokemon in the box, including customised box names and wallpapers"
+       ],
+       [
+        0,
+        "Pokedex progress"
+       ],
+       [
+        0,
+        "Bag contents, including TMs/HMs and berries"
+       ],
+       [
+        1,
+        "HMs still require badges &amp; Team Pluto to be disbanded (Surf) to be used"
+       ],
+       [
+        0,
+        "Money"
+       ],
+       [
+        0,
+        "Unlocked Game Modifiers and their settings, as well as selected options"
+       ],
+       [
+        0,
+        "Early access to the Professor’s Conservatory (v1.4.1+)"
+       ],
+       [
+        0,
+        "Your Original Trainer ID"
+       ],
+       [
+        0,
+        "All Pokemon will obey you always; both those in the box and ones newly caught"
+       ],
+       [
+        0,
+        "Most Key Items and PokeTools"
+       ],
+       [
+        1,
+        "Note: You must acquire the Pokedex in order for the DexNav to become available"
+       ]
+      ]
+     },
+     {
+      "t": "p",
+      "html": "The following does <b>not</b> carry forward:"
+     },
+     {
+      "t": "list",
+      "items": [
+       [
+        0,
+        "Pokemon in your party"
+       ],
+       [
+        0,
+        "Story Key Items (Team Pluto Keys &amp; Victory Flag)"
+       ],
+       [
+        0,
+        "Player name and gender<br>"
+       ]
+      ]
+     }
+    ]
+   }
+  ]
+ }
+]

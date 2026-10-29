@@ -61,6 +61,9 @@ pip install python-docx
 python -m tools.dexpage.items path/to/feature-list.docx
 ```
 
-This rewrites `items.csv` and `machines.csv` from the doc's item, berry, Mega Stone, TM and HM tables.
+This rewrites `items.csv`, `machines.csv` and `tutors.csv` from the doc's item, berry, Mega Stone, TM, HM and
+tutor tables. For the Docs tab, run `python -m tools.dexpage.docs path/to/feature-list.docx` too: it rewrites
+`docs.json` and `doc_images/` (Heading 1 = group, Heading 2 = topic; Locations, Dungeon Maps and topics the other
+tabs already cover are skipped — see `SKIP_TOPICS` in `docs.py`).
 
 Tests: `python -m pytest tests/dexpage`

@@ -231,3 +231,10 @@ def test_gym_trainee_tutors_grouped(data):
 
 def test_game_version_tag(html):
     assert re.search(r'class="version"[^>]*>v1.4.3<', html)
+
+
+def test_docs_in_page(data):
+    groups = {g["title"]: g for g in data["docs"]}
+    mining = next(t for t in groups["Gameplay Features"]["topics"] if t["title"] == "Mining Minigame")
+    assert "<table" in mining["html"] and "data:image/png;base64," in mining["html"]
+    assert "hardstone" in mining["s"]

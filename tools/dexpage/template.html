@@ -264,6 +264,21 @@ tr.on td { background: var(--accent-soft); }
 tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--console-h, 150px) + 12px); }
 .chip.on { border-color: var(--accent); background: var(--accent-soft); }
 
+/* Docs: feature-list topics, rendered from the doc */
+.doccard { position: relative; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px 16px; }
+.doccard h2 { margin: 0 44px 8px 0; font: 600 22px/1.15 var(--font-display); }
+.doc { display: grid; gap: 8px; font-size: 14.5px; line-height: 1.55; max-width: 78ch; }
+.doc p, .doc ul { margin: 0; }
+.doc ul { padding-left: 20px; display: grid; gap: 2px; }
+.doc h4 { margin: 8px 0 0; font: 600 13px var(--font-display); text-transform: uppercase; letter-spacing: .06em; color: var(--accent); }
+.doc a { color: var(--accent); }
+.doc img { max-width: 100%; height: auto; border-radius: 6px; border: 1px solid var(--line); justify-self: start; image-rendering: auto; }
+.doctable { overflow-x: auto; max-width: 100%; }
+.doctable table { border-collapse: collapse; font-size: 13.5px; min-width: 60%; }
+.doctable th { text-align: left; font: 600 11.5px var(--font-display); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-bottom: 1px solid var(--line); padding: 5px 10px 5px 0; vertical-align: bottom; }
+.doctable td { border-bottom: 1px solid var(--line); padding: 5px 10px 5px 0; vertical-align: top; }
+.doctable tr:last-child td { border-bottom: 0; }
+
 /* Place card */
 .loccard { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px; display: grid; gap: 12px; }
 .loccard h2 { margin: 0; font: 600 24px/1.1 var(--font-display); }
@@ -329,6 +344,7 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
       <button role="tab" data-viewtab="tutors" aria-selected="false">Tutors</button>
       <button role="tab" data-viewtab="items" aria-selected="false">Items</button>
       <button role="tab" data-viewtab="places" aria-selected="false">Locations</button>
+      <button role="tab" data-viewtab="docs" aria-selected="false">Docs</button>
     </nav>
       <span class="navbtns">
         <button class="navbtn" id="back" aria-label="Back" title="Back" disabled><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -340,7 +356,7 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
       <button class="clear" id="clear" aria-label="Clear search" hidden>×</button>
     </div>
     <div class="filters">
-      <div class="seg" role="group" aria-label="Mode">
+      <div class="seg" role="group" aria-label="Mode" id="mode-seg">
         <button id="m-all" data-mode="" aria-pressed="true">All</button>
         <button id="m-std" data-mode="Standard" aria-pressed="false">Standard</button>
         <button id="m-div" data-mode="Divergent" aria-pressed="false">Divergent</button>

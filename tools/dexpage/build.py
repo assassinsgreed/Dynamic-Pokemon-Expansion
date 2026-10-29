@@ -11,6 +11,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
+from .docs import DOC_IMAGES, load_docs, render_topic, topic_text
 from .items import load_items, load_machine_locations, load_tutors
 import difflib
 
@@ -111,6 +112,7 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
     _attach_machine_locations(data, moves)
     tutors = _attach_tutor_locations(moves)
     return {
+        "docs": _docs(),
         "tutors": tutors,
         "mons": [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, []), held.get(e.key, []),
                       item_index, item_by_const) for e in roster],
@@ -213,6 +215,15 @@ def _full_item_name(data: SourceData, const: str) -> str:
     letters = iter(full)
     abbreviated = len(rom_name) >= 11 and short != full and all(c in letters for c in short)
     return spelled if abbreviated else rom_name  # a renamed item (Link Stone → Linking Cord) keeps its game name
+
+
+def _docs() -> list[dict]:
+    """Feature-list topics rendered to HTML, with their images embedded so the page stays one offline file."""
+    images = {p.name: "data:image/png;base64," + base64.b64encode(p.read_bytes()).decode()
+              for p in DOC_IMAGES.glob("*.png")} if DOC_IMAGES.exists() else {}
+    return [{"title": g["title"], "topics": [{"title": t["title"], "html": render_topic(t, images),
+                                              "s": _norm(t["title"] + " " + topic_text(t))} for t in g["topics"]]}
+            for g in load_docs()]
 
 
 def _attach_tutor_locations(moves: dict) -> list[dict]:
