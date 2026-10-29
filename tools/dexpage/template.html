@@ -160,12 +160,14 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .mode { font: 600 10.5px/1 var(--font-body); padding: 3px 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
 .mode.d { border-color: var(--accent); color: var(--accent); }
 .mode.b { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); color: var(--ink); }
-/* Dex number: top-left corner of a grid card; in list rows, right-aligned beside the expand arrow */
+/* Dex number and mode tag: a header row at the top of a grid card; in list rows, right-aligned beside the expand arrow */
 .mon > summary { position: relative; }
-.dexno { position: absolute; top: 50%; right: 56px; transform: translateY(-50%); font: 600 13px/1 var(--font-data); color: var(--muted); font-variant-numeric: tabular-nums; pointer-events: none; }
-.mon > summary:has(.dexno) .who { padding-right: 52px; }
+.dexline { position: absolute; top: 50%; right: 56px; transform: translateY(-50%); display: flex; align-items: center; gap: 6px; pointer-events: none; }
+.dexno { font: 600 13px/1 var(--font-data); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mon > summary .who { padding-right: 150px; }
 .list.grid .mon:not([open]) > summary .who { padding-right: 0; }
-.list.grid .mon:not([open]) > summary .dexno { top: 9px; left: 10px; right: auto; transform: none; font-size: 12px; }
+.list.grid .mon:not([open]) > summary .dexline { position: static; transform: none; justify-self: stretch; margin: -2px 26px 0 2px; }
+.list.grid .mon:not([open]) > summary .dexno { font-size: 12px; }
 
 /* Detail */
 .detail { border-top: 1px solid var(--line); padding: 14px; display: grid; gap: 18px; }
@@ -344,6 +346,8 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .mon:not([open]) { content-visibility: auto; contain-intrinsic-size: auto 70px; }
 .nores { padding: 24px; text-align: center; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; }
 @media (max-width: 520px) {
+  .list:not(.grid) .mon > summary .dexline, .list.grid .mon[open] > summary .dexline { top: auto; bottom: 11px; transform: none; right: 50px; }
+  .mon > summary .who { padding-right: 0; }
   .brand .meta .long { display: none; }
   .list:not(.grid) .mon > summary { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 8px; }
   .list.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

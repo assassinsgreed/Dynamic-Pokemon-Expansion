@@ -156,9 +156,9 @@
   // ---------------------------------------------------------------- Pokémon detail
   function row(m, i) {
     return `<details class="mon" data-i="${i}" style="${tint(m)}"${state.open === i ? " open" : ""}>
-      <summary title="Show details">${dexNo(m)}${sprite(m)}
+      <summary title="Show details"><span class="dexline">${dexNo(m)}${modeBadge(m)}</span>${sprite(m)}
         <span class="who"><span class="nm">${esc(m.name)}${formLabel(m)}</span>
-          <span class="tags">${m.types.map(typeBadge).join("")}${modeBadge(m)}</span></span>
+          <span class="tags">${m.types.map(typeBadge).join("")}</span></span>
         ${CHEVRON}
       </summary>${state.open === i ? detail(i) : ""}</details>`;
   }
