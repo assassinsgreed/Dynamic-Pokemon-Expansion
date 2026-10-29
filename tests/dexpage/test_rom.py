@@ -38,3 +38,9 @@ def test_item_icons(paths, item_ids):
     icon = icons["ITEM_FIRE_STONE"]
     assert icon.size == (24, 24)
     assert icon.getpixel((0, 0))[3] == 0          # palette index 0 is transparent
+
+
+def test_charmap_unescapes_quotes():
+    from tools.dexpage.rom import load_charmap
+    charmap = load_charmap()
+    assert (charmap[0xB1], charmap[0xB2], charmap[0xB7]) == ('"', '"', "$")

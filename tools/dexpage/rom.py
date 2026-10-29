@@ -25,6 +25,8 @@ def load_charmap(path: Path = DPE_ROOT / "charmap.tbl") -> dict[int, str]:
         if len(code) != 2 or not char:
             continue
         byte = int(code, 16)
+        if char in ('\\"', "\\$"):  # escaped for the string compiler; the game shows the bare character
+            char = char[1]
         # Some bytes have several spellings; prefer the plain-ASCII one (' over ’).
         if byte not in charmap or (not charmap[byte].isascii() and char.isascii()):
             charmap[byte] = char
