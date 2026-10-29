@@ -220,7 +220,11 @@
     if (state.tab === "tutor") {
       const tutor = lists.tutor.filter(keep), special = lists.special.filter(keep);
       if (!tutor.length && !special.length) return empty("tutor moves");
-      return `${battleNote}<div class="groups">${moveTable("Move tutor", tutor, "No.")}${moveTable("Special tutor", special, "Who")}</div>`;
+      // Tutor numbers mean nothing to players; show the town that teaches the move instead
+      const where = (k) => ((moves[k].tutor || []).find((t) => t.kind === "Regular") || {}).where || "";
+      const townOrder = (k) => { const n = DEX.tutors.findIndex((t) => t.move === k && t.kind === "Regular"); return n < 0 ? 1e9 : n; };
+      const byTown = tutor.slice().sort((a, b) => townOrder(a[0]) - townOrder(b[0]));  // in the order players meet the tutors
+      return `${battleNote}<div class="groups">${moveTable("Move tutor", byTown.map(([k]) => [k, where(k)]), "Where")}${moveTable("Special tutor", special, "Who")}</div>`;
     }
     const rows = lists[state.tab].filter(keep);
     if (!rows.length) return empty({ level: "level-up moves", egg: "egg moves", tm: "TMs or HMs" }[state.tab]);
@@ -274,7 +278,7 @@
     const learners = mv.learners.filter(([i]) => inMode(mons[i]) && inType(mons[i]));
     const groups = GROUPS.map(([title, test]) => [title, learners.filter(([, h]) => test(h))]).filter(([, l]) => l.length);
     const body = groups.length
-      ? groups.map(([title, l]) => `<div><h4>${title} · ${l.length}</h4><div class="chips">${l.map(([i, h]) => monChip(i, h.replace(/^Special: /, ""))).join("")}</div></div>`).join("")
+      ? groups.map(([title, l]) => `<div><h4>${title} · ${l.length}</h4><div class="chips">${l.map(([i, h]) => monChip(i, h.startsWith("Tutor") ? "" : h.replace(/^Special: /, ""))).join("")}</div></div>`).join("")
       : `<p class="empty">${mv.learners.length ? "No Pokémon match the current filters." : "No Pokémon learn this move."}</p>`;
     return `<article class="movecard">${collapsible ? COLLAPSE : ""}
       <div class="top">${typeBadge(mv.type)}<span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span>
