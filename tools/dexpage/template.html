@@ -214,6 +214,9 @@ table.mv td.h { font-family: var(--font-data); font-size: 12.5px; white-space: n
 table.mv tr:last-child td { border-bottom: 0; }
 .mvname { background: none; border: 0; padding: 0; cursor: pointer; font-weight: 600; text-align: left; }
 .mvname:hover { text-decoration: underline; color: var(--accent); }
+/* Names inside cards that open another entry (abilities, moves, items, places): a dotted accent underline marks them as links */
+button.mvname, .itembtn .in { text-decoration: underline dotted color-mix(in srgb, var(--accent) 70%, transparent); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+button.mvname:hover, button.mvname:focus-visible, .itembtn:hover .in, .itembtn:focus-visible .in { color: var(--accent); text-decoration: underline solid var(--accent); }
 .note { color: var(--muted); font-size: 12.5px; }
 .note .link { vertical-align: middle; margin: 2px 0; }
 .tabs { display: grid; gap: 10px; }
