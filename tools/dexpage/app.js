@@ -25,6 +25,8 @@
 
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const norm = (s) => s.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  // Prose (descriptions, notes, docs) is searched word by word: "terra" finds "terrain" but not "encounter rate"
+  const words = (s) => (s || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
   const slug = (s) => s.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const TYPES = ["NORMAL", "FIRE", "WATER", "GRASS", "ELECTRIC", "ICE", "FIGHTING", "POISON", "GROUND", "FLYING", "PSYCHIC", "BUG", "ROCK", "GHOST", "DRAGON", "DARK", "STEEL", "FAIRY"];
   const STAT_LABELS = ["HP", "Atk", "Def", "SpA", "SpD", "Spe"];
@@ -220,14 +222,14 @@
 
   function panel(i) {
     const m = mons[i];
-    const f = norm(state.tabFilter);
+    const f = norm(state.tabFilter), fw = words(state.tabFilter);
     if (state.tab === "loc") {
       if (!locRows(i).length) {
         if (m.movesOf !== null) return `<p class="note">Appears in battle from ${monLink(m.movesOf, i)}.</p>`;
         const from = parent.has(i) ? parent.get(i) : null;
         return `<p class="note">Not found in the wild${state.mode ? ` in ${state.mode} mode` : ""}.${from !== null ? ` Evolve it from ${monLink(from, i)}` : ""}</p>`;
       }
-      const rows = locRows(i).filter((l) => !f || [l.location, l.sub || "", l.method, l.notes || "", l.variant || ""].some((s) => norm(s).includes(f)));
+      const rows = locRows(i).filter((l) => !f || ([l.location, l.sub || "", l.method, l.variant || ""].some((s) => norm(s).includes(f)) || words(l.notes).includes(fw)));
       return rows.length ? locTable(rows) : `<p class="note">No locations match “${esc(state.tabFilter)}”.</p>`;
     }
     const battleNote = m.movesOf !== null ? `<p class="note">Exists only in battle, so it knows whatever ${monLink(m.movesOf, i)} knows.</p>` : "";
@@ -357,11 +359,11 @@
     mons.forEach((m, i) => { if (inMode(m) && inType(m) && (num ? hasNum(m, i) : !q || m.s.some((s) => s.includes(q)) || (typeQ && m.types.includes(typeQ)))) list.push(i); });
     return list;
   }
-  const matchTutors = (q) => DEX.tutors.filter((t) => (!q || moves[t.move].s.some((x) => x.includes(q)) || norm(t.where).includes(q) || norm(t.note).includes(q))
+  const matchTutors = (q) => DEX.tutors.filter((t) => (!q || moves[t.move].s.some((x) => x.includes(q)) || norm(t.where).includes(q) || words(t.note).includes(words(state.q)))
     && (!state.type || moves[t.move].type === state.type));
-  const matchAbilities = (q) => abilities.filter((a, n) => (!q || abilityKeys[n].includes(q) || norm(a.desc).includes(q) || norm(a.detail).includes(q))
+  const matchAbilities = (q) => abilities.filter((a, n) => (!q || abilityKeys[n].includes(q) || abilityProse[n].includes(words(state.q)))
     && a.mons.some(([i]) => inMode(mons[i]) && inType(mons[i])));
-  const matchDocs = (q) => docTopics.filter((t) => !q || t.s.includes(q));
+  const matchDocs = (q) => docTopics.filter((t) => !q || norm(t.title).includes(q) || t.s.includes(words(state.q)));
 
   // Above every view: how many results the same search has in the other tabs, each a chip that goes there
   const ALSO = [["dex", (q) => matchMons(q).length, "Pokémon", "Pokémon"], ["moves", (q) => matchMoves(q).filter((k) => !state.type || moves[k].type === state.type).length, "move", "moves"],
@@ -482,6 +484,7 @@
   const abilities = DEX.abilities;
   const abilityIndex = new Map(abilities.map((a, n) => [a.name, n]));
   const abilityKeys = abilities.map((a) => norm(a.name) + " " + norm(a.official || ""));  // in-game or official name
+  const abilityProse = abilities.map((a) => words(a.desc + " " + a.detail));
 
   function abilityCard(a) {
     const holders = a.mons.filter(([i]) => inMode(mons[i]));

@@ -34,6 +34,12 @@ def _norm(s: str) -> str:
     return re.sub(r"[^a-z0-9]", "", s.lower())
 
 
+def _words(s: str) -> str:
+    """Lower-case ASCII words separated by single spaces, for searching prose without matching across words."""
+    s = unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode()
+    return " ".join(re.sub(r"[^a-z0-9]+", " ", s.lower()).split())
+
+
 def search_keys(name: str, *aliases: str | None) -> list[str]:
     """Normalised strings a search should match: the in-game name plus any distinct aliases."""
     keys = [_norm(name)]
@@ -260,7 +266,7 @@ def _docs(ability_names: set[str] = frozenset()) -> list[dict]:
     images = {p.name: "data:image/png;base64," + base64.b64encode(p.read_bytes()).decode()
               for p in DOC_IMAGES.glob("*.png")} if DOC_IMAGES.exists() else {}
     return [{"title": g["title"], "topics": [{"title": t["title"], "html": render_topic(t, images, ability_names),
-                                              "s": _norm(t["title"] + " " + topic_text(t))} for t in g["topics"]]}
+                                              "s": _words(t["title"] + " " + topic_text(t))} for t in g["topics"]]}
             for g in load_docs()]
 
 

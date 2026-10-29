@@ -237,7 +237,7 @@ def test_docs_in_page(data):
     groups = {g["title"]: g for g in data["docs"]}
     mining = next(t for t in groups["Gameplay Features"]["topics"] if t["title"] == "Mining Minigame")
     assert "<table" in mining["html"] and "data:image/png;base64," in mining["html"]
-    assert "hardstone" in mining["s"]
+    assert "hard stone" in mining["s"]
 
 
 def test_abilities_list(data):
@@ -273,6 +273,13 @@ def test_ability_details_must_match_page(paths):
     from tools.dexpage.build import _attach_ability_details
     with pytest.raises(ValueError, match="Made Up"):
         _attach_ability_details(paths, [{"name": "Made Up"}], {}, {})
+
+
+def test_doc_search_text_keeps_word_breaks(data):
+    # Prose is searched word by word, so "terra" must not match across "encounter rate"
+    topics = [t for g in data["docs"] for t in g["topics"]]
+    assert all(t["s"] == " ".join(t["s"].split()) and t["s"] == t["s"].lower() for t in topics)
+    assert any(" " in t["s"] for t in topics)
 
 
 def test_docs_link_ability_cells(data):
