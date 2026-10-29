@@ -416,7 +416,7 @@
   function movesView(q) {
     const list = exactFirst(matchMoves(q), (k) => moves[k].s.includes(q)).filter((k) => !state.type || moves[k].type === state.type);
     if (!list.length) return [`<div class="nores">No moves match “${esc(state.q)}”.</div>`, "0 moves"];
-    const open = state.move || (q && moves[list[0]].s.includes(q) ? list[0] : null);  // an exact match opens by itself
+    const open = state.move;  // only a click opens an entry; a typed name just sorts first
     let html;
     if (state.layouts.moves === "grid") {
       html = chipsWithOpen(list, (k) => `<button class="chip${k === open ? " on" : ""}" data-move="${k}">${typeBadge(moves[k].type)}<span class="ln">${esc(moves[k].name)}</span><span class="hw">${howTaught(k)}</span></button>`,
@@ -436,7 +436,7 @@
   function itemsView(q) {
     const list = exactFirst(matchItems(q), (k) => itemKeys[k] === q);
     if (!list.length) return [`<div class="nores">No items match “${esc(state.q)}”.</div>`, "0 items"];
-    const open = state.item !== null ? state.item : q && itemKeys[list[0]] === q ? list[0] : null;
+    const open = state.item;
     const cats = [];
     list.forEach((k) => { const c = items[k].category; const g = cats.find(([n]) => n === c); g ? g[1].push(k) : cats.push([c, [k]]); });
     const html = cats.map(([c, ks]) => `<div class="cat-head">${esc(c)} · ${ks.length}</div>${state.layouts.items === "grid"
@@ -450,7 +450,7 @@
   function placesView(q) {
     const list = exactFirst(matchPlaces(q), (p) => norm(p.name) === q);
     if (!list.length) return [`<div class="nores">No locations match “${esc(state.q)}”.</div>`, "0 locations"];
-    const open = state.place ? norm(state.place) : q && norm(list[0].name) === q ? q : null;
+    const open = state.place ? norm(state.place) : null;
     const isOpen = (p) => norm(p.name) === open;
     const encounters = (p) => p.rows.filter(([, l]) => rowInMode(l)).length;
     const methods = (p) => [...new Set(p.rows.filter(([, l]) => rowInMode(l)).map(([, l]) => l.method))].join(" · ");
@@ -516,7 +516,7 @@
   function abilitiesView(q) {
     const list = exactFirst(matchAbilities(q), (a) => norm(a.name) === q || (a.official && norm(a.official) === q));
     if (!list.length) return [`<div class="nores">No abilities match “${esc(state.q)}”.</div>`, "0 abilities"];
-    const open = state.ability || (q && [list[0].name, list[0].official || ""].some((s) => norm(s) === q) ? list[0].name : null);
+    const open = state.ability;
     const isOpen = (a) => a.name === open;
     const count = (a) => a.mons.filter(([i]) => inMode(mons[i]) && inType(mons[i])).length;
     const html = state.layouts.abilities === "grid"
@@ -537,7 +537,7 @@
   function docsView(q) {
     const list = matchDocs(q);
     if (!list.length) return [`<div class="nores">No topics mention “${esc(state.q)}”.</div>`, "0 topics"];
-    const open = state.doc || (q && (list.find((t) => norm(t.title) === q) || {}).title) || null;
+    const open = state.doc;
     const isOpen = (t) => t.title === open;
     const groups = [];
     list.forEach((t) => { const g = groups.find(([n]) => n === t.group); g ? g[1].push(t) : groups.push([t.group, [t]]); });
