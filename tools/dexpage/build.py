@@ -67,6 +67,9 @@ def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: 
     ability = lambda a: [*ability_display(data.paths, a, e.key, national, s["types"]),
                          ability_chances(data.paths).get(ability_ids(data.paths).get(a), 0)]
     official = e.key.removeprefix("SPECIES_").replace("_", " ").title()
+    # Modes where it has no dex number but turns up in swarms; the page lists these after every numbered entry
+    swarm = [mode for mode, field in (("Standard", "std"), ("Divergent", "div")) if mode in e.modes and not e.dex.get(field)
+             and any("Swarm" in l["method"] and l["mode"] in (mode, "Both") for l in locations)]
     return {
         "key": e.key,
         "name": e.name,
@@ -85,7 +88,8 @@ def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: 
         "family": e.family,
         # [target, method text, item index, the item's name as written in that text]
         "evo": [[index[l["to"]], l["text"], item_by_const.get(l.get("item")), data.items.get(l.get("item"))] for l in links],
-        "s": search_keys(e.name, official, f"{e.form} {e.name}" if e.form else None),
+        "swarm": swarm,
+        "s": search_keys(e.name, official, f"{e.form} {e.name}" if e.form else None, "Swarm" if swarm else None),
         "movesOf": index.get(e.base) if e.battle_form else None,
         "loc": locations,
         "held": [[h, item_index.get(_norm(h.split(" (")[0]))] for h in held],

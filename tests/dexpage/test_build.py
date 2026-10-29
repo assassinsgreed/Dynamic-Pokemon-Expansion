@@ -267,3 +267,11 @@ def test_docs_link_ability_cells(data):
 def test_ability_chance_in_page(data):
     abilities = {a["name"]: a for a in data["abilities"]}
     assert abilities["Poison Touch"]["chance"] == 30
+
+
+def test_swarm_entries(data):
+    mons = {m["key"]: m for m in data["mons"]}
+    assert mons["SPECIES_FARFETCHD"]["swarm"] == ["Standard"]     # Galarian Farfetch'd holds Standard #063
+    assert mons["SPECIES_ZIGZAGOON"]["swarm"] == ["Divergent"]
+    assert mons["SPECIES_FARFETCHD_G"]["swarm"] == []            # numbered
+    assert "swarm" in mons["SPECIES_FARFETCHD"]["s"]
