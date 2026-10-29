@@ -31485,7 +31485,7 @@ const struct BaseStats gBaseStats[] =
 		.eggGroup1 = EGG_GROUP_GRASS,
 		.eggGroup2 = EGG_GROUP_GRASS,
 		.ability1 = ABILITY_LEAFGUARD,
-		.ability2 = ABILITY_QUEENLYMAJESTY,
+		.ability2 = ABILITY_DAZZLING, // ABILITY_QUEENLYMAJESTY
 		.safariZoneFleeRate = 0,
 		.hiddenAbility = ABILITY_SWEETVEIL,
 		.noFlip = TRUE,
@@ -33036,7 +33036,7 @@ const struct BaseStats gBaseStats[] =
 		.eggGroup1 = EGG_GROUP_FIELD,
 		.eggGroup2 = EGG_GROUP_FIELD,
 		.ability1 = ABILITY_SANDVEIL,
-		.ability2 = ABILITY_TANGLINGHAIR,
+		.ability2 = ABILITY_GOOEY, // ABILITY_TANGLINGHAIR
 		.safariZoneFleeRate = 0,
 		.hiddenAbility = ABILITY_SANDFORCE,
 		.noFlip = TRUE,
@@ -33069,7 +33069,7 @@ const struct BaseStats gBaseStats[] =
 		.eggGroup1 = EGG_GROUP_FIELD,
 		.eggGroup2 = EGG_GROUP_FIELD,
 		.ability1 = ABILITY_SANDVEIL,
-		.ability2 = ABILITY_TANGLINGHAIR,
+		.ability2 = ABILITY_GOOEY, // ABILITY_TANGLINGHAIR
 		.safariZoneFleeRate = 0,
 		.hiddenAbility = ABILITY_SANDFORCE,
 		.noFlip = TRUE,
@@ -33269,7 +33269,7 @@ const struct BaseStats gBaseStats[] =
 		.ability1 = ABILITY_POISONTOUCH,
 		.ability2 = ABILITY_GLUTTONY,
 		.safariZoneFleeRate = 0,
-		.hiddenAbility = ABILITY_POWEROFALCHEMY,
+		.hiddenAbility = ABILITY_RECEIVER, // ABILITY_POWEROFALCHEMY
 		.noFlip = TRUE,
 	},
 
@@ -33302,7 +33302,7 @@ const struct BaseStats gBaseStats[] =
 		.ability1 = ABILITY_POISONTOUCH,
 		.ability2 = ABILITY_GLUTTONY,
 		.safariZoneFleeRate = 0,
-		.hiddenAbility = ABILITY_POWEROFALCHEMY,
+		.hiddenAbility = ABILITY_RECEIVER, // ABILITY_POWEROFALCHEMY
 		.noFlip = TRUE,
 	},
 
