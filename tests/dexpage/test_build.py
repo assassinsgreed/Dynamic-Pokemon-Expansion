@@ -311,6 +311,14 @@ def test_shared_dex_numbers(data):
     assert mons["SPECIES_SNEASLER"]["sharedDex"] == {}                       # no base or namesake in the dex
 
 
+def test_field_items_from_rom(data):
+    by = {it["name"]: it for it in data["items"]}
+    assert "Route 13" in by["Max Elixir"]["where"]                                 # item ball the doc doesn't list
+    assert "Treasure Beach (hidden, renews)" in by["Comet Shard"]["where"]
+    assert not any("Water Path" in w for it in data["items"] for w in it["where"])  # unused Sevii map
+    assert not any("Enigma" in it["name"] and "Old" in it["name"] for it in data["items"])
+
+
 def test_docs_link_ability_cells(data):
     mega = next(t for g in data["docs"] for t in g["topics"] if t["title"] == "Mega Pokemon")
     assert 'data-ability="Triage"' in mega["html"]

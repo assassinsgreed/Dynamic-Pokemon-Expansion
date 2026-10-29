@@ -48,6 +48,9 @@ He also tests `site/index.html` directly.
 | `items.py` + `items.csv`, `machines.csv`, `tutors.csv` | item, TM and tutor locations imported from the feature-list Google Doc (`python -m tools.dexpage.items doc.docx`, needs python-docx) |
 | `docs.py` + `docs.json`, `doc_images/` | Docs tab: feature-list topics (H1 group / H2 topic), imported with `python -m tools.dexpage.docs doc.docx`; overlapping topics skipped via `SKIP_GROUPS`/`SKIP_TOPICS` |
 | `ability_details.json` | Abilities tab's longer explanation per ability (keyed by the name shown) + `moves`: CFRU move-table names (`gPunchingMoves`…) whose moves show as chips. Hand-written from CFRU's code, not Bulbapedia; the build fails if it's out of step with the page's abilities |
+| `field_items.py` | item balls + hidden items read from the ROM's map data (gMapGroups → events; item scripts resolved via CFRU `offsets.ini`); skips FireRed's unused Sevii maps, marks Treasure Beach hidden items as renewing |
+| `script_items.csv` | hand-written sources the feature list misses (Apricorn balls, Traveller balls, Memories, Drives, relics…), checked against CFRU's scripts |
+| `extra_forms.csv` | forms the Habitat table leaves out but players can get (Rotom appliances, Cosplay/Cap Pikachu), with a how-to-get row; never enable them in Habitat_Table.c |
 | `build.py` | page data JSON, item list merge (doc + shops + held + evolution items), sprite/icon sheets, site files |
 | `template.html` | CSS + markup; `app.js` is the whole UI, inlined at build (`__APP_SCRIPT__`) |
 | `sw.js` | service worker; cache name = content hash so installs update |

@@ -12,6 +12,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 from .docs import DOC_IMAGES, load_docs, render_topic, topic_text
+from .field_items import field_items
 from .items import load_items, load_machine_locations, load_script_items, load_tutors
 import difflib
 
@@ -231,6 +232,18 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
         if extra["const"] not in data.items:
             raise ValueError(f"script_items.csv: unknown item {extra['const']}")
         add(_full_item_name(data, extra["const"]), extra["category"], extra["where"], "")
+    for const, places in field_items(data.paths).items():  # item balls and hidden items, read from the ROM's maps
+        if const not in data.items:
+            continue
+        name = _full_item_name(data, const)
+        k = index.get(_norm(name), index.get(_norm(data.items[const])))
+        if k is None:
+            k = next((j for j, it in enumerate(items) if it["key"] == const), None)
+        known = " ".join(items[k]["where"]).lower() if k is not None else ""
+        # a map the doc already names for this item ("Route 9 (Requires Surf)") isn't repeated as plain "Route 9"
+        new = [pl for pl in places if pl.split(" (")[0].lower() not in known]
+        if new:
+            add(items[k]["name"] if k is not None else name, "", new, "")
     fields = item_fields(data.paths.rom, data.item_ids)
     for item in items:
         item["category"] = _item_category(item, fields)
