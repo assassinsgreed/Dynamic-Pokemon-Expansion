@@ -404,7 +404,7 @@
   // the page instead, so the cards around it stay where they were.
   const expandRow = (cols, html) => `<tr class="expanded"><td colspan="${cols}">${html}</td></tr>`;
   const sheet = (html) => `<div class="sheet" role="dialog" aria-modal="true"><div class="sheet-backdrop" data-sheet-close></div>
-    <div class="sheet-panel expanded"><button class="sheet-close" data-sheet-close aria-label="Close" title="Close">×</button><div class="sheet-body">${html}</div></div></div>`;
+    <div class="sheet-panel expanded"><button class="sheet-close" data-sheet-close aria-label="Close" title="Close">×</button><div class="sheet-body">${html}</div><div class="sheet-bar"><i></i></div></div></div>`;
   const chipsWithOpen = (keys, chip, isOpen, card) => {
     const open = keys.find(isOpen);
     return `<div class="chips">${keys.map(chip).join("")}</div>${open !== undefined ? sheet(card(open)) : ""}`;
@@ -755,5 +755,20 @@
     remember();
     render(true);
   }
+  // The pop-up hides its native scrollbar and draws a thumb that floats over the content, so the pinned header runs edge to edge
+  const syncSheetBar = (body) => {
+    const bar = body.nextElementSibling, thumb = bar && bar.firstChild;
+    if (!thumb) return;
+    const { scrollHeight: sh, clientHeight: ch, scrollTop: st } = body, room = bar.clientHeight;
+    bar.hidden = sh <= ch + 1;
+    const h = Math.max(36, room * ch / sh);
+    thumb.style.height = `${h}px`;
+    thumb.style.transform = `translateY(${(room - h) * st / (sh - ch || 1)}px)`;
+    bar.classList.add("live");
+    clearTimeout(bar.fade);
+    bar.fade = setTimeout(() => bar.classList.remove("live"), 900);
+  };
+  document.addEventListener("scroll", (e) => { if (e.target.classList && e.target.classList.contains("sheet-body")) syncSheetBar(e.target); }, true);
+  new MutationObserver(() => { const b = $(".sheet-body"); if (b) requestAnimationFrame(() => syncSheetBar(b)); }).observe(document.body, { childList: true, subtree: true });
   fromHash();
 })();
