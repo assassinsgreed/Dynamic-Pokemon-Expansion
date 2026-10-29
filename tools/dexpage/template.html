@@ -242,11 +242,14 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
 .browse { display: grid; gap: 4px; }
 .movelist { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px 8px; overflow-x: auto; }
 .movelist tr { cursor: pointer; }
-.movelist tbody tr:hover td { background: var(--accent-soft); }
+/* Highlight only the hovered row's own cells: an opened card sits inside a row, and its tables must not light up */
+.movelist > table > tbody > tr:not(.expanded):hover > td,
+.listtable > table > tbody > tr:not(.expanded):hover > td { background: var(--accent-soft); }
+table.mv > tbody > tr:not(.expanded):hover > td,
+.doctable > table > tbody > tr:hover > td { background: color-mix(in srgb, var(--accent) 9%, transparent); }
 .also { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
 .listtable { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px 8px; overflow-x: auto; }
 .listtable tbody tr { cursor: pointer; }
-.listtable tbody tr:hover td { background: var(--accent-soft); }
 .listtable td .ii { margin-right: 6px; }
 .chip .type { flex: none; margin-left: 6px; }
 .tutorhead { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
