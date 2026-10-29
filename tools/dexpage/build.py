@@ -12,7 +12,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 from .docs import DOC_IMAGES, load_docs, render_topic, topic_text
-from .items import load_items, load_machine_locations, load_tutors
+from .items import load_items, load_machine_locations, load_script_items, load_tutors
 import difflib
 
 from .load_cfru import ability_chances, ability_display, ability_ids, ability_officials, marts, z_crystal_sources
@@ -198,6 +198,10 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
     for const, where in z_crystal_sources(data.paths).items():  # Gym Trainee rewards and wild-held Z-Crystals
         if const in data.items:
             add(_full_item_name(data, const), "Z-Crystals", where, "")
+    for extra in load_script_items():  # sources the feature list doesn't cover (apricorn balls, Memories, relics…)
+        if extra["const"] not in data.items:
+            raise ValueError(f"script_items.csv: unknown item {extra['const']}")
+        add(_full_item_name(data, extra["const"]), extra["category"], extra["where"], "")
     fields = item_fields(data.paths.rom, data.item_ids)
     for item in items:
         item["category"] = _item_category(item, fields)
@@ -266,7 +270,10 @@ def _full_item_name(data: SourceData, const: str) -> str:
     short, full = _norm(rom_name), _norm(spelled)
     letters = iter(full)
     abbreviated = len(rom_name) >= 11 and short != full and all(c in letters for c in short)
-    return spelled if abbreviated else rom_name  # a renamed item (Link Stone → Linking Cord) keeps its game name
+    # …or cut word by word to fit a narrow menu ("Bug Mem" for ITEM_BUG_MEMORY)
+    rom_words, full_words = rom_name.lower().split(), spelled.lower().split()
+    clipped = len(rom_words) == len(full_words) and short != full and all(f.startswith(w) for w, f in zip(rom_words, full_words))
+    return spelled if abbreviated or clipped else rom_name  # a renamed item (Link Stone → Linking Cord) keeps its game name
 
 
 def _abilities(mons: list[dict], officials: dict[str, str]) -> list[dict]:

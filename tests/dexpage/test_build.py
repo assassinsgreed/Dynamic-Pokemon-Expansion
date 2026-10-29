@@ -293,6 +293,14 @@ def test_item_categories(data):
     assert any("Gym Trainee" in w for w in firium["where"])
 
 
+def test_script_items(data):
+    by = {it["name"]: it for it in data["items"]}
+    for name in ("Fast Ball", "Moon Ball", "Safari Ball", "Dream Ball", "Relic Gold"):
+        assert by[name]["where"], name
+    assert by["Fast Ball"]["category"] == "Poké Balls" and "Laplaz Town" in by["Fast Ball"]["where"][0]
+    assert by["Burn Drive"]["category"] == by["Bug Memory"]["category"] == "Forme Changing Items"   # not "Bug Mem"
+
+
 def test_docs_link_ability_cells(data):
     mega = next(t for g in data["docs"] for t in g["topics"] if t["title"] == "Mega Pokemon")
     assert 'data-ability="Triage"' in mega["html"]

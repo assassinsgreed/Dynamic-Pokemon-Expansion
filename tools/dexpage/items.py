@@ -35,6 +35,16 @@ def load_items(path: Path = ITEMS_CSV) -> list[dict]:
                 for r in csv.DictReader(f)]
 
 
+SCRIPT_ITEMS_CSV = Path(__file__).with_name("script_items.csv")
+
+
+def load_script_items(path: Path = SCRIPT_ITEMS_CSV) -> list[dict]:
+    """Items the feature list doesn't cover, hand-written from CFRU's overworld scripts (one-off NPCs, daily deals,
+    the Ultra Episode). Keyed by ITEM_ constant; Category may be blank to let the game's item data decide."""
+    with path.open(encoding="utf-8", newline="") as f:
+        return [{"const": r["Item"], "category": r["Category"], "where": _lines(r["Where"])} for r in csv.DictReader(f)]
+
+
 def load_machine_locations(path: Path = MACHINES_CSV) -> dict[tuple[str, int], dict]:
     with path.open(encoding="utf-8", newline="") as f:
         return {(r["Kind"], int(r["Number"])): {"move": r["Move"], "where": _lines(r["Where"]), "requires": r["Requires"]}

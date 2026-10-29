@@ -1,0 +1,45 @@
+Item,Category,Where
+ITEM_FAST_BALL,,"Laplaz Town · Apricorn Ball maker (2 PokeChips, one ball a day)"
+ITEM_LEVEL_BALL,,"Laplaz Town · Apricorn Ball maker (2 PokeChips, one ball a day)"
+ITEM_LURE_BALL,,"Laplaz Town · Apricorn Ball maker (2 PokeChips, one ball a day)"
+ITEM_HEAVY_BALL,,"Laplaz Town · Apricorn Ball maker (2 PokeChips, one ball a day)"
+ITEM_LOVE_BALL,,"Laplaz Town · Apricorn Ball maker (2 PokeChips, one ball a day)"
+ITEM_FRIEND_BALL,,"Laplaz Town · Apricorn Ball maker (2 PokeChips, one ball a day)"
+ITEM_MOON_BALL,,"Laplaz Town · Apricorn Ball maker (2 PokeChips, one ball a day)"
+ITEM_SAFARI_BALL,,"Daimyn City Pokémon Center · Travelling man (₽1,500 for a random Safari, Sport, Park or Dream Ball; back the next day)"
+ITEM_SPORT_BALL,,"Daimyn City Pokémon Center · Travelling man (₽1,500 for a random Safari, Sport, Park or Dream Ball; back the next day)"
+ITEM_PARK_BALL,,"Daimyn City Pokémon Center · Travelling man (₽1,500 for a random Safari, Sport, Park or Dream Ball; back the next day)"
+ITEM_DREAM_BALL,,"Daimyn City Pokémon Center · Travelling man (₽1,500 for a random Safari, Sport, Park or Dream Ball; back the next day)"
+ITEM_PREMIER_BALL,,"Daimyn City Mall · Deal of the Day (5 for ₽500, on days it's the deal)"
+ITEM_BURN_DRIVE,Forme Changing Items,Daimyn Factory (Divergent mode; Standard mode has the Rusted Data there)
+ITEM_SHOCK_DRIVE,Forme Changing Items,Daimyn Factory (Divergent mode; Standard mode has the Rusted Data there)
+ITEM_DOUSE_DRIVE,Forme Changing Items,Daimyn Factory (Divergent mode; Standard mode has the Rusted Data there)
+ITEM_CHILL_DRIVE,Forme Changing Items,Daimyn Factory (Divergent mode; Standard mode has the Rusted Data there)
+ITEM_FIGHTING_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_FLYING_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_POISON_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_GROUND_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_ROCK_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_BUG_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_GHOST_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_STEEL_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_FIRE_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_WATER_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_GRASS_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_ELECTRIC_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_PSYCHIC_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_ICE_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_DRAGON_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_DARK_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_FAIRY_MEMORY,Forme Changing Items,Daimyn City · Type: Null researcher (all Memories at once after Type: Null evolves into Silvally)
+ITEM_RELIC_COPPER,,"Battle Frontier · Shady relic seller (2 PokeChips for a random relic)"
+ITEM_RELIC_SILVER,,"Battle Frontier · Shady relic seller (2 PokeChips for a random relic)"
+ITEM_RELIC_GOLD,,"Battle Frontier · Shady relic seller (2 PokeChips for a random relic)"
+ITEM_RELIC_VASE,,"Battle Frontier · Shady relic seller (2 PokeChips for a random relic)"
+ITEM_RELIC_BAND,,"Battle Frontier · Shady relic seller (2 PokeChips for a random relic)"
+ITEM_RELIC_STATUE,,"Battle Frontier · Shady relic seller (2 PokeChips for a random relic)"
+ITEM_RELIC_CROWN,,"Battle Frontier · Shady relic seller (2 PokeChips for a random relic)"
+ITEM_MAGMA_STONE,,Carnelidge Volcano
+ITEM_SOOTHE_BELL,,Heleo City · Pokémon groomer (when the Pokémon you have groomed has 175+ friendship)
+ITEM_MACHO_BRACE,,Daimyn City · Guard house (after the rival battle)
+ITEM_PIXIE_PLATE,,Tsarvosa City · Gym Trainee Faye (for beating her)
