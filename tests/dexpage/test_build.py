@@ -249,6 +249,16 @@ def test_abilities_list(data):
     assert all(i != mons["SPECIES_CINDERACE"] for i, _ in abilities.get("Protean", {"mons": []})["mons"])
 
 
+def test_ability_official_names(data, paths):
+    abilities = {a["name"]: a for a in data["abilities"]}
+    assert abilities["Odd Medicine"]["official"] == "Curious Medicine"
+    assert abilities["Alchemic Power"]["official"] == "Power of Alchemy"                        # CFRU rename label
+    assert abilities["Neutralize Gas"]["official"] == "Neutralizing Gas"
+    assert abilities["Overgrow"]["official"] is None
+    from tools.dexpage.load_cfru import ability_officials
+    assert "As One" not in ability_officials(paths)                                 # Grim/Chilling variants
+
+
 def test_docs_link_ability_cells(data):
     mega = next(t for g in data["docs"] for t in g["topics"] if t["title"] == "Mega Pokemon")
     assert 'data-ability="Triage"' in mega["html"]

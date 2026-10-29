@@ -455,29 +455,29 @@
   // Abilities: each ability as players see it, with its description and who can have it
   const abilities = DEX.abilities;
   const abilityIndex = new Map(abilities.map((a, n) => [a.name, n]));
-  const abilityKeys = abilities.map((a) => norm(a.name));
+  const abilityKeys = abilities.map((a) => norm(a.name) + " " + norm(a.official || ""));  // in-game or official name
 
   function abilityCard(a) {
-    const holders = a.mons.filter(([i]) => inMode(mons[i]) && inType(mons[i]));
+    const holders = a.mons.filter(([i]) => inMode(mons[i]));
     const group = (hidden, title) => {
       const l = holders.filter(([, h]) => h === hidden);
       return l.length ? `<div><h4>${title} · ${l.length}</h4><div class="chips">${l.map(([i]) => monChip(i, "")).join("")}</div></div>` : "";
     };
-    return `<article class="abilcard">${COLLAPSE}<h2>${esc(a.name)}</h2>${a.desc ? `<div class="gamedesc">${esc(a.desc)}</div>` : ""}${a.chance ? `<div class="specs"><span>Effect chance <b>${a.chance}%</b></span></div>` : ""}
+    return `<article class="abilcard">${COLLAPSE}<h2>${esc(a.name)}${a.official ? `<small>${esc(a.official)}</small>` : ""}</h2>${a.desc ? `<div class="gamedesc">${esc(a.desc)}</div>` : ""}${a.chance ? `<div class="specs"><span>Effect chance <b>${a.chance}%</b></span></div>` : ""}
       <div class="learners">${group(0, "Ability") + group(1, "Hidden ability") || '<p class="empty">No Pokémon match the current filters.</p>'}</div></article>`;
   }
 
   function abilitiesView(q) {
-    const list = exactFirst(abilities.filter((a, n) => !q || abilityKeys[n].includes(q) || norm(a.desc).includes(q)), (a) => norm(a.name) === q)
+    const list = exactFirst(abilities.filter((a, n) => !q || abilityKeys[n].includes(q) || norm(a.desc).includes(q)), (a) => norm(a.name) === q || (a.official && norm(a.official) === q))
       .filter((a) => a.mons.some(([i]) => inMode(mons[i]) && inType(mons[i])));
     if (!list.length) return [`<div class="nores">No abilities match “${esc(state.q)}”.</div>`, "0 abilities"];
-    const open = state.ability || (q && norm(list[0].name) === q ? list[0].name : null);
+    const open = state.ability || (q && [list[0].name, list[0].official || ""].some((s) => norm(s) === q) ? list[0].name : null);
     const isOpen = (a) => a.name === open;
     const count = (a) => a.mons.filter(([i]) => inMode(mons[i]) && inType(mons[i])).length;
     const html = state.layouts.abilities === "grid"
       ? chipsWithOpen(list, (a) => `<button class="chip${isOpen(a) ? " on" : ""}" data-ability="${esc(a.name)}"><span class="ln" style="padding-left:10px">${esc(a.name)}</span><span class="hw">${count(a)}</span></button>`, isOpen, abilityCard)
       : `<div class="listtable"><table class="mv"><thead><tr><th>Ability</th><th class="c-num">Pokémon</th></tr></thead><tbody>${list.map((a) =>
-          `<tr data-ability="${esc(a.name)}"${isOpen(a) ? ' class="on"' : ""}><td><span class="mvname">${esc(a.name)}</span><span class="mvdesc">${esc(a.desc)}</span></td><td class="n">${count(a)}</td></tr>${
+          `<tr data-ability="${esc(a.name)}"${isOpen(a) ? ' class="on"' : ""}><td><span class="mvname">${esc(a.name)}</span>${a.official ? ` <span class="note">${esc(a.official)}</span>` : ""}<span class="mvdesc">${esc(a.desc)}</span></td><td class="n">${count(a)}</td></tr>${
             isOpen(a) ? expandRow(2, abilityCard(a)) : ""}`).join("")}</tbody></table></div>`;
     return [html, `${list.length} abilities`];
   }
@@ -523,7 +523,7 @@
     $("#clear").hidden = !$("#q").value;
     $("#back").disabled = depth <= 0;
     $("#fwd").disabled = depth >= top;
-    $("#typepick").hidden = ["items", "places", "docs"].includes(state.view);  // these have no type
+    $("#typepick").hidden = ["abilities", "items", "places", "docs"].includes(state.view);  // these have no type
     $("#mode-seg").hidden = state.view === "docs";
     document.querySelectorAll("[data-viewtab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.viewtab === state.view)));
     document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));

@@ -118,6 +118,29 @@ def ability_names(p: Paths) -> dict[str, str]:
     return {k: names[v] for k, v in ability_ids(p).items() if v in names}
 
 
+OFFICIAL_ABILITY_SPELLINGS = {"Neutralising Gas": "Neutralizing Gas"}
+
+
+@cache
+def ability_officials(p: Paths) -> dict[str, str]:
+    """In-game ability name → official name, from the name table's labels (NAME_CURIOUS_MEDICINE is Odd Medicine,
+    gText_AbilityName_PowerOfAlchemy is Alchemic Power). Only names that differ; As One's Grim/Chilling labels
+    just tell the two versions apart, so they're skipped."""
+    def _norm(s): return re.sub(r"[^a-z0-9]", "", s.lower())
+
+    officials = [(" ".join(w.capitalize() for w in label.removeprefix("NAME_").split("_")), decode_text(text))
+                 for label, text in parse_string_table(p.cfru / "strings/ability_name_table.string")]
+    officials += [(re.sub(r"(?<=[a-z])(?=[A-Z0-9])", " ", label.removeprefix("gText_AbilityName_")), text)
+                  for label, text in _labelled_strings(p, "strings/ability_name_table.string").items()
+                  if label.startswith("gText_AbilityName_")]
+    result = {}
+    for official, name in officials:
+        official = OFFICIAL_ABILITY_SPELLINGS.get(official, official).replace(" Of ", " of ")
+        if _norm(name) and not _norm(official).startswith(_norm(name)):
+            result[name] = official
+    return result
+
+
 @cache
 def item_ids(p: Paths) -> dict[str, int]:
     return parse_int_defines(p.cfru / "include/constants/items.h", "ITEM_")

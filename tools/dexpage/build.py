@@ -15,7 +15,7 @@ from .docs import DOC_IMAGES, load_docs, render_topic, topic_text
 from .items import load_items, load_machine_locations, load_tutors
 import difflib
 
-from .load_cfru import ability_chances, ability_display, ability_ids, marts
+from .load_cfru import ability_chances, ability_display, ability_ids, ability_officials, marts
 from .locations import attach_encounters, load_encounters
 from .paths import DPE_ROOT, Paths
 from .roster import Entry, SourceData, build_roster, evolution_links, load_source_data
@@ -115,7 +115,7 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
     tutors = _attach_tutor_locations(moves)
     mons = [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, []), held.get(e.key, []),
                  item_index, item_by_const) for e in roster]
-    abilities = _abilities(mons)
+    abilities = _abilities(mons, ability_officials(data.paths))
     return {
         "docs": _docs({a["name"] for a in abilities}),
         "abilities": abilities,
@@ -222,13 +222,13 @@ def _full_item_name(data: SourceData, const: str) -> str:
     return spelled if abbreviated else rom_name  # a renamed item (Link Stone → Linking Cord) keeps its game name
 
 
-def _abilities(mons: list[dict]) -> list[dict]:
+def _abilities(mons: list[dict], officials: dict[str, str]) -> list[dict]:
     """Every ability as players see it, with the Pokémon that can have it ([index, 1 if hidden]).
     Names are per species, so CFRU's renames (Protean shown as Libero on Cinderace) are separate entries."""
     by_name: dict[str, dict] = {}
     for i, m in enumerate(mons):
         for (name, desc, chance), hidden in [(a, 0) for a in m["abilities"]] + ([(m["hidden"], 1)] if m["hidden"] else []):
-            entry = by_name.setdefault(name, {"name": name, "desc": desc, "chance": chance, "mons": []})
+            entry = by_name.setdefault(name, {"name": name, "official": officials.get(name), "desc": desc, "chance": chance, "mons": []})
             entry["desc"] = entry["desc"] or desc
             entry["mons"].append([i, hidden])
     return sorted(by_name.values(), key=lambda a: a["name"])
