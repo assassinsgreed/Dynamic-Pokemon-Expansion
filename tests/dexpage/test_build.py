@@ -282,6 +282,17 @@ def test_doc_search_text_keeps_word_breaks(data):
     assert any(" " in t["s"] for t in topics)
 
 
+def test_item_categories(data):
+    cat = {it["name"]: it["category"] for it in data["items"]}
+    assert cat["Poké Ball"] == cat["Master Ball"] == "Poké Balls"
+    assert cat["Super Potion"] == cat["Revive"] == cat["Repel"] == "Consumables"
+    assert cat["Sweet Apple"] == "Evolution" and any(n.endswith("Sweet") and c == "Evolution" for n, c in cat.items())
+    assert cat["Firium Z"] == "Z-Crystals" and cat["Ultranecrozium Z"] == "Z-Crystals"
+    assert cat["Everstone"] == "Held Items" and cat["Heart Scale"] == "Other items"
+    firium = next(it for it in data["items"] if it["name"] == "Firium Z")
+    assert any("Gym Trainee" in w for w in firium["where"])
+
+
 def test_docs_link_ability_cells(data):
     mega = next(t for g in data["docs"] for t in g["topics"] if t["title"] == "Mega Pokemon")
     assert 'data-ability="Triage"' in mega["html"]

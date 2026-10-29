@@ -7,6 +7,7 @@ from .cparse import (
     collect_defines,
     parse_designated_array,
     parse_int_defines,
+    parse_int_enums,
     parse_string_table,
     parse_struct_fields,
     read,
@@ -143,7 +144,9 @@ def ability_officials(p: Paths) -> dict[str, str]:
 
 @cache
 def item_ids(p: Paths) -> dict[str, int]:
-    return parse_int_defines(p.cfru / "include/constants/items.h", "ITEM_")
+    # Z-Crystals and TMs are numbered by enums (the TM one picked by #ifndef UNBOUND)
+    header = p.cfru / "include/constants/items.h"
+    return {**parse_int_enums(source(p, "include/constants/items.h"), "ITEM_"), **parse_int_defines(header, "ITEM_")}
 
 
 @cache
@@ -281,12 +284,34 @@ def marts(p: Paths) -> list[dict]:
             else:
                 prefix = script.removeprefix("EventScript_").split("_")[0] if script.startswith("EventScript_") else ""
                 place = PLACE_ALIASES.get(prefix) or (_words(prefix) if prefix else _words(path.stem.replace("_", " ").title().replace(" ", "")))
-                shop = _words(re.sub(r"(Shop|Stock|Items|Mart)(Divergent)?$", "", label.split("_")[-1]) or label)
+                shop = _words(re.sub(r"(Shop|Stock|Items|Mart)(Divergent)?$", "", label.split("_")[-1]) or label).replace("ZCrystals", "Z-Crystals")
                 where = f"{place} · {shop} shop" + (" (Divergent)" if "Divergent" in label + script else "")
             if (where, label) in seen:
                 continue
             seen.add((where, label))
             result.append({"where": where, "items": items})
+    return result
+
+
+@cache
+def z_crystal_sources(p: Paths) -> dict[str, list[str]]:
+    """Where Z-Crystals come from besides shops: the Tsarvosa City Gym Trainees (setvar 0x4004 ITEM_*IUM_Z, given
+    after the Ultra Episode for a win with a team of only their type) and wild battles holding one (setwildbattle)."""
+    from .load_dpe import species_names
+    names = species_names(p)
+    result: dict[str, list[str]] = {}
+    for path in sorted((p.cfru / "assembly/overworld_scripts").rglob("*.s")):
+        text = strip_comments(read(path))
+        for m in re.finditer(r"^EventScript_(\w+?)_GymTraineeCafe_(\w+):(.*?)(?=^\w+:)", text, flags=re.M | re.S):
+            item = re.search(r"setvar\s+0x4004\s+(ITEM_\w+IUM_Z)\b", m.group(3))
+            kind = re.search(r"setvar\s+0x4005\s+TYPE_(\w+)", m.group(3))
+            if item and kind:
+                result.setdefault(item.group(1), []).append(
+                    f"{_words(m.group(1))} · Gym Trainee {m.group(2)} (after the Ultra Episode, beat them using only {kind.group(1).title()} types)")
+        for m in re.finditer(r"setwildbattle\s+(SPECIES_\w+)\s+\d+\s+(ITEM_\w+IUM_Z)\b", text):
+            where = f"Held by {names.get(m.group(1), m.group(1))} · {_words(path.stem.replace('_', ' ').title().replace(' ', ''))}"
+            if where not in result.setdefault(m.group(2), []):
+                result[m.group(2)].append(where)
     return result
 
 

@@ -187,6 +187,22 @@ def parse_string_table(path: Path) -> list[tuple[str, str]]:
     return rows
 
 
+def parse_int_enums(text: str, prefix: str) -> dict[str, int]:
+    """Members of `enum { A = 0x10, B, C, };` blocks, counting up from the last explicit value.
+    Pass text with comments stripped and #ifdefs resolved."""
+    values = {}
+    for body in re.findall(r"\benum\s*\w*\s*\{([^}]*)\}", text):
+        value = -1
+        for entry in (e.strip() for e in body.split(",")):
+            m = re.fullmatch(r"(\w+)\s*(?:=\s*(0[xX][0-9a-fA-F]+|\d+))?", entry)
+            if not m:
+                continue
+            value = int(m.group(2), 0) if m.group(2) else value + 1
+            if m.group(1).startswith(prefix):
+                values[m.group(1)] = value
+    return values
+
+
 def parse_int_defines(path: Path, prefix: str) -> dict[str, int]:
     values = {}
     for m in re.finditer(rf"^\s*#\s*define\s+({re.escape(prefix)}\w+)\s+(0[xX][0-9a-fA-F]+|\d+)\b",

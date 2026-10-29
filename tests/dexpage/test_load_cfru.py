@@ -69,3 +69,16 @@ def test_species_switch_renames(paths):
     assert ability_display(paths, "ABILITY_INSOMNIA", "SPECIES_ELEKID", None, ["ELECTRIC"])[0] == "Vital Spirit"
     assert ability_display(paths, "ABILITY_CLEARBODY", "SPECIES_HEATMOR", None, ["FIRE"])[0] == "White Smoke"
     assert ability_display(paths, "ABILITY_CLOUDNINE", "SPECIES_RAYQUAZA", None, ["DRAGON", "FLYING"])[0] == "Air Lock"
+
+
+def test_item_ids_include_enums(paths):
+    ids = item_ids(paths)
+    assert ids["ITEM_NORMALIUM_Z"] == 0x29E and ids["ITEM_FIRIUM_Z"] == 0x2A7 and ids["ITEM_TAPUNIUM_Z"] == 0x2BF
+    assert ids["ITEM_TM02_DRAGON_CLAW"] == 0x122                              # the non-Unbound TM enum
+
+
+def test_z_crystal_sources(paths):
+    from tools.dexpage.load_cfru import z_crystal_sources
+    src = z_crystal_sources(paths)
+    assert any("Gym Trainee" in w and "Fire" in w for w in src["ITEM_FIRIUM_Z"])
+    assert any("Necrozma" in w for w in src["ITEM_ULTRANECROZIUM_Z"])

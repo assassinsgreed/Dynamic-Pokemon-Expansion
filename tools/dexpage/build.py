@@ -15,11 +15,11 @@ from .docs import DOC_IMAGES, load_docs, render_topic, topic_text
 from .items import load_items, load_machine_locations, load_tutors
 import difflib
 
-from .load_cfru import ability_chances, ability_display, ability_ids, ability_officials, marts
+from .load_cfru import ability_chances, ability_display, ability_ids, ability_officials, marts, z_crystal_sources
 from .locations import attach_encounters, load_encounters
 from .paths import DPE_ROOT, Paths
 from .roster import Entry, SourceData, build_roster, evolution_links, load_source_data
-from .rom import item_icons
+from .rom import POCKET_BERRIES, POCKET_KEY_ITEMS, POCKET_POKE_BALLS, item_fields, item_icons
 from .sprites import build_sheet, pack
 
 TEMPLATE = Path(__file__).with_name("template.html")
@@ -188,18 +188,24 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
         need = f"Needs {loc['requires']} to reach." if loc.get("requires") else ""
         name = f"{label} {data.moves[m['move']]['name']}"
         index[_norm(name)] = len(items)
+        index[_norm(label)] = len(items)  # shops sell "TM16" under CFRU's ITEM_TM16_ROAR as well as ITEM_TM16
         items.append({"name": name, "category": f"{m['kind']}s", "where": list(loc.get("where", [])), "use": need,
                       "key": const if const in data.item_ids else None, "move": m["move"]})
     for mart in marts(data.paths):
         for const in mart["items"]:
             if const in data.items:
                 add(_full_item_name(data, const), "", [mart["where"]], "")
+    for const, where in z_crystal_sources(data.paths).items():  # Gym Trainee rewards and wild-held Z-Crystals
+        if const in data.items:
+            add(_full_item_name(data, const), "Z-Crystals", where, "")
+    fields = item_fields(data.paths.rom, data.item_ids)
+    for item in items:
+        item["category"] = _item_category(item, fields)
     for item in items:
         # "Daimyn City Mall" from the doc is redundant next to "Daimyn City Mall · Gems shop"
         places = {w.split(" · ")[0] for w in item["where"] if " · " in w}
         # …and "PokeChip Crusher" next to "PokeChip Crusher (5 chips)"
         item["where"] = [w for w in item["where"] if w not in places and not any(o.startswith(w + " (") for o in item["where"])]
-        item["category"] = item["category"] or "Other items"
     for names in held.values():
         for h in names:
             add(h.split(" (")[0], "Held by wild Pokémon", [], "")
@@ -208,6 +214,9 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
             if link.get("item") and link["item"] in data.items and _norm(data.items[link["item"]]) not in index:
                 add(data.items[link["item"]], "Evolution", [], "")
 
+    items.sort(key=lambda it: ITEM_CATEGORY_ORDER.index(it["category"]) if it["category"] in ITEM_CATEGORY_ORDER else len(ITEM_CATEGORY_ORDER) - 1)
+    index.clear()
+    index.update((_norm(it["name"]), k) for k, it in enumerate(items))
     by_const = {}
     for k, item in enumerate(items):
         if item["key"]:
@@ -222,6 +231,32 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
     for item in items:
         item["icon"] = offsets.get(item.pop("key"))
     return items, index, by_const, "data:image/webp;base64," + base64.b64encode(sheet).decode()
+
+
+ITEM_CATEGORY_ORDER = ["Poké Balls", "Consumables", "Held Items", "Berries", "Breeding", "Evolution", "Mega Stones", "Z-Crystals",
+                       "Primal Reversion", "Forme Changing Items", "Key Items", "HMs", "TMs", "Held by wild Pokémon", "Other items"]
+
+
+def _item_category(item: dict, fields: dict[str, dict]) -> str:
+    """Z-Crystals and Poké Balls always get their own group; otherwise the doc's category, else what the game's item
+    table says: Key Items pocket, an evolution-stone use (sweets, apples), a field or battle use, a hold effect."""
+    key, f = item["key"], fields.get(item["key"])
+    if key and key.endswith("IUM_Z"):
+        return "Z-Crystals"
+    if f and f["pocket"] == POCKET_POKE_BALLS:
+        return "Poké Balls"
+    if item["category"] or not f:
+        return item["category"] or "Other items"
+    evolve, unusable = fields["ITEM_FIRE_STONE"]["field_use"], fields["ITEM_LEFTOVERS"]["field_use"]
+    if f["pocket"] == POCKET_KEY_ITEMS:
+        return "Key Items"
+    if f["pocket"] == POCKET_BERRIES:
+        return "Berries"
+    if f["field_use"] == evolve:
+        return "Evolution"
+    if f["battle_use"] or f["field_use"] not in (0, unusable):
+        return "Consumables"
+    return "Held Items" if f["hold"] else "Other items"
 
 
 def _full_item_name(data: SourceData, const: str) -> str:

@@ -10,6 +10,7 @@ from .paths import DPE_ROOT
 ITEM_STRUCT_SIZE = 44  # FireRed struct Item
 ITEM_NAME_LENGTH = 14
 TERMINATOR = 0xFF
+POCKET_KEY_ITEMS, POCKET_POKE_BALLS, POCKET_BERRIES = 2, 3, 5  # FireRed bag pockets (struct Item.pocket)
 
 
 class RomError(Exception):
@@ -163,6 +164,20 @@ def read_text(rom_path: Path, address: int, limit: int = 200) -> str:
     for brk in ("\\n", "\\l", "\\p"):
         text = text.replace("-" + brk, "-").replace(brk, " ")  # "hide-" + break + "melting" is one word
     return " ".join(text.split())
+
+
+def item_fields(rom_path: Path, item_ids: dict[str, int]) -> dict[str, dict]:
+    """What the game's item table says about each item: its bag pocket, hold effect, and whether it has a field or
+    battle use (FireRed struct Item: pocket at +26, fieldUseFunc at +28, battleUsage at +32)."""
+    rom = _rom_bytes(rom_path)
+    base = _find_item_table(rom, _charmap())
+    fields = {}
+    for const, idx in item_ids.items():
+        o = base + idx * ITEM_STRUCT_SIZE
+        if o + ITEM_STRUCT_SIZE <= len(rom):
+            b = rom[o:o + ITEM_STRUCT_SIZE]
+            fields[const] = {"hold": b[18], "pocket": b[26], "field_use": int.from_bytes(b[28:32], "little"), "battle_use": b[32]}
+    return fields
 
 
 def item_names(rom_path: Path, item_ids: dict[str, int]) -> dict[str, str]:
