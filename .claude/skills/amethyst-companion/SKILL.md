@@ -74,6 +74,12 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   Back/Forward buttons sit right of the tabs, always visible, disabled when there's nowhere to go.
 - Tutor rows like "Fire Fang, or Flame Burst (v1.4+)" resolve to the move the game teaches for that tutor kind
   (move-tutor files for Regular, CFRU special tutors for Special); doc typos fuzzy-match (Breaking Strike → Breaking Swipe).
+- Content describes the **latest release** (version tag from `../PokemonShootingStars/Changelog.txt` beside the
+  title): "A, or B (v1.4+)" means B; "(v1.4)" tags are dropped from place names.
+- Gym Trainee special tutors are grouped per trainee ("one of three chosen each day" is the shared note).
+- Moves, Tutors, Items and Locations open an entry in place (under its row, or full-width under its card) with a
+  collapse button, like Pokédex rows; links from inside a card open the entry in its own view. The type filter is
+  hidden on Items and Locations.
 - Every TM/HM is an item ("TM02 Dragon Claw", category TMs/HMs) linking to its move; typing a type name in the
   Pokédex lists that type.
 

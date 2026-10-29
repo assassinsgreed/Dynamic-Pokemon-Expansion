@@ -16,7 +16,7 @@ import difflib
 
 from .load_cfru import ability_display, marts
 from .locations import attach_encounters, load_encounters
-from .paths import Paths
+from .paths import DPE_ROOT, Paths
 from .roster import Entry, SourceData, build_roster, evolution_links, load_source_data
 from .rom import item_icons
 from .sprites import build_sheet, pack
@@ -227,7 +227,10 @@ def _attach_tutor_locations(moves: dict) -> list[dict]:
 
     rows = []
     for t in load_tutors():
-        options = [re.sub(r"\s*\([^)]*\)", "", o).strip() for o in re.split(r",\s*or\s+", t["move"])]
+        # The page describes the latest release: "Fire Fang, or Flame Burst (v1.4+)" means Flame Burst
+        raw = re.split(r",\s*or\s+", t["move"])
+        raw = [o for o in raw if re.search(r"\(v[\d.]+\+?\)", o)] or raw
+        options = [re.sub(r"\s*\([^)]*\)", "", o).strip() for o in raw]
         found = []
         for o in options:
             const = by_key.get(_norm(o))
@@ -242,7 +245,10 @@ def _attach_tutor_locations(moves: dict) -> list[dict]:
         if const is None:
             print(f"warning: tutor move {t['move']!r} matches no move", file=sys.stderr)
             continue
-        entry = {"where": t["where"], "note": t["note"], "kind": t["kind"]}
+        where = re.sub(r"\s*\(v[\d.]+\+?\)", "", t["where"])  # "Battle Frontier (v1.4)": everything is current
+        if t["kind"] == "Special":
+            where = re.sub(r"\s*\(\d+\)$", "", where)  # "Gym Trainee Mason (1..3)" teach one of three each day
+        entry = {"where": where, "note": t["note"], "kind": t["kind"]}
         moves[const].setdefault("tutor", []).append(entry)
         rows.append({"move": const, **entry})
     return rows
@@ -308,6 +314,17 @@ def build(paths: Paths, out: Path) -> None:
 BRAND_ICON = Path(__file__).with_name("jirachi-trozei.png")  # Jirachi's Pokémon Trozei head (Bulbapedia BT385.png)
 
 
+CHANGELOG = DPE_ROOT.parent / "PokemonShootingStars" / "Changelog.txt"
+
+
+def game_version() -> str:
+    """The newest release in the game's changelog (shown beside the title so players know what the page matches)."""
+    if not CHANGELOG.exists():
+        return ""
+    m = re.search(r"^v(\d+(?:\.\d+)+)\s+-", CHANGELOG.read_text(encoding="utf-8", errors="replace"), flags=re.M)
+    return f"v{m.group(1)}" if m else ""
+
+
 def _brand_icon() -> str:
     return "data:image/png;base64," + base64.b64encode(BRAND_ICON.read_bytes()).decode()
 
@@ -321,4 +338,5 @@ def render(data: dict, sheet: bytes, offsets: dict) -> str:
             .replace("__DEX_DATA__", blob)
             .replace("__SPRITE_SHEET__", sprites)
             .replace("__BRAND_ICON__", _brand_icon())
+            .replace("__GAME_VERSION__", game_version())
             .replace("__APP_SCRIPT__", APP_SCRIPT.read_text(encoding="utf-8").replace("</", "<\/")))

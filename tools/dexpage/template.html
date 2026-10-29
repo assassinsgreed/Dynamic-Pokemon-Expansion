@@ -57,6 +57,8 @@ header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 
 .console .wrap > * { min-width: 0; }  /* let the tab strip scroll instead of widening the header */
 .brand { display: flex; align-items: baseline; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
 .brand h1 { margin: 0; font: 600 22px/1 var(--font-display); letter-spacing: .02em; display: flex; align-items: center; gap: 8px; }
+.brand h1 .version { font: 600 11px var(--font-data); color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 2px 7px; letter-spacing: 0; align-self: center; }
+.brand h1 .version:empty { display: none; }
 .brand h1 .brand-icon { width: 34px; height: 34px; flex: none; margin: -6px 0 -6px -2px; }
 .brand .meta { color: var(--muted); font-size: 12.5px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
 .brand a { color: var(--accent); font-weight: 600; text-decoration: none; }
@@ -251,6 +253,17 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
 .tutorhead small { font: 500 12.5px var(--font-body); color: var(--muted); text-transform: none; letter-spacing: 0; }
 .also button { border: 1px solid var(--line); background: var(--surface); padding: 4px 10px; border-radius: 999px; cursor: pointer; color: var(--accent); font-weight: 600; font-size: 13px; }
 
+/* Entries opened in place in the Moves / Tutors / Items / Locations lists */
+.movecard, .itemcard, .loccard { position: relative; }
+.collapse { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--accent); background: var(--surface); color: var(--accent); cursor: pointer; }
+.collapse:hover { background: var(--accent-soft); }
+.expanded { grid-column: 1 / -1; margin: 6px 0; scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--console-h, 150px) + 8px); }
+tr.expanded > td { padding: 6px 0 10px; background: none !important; }
+tr.expanded { cursor: default; }
+tr.on td { background: var(--accent-soft); }
+tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--console-h, 150px) + 12px); }
+.chip.on { border-color: var(--accent); background: var(--accent-soft); }
+
 /* Place card */
 .loccard { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px; display: grid; gap: 12px; }
 .loccard h2 { margin: 0; font: 600 24px/1.1 var(--font-display); }
@@ -301,7 +314,7 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
 <header class="console">
   <div class="wrap">
     <div class="brand">
-      <h1><img class="brand-icon" src="__BRAND_ICON__" alt="" width="34" height="34">Pokemon Amethyst Companion</h1>
+      <h1><img class="brand-icon" src="__BRAND_ICON__" alt="" width="34" height="34">Pokemon Amethyst Companion<span class="version" title="Matches this game version">__GAME_VERSION__</span></h1>
       <div class="meta"><span class="long">Pokémon, moves, items &amp; where to find them</span><button class="offline-btn" id="offline-btn" aria-expanded="false" aria-controls="offline-help">Download for Offline Use</button></div>
     </div>
     <div class="offline-help" id="offline-help" hidden>

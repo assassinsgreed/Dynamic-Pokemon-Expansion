@@ -209,5 +209,25 @@ def test_tutor_locations_on_moves(data):
     snore = data["moves"]["MOVE_SNORE"]["tutor"]
     assert {"where": "Ferrox Village", "note": "5 PokeChips", "kind": "Regular"} in snore
     burst = data["moves"]["MOVE_FLAMEBURST"]["tutor"]      # doc row "Fire Fang, or Flame Burst (v1.4+)"
-    assert burst[0]["where"] == "Gym Trainee Ashley (1)"
-    assert "tutor" not in data["moves"]["MOVE_FIREFANG"] or all(t["where"] != "Gym Trainee Ashley (1)" for t in data["moves"]["MOVE_FIREFANG"]["tutor"])
+    assert burst[0]["where"] == "Gym Trainee Ashley"
+    assert "tutor" not in data["moves"]["MOVE_FIREFANG"] or all(t["where"] != "Gym Trainee Ashley" for t in data["moves"]["MOVE_FIREFANG"]["tutor"])
+
+
+def test_tutors_assume_latest_version(data):
+    by_move = {}
+    for t in data["tutors"]:
+        by_move.setdefault(t["move"], []).append(t["where"])
+    assert "MOVE_VACUUMWAVE" in by_move and "MOVE_AURASPHERE" not in by_move or all(
+        not w.startswith("Gym Trainee Gawain") for w in by_move.get("MOVE_AURASPHERE", []))
+    assert "MOVE_PLUCK" in by_move                                  # "Dual Wingbeat, or Pluck (v1.4+)"
+    assert not any("(v1." in t["where"] for t in data["tutors"])    # "Battle Frontier (v1.4)" → "Battle Frontier"
+
+
+def test_gym_trainee_tutors_grouped(data):
+    mason = [t for t in data["tutors"] if t["where"] == "Gym Trainee Mason"]
+    assert {t["move"] for t in mason} == {"MOVE_AUTOTOMIZE", "MOVE_METALBURST", "MOVE_HEAVYSLAM"}
+    assert len({t["note"] for t in mason}) == 1
+
+
+def test_game_version_tag(html):
+    assert re.search(r'class="version"[^>]*>v1.4.3<', html)

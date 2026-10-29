@@ -267,14 +267,16 @@
   const GROUPS = [["Level up", (h) => h === "Evo" || h.startsWith("Lv ")], ["TM / HM", (h) => /^(TM|HM)\d/.test(h)],
     ["Move tutor", (h) => h.startsWith("Tutor")], ["Special tutor", (h) => h.startsWith("Special:")], ["Egg move", (h) => h === "Egg"]];
 
-  function moveCard(k) {
+  const COLLAPSE = '<button class="collapse" data-collapse aria-label="Collapse" title="Collapse"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 10l4-4 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
+
+  function moveCard(k, collapsible) {
     const mv = moves[k];
     const learners = mv.learners.filter(([i]) => inMode(mons[i]) && inType(mons[i]));
     const groups = GROUPS.map(([title, test]) => [title, learners.filter(([, h]) => test(h))]).filter(([, l]) => l.length);
     const body = groups.length
       ? groups.map(([title, l]) => `<div><h4>${title} · ${l.length}</h4><div class="chips">${l.map(([i, h]) => monChip(i, h.replace(/^Special: /, ""))).join("")}</div></div>`).join("")
       : `<p class="empty">${mv.learners.length ? "No Pokémon match the current filters." : "No Pokémon learn this move."}</p>`;
-    return `<article class="movecard">
+    return `<article class="movecard">${collapsible ? COLLAPSE : ""}
       <div class="top">${typeBadge(mv.type)}<span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span>
         <h2>${esc(mv.name)}${mv.official ? `<small>${esc(mv.official)}</small>` : ""}</h2></div>
       <div class="specs"><span>${CAT_NAME[mv.split]}</span><span>Pow <b>${mv.power || "—"}</b></span><span>Acc <b>${mv.acc || "—"}</b></span><span>PP <b>${mv.pp}</b></span></div>
@@ -283,7 +285,7 @@
       <div class="learners">${body}</div></article>`;
   }
 
-  function itemCard(k) {
+  function itemCard(k, collapsible) {
     const it = items[k];
     const holders = [];
     mons.forEach((m, i) => m.held.forEach(([h, hk]) => { if (hk === k && inMode(m)) holders.push([i, (h.match(/\(([^)]*)\)/) || [])[1] || ""]); }));
@@ -292,7 +294,7 @@
     // "Used on" repeats Evolves for evolution items; form-changing items (Gracidea, Drives, Nectars) still need it
     const showUse = it.use && !(evolves.length && it.category === "Evolution");
     const useTitle = /Forme|Primal|Evolution/.test(it.category) ? "Used on" : "Effect";
-    return `<article class="itemcard">
+    return `<article class="itemcard">${collapsible ? COLLAPSE : ""}
       <div class="top">${itemIcon(k)}<h2>${esc(it.name)}<small>${esc(it.category)}</small></h2></div>
       ${it.where.length ? `<div><h4>Where to find</h4><ul class="where">${it.where.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>` : '<p class="note">No known location.</p>'}
       ${it.move ? `<div><h4>Teaches</h4><div class="chips"><button class="chip" data-move="${it.move}">${typeBadge(moves[it.move].type)}<span class="ln">${esc(moves[it.move].name)}</span><span class="hw">${moves[it.move].learners.filter(([, h]) => /^(TM|HM)\d/.test(h)).length} Pokémon</span></button></div></div>` : ""}
@@ -302,8 +304,8 @@
     </article>`;
   }
 
-  function placeCard(p) {
-    const rows = p.rows.filter(([i, l]) => rowInMode(l) && inType(mons[i]));
+  function placeCard(p, collapsible) {
+    const rows = p.rows.filter(([, l]) => rowInMode(l));
     const methods = [];
     rows.forEach((r) => { const g = methods.find(([mt]) => mt === r[1].method); g ? g[1].push(r) : methods.push([r[1].method, [r]]); });
     const re = placeRe(p.name);
@@ -314,7 +316,7 @@
       : `<p class="empty">No Pokémon match the current filters here.</p>`) +
       (found.length ? `<div><h4>Items · ${found.length}</h4><div class="chips">${found.map(([k, line]) =>
         `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line.toLowerCase() !== p.name.toLowerCase() ? `<span class="hw">${esc(line.replace(p.name, "").replace(/^[\s·(-]+|\)$/g, "") || line)}</span>` : ""}</button>`).join("")}</div></div>` : "");
-    return `<article class="loccard"><h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2><div class="learners">${body}</div></article>`;
+    return `<article class="loccard">${collapsible ? COLLAPSE : ""}<h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2><div class="learners">${body}</div></article>`;
   }
 
   // ---------------------------------------------------------------- views
@@ -342,74 +344,97 @@
     return [html, `${list.length} Pokémon`];
   }
 
+  // The open entry expands in place, like a Pokédex row: under its table row, or full-width under its card
+  const expandRow = (cols, html) => `<tr class="expanded"><td colspan="${cols}">${html}</td></tr>`;
+  const expandCell = (html) => `<div class="expanded">${html}</div>`;
+  const chipsWithOpen = (keys, chip, isOpen, card) => {
+    // A chip grid split so the open card can span the full width right after its chip
+    let out = "", run = [];
+    const flush = () => { if (run.length) out += `<div class="chips">${run.join("")}</div>`; run = []; };
+    keys.forEach((k) => { run.push(chip(k)); if (isOpen(k)) { flush(); out += expandCell(card(k)); } });
+    flush();
+    return out;
+  };
+
   function movesView(q) {
-    if (state.move) return [moveCard(state.move), moves[state.move].name];
     const list = exactFirst(matchMoves(q), (k) => moves[k].s.includes(q)).filter((k) => !state.type || moves[k].type === state.type);
-    const top = q && list.length && moves[list[0]].s.includes(q) ? moveCard(list[0]) : "";
-    const rows = list.map((k) => {
-      const mv = moves[k];
-      return `<tr data-move="${k}"><td><span class="mvname">${esc(mv.name)}</span>${mv.official ? ` <span class="note">${esc(mv.official)}</span>` : ""}</td><td>${typeBadge(mv.type)}</td>
-        <td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td><td class="n">${mv.power || "—"}</td>
-        <td class="n hide-sm">${mv.acc || "—"}</td><td class="n hide-sm">${mv.pp}</td><td class="n hide-sm">${mv.tm ? mv.tm.label : ""}</td></tr>`;
-    }).join("");
-    const cards = state.layouts.moves === "grid";
-    const table = !list.length ? "" : cards ? `<div class="chips">${list.map((k) => `<button class="chip" data-move="${k}">${typeBadge(moves[k].type)}<span class="ln">${esc(moves[k].name)}</span><span class="hw">${moves[k].tm ? moves[k].tm.label : moves[k].power || ""}</span></button>`).join("")}</div>`
-      : `<div class="movelist"><table class="mv"><thead><tr><th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num">Pow</th><th class="c-num hide-sm">Acc</th><th class="c-num hide-sm">PP</th><th class="c-tm hide-sm">TM</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-    if (!list.length) return [top + `<div class="nores">No moves match “${esc(state.q)}”.</div>`, "0 moves"];
-    return [top + table, `${list.length} moves`];
+    if (!list.length) return [`<div class="nores">No moves match “${esc(state.q)}”.</div>`, "0 moves"];
+    const open = state.move || (q && moves[list[0]].s.includes(q) ? list[0] : null);  // an exact match opens by itself
+    let html;
+    if (state.layouts.moves === "grid") {
+      html = chipsWithOpen(list, (k) => `<button class="chip${k === open ? " on" : ""}" data-move="${k}">${typeBadge(moves[k].type)}<span class="ln">${esc(moves[k].name)}</span><span class="hw">${moves[k].tm ? moves[k].tm.label : moves[k].power || ""}</span></button>`,
+        (k) => k === open, (k) => moveCard(k, true));
+    } else {
+      const rows = list.map((k) => {
+        const mv = moves[k];
+        return `<tr data-move="${k}"${k === open ? ' class="on"' : ""}><td><span class="mvname">${esc(mv.name)}</span>${mv.official ? ` <span class="note">${esc(mv.official)}</span>` : ""}</td><td>${typeBadge(mv.type)}</td>
+          <td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td><td class="n">${mv.power || "—"}</td>
+          <td class="n hide-sm">${mv.acc || "—"}</td><td class="n hide-sm">${mv.pp}</td><td class="n hide-sm">${mv.tm ? mv.tm.label : ""}</td></tr>${k === open ? expandRow(7, moveCard(k, true)) : ""}`;
+      }).join("");
+      html = `<div class="movelist"><table class="mv"><thead><tr><th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num">Pow</th><th class="c-num hide-sm">Acc</th><th class="c-num hide-sm">PP</th><th class="c-tm hide-sm">TM</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+    return [html, `${list.length} moves`];
   }
 
   function itemsView(q) {
-    if (state.item !== null) return [itemCard(state.item), items[state.item].name];
     const list = exactFirst(matchItems(q), (k) => itemKeys[k] === q);
-    const top = q && list.length && itemKeys[list[0]] === q ? itemCard(list[0]) : "";
+    if (!list.length) return [`<div class="nores">No items match “${esc(state.q)}”.</div>`, "0 items"];
+    const open = state.item !== null ? state.item : q && itemKeys[list[0]] === q ? list[0] : null;
     const cats = [];
     list.forEach((k) => { const c = items[k].category; const g = cats.find(([n]) => n === c); g ? g[1].push(k) : cats.push([c, [k]]); });
-    const asCards = state.layouts.items === "grid";
-    const html = cats.map(([c, ks]) => `<div class="cat-head">${esc(c)} · ${ks.length}</div>${asCards
-      ? `<div class="chips">${ks.map((k) => `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span></button>`).join("")}</div>`
+    const html = cats.map(([c, ks]) => `<div class="cat-head">${esc(c)} · ${ks.length}</div>${state.layouts.items === "grid"
+      ? chipsWithOpen(ks, (k) => `<button class="chip${k === open ? " on" : ""}" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span></button>`, (k) => k === open, (k) => itemCard(k, true))
       : `<div class="listtable"><table class="mv"><thead><tr><th>Item</th><th>Where to find</th></tr></thead><tbody>${ks.map((k) =>
-          `<tr data-item="${k}"><td>${itemIcon(k)}<span class="mvname">${esc(items[k].name)}</span></td><td class="note">${esc(items[k].where.slice(0, 2).join("; ") || "—")}${items[k].where.length > 2 ? ` +${items[k].where.length - 2} more` : ""}</td></tr>`).join("")}</tbody></table></div>`}`).join("");
-    return [top + (html || `<div class="nores">No items match “${esc(state.q)}”.</div>`), `${list.length} items`];
+          `<tr data-item="${k}"${k === open ? ' class="on"' : ""}><td>${itemIcon(k)}<span class="mvname">${esc(items[k].name)}</span></td><td class="note">${esc(items[k].where.slice(0, 2).join("; ") || "—")}${
+            items[k].where.length > 2 ? ` +${items[k].where.length - 2} more` : ""}</td></tr>${k === open ? expandRow(2, itemCard(k, true)) : ""}`).join("")}</tbody></table></div>`}`).join("");
+    return [html, `${list.length} items`];
   }
 
   function placesView(q) {
-    if (state.place) {
-      const p = places.get(norm(state.place));
-      return [p ? placeCard(p) : `<div class="nores">No encounters recorded for ${esc(state.place)}.</div>`, state.place];
-    }
     const list = exactFirst(matchPlaces(q), (p) => norm(p.name) === q);
-    const top = q && list.length && norm(list[0].name) === q ? placeCard(list[0]) : "";
+    if (!list.length) return [`<div class="nores">No locations match “${esc(state.q)}”.</div>`, "0 locations"];
+    const open = state.place ? norm(state.place) : q && norm(list[0].name) === q ? q : null;
+    const isOpen = (p) => norm(p.name) === open;
     const encounters = (p) => p.rows.filter(([, l]) => rowInMode(l)).length;
     const methods = (p) => [...new Set(p.rows.filter(([, l]) => rowInMode(l)).map(([, l]) => l.method))].join(" · ");
-    const html = !list.length ? `<div class="nores">No locations match “${esc(state.q)}”.</div>`
-      : state.layouts.places === "grid"
-        ? `<div class="chips">${list.map((p) => `<button class="chip" data-place="${esc(p.name)}"><span class="ln" style="padding-left:10px">${esc(p.name)}</span><span class="hw">${encounters(p)}</span></button>`).join("")}</div>`
-        : `<div class="listtable"><table class="mv"><thead><tr><th>Location</th><th class="hide-sm">Found by</th><th class="c-num">Pokémon</th></tr></thead><tbody>${list.map((p) =>
-            `<tr data-place="${esc(p.name)}"><td><span class="mvname">${esc(p.name)}</span></td><td class="note hide-sm">${esc(methods(p))}</td><td class="n">${encounters(p)}</td></tr>`).join("")}</tbody></table></div>`;
-    return [top + html, `${list.length} locations`];
+    const html = state.layouts.places === "grid"
+      ? chipsWithOpen(list, (p) => `<button class="chip${isOpen(p) ? " on" : ""}" data-place="${esc(p.name)}"><span class="ln" style="padding-left:10px">${esc(p.name)}</span><span class="hw">${encounters(p)}</span></button>`, isOpen, (p) => placeCard(p, true))
+      : `<div class="listtable"><table class="mv"><thead><tr><th>Location</th><th class="hide-sm">Found by</th><th class="c-num">Pokémon</th></tr></thead><tbody>${list.map((p) =>
+          `<tr data-place="${esc(p.name)}"${isOpen(p) ? ' class="on"' : ""}><td><span class="mvname">${esc(p.name)}</span></td><td class="note hide-sm">${esc(methods(p))}</td><td class="n">${encounters(p)}</td></tr>${
+            isOpen(p) ? expandRow(3, placeCard(p, true)) : ""}`).join("")}</tbody></table></div>`;
+    return [html, `${list.length} locations`];
   }
 
   function tutorsView(q) {
     const rows = DEX.tutors.filter((t) => (!q || moves[t.move].s.some((x) => x.includes(q)) || norm(t.where).includes(q) || norm(t.note).includes(q))
       && (!state.type || moves[t.move].type === state.type));
+    if (!rows.length) return [`<div class="nores">No tutors match “${esc(state.q)}”.</div>`, "0 tutor moves"];
+    const open = state.move || (q && rows.find((t) => moves[t.move].s.includes(q)) || {}).move || null;
+    let opened = false;  // a move taught in two places opens under the first
+    const isOpen = (t) => { if (t.move !== open || opened) return false; opened = true; return true; };
     const groups = [];
     rows.forEach((t) => { const key = t.kind + "|" + t.where; const g = groups.find(([k]) => k === key); g ? g[1].push(t) : groups.push([key, [t]]); });
-    const learners = (k) => moves[k].learners.filter(([i, h]) => inMode(mons[i]) && h.startsWith(moves[k].tutor && moves[k].tutor[0].kind === "Special" ? "Special:" : "Tutor")).length;
+    const learners = (t) => moves[t.move].learners.filter(([i, h]) => inMode(mons[i]) && h.startsWith(t.kind === "Special" ? "Special:" : "Tutor")).length;
     const asCards = state.layouts.tutors === "grid";
     const html = groups.map(([key, ts]) => {
       const [kind, where] = key.split("|");
       const sameNote = ts.every((t) => t.note === ts[0].note) ? ts[0].note : "";
       const head = `<div class="cat-head tutorhead">${esc(where)}${kind === "Special" ? " · special tutor" : ""}${sameNote ? `<small>${esc(sameNote)}</small>` : ""}</div>`;
-      const body = asCards
-        ? `<div class="chips">${ts.map((t) => `<button class="chip" data-move="${t.move}">${typeBadge(moves[t.move].type)}<span class="ln">${esc(moves[t.move].name)}</span><span class="hw" title="${sameNote ? "Pokémon that can learn it" : esc(t.note)}">${learners(t.move)}</span></button>`).join("")}</div>`
-        : `<div class="listtable"><table class="mv"><thead><tr><th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num hide-sm">Pow</th>${sameNote ? "" : "<th>Requirement</th>"}<th class="c-num">Learn</th></tr></thead><tbody>${ts.map((t) => {
-            const mv = moves[t.move];
-            return `<tr data-move="${t.move}"><td><span class="mvname">${esc(mv.name)}</span></td><td>${typeBadge(mv.type)}</td><td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td><td class="n hide-sm">${mv.power || "—"}</td>${sameNote ? "" : `<td class="note">${esc(t.note)}</td>`}<td class="n">${learners(t.move)}</td></tr>`;
-          }).join("")}</tbody></table></div>`;
-      return head + body;
+      if (asCards) {
+        const flags = ts.map(isOpen);
+        return head + chipsWithOpen(ts.map((_, n) => n), (n) => {
+          const t = ts[n];
+          return `<button class="chip${flags[n] ? " on" : ""}" data-move="${t.move}">${typeBadge(moves[t.move].type)}<span class="ln">${esc(moves[t.move].name)}</span><span class="hw" title="${sameNote ? "Pokémon that can learn it" : esc(t.note)}">${learners(t)}</span></button>`;
+        }, (n) => flags[n], (n) => moveCard(ts[n].move, true));
+      }
+      const cols = sameNote ? 5 : 6;
+      return head + `<div class="listtable"><table class="mv"><thead><tr><th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num hide-sm">Pow</th>${sameNote ? "" : "<th>Requirement</th>"}<th class="c-num">Learn</th></tr></thead><tbody>${ts.map((t) => {
+        const mv = moves[t.move], on = isOpen(t);
+        return `<tr data-move="${t.move}"${on ? ' class="on"' : ""}><td><span class="mvname">${esc(mv.name)}</span></td><td>${typeBadge(mv.type)}</td><td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td><td class="n hide-sm">${mv.power || "—"}</td>${
+          sameNote ? "" : `<td class="note">${esc(t.note)}</td>`}<td class="n">${learners(t)}</td></tr>${on ? expandRow(cols, moveCard(t.move, true)) : ""}`;
+      }).join("")}</tbody></table></div>`;
     }).join("");
-    return [html || `<div class="nores">No tutors match “${esc(state.q)}”.</div>`, `${rows.length} tutor moves`];
+    return [html, `${rows.length} tutor moves`];
   }
 
   const PLACEHOLDER = {
@@ -425,19 +450,19 @@
     const [html, count] = { dex: dexView, moves: movesView, tutors: tutorsView, items: itemsView, places: placesView }[state.view](q);
     $("#out").innerHTML = html;
     $("#count").textContent = count;
-    $("#q").value = state.move || state.item !== null || state.place ? "" : state.q;
+    $("#q").value = state.q;
     $("#q").placeholder = PLACEHOLDER[state.view];
     $("#clear").hidden = !$("#q").value;
     $("#back").disabled = depth <= 0;
     $("#fwd").disabled = depth >= top;
-    $("#layout-seg").hidden = Boolean(state.move || state.item !== null || state.place);
+    $("#typepick").hidden = state.view === "items" || state.view === "places";  // items and places have no type
     document.querySelectorAll("[data-viewtab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.viewtab === state.view)));
     document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
     document.querySelectorAll(".seg button[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.layouts[state.view])));
     $("#type-label").innerHTML = state.type ? typeBadge(state.type) : "All types";
     syncConsoleHeight();
     if (scroll) {
-      const el = state.open !== null && document.querySelector(`.mon[data-i="${state.open}"]`);
+      const el = (state.open !== null && document.querySelector(`.mon[data-i="${state.open}"]`)) || ((state.move || state.item !== null || state.place) && document.querySelector("tr.on, .chip.on"));
       if (el) el.scrollIntoView({ block: "start" }); else window.scrollTo({ top: 0 });
     }
   }
@@ -488,12 +513,33 @@
     const t = e.target;
     const go = t.closest("[data-goto]");
     if (go) { navigate({ view: go.dataset.goto, q: state.q }); return; }
+    if (t.closest("[data-collapse]")) { navigate({ view: state.view, q: state.q }); return; }
+    // In its own list, an entry toggles open in place; from inside a card it opens in its own view
+    const inList = !t.closest(".expanded");
     const itm = t.closest("[data-item]");
-    if (itm) { e.preventDefault(); openItem(+itm.dataset.item); return; }
+    if (itm) {
+      e.preventDefault();
+      const k = +itm.dataset.item;
+      if (state.view === "items" && inList) navigate({ view: "items", q: state.q, item: state.item === k ? null : k });
+      else openItem(k);
+      return;
+    }
     const mv = t.closest("[data-move]");
-    if (mv) { e.preventDefault(); openMove(mv.dataset.move); return; }
+    if (mv) {
+      e.preventDefault();
+      const k = mv.dataset.move;
+      if ((state.view === "moves" || state.view === "tutors") && inList) navigate({ view: state.view, q: state.q, move: state.move === k ? null : k });
+      else openMove(k);
+      return;
+    }
     const pl = t.closest("[data-place]");
-    if (pl) { e.preventDefault(); openPlace(pl.dataset.place); return; }
+    if (pl) {
+      e.preventDefault();
+      const name = pl.dataset.place;
+      if (state.view === "places" && inList) navigate({ view: "places", q: state.q, place: state.place === name ? null : name });
+      else openPlace(name);
+      return;
+    }
     const op = t.closest("[data-open]");
     if (op) { e.preventDefault(); if (+op.dataset.open !== state.open) openMon(+op.dataset.open); return; }
     const tab = t.closest("[data-tab]");
