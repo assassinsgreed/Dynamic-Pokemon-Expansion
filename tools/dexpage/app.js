@@ -372,7 +372,7 @@
   }
   const matchTutors = (q) => DEX.tutors.filter((t) => (!q || moves[t.move].s.some((x) => x.includes(q)) || norm(t.where).includes(q) || words(t.note).includes(words(state.q)))
     && (!state.type || moves[t.move].type === state.type));
-  const matchAbilities = (q) => abilities.filter((a, n) => (!q || abilityKeys[n].includes(q) || abilityProse[n].includes(words(state.q)))
+  const matchAbilities = (q) => abilities.filter((a, n) => (!q || abilityKeys[n].includes(q))
     && a.mons.some(([i]) => inMode(mons[i]) && inType(mons[i])));
   const matchDocs = (q) => docTopics.filter((t) => !q || norm(t.title).includes(q) || t.s.includes(words(state.q)));
 
@@ -494,7 +494,6 @@
   const abilities = DEX.abilities;
   const abilityIndex = new Map(abilities.map((a, n) => [a.name, n]));
   const abilityKeys = abilities.map((a) => norm(a.name) + " " + norm(a.official || ""));  // in-game or official name
-  const abilityProse = abilities.map((a) => words(a.desc + " " + a.detail));
 
   function abilityCard(a) {
     const holders = a.mons.filter(([i]) => inMode(mons[i]));
