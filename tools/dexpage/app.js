@@ -468,7 +468,7 @@
   }
 
   const PLACEHOLDER = {
-    dex: "Search Pokémon — e.g. Rockruff, Galarian, Fire",
+    dex: "Search Pokémon — e.g. Rockruff, Mega, Galarian, Fire",
     moves: "Search moves or TMs — e.g. Ceaseless Edge, TM02",
     tutors: "Search tutor moves or towns — e.g. Draco Meteor, Ferrox Village",
     items: "Search items — e.g. Fire Stone, Berries",
