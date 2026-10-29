@@ -175,7 +175,9 @@ def ability_name_overrides(p: Paths) -> list[tuple[str, str, frozenset, frozense
 
     def predicate_targets(name: str) -> tuple[frozenset, frozenset]:
         body = function(name)
-        return frozenset(re.findall(r"species\s*==\s*(SPECIES_\w+)", body)), frozenset(re.findall(r"NATIONAL_DEX_\w+", body))
+        # species named by `species == SPECIES_X` or by `case SPECIES_X:` inside a `switch (species)`
+        named = re.findall(r"species\s*==\s*(SPECIES_\w+)", body) + re.findall(r"case\s+(SPECIES_\w+)\s*:", body)
+        return frozenset(named), frozenset(re.findall(r"NATIONAL_DEX_\w+", body))
 
     body = function("GetAbilityNameOverride")
     rules = []

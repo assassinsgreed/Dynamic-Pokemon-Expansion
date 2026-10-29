@@ -61,3 +61,11 @@ def test_divergent_species_ability_renames(paths):
     assert ability_display(paths, "ABILITY_HUGEPOWER", "SPECIES_MEDICHAM", None, ["FIGHTING", "PSYCHIC"])[0] == "Pure Power"
     assert ability_display(paths, "ABILITY_EMERGENCYEXIT", "SPECIES_WIMPOD", None, ["BUG", "WATER"])[0] == "Wimp Out"
     assert ability_display(paths, "ABILITY_RECEIVER", "SPECIES_GRIMER_A", "NATIONAL_DEX_GRIMER", ["POISON", "DARK"])[0] == "Alchemic Power"
+
+
+def test_species_switch_renames(paths):
+    # IsVitalSpiritAbility / IsWhiteSmokeAbility list Divergent-only species in a `switch (species)`
+    from tools.dexpage.load_cfru import ability_display
+    assert ability_display(paths, "ABILITY_INSOMNIA", "SPECIES_ELEKID", None, ["ELECTRIC"])[0] == "Vital Spirit"
+    assert ability_display(paths, "ABILITY_CLEARBODY", "SPECIES_HEATMOR", None, ["FIRE"])[0] == "White Smoke"
+    assert ability_display(paths, "ABILITY_CLOUDNINE", "SPECIES_RAYQUAZA", None, ["DRAGON", "FLYING"])[0] == "Air Lock"
