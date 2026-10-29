@@ -359,7 +359,10 @@
   function dexView(q) {
     const list = [];
     const typeQ = TYPES.find((t) => norm(t) === q);  // "fire" lists every Fire type, as well as names containing it
-    mons.forEach((m, i) => { if (inMode(m) && inType(m) && (!q || m.s.some((s) => s.includes(q)) || (typeQ && m.types.includes(typeQ)))) list.push(i); });
+    // "16" or "#016" is a dex number in the chosen mode (either on All), with the unnumbered forms listed after it
+    const num = /^\d+$/.test(q) ? +q : 0;
+    const hasNum = (m, i) => (state.mode ? [state.mode] : m.modes).some((mode) => m.modes.includes(mode) && Math.floor(order[mode][i]) === num);
+    mons.forEach((m, i) => { if (inMode(m) && inType(m) && (num ? hasNum(m, i) : !q || m.s.some((s) => s.includes(q)) || (typeQ && m.types.includes(typeQ)))) list.push(i); });
     if (state.mode) list.sort((a, b) => order[state.mode][a] - order[state.mode][b]);
     if (q) list.sort((a, b) => mons[b].s.some((s) => s.startsWith(q)) - mons[a].s.some((s) => s.startsWith(q)));
     const html = alsoLine(q) + (list.length
@@ -516,7 +519,7 @@
   }
 
   const PLACEHOLDER = {
-    dex: "Search Pokémon — e.g. Rockruff, Mega, Galarian, Fire",
+    dex: "Search Pokémon or dex # — e.g. Rockruff, 16, Mega, Galarian, Fire",
     moves: "Search moves or TMs — e.g. Ceaseless Edge, TM02",
     tutors: "Search tutor moves or towns — e.g. Draco Meteor, Ferrox Village",
     abilities: "Search abilities or what they do — e.g. Triage, Libero, weather",
