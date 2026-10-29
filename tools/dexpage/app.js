@@ -155,8 +155,9 @@
   const genderText = (g) => (g === null ? "Genderless" : g === 0 ? "♂ only" : g === 100 ? "♀ only" : `♂ ${+(100 - g).toFixed(1)}% · ♀ ${+g.toFixed(1)}%`);
 
   // ---------------------------------------------------------------- Pokémon detail
-  function row(m, i) {
-    return `<details class="mon" data-i="${i}" style="${tint(m)}"${state.open === i ? " open" : ""}>
+  function row(m, i, inSheet = false) {
+    const cards = state.layouts.dex === "grid" && !inSheet, open = state.open === i && !cards;
+    return `<details class="mon${cards && state.open === i ? " on" : ""}" data-i="${i}" style="${tint(m)}"${open ? " open" : ""}>
       <summary title="Show details"><span class="dexline">${dexNo(m)}${modeBadge(m)}</span>${sprite(m)}
         <span class="who"><span class="nm">${esc(m.name)}${formLabel(m)}</span>
           <span class="tags">${m.types.map(typeBadge).join("")}</span></span>
@@ -392,20 +393,19 @@
     if (q) list.sort((a, b) => mons[b].s.some((s) => s.startsWith(q)) - mons[a].s.some((s) => s.startsWith(q)));
     const html = (list.length
       ? `<div class="list${state.layouts.dex === "grid" ? " grid" : ""}">${list.map((i) => row(mons[i], i)).join("")}</div>`
+        + (state.layouts.dex === "grid" && state.open !== null ? sheet(`<div class="list">${row(mons[state.open], state.open, true)}</div>`) : "")
       : `<div class="nores">No Pokémon match “${esc(state.q)}”${state.mode ? ` in ${state.mode} mode` : ""}.</div>`);
     return [html, `${list.length} Pokémon`];
   }
 
-  // The open entry expands in place, like a Pokédex row: under its table row, or full-width under its card
+  // In list views the open entry expands in place under its table row. In card views it opens in a pop-up over
+  // the page instead, so the cards around it stay where they were.
   const expandRow = (cols, html) => `<tr class="expanded"><td colspan="${cols}">${html}</td></tr>`;
-  const expandCell = (html) => `<div class="expanded">${html}</div>`;
+  const sheet = (html) => `<div class="sheet" role="dialog" aria-modal="true"><div class="sheet-backdrop" data-sheet-close></div>
+    <div class="sheet-panel expanded"><button class="sheet-close" data-sheet-close aria-label="Close" title="Close">×</button>${html}</div></div>`;
   const chipsWithOpen = (keys, chip, isOpen, card) => {
-    // A chip grid split so the open card can span the full width right after its chip
-    let out = "", run = [];
-    const flush = () => { if (run.length) out += `<div class="chips">${run.join("")}</div>`; run = []; };
-    keys.forEach((k) => { run.push(chip(k)); if (isOpen(k)) { flush(); out += expandCell(card(k)); } });
-    flush();
-    return out;
+    const open = keys.find(isOpen);
+    return `<div class="chips">${keys.map(chip).join("")}</div>${open !== undefined ? sheet(card(open)) : ""}`;
   };
 
   // A move card's corner says how to teach it: its TM/HM number, or "Tutor" (tutor numbers mean nothing to players)
@@ -573,7 +573,11 @@
     document.querySelectorAll(".seg button[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.layouts[state.view])));
     $("#type-label").innerHTML = state.type ? typeBadge(state.type) : "All types";
     syncConsoleHeight();
-    if (scroll) {
+    document.body.classList.toggle("sheet-open", !!$("#out .sheet"));
+    if (scroll && $("#out .sheet")) {
+      const on = document.querySelector(".mon.on, .chip.on");
+      if (on) on.scrollIntoView({ block: "nearest" });
+    } else if (scroll) {
       const el = (state.open !== null && document.querySelector(`.mon[data-i="${state.open}"]`)) || ((state.move || state.item !== null || state.place || state.doc || state.ability) && document.querySelector("tr.on, .chip.on"));
       if (el) el.scrollIntoView({ block: "start" }); else window.scrollTo({ top: 0 });
     }
@@ -623,13 +627,20 @@
     render();
   });
   document.addEventListener("click", (e) => { if (!menu.hidden && !e.target.closest("#typepick")) closeMenu(); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenu(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if ($("#out .sheet")) navigate({ view: state.view, q: state.q }); else closeMenu();
+  });
 
   $("#out").addEventListener("click", (e) => {
     const t = e.target;
     const go = t.closest("[data-goto]");
     if (go) { navigate({ view: go.dataset.goto, q: state.q }); return; }
-    if (t.closest("[data-collapse]")) { navigate({ view: state.view, q: state.q }); return; }
+    if (t.closest("[data-collapse], [data-sheet-close]") || t.closest(".sheet .mon > summary")) {
+      e.preventDefault(); navigate({ view: state.view, q: state.q }); return;
+    }
+    const card = t.closest(".list.grid .mon > summary");
+    if (card) { e.preventDefault(); navigate({ view: "dex", q: state.q, open: +card.parentElement.dataset.i }); return; }
     // In its own list, an entry toggles open in place; from inside a card it opens in its own view
     const inList = !t.closest(".expanded");
     const itm = t.closest("[data-item]");
