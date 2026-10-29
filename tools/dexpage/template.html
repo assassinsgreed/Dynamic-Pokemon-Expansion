@@ -366,13 +366,18 @@ body.sheet-open { overflow: hidden; }
 .sheet-panel .collapse, .sheet-panel .mon > summary .chev { display: none; }
 .sheet-panel .mon > summary .dexline { right: 58px; }
 .list.grid .mon.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-@media (max-width: 520px) {
-  .sheet { padding: 0; place-items: stretch; }
-  .sheet-panel { max-height: none; height: 100%; border: 0; border-radius: 0; }
-  /* Full-screen on phones: the pinned header reaches up under the status bar / notch */
+/* Phones and touch tablets: the pop-up is full-screen and opaque, so no page shows around or above it;
+   the pinned header reaches up under the status bar / notch (viewport-fit=cover) */
+@media (max-width: 760px), (hover: none) and (pointer: coarse) {
+  .sheet { padding: 0; place-items: stretch; background: var(--bg); }
+  .sheet-backdrop { display: none; }
+  .sheet-body { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .sheet-panel { width: 100%; max-height: none; height: 100%; border: 0; border-radius: 0; box-shadow: none; }
   .sheet-body .mon > summary { padding-top: calc(6px + env(safe-area-inset-top, 0px)); }
   .sheet-body > article > .top, .sheet-body > :is(.loccard, .abilcard, .doccard) > h2 { padding-top: calc(14px + env(safe-area-inset-top, 0px)); }
   .sheet-close { top: calc(12px + env(safe-area-inset-top, 0px)); }
+}
+@media (max-width: 520px) {
   .list:not(.grid) .mon > summary .dexline, .list.grid .mon[open] > summary .dexline { top: auto; bottom: 11px; transform: none; right: 50px; }
   .mon > summary .who { padding-right: 0; }
   .brand .meta .long { display: none; }
