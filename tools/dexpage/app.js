@@ -57,9 +57,13 @@
 
   // ---------------------------------------------------------------- state & navigation
   // state.view: dex | moves | items | places; move/item/place name the open card; open is the expanded Pokémon
-  const state = { view: "dex", q: "", move: null, item: null, place: null, open: null, mode: "", type: "", layout: "list", tab: "level", tabFilter: "" };
-  try { state.mode = localStorage.getItem("dex-mode") || ""; state.layout = localStorage.getItem("dex-view") || "list"; } catch (e) {}
-  let depth = 0;  // how many in-page steps the Back button can undo
+  const state = { view: "dex", q: "", move: null, item: null, place: null, open: null, mode: "", type: "", tab: "level", tabFilter: "",
+    layouts: { dex: "list", moves: "list", tutors: "list", items: "grid", places: "grid" } };  // list or cards, per view
+  try {
+    state.mode = localStorage.getItem("dex-mode") || "";
+    Object.assign(state.layouts, JSON.parse(localStorage.getItem("dex-layouts") || "{}"));
+  } catch (e) {}
+  let depth = 0, top = 0;  // position in this page's history, and how far Forward can go
 
   const snapshot = () => ({ view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, open: state.open });
   function hashFor(st) {
@@ -67,12 +71,13 @@
     if (st.move) return "move-" + slug(moves[st.move].name);
     if (st.item !== null) return "item-" + slug(items[st.item].name);
     if (st.place) return "place-" + slug(st.place);
-    return { dex: "", moves: "moves", items: "items", places: "locations" }[st.view];
+    return { dex: "", moves: "moves", tutors: "tutors", items: "items", places: "locations" }[st.view];
   }
   function navigate(change) {
     const next = Object.assign({ view: state.view, q: "", move: null, item: null, place: null, open: null }, change);
     Object.assign(state, next, { tabFilter: "" });
     depth++;
+    top = depth;  // a new step discards anything Forward could have returned to
     try { history.pushState({ dex: snapshot(), depth }, "", "#" + hashFor(state)); } catch (e) {}
     render(true);
   }
@@ -80,7 +85,7 @@
     try { history.replaceState({ dex: snapshot(), depth }, "", "#" + hashFor(state)); } catch (e) {}
   }
   window.addEventListener("popstate", (e) => {
-    if (e.state && e.state.dex) { Object.assign(state, e.state.dex, { tabFilter: "" }); depth = e.state.depth || 0; render(true); }
+    if (e.state && e.state.dex) { Object.assign(state, e.state.dex, { tabFilter: "" }); depth = e.state.depth || 0; top = Math.max(top, depth); render(true); }
     else fromHash();
   });
 
@@ -274,6 +279,7 @@
         <h2>${esc(mv.name)}${mv.official ? `<small>${esc(mv.official)}</small>` : ""}</h2></div>
       <div class="specs"><span>${CAT_NAME[mv.split]}</span><span>Pow <b>${mv.power || "—"}</b></span><span>Acc <b>${mv.acc || "—"}</b></span><span>PP <b>${mv.pp}</b></span></div>
       ${mv.tm ? `<div class="tmloc"><b>${mv.tm.label}</b> · ${mv.tm.where.map(esc).join(" · ")}${mv.tm.requires ? ` · needs ${esc(mv.tm.requires)}` : ""}</div>` : ""}
+      ${(mv.tutor || []).map((t) => `<div class="tmloc"><b>Tutor</b> · ${esc(t.where)} · ${esc(t.note)}</div>`).join("")}
       <div class="learners">${body}</div></article>`;
   }
 
@@ -331,7 +337,7 @@
     if (state.mode) list.sort((a, b) => order[state.mode][a] - order[state.mode][b]);
     if (q) list.sort((a, b) => mons[b].s.some((s) => s.startsWith(q)) - mons[a].s.some((s) => s.startsWith(q)));
     const html = alsoLine(q) + (list.length
-      ? `<div class="list${state.layout === "grid" ? " grid" : ""}">${list.map((i) => row(mons[i], i)).join("")}</div>`
+      ? `<div class="list${state.layouts.dex === "grid" ? " grid" : ""}">${list.map((i) => row(mons[i], i)).join("")}</div>`
       : `<div class="nores">No Pokémon match “${esc(state.q)}”${state.mode ? ` in ${state.mode} mode` : ""}.</div>`);
     return [html, `${list.length} Pokémon`];
   }
@@ -346,8 +352,10 @@
         <td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td><td class="n">${mv.power || "—"}</td>
         <td class="n hide-sm">${mv.acc || "—"}</td><td class="n hide-sm">${mv.pp}</td><td class="n hide-sm">${mv.tm ? mv.tm.label : ""}</td></tr>`;
     }).join("");
-    const table = list.length ? `<div class="movelist"><table class="mv"><thead><tr><th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num">Pow</th><th class="c-num hide-sm">Acc</th><th class="c-num hide-sm">PP</th><th class="c-tm hide-sm">TM</th></tr></thead><tbody>${rows}</tbody></table></div>`
-      : `<div class="nores">No moves match “${esc(state.q)}”.</div>`;
+    const cards = state.layouts.moves === "grid";
+    const table = !list.length ? "" : cards ? `<div class="chips">${list.map((k) => `<button class="chip" data-move="${k}">${typeBadge(moves[k].type)}<span class="ln">${esc(moves[k].name)}</span><span class="hw">${moves[k].tm ? moves[k].tm.label : moves[k].power || ""}</span></button>`).join("")}</div>`
+      : `<div class="movelist"><table class="mv"><thead><tr><th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num">Pow</th><th class="c-num hide-sm">Acc</th><th class="c-num hide-sm">PP</th><th class="c-tm hide-sm">TM</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    if (!list.length) return [top + `<div class="nores">No moves match “${esc(state.q)}”.</div>`, "0 moves"];
     return [top + table, `${list.length} moves`];
   }
 
@@ -357,8 +365,11 @@
     const top = q && list.length && itemKeys[list[0]] === q ? itemCard(list[0]) : "";
     const cats = [];
     list.forEach((k) => { const c = items[k].category; const g = cats.find(([n]) => n === c); g ? g[1].push(k) : cats.push([c, [k]]); });
-    const html = cats.map(([c, ks]) => `<div class="cat-head">${esc(c)} · ${ks.length}</div><div class="chips">${ks.map((k) =>
-      `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span></button>`).join("")}</div>`).join("");
+    const asCards = state.layouts.items === "grid";
+    const html = cats.map(([c, ks]) => `<div class="cat-head">${esc(c)} · ${ks.length}</div>${asCards
+      ? `<div class="chips">${ks.map((k) => `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span></button>`).join("")}</div>`
+      : `<div class="listtable"><table class="mv"><thead><tr><th>Item</th><th>Where to find</th></tr></thead><tbody>${ks.map((k) =>
+          `<tr data-item="${k}"><td>${itemIcon(k)}<span class="mvname">${esc(items[k].name)}</span></td><td class="note">${esc(items[k].where.slice(0, 2).join("; ") || "—")}${items[k].where.length > 2 ? ` +${items[k].where.length - 2} more` : ""}</td></tr>`).join("")}</tbody></table></div>`}`).join("");
     return [top + (html || `<div class="nores">No items match “${esc(state.q)}”.</div>`), `${list.length} items`];
   }
 
@@ -369,31 +380,60 @@
     }
     const list = exactFirst(matchPlaces(q), (p) => norm(p.name) === q);
     const top = q && list.length && norm(list[0].name) === q ? placeCard(list[0]) : "";
-    const html = list.length ? `<div class="chips">${list.map((p) => `<button class="chip" data-place="${esc(p.name)}"><span class="ln" style="padding-left:10px">${esc(p.name)}</span><span class="hw">${p.rows.filter(([, l]) => rowInMode(l)).length}</span></button>`).join("")}</div>`
-      : `<div class="nores">No locations match “${esc(state.q)}”.</div>`;
+    const encounters = (p) => p.rows.filter(([, l]) => rowInMode(l)).length;
+    const methods = (p) => [...new Set(p.rows.filter(([, l]) => rowInMode(l)).map(([, l]) => l.method))].join(" · ");
+    const html = !list.length ? `<div class="nores">No locations match “${esc(state.q)}”.</div>`
+      : state.layouts.places === "grid"
+        ? `<div class="chips">${list.map((p) => `<button class="chip" data-place="${esc(p.name)}"><span class="ln" style="padding-left:10px">${esc(p.name)}</span><span class="hw">${encounters(p)}</span></button>`).join("")}</div>`
+        : `<div class="listtable"><table class="mv"><thead><tr><th>Location</th><th class="hide-sm">Found by</th><th class="c-num">Pokémon</th></tr></thead><tbody>${list.map((p) =>
+            `<tr data-place="${esc(p.name)}"><td><span class="mvname">${esc(p.name)}</span></td><td class="note hide-sm">${esc(methods(p))}</td><td class="n">${encounters(p)}</td></tr>`).join("")}</tbody></table></div>`;
     return [top + html, `${list.length} locations`];
+  }
+
+  function tutorsView(q) {
+    const rows = DEX.tutors.filter((t) => (!q || moves[t.move].s.some((x) => x.includes(q)) || norm(t.where).includes(q) || norm(t.note).includes(q))
+      && (!state.type || moves[t.move].type === state.type));
+    const groups = [];
+    rows.forEach((t) => { const key = t.kind + "|" + t.where; const g = groups.find(([k]) => k === key); g ? g[1].push(t) : groups.push([key, [t]]); });
+    const learners = (k) => moves[k].learners.filter(([i, h]) => inMode(mons[i]) && h.startsWith(moves[k].tutor && moves[k].tutor[0].kind === "Special" ? "Special:" : "Tutor")).length;
+    const asCards = state.layouts.tutors === "grid";
+    const html = groups.map(([key, ts]) => {
+      const [kind, where] = key.split("|");
+      const sameNote = ts.every((t) => t.note === ts[0].note) ? ts[0].note : "";
+      const head = `<div class="cat-head tutorhead">${esc(where)}${kind === "Special" ? " · special tutor" : ""}${sameNote ? `<small>${esc(sameNote)}</small>` : ""}</div>`;
+      const body = asCards
+        ? `<div class="chips">${ts.map((t) => `<button class="chip" data-move="${t.move}">${typeBadge(moves[t.move].type)}<span class="ln">${esc(moves[t.move].name)}</span><span class="hw" title="${sameNote ? "Pokémon that can learn it" : esc(t.note)}">${learners(t.move)}</span></button>`).join("")}</div>`
+        : `<div class="listtable"><table class="mv"><thead><tr><th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num hide-sm">Pow</th>${sameNote ? "" : "<th>Requirement</th>"}<th class="c-num">Learn</th></tr></thead><tbody>${ts.map((t) => {
+            const mv = moves[t.move];
+            return `<tr data-move="${t.move}"><td><span class="mvname">${esc(mv.name)}</span></td><td>${typeBadge(mv.type)}</td><td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td><td class="n hide-sm">${mv.power || "—"}</td>${sameNote ? "" : `<td class="note">${esc(t.note)}</td>`}<td class="n">${learners(t.move)}</td></tr>`;
+          }).join("")}</tbody></table></div>`;
+      return head + body;
+    }).join("");
+    return [html || `<div class="nores">No tutors match “${esc(state.q)}”.</div>`, `${rows.length} tutor moves`];
   }
 
   const PLACEHOLDER = {
     dex: "Search Pokémon — e.g. Rockruff, Galarian, Fire",
     moves: "Search moves or TMs — e.g. Ceaseless Edge, TM02",
+    tutors: "Search tutor moves or towns — e.g. Draco Meteor, Ferrox Village",
     items: "Search items — e.g. Fire Stone, Berries",
     places: "Search locations — e.g. Route 2, Lake Laplaz",
   };
 
   function render(scroll) {
     const q = norm(state.q);
-    const [html, count] = { dex: dexView, moves: movesView, items: itemsView, places: placesView }[state.view](q);
+    const [html, count] = { dex: dexView, moves: movesView, tutors: tutorsView, items: itemsView, places: placesView }[state.view](q);
     $("#out").innerHTML = html;
     $("#count").textContent = count;
     $("#q").value = state.move || state.item !== null || state.place ? "" : state.q;
     $("#q").placeholder = PLACEHOLDER[state.view];
     $("#clear").hidden = !$("#q").value;
-    $("#back").hidden = depth <= 0;
-    $("#layout-seg").hidden = state.view !== "dex";
+    $("#back").disabled = depth <= 0;
+    $("#fwd").disabled = depth >= top;
+    $("#layout-seg").hidden = Boolean(state.move || state.item !== null || state.place);
     document.querySelectorAll("[data-viewtab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.viewtab === state.view)));
     document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
-    document.querySelectorAll(".seg button[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.layout)));
+    document.querySelectorAll(".seg button[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.layouts[state.view])));
     $("#type-label").innerHTML = state.type ? typeBadge(state.type) : "All types";
     syncConsoleHeight();
     if (scroll) {
@@ -410,10 +450,11 @@
   });
   $("#clear").addEventListener("click", () => { Object.assign(state, { q: "", open: null, move: null, item: null, place: null }); remember(); render(); $("#q").focus(); });
   $("#back").addEventListener("click", () => history.back());
+  $("#fwd").addEventListener("click", () => history.forward());
   document.querySelectorAll("[data-viewtab]").forEach((b) => b.addEventListener("click", () => navigate({ view: b.dataset.viewtab, q: state.view === b.dataset.viewtab ? "" : state.q })));
   document.querySelectorAll(".seg button[data-view]").forEach((b) => b.addEventListener("click", () => {
-    state.layout = b.dataset.view;
-    try { localStorage.setItem("dex-view", state.layout); } catch (e) {}
+    state.layouts[state.view] = b.dataset.view;
+    try { localStorage.setItem("dex-layouts", JSON.stringify(state.layouts)); } catch (e) {}
     render();
   }));
   document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.addEventListener("click", () => {
@@ -502,7 +543,7 @@
   // Links: #rockruff, #move-crunch, #item-fire-stone, #place-route-2, #items … (older #ceaseless-edge style still works)
   function fromHash() {
     const h = decodeURIComponent(location.hash.slice(1));
-    const views = { "": "dex", pokedex: "dex", moves: "moves", items: "items", locations: "places" };
+    const views = { "": "dex", pokedex: "dex", moves: "moves", tutors: "tutors", items: "items", locations: "places" };
     Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, open: null });
     if (h in views) state.view = views[h];
     else if (h.startsWith("move-")) { const k = moveKeys.find((x) => slug(moves[x].name) === h.slice(5)); Object.assign(state, k ? { view: "moves", move: k } : { view: "moves", q: h.slice(5).replace(/-/g, " ") }); }

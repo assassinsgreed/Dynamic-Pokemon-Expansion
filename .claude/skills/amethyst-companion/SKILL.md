@@ -45,7 +45,7 @@ He also tests `site/index.html` directly.
 | `rom.py` | item names and item icons (icon table found via literal pool near `AddItemIconSprite` 0x8098758), text at ROM addresses |
 | `roster.py` | which Pokémon/forms get rows, Mode labels, special tutors (parsed from `item.c`), egg-move rules (parsed from `daycare.c`), evolution text |
 | `locations.py` + `encounters.csv` | wild/gift/trade encounters from Collin's Google Sheet (Encounters tab, hand-exported CSV) |
-| `items.py` + `items.csv`, `machines.csv` | item & TM locations imported from the feature-list Google Doc (`python -m tools.dexpage.items doc.docx`, needs python-docx) |
+| `items.py` + `items.csv`, `machines.csv`, `tutors.csv` | item, TM and tutor locations imported from the feature-list Google Doc (`python -m tools.dexpage.items doc.docx`, needs python-docx) |
 | `build.py` | page data JSON, item list merge (doc + shops + held + evolution items), sprite/icon sheets, site files |
 | `template.html` | CSS + markup; `app.js` is the whole UI, inlined at build (`__APP_SCRIPT__`) |
 | `sw.js` | service worker; cache name = content hash so installs update |
@@ -70,6 +70,10 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   re-parses the multi-hundred-KB string on each style recalc (Items tab went 195 ms → 13 ms when moved into a
   plain stylesheet rule in app.js). Time changes with a load-event probe that clicks tabs and logs
   `performance.now()` deltas (run without `--virtual-time-budget`, which freezes the clock).
+- Views: Pokédex, Moves, Tutors, Items, Locations; each has its own list/cards layout (remembered per browser).
+  Back/Forward buttons sit right of the tabs, always visible, disabled when there's nowhere to go.
+- Tutor rows like "Fire Fang, or Flame Burst (v1.4+)" resolve to the move the game teaches for that tutor kind
+  (move-tutor files for Regular, CFRU special tutors for Special); doc typos fuzzy-match (Breaking Strike → Breaking Swipe).
 - Every TM/HM is an item ("TM02 Dragon Claw", category TMs/HMs) linking to its move; typing a type name in the
   Pokédex lists that type.
 

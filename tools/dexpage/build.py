@@ -11,7 +11,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from .items import load_items, load_machine_locations
+from .items import load_items, load_machine_locations, load_tutors
 import difflib
 
 from .load_cfru import ability_display, marts
@@ -109,7 +109,9 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
     locations, held, unmatched = attach_encounters(load_encounters(), roster)
     items, item_index, item_by_const, icon_sheet = _items(data, held, evo_links)
     _attach_machine_locations(data, moves)
+    tutors = _attach_tutor_locations(moves)
     return {
+        "tutors": tutors,
         "mons": [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, []), held.get(e.key, []),
                       item_index, item_by_const) for e in roster],
         "items": items,
@@ -176,7 +178,8 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
     for item in items:
         # "Daimyn City Mall" from the doc is redundant next to "Daimyn City Mall · Gems shop"
         places = {w.split(" · ")[0] for w in item["where"] if " · " in w}
-        item["where"] = [w for w in item["where"] if w not in places]
+        # …and "PokeChip Crusher" next to "PokeChip Crusher (5 chips)"
+        item["where"] = [w for w in item["where"] if w not in places and not any(o.startswith(w + " (") for o in item["where"])]
         item["category"] = item["category"] or "Other items"
     for names in held.values():
         for h in names:
@@ -210,6 +213,39 @@ def _full_item_name(data: SourceData, const: str) -> str:
     letters = iter(full)
     abbreviated = len(rom_name) >= 11 and short != full and all(c in letters for c in short)
     return spelled if abbreviated else rom_name  # a renamed item (Link Stone → Linking Cord) keeps its game name
+
+
+def _attach_tutor_locations(moves: dict) -> list[dict]:
+    """Where each tutor move is taught, from the feature list's tutor tables. A row like "Fire Fang, or Flame Burst
+    (v1.4+)" names two versions; keep the one the game teaches (a move tutor file or a CFRU special tutor)."""
+    by_key = {}
+    for const, m in moves.items():
+        for key in m["s"]:
+            by_key.setdefault(key, const)
+    taught = {kind: {k for k, m in moves.items() if any(h.startswith(prefix) for _, h in m["learners"])}
+              for kind, prefix in (("Regular", "Tutor"), ("Special", "Special:"))}
+
+    rows = []
+    for t in load_tutors():
+        options = [re.sub(r"\s*\([^)]*\)", "", o).strip() for o in re.split(r",\s*or\s+", t["move"])]
+        found = []
+        for o in options:
+            const = by_key.get(_norm(o))
+            if const is None:  # doc slips like "Breaking Strike" / "Automize" resolve to the nearest move name
+                close = difflib.get_close_matches(_norm(o), list(by_key), n=1, cutoff=0.8)
+                const = by_key[close[0]] if close else None
+                if const:
+                    print(f"note: tutor move {o!r} matched to {moves[const]['name']!r}", file=sys.stderr)
+            found.append(const)
+        found = [c for c in found if c]
+        const = next((c for c in found if c in taught.get(t["kind"], ())), found[0] if found else None)
+        if const is None:
+            print(f"warning: tutor move {t['move']!r} matches no move", file=sys.stderr)
+            continue
+        entry = {"where": t["where"], "note": t["note"], "kind": t["kind"]}
+        moves[const].setdefault("tutor", []).append(entry)
+        rows.append({"move": const, **entry})
+    return rows
 
 
 def _attach_machine_locations(data: SourceData, moves: dict) -> None:

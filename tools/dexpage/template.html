@@ -54,6 +54,7 @@ button { font: inherit; color: inherit; }
 /* Console */
 header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--console); border-bottom: 1px solid var(--line); }
 .console .wrap { padding-block: 12px; display: grid; gap: 10px; }
+.console .wrap > * { min-width: 0; }  /* let the tab strip scroll instead of widening the header */
 .brand { display: flex; align-items: baseline; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
 .brand h1 { margin: 0; font: 600 22px/1 var(--font-display); letter-spacing: .02em; display: flex; align-items: center; gap: 8px; }
 .brand h1 .brand-icon { width: 34px; height: 34px; flex: none; margin: -6px 0 -6px -2px; }
@@ -64,7 +65,13 @@ header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 
 .views button { flex: none; border: 0; background: none; padding: 7px 12px; border-radius: 999px; font: 600 14px var(--font-display); letter-spacing: .03em; color: var(--muted); cursor: pointer; }
 .views button[aria-selected="true"] { background: var(--accent); color: #fff; }
 .views button:not([aria-selected="true"]):hover { background: var(--accent-soft); color: var(--ink); }
-.views .back { display: inline-flex; align-items: center; gap: 2px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); margin-right: 4px; padding: 6px 12px 6px 8px; }
+/* Tabs scroll sideways on narrow screens; Back/Forward stay put on the right */
+.viewrow { display: flex; align-items: center; gap: 8px; }
+.viewrow .views { flex: 1 1 auto; min-width: 0; }
+.navbtns { display: flex; gap: 4px; flex: none; }
+.navbtn { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); cursor: pointer; }
+.navbtn:not(:disabled):hover { border-color: var(--accent); color: var(--accent); }
+.navbtn:disabled { opacity: .35; cursor: default; }
 .offline-btn { border: 1px solid var(--line); background: var(--surface); color: var(--accent); font: 600 12.5px var(--font-body); padding: 5px 10px; border-radius: 999px; cursor: pointer; }
 .offline-help { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; font-size: 13.5px; display: grid; gap: 6px; }
 .offline-help p { margin: 0; }
@@ -235,6 +242,13 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
 .movelist tr { cursor: pointer; }
 .movelist tbody tr:hover td { background: var(--accent-soft); }
 .also { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
+.listtable { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px 8px; overflow-x: auto; }
+.listtable tbody tr { cursor: pointer; }
+.listtable tbody tr:hover td { background: var(--accent-soft); }
+.listtable td .ii { margin-right: 6px; }
+.chip .type { flex: none; margin-left: 6px; }
+.tutorhead { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.tutorhead small { font: 500 12.5px var(--font-body); color: var(--muted); text-transform: none; letter-spacing: 0; }
 .also button { border: 1px solid var(--line); background: var(--surface); padding: 4px 10px; border-radius: 999px; cursor: pointer; color: var(--accent); font-weight: 600; font-size: 13px; }
 
 /* Place card */
@@ -295,13 +309,19 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
       <p id="offline-web2"><b>On a phone:</b> open this page in your browser, then choose <b>Add to Home Screen</b> (iPhone: Share button; Android: ⋮ menu → Install app). After one visit it opens offline like an app, and updates itself the next time you're online.</p>
       <p id="offline-file" hidden>You're using the downloaded copy, so everything here already works offline.</p>
     </div>
+    <div class="viewrow">
     <nav class="views" role="tablist" aria-label="Views">
-      <button class="back" id="back" hidden aria-label="Back"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Back</button>
       <button role="tab" data-viewtab="dex" aria-selected="true">Pokédex</button>
       <button role="tab" data-viewtab="moves" aria-selected="false">Moves</button>
+      <button role="tab" data-viewtab="tutors" aria-selected="false">Tutors</button>
       <button role="tab" data-viewtab="items" aria-selected="false">Items</button>
       <button role="tab" data-viewtab="places" aria-selected="false">Locations</button>
     </nav>
+      <span class="navbtns">
+        <button class="navbtn" id="back" aria-label="Back" title="Back" disabled><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="navbtn" id="fwd" aria-label="Forward" title="Forward" disabled><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </span>
+    </div>
     <div class="search">
       <input id="q" type="search" placeholder="Search Pokémon, moves, items or places — e.g. Rockruff, Fire Stone, Route 2" autocomplete="off" spellcheck="false" aria-label="Search Pokémon, moves, items or places">
       <button class="clear" id="clear" aria-label="Clear search" hidden>×</button>

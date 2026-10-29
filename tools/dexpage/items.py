@@ -9,6 +9,7 @@ from pathlib import Path
 
 ITEMS_CSV = Path(__file__).with_name("items.csv")
 MACHINES_CSV = Path(__file__).with_name("machines.csv")
+TUTORS_CSV = Path(__file__).with_name("tutors.csv")
 
 # Item tables are found by their first header cell; the heading above each table names the category.
 ITEM_TABLE_HEADERS = {"Item", "Berry", "Incense", "Consumable", "Mega Stone"}
@@ -40,12 +41,17 @@ def load_machine_locations(path: Path = MACHINES_CSV) -> dict[tuple[str, int], d
                 for r in csv.DictReader(f)}
 
 
+def load_tutors(path: Path = TUTORS_CSV) -> list[dict]:
+    with path.open(encoding="utf-8", newline="") as f:
+        return [{"kind": r["Kind"], "where": r["Where"], "move": r["Move"], "note": r["Note"]} for r in csv.DictReader(f)]
+
+
 def import_docx(docx_path: Path) -> None:
     import docx  # optional dependency, only for re-importing the feature list
     from docx.oxml.ns import qn
 
     document = docx.Document(str(docx_path))
-    items, machines = [], []
+    items, machines, tutors = [], [], []
     heading, table_index = None, 0
     for el in document.element.body.iterchildren():
         if el.tag == qn("w:p"):
@@ -58,7 +64,16 @@ def import_docx(docx_path: Path) -> None:
             table_index += 1
             header = [c.text.strip() for c in table.rows[0].cells]
             rows = [[c.text.strip() for c in r.cells] for r in table.rows[1:]]
-            if header[0] in ("TM #", "HM #"):
+            if header == ["Where", "Moves", "Cost"]:
+                # Regular tutors: a town, its move list, and the price; a second line under the town is a condition
+                for r in rows:
+                    where, *condition = _lines(r[0])
+                    note = " · ".join([r[2], *[c.strip("()") for c in condition]])
+                    tutors.extend(["Regular", where, move, note] for move in _lines(r[1]))
+            elif header == ["Where", "Move", "Requirement"]:
+                for r in rows:
+                    tutors.append(["Special", r[0], r[1], " ".join(_lines(r[2]))])
+            elif header[0] in ("TM #", "HM #"):
                 kind = header[0][:2]
                 for r in rows:
                     if r[0].isdigit():
@@ -89,7 +104,11 @@ def import_docx(docx_path: Path) -> None:
         w = csv.writer(f)
         w.writerow(["Kind", "Number", "Move", "Where", "Requires"])
         w.writerows(machines)
-    print(f"Wrote {len(items)} items and {len(machines)} TMs/HMs")
+    with TUTORS_CSV.open("w", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["Kind", "Where", "Move", "Note"])
+        w.writerows(tutors)
+    print(f"Wrote {len(items)} items, {len(machines)} TMs/HMs and {len(tutors)} tutor moves")
 
 
 if __name__ == "__main__":

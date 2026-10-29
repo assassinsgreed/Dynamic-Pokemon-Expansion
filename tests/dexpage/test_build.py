@@ -203,3 +203,11 @@ def test_every_tm_and_hm_is_an_item(data):
     claw = tms["TM02 Dragon Claw"]
     assert claw["where"] == ["Rubarr Desert B1F"] and claw["move"] == "MOVE_DRAGONCLAW" and claw["icon"] is not None
     assert not any(i["name"] == "TM16" for i in data["items"])        # shop TMs merge into the full entry
+
+
+def test_tutor_locations_on_moves(data):
+    snore = data["moves"]["MOVE_SNORE"]["tutor"]
+    assert {"where": "Ferrox Village", "note": "5 PokeChips", "kind": "Regular"} in snore
+    burst = data["moves"]["MOVE_FLAMEBURST"]["tutor"]      # doc row "Fire Fang, or Flame Burst (v1.4+)"
+    assert burst[0]["where"] == "Gym Trainee Ashley (1)"
+    assert "tutor" not in data["moves"]["MOVE_FIREFANG"] or all(t["where"] != "Gym Trainee Ashley (1)" for t in data["moves"]["MOVE_FIREFANG"]["tutor"])
