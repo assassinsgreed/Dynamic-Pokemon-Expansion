@@ -259,6 +259,22 @@ def test_ability_official_names(data, paths):
     assert "As One" not in ability_officials(paths)                                 # Grim/Chilling variants
 
 
+def test_ability_details(data):
+    abilities = {a["name"]: a for a in data["abilities"]}
+    assert all(a["detail"] for a in data["abilities"])
+    assert abilities["Pure Power"]["detail"] == "Its Attack is doubled."
+    assert "Gen 9" in abilities["Libero"]["detail"]                       # no once-per-switch-in limit in CFRU
+    assert "full HP" in abilities["Gale Wings"]["detail"]                 # OLD_GALE_WINGS is off
+    assert "MOVE_FIREPUNCH" in abilities["Iron Fist"]["moves"]            # from CFRU's gPunchingMoves
+    assert abilities["Adaptability"]["moves"] == []
+
+
+def test_ability_details_must_match_page(paths):
+    from tools.dexpage.build import _attach_ability_details
+    with pytest.raises(ValueError, match="Made Up"):
+        _attach_ability_details(paths, [{"name": "Made Up"}], {}, {})
+
+
 def test_docs_link_ability_cells(data):
     mega = next(t for g in data["docs"] for t in g["topics"] if t["title"] == "Mega Pokemon")
     assert 'data-ability="Triage"' in mega["html"]

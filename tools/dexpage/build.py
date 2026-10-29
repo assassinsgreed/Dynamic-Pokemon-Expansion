@@ -25,6 +25,7 @@ from .sprites import build_sheet, pack
 TEMPLATE = Path(__file__).with_name("template.html")
 SW_TEMPLATE = Path(__file__).with_name("sw.js")
 APP_SCRIPT = Path(__file__).with_name("app.js")  # the page's script, inlined so the page stays one file
+ABILITY_DETAILS = Path(__file__).with_name("ability_details.json")  # hand-written, checked against CFRU's code
 STAT_KEYS = ("hp", "atk", "def", "spa", "spd", "spe")
 
 
@@ -120,6 +121,7 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
     mons = [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, []), held.get(e.key, []),
                  item_index, item_by_const) for e in roster]
     abilities = _abilities(mons, ability_officials(data.paths))
+    _attach_ability_details(data.paths, abilities, moves)
     return {
         "docs": _docs({a["name"] for a in abilities}),
         "abilities": abilities,
@@ -236,6 +238,21 @@ def _abilities(mons: list[dict], officials: dict[str, str]) -> list[dict]:
             entry["desc"] = entry["desc"] or desc
             entry["mons"].append([i, hidden])
     return sorted(by_name.values(), key=lambda a: a["name"])
+
+
+def _attach_ability_details(paths: Paths, abilities: list[dict], moves: dict, details: dict | None = None) -> None:
+    """The Abilities tab's longer explanation of each ability (ability_details.json, keyed by the name shown), plus
+    the moves it affects, taken from the CFRU move tables the entry names (gPunchingMoves for Iron Fist...)."""
+    details = details if details is not None else json.loads(ABILITY_DETAILS.read_text(encoding="utf-8"))
+    names = {a["name"] for a in abilities}
+    missing, unknown = sorted(names - set(details)), sorted(set(details) - names)
+    if missing or unknown:
+        raise ValueError(f"{ABILITY_DETAILS.name} is out of step with the page: missing {missing}, not on the page {unknown}")
+    tables = json.loads((paths.cfru / "assembly/data/move_tables.json").read_text(encoding="utf-8"))
+    for a in abilities:
+        entry = details[a["name"]]
+        a["detail"] = entry["text"]
+        a["moves"] = list(dict.fromkeys(m for t in entry.get("moves", []) for m in tables[t] if m in moves))
 
 
 def _docs(ability_names: set[str] = frozenset()) -> list[dict]:

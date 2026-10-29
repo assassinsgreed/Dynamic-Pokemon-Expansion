@@ -47,6 +47,7 @@ He also tests `site/index.html` directly.
 | `locations.py` + `encounters.csv` | wild/gift/trade encounters from Collin's Google Sheet (Encounters tab, hand-exported CSV) |
 | `items.py` + `items.csv`, `machines.csv`, `tutors.csv` | item, TM and tutor locations imported from the feature-list Google Doc (`python -m tools.dexpage.items doc.docx`, needs python-docx) |
 | `docs.py` + `docs.json`, `doc_images/` | Docs tab: feature-list topics (H1 group / H2 topic), imported with `python -m tools.dexpage.docs doc.docx`; overlapping topics skipped via `SKIP_GROUPS`/`SKIP_TOPICS` |
+| `ability_details.json` | Abilities tab's longer explanation per ability (keyed by the name shown) + `moves`: CFRU move-table names (`gPunchingMoves`…) whose moves show as chips. Hand-written from CFRU's code, not Bulbapedia; the build fails if it's out of step with the page's abilities |
 | `build.py` | page data JSON, item list merge (doc + shops + held + evolution items), sprite/icon sheets, site files |
 | `template.html` | CSS + markup; `app.js` is the whole UI, inlined at build (`__APP_SCRIPT__`) |
 | `sw.js` | service worker; cache name = content hash so installs update |
@@ -88,6 +89,7 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
 - Abilities tab: one entry per ability *as shown* (CFRU per-species renames make Libero/Protean separate), with
   in-game description and who has it (normal/hidden, incl. Mega forms). Ability names in Pokédex profiles and
   doc table cells that are exactly an ability name link to it.
+- Ability details must describe **CFRU's** behavior, checked in its source with `#ifdef`s resolved against `src/config.h` + `include/constants/abilities.h` (e.g. Protean/Libero has no once-per-switch-in limit; `OLD_GALE_WINGS` is off so Gale Wings needs full HP; Flash Fire boosts only Sp. Atk; `FROSTBITE` replaces freezing; Pickup/Honey Gather items go to the bag). Include outside-battle lead effects from `wild_encounter.c`/`build_pokemon.c`/`daycare.c`. Pokémon profiles keep only the in-game line.
 - Abilities resolve through **ids**: DPE's constant (its own spelling, e.g. ABILITY_GULPMISSLE) → DPE id → CFRU's
   name/description/rename rules at that id (`ability_ids` in load_cfru.py). Effect chances (Poison Touch 30%,
   Static 33%…) are parsed from the `case ABILITY_X:` blocks in CFRU's battle code (`ability_chances`).

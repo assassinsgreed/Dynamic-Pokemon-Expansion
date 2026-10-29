@@ -1,0 +1,769 @@
+{
+ "Adaptability": {
+  "text": "Same-type attack bonus is 2× instead of the usual 1.5×."
+ },
+ "Aerilate": {
+  "text": "Normal-type moves become Flying-type and get 1.2× power. Doesn't apply to Max Moves, moves whose type is set by something else (Hidden Power, Weather Ball, Judgment…) or a move already changed by Electrify."
+ },
+ "Aftermath": {
+  "text": "If a contact move knocks it out, the attacker loses 1/4 of its max HP. Doesn't work while any Pokémon on the field has Damp, or on an attacker with Magic Guard."
+ },
+ "Alchemic Power": {
+  "text": "Doubles only: when its ally faints, it replaces this Ability with the fainted ally's Ability. A few Abilities can't be taken: Trace, Forecast, Flower Gift, Multitype, Illusion, Zen Mode, Imposter, Stance Change, Receiver/Alchemic Power, Schooling, Comatose, Shields Down, Disguise, RKS System, Battle Bond, Power Construct, Wonder Guard, Neutralizing Gas, Ice Face, Hunger Switch, Gulp Missile and As One."
+ },
+ "Analytic": {
+  "text": "Its moves get 1.3× power if the target has already moved this turn."
+ },
+ "Anger Point": {
+  "text": "When it survives a critical hit, its Attack rises straight to the maximum (+6)."
+ },
+ "Anticipation": {
+  "text": "On entering battle, it shudders if any foe knows a move that's super effective against it or a one-hit KO move."
+ },
+ "Arena Trap": {
+  "text": "Grounded foes can't switch out or flee. Pokémon that aren't grounded (Flying types, Levitate, Air Balloon, Magnet Rise…) get away, as do Ghost types and Shed Shell holders. Outside battle, leading with it doubles the wild encounter rate."
+ },
+ "Aroma Veil": {
+  "text": "Protects it and its ally from Attract, Disable, Encore, Torment, Taunt and Heal Block, and from Cute Charm and Cursed Body.",
+  "moves": [
+   "gAromaVeilProtectedMoves"
+  ]
+ },
+ "Bad Dreams": {
+  "text": "At the end of each turn, each sleeping foe (or a foe with Comatose) loses 1/8 of its max HP. Magic Guard prevents it."
+ },
+ "Ball Fetch": {
+  "text": "If it isn't holding an item, it picks up the first Poké Ball that failed to catch a wild Pokémon in that battle (once per battle)."
+ },
+ "Battery": {
+  "text": "Doubles: its ally's special moves get 1.3× power."
+ },
+ "Battle Armor": {
+  "text": "Opponents can't land critical hits on it."
+ },
+ "Battle Bond": {
+  "text": "Greninja only: when it knocks out a foe that still has Pokémon left, it becomes Ash-Greninja for the rest of the battle. As Ash-Greninja, Water Shuriken has 20 power and always hits 3 times. This is the Gen 7 version; there's no stat boost."
+ },
+ "Beast Boost": {
+  "text": "When it knocks out a foe (and the foe still has Pokémon left), its highest stat rises by 1 stage. HP doesn't count and stat stages are ignored when picking the stat; Wonder Room swaps Defense and Sp. Def for the comparison."
+ },
+ "Berserk": {
+  "text": "When a hit drops it from above half HP to below half, its Sp. Atk rises by 1 stage. Doesn't trigger from moves boosted by Sheer Force."
+ },
+ "Big Pecks": {
+  "text": "Other Pokémon can't lower its Defense."
+ },
+ "Blaze": {
+  "text": "At 1/3 max HP or less, its Fire-type moves get 1.5× power."
+ },
+ "Bulletproof": {
+  "text": "Immune to ball and bomb moves (Shadow Ball, Sludge Bomb, Focus Blast, Aura Sphere…).",
+  "moves": [
+   "gBallBombMoves"
+  ]
+ },
+ "Cheek Pouch": {
+  "text": "Eating a Berry also restores 1/3 of its max HP, on top of the Berry's own effect. Blocked by Heal Block."
+ },
+ "Chilling Neigh": {
+  "text": "When it knocks out a foe (and the foe still has Pokémon left), its Attack rises by 1 stage."
+ },
+ "Chlorophyll": {
+  "text": "Speed doubles in sun. A held Utility Umbrella cancels it."
+ },
+ "Clear Body": {
+  "text": "Other Pokémon can't lower its stats, including Intimidate and Sticky Web. Its own moves that lower its stats still work."
+ },
+ "Cloud Nine": {
+  "text": "While it's on the field, weather has no effect for any Pokémon (the weather itself stays)."
+ },
+ "Competitive": {
+  "text": "Each time an opposing Pokémon lowers one of its stats (Intimidate and a foe's Sticky Web included), its Sp. Atk rises by 2 stages. Drops caused by itself or its ally don't count."
+ },
+ "Compound Eyes": {
+  "text": "Its moves are 1.3× as accurate. Outside battle, leading with it makes wild Pokémon more likely to hold items: 60% for the common item and 20% for the rare one, instead of 50% and 5%."
+ },
+ "Contrary": {
+  "text": "Stat changes are reversed: raises become drops and drops become raises (Intimidate raises its Attack, Overheat raises its Sp. Atk)."
+ },
+ "Corrosion": {
+  "text": "It can poison Poison- and Steel-type Pokémon with moves like Toxic."
+ },
+ "Cursed Body": {
+  "text": "When hit by a damaging move, there's a 1 in 3 chance the move gets disabled for the attacker. Aroma Veil blocks it; Future Sight can't be disabled."
+ },
+ "Cute Charm": {
+  "text": "When hit by a contact move, there's a 1 in 3 chance the attacker becomes infatuated, if they're opposite genders. Oblivious and Aroma Veil block it. Outside battle, leading with it makes wild Pokémon of the opposite gender appear 2/3 of the time."
+ },
+ "Damp": {
+  "text": "No Pokémon on the field can use Self-Destruct, Explosion, Mind Blown or Misty Explosion, and Aftermath doesn't work."
+ },
+ "Dancer": {
+  "text": "When another Pokémon uses a dance move, it immediately uses the same move too. It doesn't copy a move that was bounced back.",
+  "moves": [
+   "gDanceMoves"
+  ]
+ },
+ "Defiant": {
+  "text": "Each time an opposing Pokémon lowers one of its stats (Intimidate and a foe's Sticky Web included), its Attack rises by 2 stages. Drops caused by itself or its ally don't count."
+ },
+ "Desolate Land": {
+  "text": "Summons extremely harsh sunlight on entering battle. It lasts until this Pokémon leaves the field, and weather moves and other weather Abilities can't replace it (Primordial Sea can). Water-type attacks fail completely."
+ },
+ "Disguise": {
+  "text": "Mimikyu only: the first time it would take damage from a hit, the disguise takes it instead and breaks, and it loses only 1/8 of its current HP. Hurting itself in confusion also breaks it."
+ },
+ "Download": {
+  "text": "On entering battle, compares the foes' Defense and Sp. Def (stat stages included; both foes added together in doubles). Raises its Attack by 1 stage if Defense is lower, otherwise its Sp. Atk."
+ },
+ "Drizzle": {
+  "text": "Summons rain for 5 turns on entering battle (8 with Damp Rock). Fails against the extreme weather of Desolate Land, Primordial Sea or Delta Stream, and Evaporate stops it."
+ },
+ "Drought": {
+  "text": "Summons sun for 5 turns on entering battle (8 with Heat Rock). Fails against the extreme weather of Desolate Land, Primordial Sea or Delta Stream."
+ },
+ "Dry Skin": {
+  "text": "Water-type moves heal it by 1/4 of its max HP instead of hurting it. In rain it heals 1/8 of its max HP each turn; in sun it loses 1/8. Fire-type moves do 1.25× damage to it."
+ },
+ "Early Bird": {
+  "text": "Wakes up from sleep twice as fast."
+ },
+ "Effect Spore": {
+  "text": "When hit by a contact move, there's a 10% chance to poison, paralyze or put the attacker to sleep (equally likely). Grass types, Overcoat and Safety Goggles are immune."
+ },
+ "Electric Surge": {
+  "text": "Sets Electric Terrain for 5 turns on entering battle (8 with Terrain Extender)."
+ },
+ "Emergency Exit": {
+  "text": "When an attack or end-of-turn damage drops it from above half HP to half or below, it switches out right away. Doesn't trigger during Sky Drop."
+ },
+ "Fairy Aura": {
+  "text": "While it's on the field, Fairy-type moves from every Pokémon do 4/3 damage. With Aura Break on the field they do 0.75× instead."
+ },
+ "Filter": {
+  "text": "Super-effective moves do 0.75× damage to it."
+ },
+ "Flame Body": {
+  "text": "When hit by a contact move, there's a 1 in 3 chance the attacker is burned. Outside battle, having it in the party makes Eggs hatch twice as fast."
+ },
+ "Flare Boost": {
+  "text": "While burned, its special moves get 1.5× power."
+ },
+ "Flash Fire": {
+  "text": "Immune to Fire-type moves. After absorbing one, its Fire-type moves get a 1.5× boost to Sp. Atk for as long as it stays in. In this game the boost only applies to special Fire moves; physical ones like Flare Blitz aren't boosted. Outside battle, leading with it makes Fire-type wild Pokémon appear more often."
+ },
+ "Flower Veil": {
+  "text": "Grass-type Pokémon on its side (itself and its ally) can't get status conditions, be made drowsy by Yawn, or have their stats lowered by other Pokémon. Confusion isn't blocked."
+ },
+ "Fluffy": {
+  "text": "Contact moves do half damage to it, but Fire-type moves do double damage. If a Fire move makes contact, the two cancel out."
+ },
+ "Forecast": {
+  "text": "Castform only: changes type and form with the weather. It becomes Fire type in sun, Water type in rain and Ice type in hail, and turns back to Normal when the weather ends or is suppressed."
+ },
+ "Forewarn": {
+  "text": "On entering battle, reveals the foes' most powerful move. One-hit KO moves count as the strongest, then Counter, Mirror Coat and Metal Burst; ties are broken at random."
+ },
+ "Friend Guard": {
+  "text": "Doubles: its ally takes 0.75× damage from attacks."
+ },
+ "Frisk": {
+  "text": "On entering battle, reveals a foe's held item. In doubles it shows only one item: the first foe's, or its partner's if the first foe isn't holding anything."
+ },
+ "Full Metal Body": {
+  "text": "Other Pokémon can't lower its stats, including Intimidate. Unlike Clear Body, Mold Breaker and similar Abilities can't get past it."
+ },
+ "Fur Coat": {
+  "text": "Its Defense is doubled, so physical moves do about half damage."
+ },
+ "Gale Wings": {
+  "text": "Its Flying-type moves get +1 priority, but only while it's at full HP (Gen 7+ behavior)."
+ },
+ "Galvanize": {
+  "text": "Normal-type moves become Electric-type and get 1.2× power. Doesn't apply to Max Moves, moves whose type is set by something else (Hidden Power, Weather Ball, Judgment…) or a move already changed by Electrify."
+ },
+ "Gluttony": {
+  "text": "It eats pinch Berries (the ones normally eaten at 1/4 HP, like Sitrus or Liechi Berry) at 1/2 HP instead."
+ },
+ "Gooey": {
+  "text": "When hit by a contact move, the attacker's Speed drops by 1 stage."
+ },
+ "Gorilla Tactics": {
+  "text": "Attack is 1.5×, but it's locked into the first move it uses until it switches out, like a Choice Band. Neither effect applies while Dynamaxed."
+ },
+ "Grass Pelt": {
+  "text": "Its Defense is 1.5× while Grassy Terrain is active."
+ },
+ "Grassy Surge": {
+  "text": "Sets Grassy Terrain for 5 turns on entering battle (8 with Terrain Extender)."
+ },
+ "Grim Neigh": {
+  "text": "When it knocks out a foe (and the foe still has Pokémon left), its Sp. Atk rises by 1 stage."
+ },
+ "Gulp Missile": {
+  "text": "Cramorant only: using Surf or Dive makes it catch prey. Above half HP it catches an Arrokuda, at half or below a Pikachu. When it's next hit by an attack, it spits the prey out: the attacker loses 1/4 of its max HP, and Arrokuda also lowers the attacker's Defense by 1 stage while Pikachu paralyzes it."
+ },
+ "Guts": {
+  "text": "With any status condition, its Attack is 1.5×, and a burn no longer halves its physical damage."
+ },
+ "Harvest": {
+  "text": "At the end of each turn, if it isn't holding an item, there's a 50% chance to restore the Berry it used up this battle, or 100% in sun. Outside battle, leading with it makes Grass-type wild Pokémon appear more often."
+ },
+ "Healer": {
+  "text": "Doubles: at the end of each turn, there's a 30% chance to cure its ally's status condition."
+ },
+ "Heatproof": {
+  "text": "Fire-type moves do half damage to it, and burns hurt it for only 1/32 of its max HP per turn (instead of 1/16)."
+ },
+ "Heavy Metal": {
+  "text": "Its weight is doubled. This affects moves like Heavy Slam, Low Kick and Grass Knot."
+ },
+ "Honey Gather": {
+  "text": "After each battle, it may find Honey, which goes straight to the bag (holding an item doesn't matter). The chance is 5% at levels 1–10 and goes up by 5% every 10 levels, to 50% at level 91 and up."
+ },
+ "Huge Power": {
+  "text": "Its Attack is doubled."
+ },
+ "Hunger Switch": {
+  "text": "Morpeko only: switches between Full Belly and Hangry Mode at the end of every turn. Aura Wheel is Electric-type in Full Belly Mode and Dark-type in Hangry Mode."
+ },
+ "Hustle": {
+  "text": "Attack is 1.5×, but its physical moves are only 0.8× as accurate. Outside battle, leading with it makes wild Pokémon appear at the top of their level range half the time."
+ },
+ "Hydration": {
+  "text": "At the end of each turn in rain, it's cured of any status condition."
+ },
+ "Hyper Cutter": {
+  "text": "Other Pokémon can't lower its Attack."
+ },
+ "Ice Body": {
+  "text": "Restores 1/16 of its max HP at the end of each turn in hail, and it takes no hail damage."
+ },
+ "Ice Face": {
+  "text": "Eiscue only: the first physical hit breaks its ice face instead of doing damage, turning it into Noice Face. Special moves aren't blocked. In hail, the ice face comes back."
+ },
+ "Ice Scales": {
+  "text": "Special moves do half damage to it."
+ },
+ "Illuminate": {
+  "text": "Outside battle, leading with it doubles the wild encounter rate."
+ },
+ "Illusion": {
+  "text": "Enters battle disguised as the last healthy Pokémon in its party. The disguise breaks when it takes damage from a move. Wild Pokémon can't use it to hide."
+ },
+ "Immunity": {
+  "text": "It can't be poisoned, and it's cured right away if it somehow gets poisoned."
+ },
+ "Imposter": {
+  "text": "On entering battle, it transforms into the foe opposite it. Fails if that foe is behind a Substitute, already transformed, disguised by Illusion, in the middle of Fly/Dig/Dive, or if Neutralizing Gas is active. It can't copy wild boss Pokémon."
+ },
+ "Infiltrator": {
+  "text": "Its moves go straight past the target's Substitute, Reflect, Light Screen, Aurora Veil, Safeguard and Mist. Its accuracy also isn't lowered by fog. Outside battle, leading with it halves the wild encounter rate."
+ },
+ "Inner Focus": {
+  "text": "It can't flinch, and Intimidate doesn't affect it."
+ },
+ "Insomnia": {
+  "text": "It can't fall asleep (including from Yawn and Rest), and it wakes up right away if it somehow does."
+ },
+ "Intimidate": {
+  "text": "On entering battle, lowers each foe's Attack by 1 stage. Foes behind a Substitute aren't affected, and Inner Focus, Own Tempo, Oblivious, Scrappy and stat-protecting Abilities block it. Outside battle, leading with it makes wild Pokémon 5 or more levels below it appear half as often."
+ },
+ "Iron Barbs": {
+  "text": "When hit by a contact move, the attacker loses 1/8 of its max HP. Magic Guard prevents it."
+ },
+ "Iron Fist": {
+  "text": "Punching moves get 1.2× power.",
+  "moves": [
+   "gPunchingMoves"
+  ]
+ },
+ "Justified": {
+  "text": "When hit by a Dark-type move, its Attack rises by 1 stage."
+ },
+ "Keen Eye": {
+  "text": "Other Pokémon can't lower its accuracy, it ignores the target's raised evasion, and fog doesn't lower its accuracy. Outside battle, leading with it makes wild Pokémon 5 or more levels below it appear half as often."
+ },
+ "Klutz": {
+  "text": "Its held item has no effect, good or bad (Iron Ball, Air Balloon and Plates included), and it can't use Fling or Natural Gift. Poltergeist fails against it."
+ },
+ "Leaf Guard": {
+  "text": "In sun, it can't get a status condition or be made drowsy by Yawn, and it can't use Rest."
+ },
+ "Levitate": {
+  "text": "Immune to Ground-type moves except Thousand Arrows. It also counts as not touching the ground, so it ignores Spikes, Toxic Spikes, Sticky Web and terrain."
+ },
+ "Libero": {
+  "text": "Before each move, its type changes to match the move's type, so every move gets the same-type bonus. In this game it triggers on every move, not just once per switch-in like in Gen 9."
+ },
+ "Light Metal": {
+  "text": "Its weight is halved. This affects moves like Heavy Slam, Low Kick and Grass Knot."
+ },
+ "Lightning Rod": {
+  "text": "Draws single-target Electric-type moves to itself, even its ally's. Electric moves don't affect it and raise its Sp. Atk by 1 stage instead. Outside battle, leading with it makes Electric-type wild Pokémon appear more often."
+ },
+ "Limber": {
+  "text": "It can't be paralyzed, and it's cured right away if it somehow gets paralyzed."
+ },
+ "Liquid Ooze": {
+  "text": "Moves that drain HP from it (Absorb, Giga Drain, Drain Punch, Leech Seed, Dream Eater…) hurt the attacker by the amount it would have healed."
+ },
+ "Liquid Voice": {
+  "text": "Its sound-based moves become Water-type (no extra power).",
+  "moves": [
+   "gSoundMoves"
+  ]
+ },
+ "Long Reach": {
+  "text": "Its moves never make contact, so it doesn't trigger things like Rough Skin, Static or a Rocky Helmet."
+ },
+ "Magic Bounce": {
+  "text": "Status moves aimed at it (the ones Magic Coat can reflect, like Toxic, Stealth Rock or Taunt) bounce back at the user. Doesn't work while it's in the middle of Fly, Dig or a similar move."
+ },
+ "Magic Guard": {
+  "text": "It only takes damage from direct attacks. Poison, burn, frostbite, weather, entry hazards, Leech Seed, Curse, Nightmare, Bad Dreams, binding moves, recoil (Mind Blown and Steel Beam included), crash damage, Life Orb, Sticky Barb, Rocky Helmet and contact Abilities like Rough Skin can't hurt it. Its poison doesn't hurt it outside battle either."
+ },
+ "Magician": {
+  "text": "When it damages a target while holding nothing, it steals the target's held item. Doesn't work for wild Pokémon, through a Substitute, with Fling or Natural Gift, or against Sticky Hold."
+ },
+ "Magma Armor": {
+  "text": "It can't get frostbite, and it's cured right away if it somehow does. Outside battle, having it in the party makes Eggs hatch twice as fast."
+ },
+ "Magnet Pull": {
+  "text": "Steel-type foes can't switch out or flee (Ghost types and Shed Shell holders still can). Outside battle, leading with it makes Steel-type wild Pokémon appear more often."
+ },
+ "Marvel Scale": {
+  "text": "With any status condition, its Defense is 1.5×."
+ },
+ "Mega Launcher": {
+  "text": "Aura and pulse moves get 1.5× power. A Pokémon with Mega Launcher is healed by 3/4 of its max HP by Heal Pulse instead of 1/2.",
+  "moves": [
+   "gPulseAuraMoves"
+  ]
+ },
+ "Merciless": {
+  "text": "Its attacks are always critical hits against poisoned targets."
+ },
+ "Mimicry": {
+  "text": "Its type changes with the terrain: Electric on Electric Terrain, Grass on Grassy Terrain, Fairy on Misty Terrain and Psychic on Psychic Terrain. It goes back to its normal type when the terrain ends."
+ },
+ "Minus": {
+  "text": "Doubles: its Sp. Atk is 1.5× while its ally has Plus or Minus."
+ },
+ "Mirror Armor": {
+  "text": "When another Pokémon tries to lower its stats (with a move, Intimidate, Cotton Down or Sticky Web), the drop bounces back onto that Pokémon instead."
+ },
+ "Misty Surge": {
+  "text": "Sets Misty Terrain for 5 turns on entering battle (8 with Terrain Extender)."
+ },
+ "Mold Breaker": {
+  "text": "Its moves ignore the target's Abilities that would get in the way, like Levitate, Sturdy, Multiscale, Wonder Guard or Water Absorb."
+ },
+ "Moody": {
+  "text": "At the end of each turn, one random stat rises by 2 stages and a different one drops by 1. Only Attack, Defense, Sp. Atk, Sp. Def and Speed can be picked (Gen 8 behavior: no accuracy or evasion)."
+ },
+ "Motor Drive": {
+  "text": "Immune to Electric-type moves; being hit by one raises its Speed by 1 stage instead."
+ },
+ "Moxie": {
+  "text": "When it knocks out a foe (and the foe still has Pokémon left), its Attack rises by 1 stage."
+ },
+ "Multiscale": {
+  "text": "At full HP it takes half damage from attacks."
+ },
+ "Mummy": {
+  "text": "When hit by a contact move, the attacker's Ability becomes Mummy. Abilities tied to a form (Disguise, Stance Change, Schooling, Battle Bond…) can't be replaced."
+ },
+ "Natural Cure": {
+  "text": "Its status condition is cured when it switches out, and at the end of the battle."
+ },
+ "Neuroforce": {
+  "text": "Its super-effective moves get 1.25× power."
+ },
+ "Neutralize Gas": {
+  "text": "While it's on the field, every other Pokémon's Ability stops working, including ones that come in later. Abilities tied to a form (Disguise, Stance Change, Schooling, Ice Face…) still work. Abilities come back when it leaves."
+ },
+ "No Guard": {
+  "text": "Every move it uses and every move used against it hits, including one-hit KO moves and moves against a target in the middle of Fly or Dig. Outside battle, leading with it doubles the wild encounter rate."
+ },
+ "Oblivious": {
+  "text": "It can't be infatuated (Attract, Captivate, Cute Charm) or taunted, and Intimidate doesn't affect it."
+ },
+ "Odd Medicine": {
+  "text": "Doubles: on entering battle, resets all of its ally's stat changes."
+ },
+ "Overcoat": {
+  "text": "It takes no damage from weather, and powder and spore moves (Spore, Sleep Powder, Stun Spore, Rage Powder…) and Effect Spore don't affect it.",
+  "moves": [
+   "gPowderMoves"
+  ]
+ },
+ "Overgrow": {
+  "text": "At 1/3 max HP or less, its Grass-type moves get 1.5× power."
+ },
+ "Own Tempo": {
+  "text": "It can't be confused (it also doesn't get confused after Outrage, Thrash or Petal Dance), and Intimidate doesn't affect it."
+ },
+ "Parental Bond": {
+  "text": "Its damaging moves hit twice; the second hit does 1/4 of the damage. Doesn't apply to multi-hit moves, two-turn moves, one-hit KO moves, Max Moves, spread moves when more than one target is hit, or Fling, Self-Destruct, Explosion, Misty Explosion, Final Gambit, Endeavor, Uproar, Rollout and Ice Ball."
+ },
+ "Pastel Veil": {
+  "text": "It and its ally can't be poisoned. On entering battle, it cures poison from itself and its ally."
+ },
+ "Perish Body": {
+  "text": "When hit by a contact move, both it and the attacker get a perish count of 3 and faint in three turns unless they switch out. Doesn't work if the attacker already has a perish count."
+ },
+ "Pickpocket": {
+  "text": "When hit by a contact move while holding nothing, it steals the attacker's item. Doesn't work for wild Pokémon, through a Substitute, after a Sheer Force-boosted move, or against Sticky Hold."
+ },
+ "Pickup": {
+  "text": "In battle: at the end of a turn, if it isn't holding anything, it picks up an item another Pokémon used up that turn. After battle: a 10% chance to find an item (better items at higher levels), which goes straight to the bag."
+ },
+ "Pixilate": {
+  "text": "Normal-type moves become Fairy-type and get 1.2× power. Doesn't apply to Max Moves, moves whose type is set by something else (Hidden Power, Weather Ball, Judgment…) or a move already changed by Electrify."
+ },
+ "Plus": {
+  "text": "Doubles: its Sp. Atk is 1.5× while its ally has Plus or Minus."
+ },
+ "Poison Heal": {
+  "text": "If poisoned, it restores 1/8 of its max HP each turn instead of losing HP (Heal Block stops the healing). Its poison doesn't hurt it outside battle either."
+ },
+ "Poison Point": {
+  "text": "When hit by a contact move, there's a 1 in 3 chance the attacker is poisoned."
+ },
+ "Poison Touch": {
+  "text": "Its contact moves have a 30% chance to poison the target (60% with a rainbow from the Water and Fire Pledges). Shield Dust blocks it."
+ },
+ "Power Spot": {
+  "text": "Doubles: its ally's moves get 1.3× power."
+ },
+ "Prankster": {
+  "text": "Its status moves get +1 priority. Dark-type Pokémon are immune to status moves it aims at them, except ones that affect the whole field or side."
+ },
+ "Pressure": {
+  "text": "Moves aimed at it use 1 extra PP. Outside battle, leading with it makes wild Pokémon appear at the top of their level range half the time."
+ },
+ "Primordial Sea": {
+  "text": "Summons heavy rain on entering battle. It lasts until this Pokémon leaves the field, and weather moves and other weather Abilities can't replace it (Desolate Land can). Fire-type attacks fail completely."
+ },
+ "Prism Armor": {
+  "text": "Super-effective moves do 0.75× damage to it. Unlike Filter, Mold Breaker can't get past it."
+ },
+ "Protean": {
+  "text": "Before each move, its type changes to match the move's type, so every move gets the same-type bonus. In this game it triggers on every move, not just once per switch-in like in Gen 9."
+ },
+ "Psychic Surge": {
+  "text": "Sets Psychic Terrain for 5 turns on entering battle (8 with Terrain Extender)."
+ },
+ "Punk Rock": {
+  "text": "Its sound-based moves get 1.3× power, and sound-based moves do half damage to it.",
+  "moves": [
+   "gSoundMoves"
+  ]
+ },
+ "Pure Power": {
+  "text": "Its Attack is doubled."
+ },
+ "Queenly Majesty": {
+  "text": "Foes can't use priority moves against it or its ally. Moves that hit the whole field or the opposing side (like Spikes) aren't blocked."
+ },
+ "Quick Draw": {
+  "text": "30% of the time, it moves first within its priority bracket when using a damaging move."
+ },
+ "Quick Feet": {
+  "text": "With any status condition, its Speed is 1.5× and paralysis no longer halves it. Outside battle, leading with it halves the wild encounter rate."
+ },
+ "RKS System": {
+  "text": "Silvally only: its type matches the Memory it holds."
+ },
+ "Rain Dish": {
+  "text": "Restores 1/16 of its max HP at the end of each turn in rain."
+ },
+ "Rattled": {
+  "text": "When hit by a Bug-, Dark- or Ghost-type move, its Speed rises by 1 stage. Intimidate also raises its Speed by 1 stage (and still lowers its Attack)."
+ },
+ "Receiver": {
+  "text": "Doubles only: when its ally faints, it replaces this Ability with the fainted ally's Ability. A few Abilities can't be taken: Trace, Forecast, Flower Gift, Multitype, Illusion, Zen Mode, Imposter, Stance Change, Receiver/Alchemic Power, Schooling, Comatose, Shields Down, Disguise, RKS System, Battle Bond, Power Construct, Wonder Guard, Neutralizing Gas, Ice Face, Hunger Switch, Gulp Missile and As One."
+ },
+ "Reckless": {
+  "text": "Moves with recoil get 1.2× power, and so do Jump Kick and High Jump Kick. Mind Blown and Steel Beam don't count.",
+  "moves": [
+   "gPercent25RecoilMoves",
+   "gPercent33RecoilMoves",
+   "gPercent50RecoilMoves"
+  ]
+ },
+ "Refrigerate": {
+  "text": "Normal-type moves become Ice-type and get 1.2× power. Doesn't apply to Max Moves, moves whose type is set by something else (Hidden Power, Weather Ball, Judgment…) or a move already changed by Electrify."
+ },
+ "Regenerator": {
+  "text": "Restores 1/3 of its max HP when it switches out."
+ },
+ "Ripen": {
+  "text": "Doubles what its Berries do: twice the HP from Oran and Sitrus, twice the PP from Leppa, +2 stages from stat Berries (+4 from Starf), 1.4× accuracy from Micle, and Jaboca/Rowap hurt the attacker for 1/4 of its HP. Damage-halving Berries cut damage to 1/3 instead. In this game, Figy, Wiki, Mago, Aguav and Iapapa Berries restore 8/9 of its max HP instead of 1/3, more than the official 2/3."
+ },
+ "Rivalry": {
+  "text": "Its moves get 1.25× power against a target of the same gender and 0.75× against the opposite gender. No effect if either is genderless."
+ },
+ "Rock Head": {
+  "text": "It takes no recoil damage from moves like Double-Edge, Brave Bird or Head Smash. Mind Blown and Steel Beam still cost it HP."
+ },
+ "Rough Skin": {
+  "text": "When hit by a contact move, the attacker loses 1/8 of its max HP. Magic Guard prevents it."
+ },
+ "Run Away": {
+  "text": "It can always flee from wild battles, even when trapped."
+ },
+ "Sand Force": {
+  "text": "In a sandstorm, its Rock-, Ground- and Steel-type moves get 1.3× power, and it takes no sandstorm damage."
+ },
+ "Sand Rush": {
+  "text": "Its Speed doubles in a sandstorm, and it takes no sandstorm damage."
+ },
+ "Sand Spit": {
+  "text": "When hit by an attack, it whips up a sandstorm for 5 turns (8 with Smooth Rock). Fails if a sandstorm or extreme weather is already active."
+ },
+ "Sand Stream": {
+  "text": "Summons a sandstorm for 5 turns on entering battle (8 with Smooth Rock). Fails against the extreme weather of Desolate Land, Primordial Sea or Delta Stream."
+ },
+ "Sand Veil": {
+  "text": "In a sandstorm, moves against it are 0.8× as accurate, and it takes no sandstorm damage. Outside battle, leading with it halves the wild encounter rate during a sandstorm."
+ },
+ "Sap Sipper": {
+  "text": "Immune to Grass-type moves; being hit by one raises its Attack by 1 stage instead."
+ },
+ "Schooling": {
+  "text": "Wishiwashi only: from level 20, it enters School Form while above 1/4 of its max HP, and goes back to Solo Form at 1/4 or below. Checked on entering battle and at the end of each turn."
+ },
+ "Scrappy": {
+  "text": "Its Normal- and Fighting-type moves can hit Ghost types, and Intimidate doesn't affect it."
+ },
+ "Screen Cleaner": {
+  "text": "On entering battle, removes Reflect, Light Screen and Aurora Veil from both sides of the field."
+ },
+ "Serene Grace": {
+  "text": "Doubles the chance of its moves' added effects (like a flinch, burn or stat drop), King's Rock and Razor Fang included."
+ },
+ "Shadow Shield": {
+  "text": "At full HP it takes half damage from attacks. Unlike Multiscale, Mold Breaker can't get past it."
+ },
+ "Shadow Tag": {
+  "text": "Foes can't switch out or flee, unless they also have Shadow Tag, are Ghost types or hold a Shed Shell."
+ },
+ "Sharpness": {
+  "text": "Slicing moves get 1.5× power.",
+  "moves": [
+   "gSlicingMoves"
+  ]
+ },
+ "Shed Skin": {
+  "text": "At the end of each turn, there's a 1 in 3 chance it cures its own status condition."
+ },
+ "Sheer Force": {
+  "text": "Moves with an added effect (a chance to burn, flinch, lower stats…) get 1.3× power, but the added effect never happens. A Life Orb doesn't cost it HP when using these moves.",
+  "moves": [
+   "gSheerForceBoostedMoves"
+  ]
+ },
+ "Shell Armor": {
+  "text": "Opponents can't land critical hits on it."
+ },
+ "Shield Dust": {
+  "text": "It's protected from the added effects of other Pokémon's moves (the chance to burn, flinch, lower stats…) and from Poison Touch. The move's main damage still lands."
+ },
+ "Shields Down": {
+  "text": "Minior only: above half HP it's in Meteor Form, which can't get status conditions or be made drowsy. At half HP or below it becomes Core Form. Checked on entering battle and at the end of each turn."
+ },
+ "Simple": {
+  "text": "All its stat changes are doubled: +1 becomes +2, −1 becomes −2."
+ },
+ "Skill Link": {
+  "text": "Moves that hit 2–5 times always hit 5 times, and Triple Kick and Triple Axel don't need to check accuracy after the first hit."
+ },
+ "Slush Rush": {
+  "text": "Its Speed doubles in hail."
+ },
+ "Sniper": {
+  "text": "Its critical hits do 1.5× more damage than usual (2.25× instead of 1.5×)."
+ },
+ "Snow Cloak": {
+  "text": "In hail, moves against it are 0.8× as accurate, and it takes no hail damage. Outside battle, leading with it halves the wild encounter rate while it's snowing."
+ },
+ "Snow Warning": {
+  "text": "Summons hail for 5 turns on entering battle (8 with Icy Rock). Fails against the extreme weather of Desolate Land, Primordial Sea or Delta Stream."
+ },
+ "Solar Power": {
+  "text": "In sun its Sp. Atk is 1.5×, but it loses 1/8 of its max HP at the end of each turn."
+ },
+ "Solid Rock": {
+  "text": "Super-effective moves do 0.75× damage to it."
+ },
+ "Soundproof": {
+  "text": "Immune to sound-based moves from other Pokémon, including Perish Song. Heal Bell doesn't cure its status.",
+  "moves": [
+   "gSoundMoves"
+  ]
+ },
+ "Speed Boost": {
+  "text": "At the end of each turn its Speed rises by 1 stage, except on the turn it entered battle."
+ },
+ "Stakeout": {
+  "text": "Its moves do double damage to a target that switched in this turn."
+ },
+ "Stall": {
+  "text": "It moves last among Pokémon using moves of the same priority."
+ },
+ "Stalwart": {
+  "text": "Its moves can't be redirected by Follow Me, Rage Powder, Lightning Rod or Storm Drain."
+ },
+ "Stamina": {
+  "text": "Each time it's hit by an attack, its Defense rises by 1 stage."
+ },
+ "Stance Change": {
+  "text": "Aegislash only: it switches to Blade Forme before using an attacking move and back to Shield Forme when it uses King's Shield."
+ },
+ "Static": {
+  "text": "When hit by a contact move, there's a 1 in 3 chance the attacker is paralyzed. Outside battle, leading with it makes Electric-type wild Pokémon appear more often."
+ },
+ "Steadfast": {
+  "text": "Each time it flinches, its Speed rises by 1 stage."
+ },
+ "Steam Engine": {
+  "text": "When hit by a Fire- or Water-type move, its Speed rises to the maximum (+6). Outside battle, having it in the party makes Eggs hatch twice as fast."
+ },
+ "Steelworker": {
+  "text": "Its Steel-type moves get 1.5× power."
+ },
+ "Steely Spirit": {
+  "text": "Its own and its ally's Steel-type moves get 1.5× power."
+ },
+ "Stench": {
+  "text": "Its damaging moves have a 10% chance to make the target flinch, if it moves first. Outside battle, leading with it halves the wild encounter rate."
+ },
+ "Sticky Hold": {
+  "text": "While it's conscious, its held item can't be stolen, knocked off, swapped, burned up or eaten by other Pokémon (Thief, Knock Off, Trick, Incinerate, Bug Bite, Corrosive Gas, Magician, Pickpocket…). Outside battle, leading with it makes fish bite 85% of the time instead of 50%."
+ },
+ "Storm Drain": {
+  "text": "Draws single-target Water-type moves to itself, even its ally's. Water moves don't affect it and raise its Sp. Atk by 1 stage instead. Outside battle, leading with it makes Water-type wild Pokémon appear more often."
+ },
+ "Strong Jaw": {
+  "text": "Biting moves get 1.5× power.",
+  "moves": [
+   "gBitingMoves"
+  ]
+ },
+ "Sturdy": {
+  "text": "At full HP, it survives any single hit with at least 1 HP. One-hit KO moves don't affect it."
+ },
+ "Suction Cups": {
+  "text": "It can't be forced out by Roar, Whirlwind, Dragon Tail, Circle Throw or a Red Card. Outside battle, leading with it makes fish bite 85% of the time instead of 50%."
+ },
+ "Super Luck": {
+  "text": "Its moves are one stage more likely to land a critical hit. Outside battle, leading with it makes wild Pokémon more likely to hold items: 60% for the common item and 20% for the rare one, instead of 50% and 5%."
+ },
+ "Surge Surfer": {
+  "text": "Its Speed doubles on Electric Terrain."
+ },
+ "Swarm": {
+  "text": "At 1/3 max HP or less, its Bug-type moves get 1.5× power. Outside battle, leading with it doubles the wild encounter rate."
+ },
+ "Sweet Veil": {
+  "text": "It and its ally can't fall asleep or be made drowsy by Yawn, and can't use Rest."
+ },
+ "Swift Swim": {
+  "text": "Its Speed doubles in rain. A held Utility Umbrella cancels it."
+ },
+ "Symbiosis": {
+  "text": "Doubles: when its ally uses up its held item, it passes its own item to the ally."
+ },
+ "Synchronize": {
+  "text": "When another Pokémon burns, poisons or paralyzes it, the attacker gets the same condition. Outside battle, leading with it makes every wild Pokémon have its Nature, and gift Pokémon too."
+ },
+ "Tangled Feet": {
+  "text": "While it's confused, moves against it are half as accurate."
+ },
+ "Tangling Hair": {
+  "text": "When hit by a contact move, the attacker's Speed drops by 1 stage."
+ },
+ "Technician": {
+  "text": "Moves with 60 power or less get 1.5× power. Variable-power moves count with the power they end up with."
+ },
+ "Telepathy": {
+  "text": "Doubles: its ally's moves can't hurt it."
+ },
+ "Thick Fat": {
+  "text": "Fire- and Ice-type moves do half damage to it."
+ },
+ "Tinted Lens": {
+  "text": "Its not-very-effective moves do double damage."
+ },
+ "Torrent": {
+  "text": "At 1/3 max HP or less, its Water-type moves get 1.5× power."
+ },
+ "Tough Claws": {
+  "text": "Its contact moves get 1.3× power. Holding Protective Pads cancels it."
+ },
+ "Toxic Boost": {
+  "text": "While poisoned, its physical moves get 1.5× power."
+ },
+ "Trace": {
+  "text": "On entering battle, it copies a foe's Ability (a random foe in doubles). Some Abilities can't be copied: Trace, Forecast, Flower Gift, Multitype, Illusion, Zen Mode, Imposter, Stance Change, Receiver/Alchemic Power, Schooling, Comatose, Shields Down, Disguise, RKS System, Battle Bond, Power Construct, Neutralizing Gas, Ice Face, Hunger Switch, Gulp Missile and As One."
+ },
+ "Triage": {
+  "text": "Its healing moves (Drain Punch, Giga Drain, Recover, Roost, Synthesis…) get +3 priority."
+ },
+ "Truant": {
+  "text": "It can only use a move every other turn; on the turns in between it loafs around. Sleeping resets the count."
+ },
+ "Turboblaze": {
+  "text": "Its moves ignore the target's Abilities that would get in the way, like Levitate, Sturdy, Multiscale, Wonder Guard or Water Absorb."
+ },
+ "Unaware": {
+  "text": "It ignores the target's stat changes when it attacks (raised Defense, evasion…) and the attacker's stat changes when it's attacked (raised Attack, accuracy…)."
+ },
+ "Unburden": {
+  "text": "Its Speed doubles after it loses or uses up its held item, until it gets a new one or switches out."
+ },
+ "Unnerve": {
+  "text": "Foes can't eat Berries while it's on the field."
+ },
+ "Unseen Fist": {
+  "text": "Its contact moves hit through Protect, Detect and similar moves."
+ },
+ "Victory Star": {
+  "text": "It and its ally's moves are 1.1× as accurate."
+ },
+ "Vital Spirit": {
+  "text": "It can't fall asleep (including from Yawn and Rest), and it wakes up right away if it somehow does. Outside battle, leading with it makes wild Pokémon appear at the top of their level range half the time."
+ },
+ "Volt Absorb": {
+  "text": "Electric-type moves heal it by 1/4 of its max HP instead of hurting it."
+ },
+ "Wandering Soul": {
+  "text": "When hit by a contact move, it swaps Abilities with the attacker."
+ },
+ "Water Absorb": {
+  "text": "Water-type moves heal it by 1/4 of its max HP instead of hurting it."
+ },
+ "Water Bubble": {
+  "text": "Its Water-type moves get double power, Fire-type moves do half damage to it, and it can't be burned."
+ },
+ "Water Compact": {
+  "text": "When hit by a Water-type move, its Defense rises by 2 stages."
+ },
+ "Weak Armor": {
+  "text": "When hit by a physical move, its Defense drops by 1 stage and its Speed rises by 2 stages."
+ },
+ "White Smoke": {
+  "text": "Other Pokémon can't lower its stats, including Intimidate and Sticky Web. Its own moves that lower its stats still work. Outside battle, leading with it halves the wild encounter rate."
+ },
+ "Wimp Out": {
+  "text": "When an attack or end-of-turn damage drops it from above half HP to half or below, it switches out right away. Doesn't trigger during Sky Drop."
+ },
+ "Wonder Guard": {
+  "text": "Only super-effective moves can damage it. Status moves, weather, poison and other indirect damage still work."
+ },
+ "Zen Mode": {
+  "text": "Darmanitan only: at the end of a turn at half HP or less, it changes to Zen Mode; it changes back once it's above half HP."
+ }
+}

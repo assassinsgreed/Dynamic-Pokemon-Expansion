@@ -478,12 +478,16 @@
       const l = holders.filter(([, h]) => h === hidden);
       return l.length ? `<div><h4>${title} · ${l.length}</h4><div class="chips">${l.map(([i]) => monChip(i, "")).join("")}</div></div>` : "";
     };
-    return `<article class="abilcard">${COLLAPSE}<h2>${esc(a.name)}${a.official ? `<small>${esc(a.official)}</small>` : ""}</h2>${a.desc ? `<div class="gamedesc">${esc(a.desc)}</div>` : ""}${a.chance ? `<div class="specs"><span>Effect chance <b>${a.chance}%</b></span></div>` : ""}
-      <div class="learners">${group(0, "Ability") + group(1, "Hidden ability") || '<p class="empty">No Pokémon match the current filters.</p>'}</div></article>`;
+    // The game's one-line description, then how it actually works in this game (written from CFRU's code)
+    const affects = a.moves.length ? `<div><h4>Affected moves · ${a.moves.length}</h4><div class="chips">${a.moves.map((k) =>
+      `<button class="chip" data-move="${k}">${typeBadge(moves[k].type)}<span class="ln">${esc(moves[k].name)}</span></button>`).join("")}</div></div>` : "";
+    return `<article class="abilcard">${COLLAPSE}<h2>${esc(a.name)}${a.official ? `<small>${esc(a.official)}</small>` : ""}</h2>${a.desc ? `<div class="gamedesc">${esc(a.desc)}</div>` : ""}
+      <p class="abildetail">${esc(a.detail)}</p>${a.chance ? `<div class="specs"><span>Effect chance <b>${a.chance}%</b></span></div>` : ""}
+      <div class="learners">${group(0, "Ability") + group(1, "Hidden ability") || '<p class="empty">No Pokémon match the current filters.</p>'}${affects}</div></article>`;
   }
 
   function abilitiesView(q) {
-    const list = exactFirst(abilities.filter((a, n) => !q || abilityKeys[n].includes(q) || norm(a.desc).includes(q)), (a) => norm(a.name) === q || (a.official && norm(a.official) === q))
+    const list = exactFirst(abilities.filter((a, n) => !q || abilityKeys[n].includes(q) || norm(a.desc).includes(q) || norm(a.detail).includes(q)), (a) => norm(a.name) === q || (a.official && norm(a.official) === q))
       .filter((a) => a.mons.some(([i]) => inMode(mons[i]) && inType(mons[i])));
     if (!list.length) return [`<div class="nores">No abilities match “${esc(state.q)}”.</div>`, "0 abilities"];
     const open = state.ability || (q && [list[0].name, list[0].official || ""].some((s) => norm(s) === q) ? list[0].name : null);
