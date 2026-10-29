@@ -1,8 +1,10 @@
 """Decides which Pokémon get a row, their Mode, their move lists, and their evolution text."""
 
+import csv
 import re
 from dataclasses import dataclass, field
 from functools import cache
+from pathlib import Path
 
 from . import load_cfru, load_dpe
 from .cparse import read, resolve_conditionals, strip_comments
@@ -22,7 +24,10 @@ FORM_LABELS = {
 KEY_FORM_LABELS = {
     "SPECIES_ORICORIO_Y": "Pom-Pom", "SPECIES_ORICORIO_P": "Pa'u", "SPECIES_ORICORIO_S": "Sensu",
     "SPECIES_WISHIWASHI_S": "School",
+    "SPECIES_PIKACHU_CAP_ORIGINAL": "Original Cap", "SPECIES_PIKACHU_PHD": "PhD",
 }
+# Forms the Habitat table leaves out but players can get (by form change or as a gift), with how to get them
+EXTRA_FORMS_CSV = Path(__file__).with_name("extra_forms.csv")
 
 DROPPED_METHODS = {"EVO_TRADE", "EVO_TRADE_ITEM", "EVO_GIGANTAMAX"}  # impossible in game
 AMPED_NATURES = "Hardy, Brave, Adamant, Naughty, Docile, Impish, Lax, Hasty, Jolly, Naive, Rash, Sassy, Quirky"
@@ -240,6 +245,14 @@ def _family_roots(data: SourceData) -> dict[str, str]:
     return roots
 
 
+def load_extra_forms(path: Path = EXTRA_FORMS_CSV) -> list[dict]:
+    """Rows of extra_forms.csv: a species the Habitat table leaves out, and (when Method is set) one way to get it.
+    A species can have several rows; rows without a method only add the form (the Encounters sheet has its gift)."""
+    with path.open(encoding="utf-8", newline="") as f:
+        return [{"species": r["Species"], "mode": r["Mode"], "method": r["Method"], "location": r["Location"],
+                 "sub": r["Sub-area"], "notes": r["Notes"]} for r in csv.DictReader(f)]
+
+
 def build_roster(data: SourceData) -> list[Entry]:
     roots = _family_roots(data)
     modes: dict[str, set] = {}
@@ -259,6 +272,14 @@ def build_roster(data: SourceData) -> list[Entry]:
 
     def form_of(key: str) -> str | None:
         return bases[key][1] if key in bases else _split_form(key, data.ids, data.names)[1]
+
+    for extra in load_extra_forms():
+        key = extra["species"]
+        if key not in data.stats:
+            raise ValueError(f"{EXTRA_FORMS_CSV.name}: unknown species {key}")
+        if key not in modes:
+            bases[key] = _split_form(key, data.ids, data.names)
+            modes[key] = {STANDARD, DIVERGENT} if extra["mode"] == "Both" else {extra["mode"]}
 
     for source in list(modes):
         for _, _, target, _ in _mega_links(data, source):

@@ -64,7 +64,8 @@
   for (const [mode, field] of [["Standard", "std"], ["Divergent", "div"]]) {
     let last = 0, step = 0;
     mons.forEach((m, i) => {
-      if (m.dex[field]) { last = m.dex[field]; step = 0; order[mode][i] = last; } else order[mode][i] = last + ++step / 1000;
+      // an unnumbered entry with nothing numbered before it in this mode (a gift form of a Standard-only species) goes last
+      if (m.dex[field]) { last = m.dex[field]; step = 0; order[mode][i] = last; } else order[mode][i] = last ? last + ++step / 1000 : 1e6 + i;
     });
   }
   const monSlug = (i) => slug(mons[i].key.replace(/^SPECIES_/, ""));

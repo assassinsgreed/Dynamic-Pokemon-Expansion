@@ -344,6 +344,8 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .moreoves button { border: 1px solid var(--line); background: var(--surface); padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 13.5px; display: inline-flex; gap: 6px; align-items: center; }
 /* Rows off screen skip layout and paint until scrolled to */
 .mon:not([open]) { content-visibility: auto; contain-intrinsic-size: auto 70px; }
+/* …at the height a grid card really is, or off-screen cards collapse to 70px and the grid jumps when one opens */
+.list.grid .mon:not([open]) { contain-intrinsic-size: auto 205px; }
 .nores { padding: 24px; text-align: center; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; }
 @media (max-width: 520px) {
   .list:not(.grid) .mon > summary .dexline, .list.grid .mon[open] > summary .dexline { top: auto; bottom: 11px; transform: none; right: 50px; }

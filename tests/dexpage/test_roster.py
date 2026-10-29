@@ -115,3 +115,10 @@ def test_unnumbered_forms_sit_with_relatives(roster):
     assert at("SPECIES_KOFFING") == at("SPECIES_KOFFING_G") + 1
     assert at("SPECIES_ZORUA") < at("SPECIES_ZORUA_H") < at("SPECIES_ZOROARK")
     assert at("SPECIES_MEOWTH_G") < at("SPECIES_MEOWTH") < at("SPECIES_MEOWTH_A") < at("SPECIES_PERRSERKER")
+
+
+def test_extra_forms_with_how_to_get(roster):
+    # Forms the Habitat table leaves out but players can get (extra_forms.csv)
+    by = {e.key: e for e in roster}
+    assert by["SPECIES_ROTOM_WASH"].form == "Wash" and by["SPECIES_PIKACHU_CAP_ORIGINAL"].form == "Original Cap"
+    assert {"SPECIES_PIKACHU_ROCK_STAR", "SPECIES_PIKACHU_POP_STAR", "SPECIES_ROTOM_MOW"} <= set(by)

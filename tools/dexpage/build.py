@@ -18,7 +18,7 @@ import difflib
 from .load_cfru import ability_chances, ability_display, ability_ids, ability_officials, marts, z_crystal_sources
 from .locations import attach_encounters, load_encounters
 from .paths import DPE_ROOT, Paths
-from .roster import Entry, SourceData, build_roster, evolution_links, load_source_data
+from .roster import Entry, SourceData, build_roster, evolution_links, load_extra_forms, load_source_data
 from .rom import POCKET_BERRIES, POCKET_KEY_ITEMS, POCKET_POKE_BALLS, item_fields, item_icons
 from .sprites import build_sheet, pack
 
@@ -120,7 +120,11 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
                 move = _move_of(method, item)
                 if move in moves:
                     moves[move]["learners"].append([i, _how(method, item)])
-    locations, held, unmatched = attach_encounters(load_encounters(), roster)
+    by_key = {e.key: e for e in roster}
+    form_rows = [{"name": by_key[x["species"]].name, "form": by_key[x["species"]].form, "mode": x["mode"], "method": x["method"],
+                  "location": x["location"], "sub": x["sub"], "rate": "", "levels": "", "item": "", "notes": x["notes"]}
+                 for x in load_extra_forms() if x["method"] and x["species"] in by_key]  # e.g. Rotom's appliance forms
+    locations, held, unmatched = attach_encounters(load_encounters() + form_rows, roster)
     items, item_index, item_by_const, icon_sheet = _items(data, held, evo_links)
     _attach_machine_locations(data, moves)
     tutors = _attach_tutor_locations(moves)
