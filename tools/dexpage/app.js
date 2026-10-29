@@ -402,7 +402,7 @@
   // the page instead, so the cards around it stay where they were.
   const expandRow = (cols, html) => `<tr class="expanded"><td colspan="${cols}">${html}</td></tr>`;
   const sheet = (html) => `<div class="sheet" role="dialog" aria-modal="true"><div class="sheet-backdrop" data-sheet-close></div>
-    <div class="sheet-panel expanded"><button class="sheet-close" data-sheet-close aria-label="Close" title="Close">×</button>${html}</div></div>`;
+    <div class="sheet-panel expanded"><button class="sheet-close" data-sheet-close aria-label="Close" title="Close">×</button><div class="sheet-body">${html}</div></div></div>`;
   const chipsWithOpen = (keys, chip, isOpen, card) => {
     const open = keys.find(isOpen);
     return `<div class="chips">${keys.map(chip).join("")}</div>${open !== undefined ? sheet(card(open)) : ""}`;
