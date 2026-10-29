@@ -115,8 +115,8 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .t-POISON{background:#8f45c6}.t-GROUND{background:#946033}.t-FLYING{background:#6f9fdc}.t-PSYCHIC{background:#e8487d}
 .t-BUG{background:#8b9b1c}.t-ROCK{background:#a49a6c}.t-GHOST{background:#6c4a74}.t-DRAGON{background:#5463d8}
 .t-DARK{background:#5b4b4c}.t-STEEL{background:#5f99ad}.t-FAIRY{background:#e06fe0}.t-MYSTERY{background:#5e8f86}
-.cat { display: inline-flex; width: 18px; height: 18px; vertical-align: middle; flex: none; }
-.cat svg { width: 100%; height: 100%; }
+.cat { display: inline-flex; width: 40px; height: 16px; vertical-align: middle; flex: none; }
+.cat img { width: 100%; height: 100%; display: block; }
 
 /* Rows */
 .list { display: grid; gap: 6px; }
@@ -215,7 +215,7 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .more-l { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 36px), transparent); }
 .more-l.more-r { -webkit-mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent); }
 table.mv { border-collapse: collapse; width: 100%; font-size: 13.5px; table-layout: fixed; }
-table.mv .c-how { width: 128px; } table.mv .c-type { width: 92px; } table.mv .c-cat { width: 42px; }
+table.mv .c-how { width: 128px; } table.mv .c-type { width: 92px; } table.mv .c-cat { width: 56px; }
 table.mv .c-num { width: 56px; text-align: right; } table.mv .c-tm { width: 64px; text-align: right; }
 table.loc { table-layout: auto; }
 table.mv td { overflow: hidden; text-overflow: ellipsis; }
@@ -458,6 +458,7 @@ body.sheet-open { overflow: hidden; }
 <script>
 const DEX = __DEX_DATA__;
 const SHEET = "__SPRITE_SHEET__";
+const CAT_ICONS = __CAT_ICONS__;
 </script>
 <script>
 __APP_SCRIPT__

@@ -475,6 +475,13 @@ def game_version() -> str:
     return f"v{m.group(1)}" if m else ""
 
 
+CAT_ICON_DIR = Path(__file__).with_name("cat_icons")  # the games' Physical / Special / Status move labels (Bulbapedia archives)
+
+
+def _cat_icons() -> str:
+    return json.dumps({p.stem: "data:image/png;base64," + base64.b64encode(p.read_bytes()).decode() for p in sorted(CAT_ICON_DIR.glob("*.png"))})
+
+
 def _brand_icon() -> str:
     return "data:image/png;base64," + base64.b64encode(BRAND_ICON.read_bytes()).decode()
 
@@ -488,5 +495,6 @@ def render(data: dict, sheet: bytes, offsets: dict) -> str:
             .replace("__DEX_DATA__", blob)
             .replace("__SPRITE_SHEET__", sprites)
             .replace("__BRAND_ICON__", _brand_icon())
+            .replace("__CAT_ICONS__", _cat_icons())
             .replace("__GAME_VERSION__", game_version())
             .replace("__APP_SCRIPT__", APP_SCRIPT.read_text(encoding="utf-8").replace("</", "<\/")))

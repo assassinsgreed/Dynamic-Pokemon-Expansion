@@ -23,11 +23,23 @@ def _rate(value: str) -> str:
     return f"{pct:.0f}%" if pct >= 1 or pct == 0 else f"{pct:.1f}%"
 
 
+def _by_time(rate: str, notes: str) -> tuple[str, str]:
+    """Rows that differ by time of day show both rates in the rate cell ("☀️ 10% 🌙 15%") instead of a note."""
+    m = re.fullmatch(r"By time: Morning/Day (\d+%) · Evening/Night (\d+%)\.?", notes)
+    if m:
+        return f"☀️ {m.group(1)} 🌙 {m.group(2)}", ""
+    m = re.fullmatch(r"(\d+%) during evening/night", notes)
+    if m and rate:
+        return f"☀️ {rate} 🌙 {m.group(1)}", ""
+    return rate, notes.replace("Morning/Day only", "☀️ Morning/Day only").replace("Evening/Night only", "🌙 Evening/Night only")
+
+
 def load_encounters(path: Path = ENCOUNTERS_CSV) -> list[dict]:
     with path.open(encoding="utf-8-sig", newline="") as f:
         rows = list(csv.DictReader(f))
     result = []
     for r in rows:
+        rate, notes = _by_time(_rate(r["Rate"]) if r["Rate"] else "", r["Notes"].strip())
         name = r["Pokémon"].replace("\\e", "é")  # the sheet keeps the game's \e escape for é
         m = re.fullmatch(r"(.*?)\s*\((.+)\)", name)
         result.append({
@@ -37,11 +49,11 @@ def load_encounters(path: Path = ENCOUNTERS_CSV) -> list[dict]:
             "method": r["Method"],
             "location": r["Location"],
             "sub": r["Sub-area"],
-            "rate": _rate(r["Rate"]) if r["Rate"] else "",
+            "rate": rate,
             "levels": r["Levels"],
             "item": r["Held item"],
             # The sheet's other tabs don't exist on the page
-            "notes": re.sub(r"\s*Details on the \w+ tab\.", "", r["Notes"]).strip().replace("Swarm days only", "When swarming"),
+            "notes": re.sub(r"\s*Details on the \w+ tab\.", "", notes).strip().replace("Swarm days only", "When swarming"),
         })
     return result
 

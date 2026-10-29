@@ -30,11 +30,8 @@
   const slug = (s) => s.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const TYPES = ["NORMAL", "FIRE", "WATER", "GRASS", "ELECTRIC", "ICE", "FIGHTING", "POISON", "GROUND", "FLYING", "PSYCHIC", "BUG", "ROCK", "GHOST", "DRAGON", "DARK", "STEEL", "FAIRY"];
   const STAT_LABELS = ["HP", "Atk", "Def", "SpA", "SpD", "Spe"];
-  const CAT = {
-    physical: '<svg viewBox="0 0 20 20" aria-hidden="true"><path fill="#e2562a" d="M10 1l2.2 4.6 5-1.3-2.2 4.7 4 2.9-5 .8.4 5.1L10 15l-4.4 2.8.4-5.1-5-.8 4-2.9-2.2-4.7 5 1.3z"/></svg>',
-    special: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#2f7fe6"/><circle cx="10" cy="10" r="5.2" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="10" cy="10" r="2" fill="#fff"/></svg>',
-    status: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#8b949e"/><path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="#c9d1d9"/></svg>',
-  };
+  // The games' own Physical / Special / Status labels (cat_icons/, embedded by build.py)
+  const CAT = Object.fromEntries(Object.entries(CAT_ICONS).map(([k, src]) => [k, `<img src="${src}" alt="" draggable="false">`]));
   const CAT_NAME = { physical: "Physical", special: "Special", status: "Status" };
   const TYPE_COLOR = { NORMAL: "#9a9d9a", FIRE: "#e2562a", WATER: "#2f7fe6", GRASS: "#3c9a2d", ELECTRIC: "#f2bd16", ICE: "#3fc4e8",
     FIGHTING: "#e07510", POISON: "#8f45c6", GROUND: "#946033", FLYING: "#6f9fdc", PSYCHIC: "#e8487d", BUG: "#8b9b1c", ROCK: "#a49a6c",
@@ -335,7 +332,7 @@
       ${it.where.length ? `<div><h4>Where to find</h4><ul class="where">${it.where.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>` : '<p class="note">No known location.</p>'}
       ${it.move ? `<div><h4>Teaches</h4><div class="chips"><button class="chip" data-move="${it.move}">${typeBadge(moves[it.move].type)}<span class="ln">${esc(moves[it.move].name)}</span><span class="hw">${moves[it.move].learners.filter(([, h]) => /^(TM|HM)\d/.test(h)).length} Pokémon</span></button></div></div>` : ""}
       ${showUse ? `<div><h4>${it.move ? "Note" : useTitle}</h4><div class="use">${esc(it.use)}</div></div>` : ""}
-      ${evolves.length ? `<div><h4>Evolves · ${evolves.length}</h4><div class="chips">${evolves.map(([i, to]) => monChip(to, "", "", it.category === "Mega Stones")).join("")}</div></div>` : ""}
+      ${evolves.length ? `<div><h4>${it.category === "Mega Stones" ? "Mega Evolves" : "Evolves"} · ${evolves.length}</h4><div class="chips">${evolves.map(([i, to]) => monChip(to, "", "", it.category === "Mega Stones")).join("")}</div></div>` : ""}
       ${holders.length ? `<div><h4>Held by wild Pokémon · ${holders.length}</h4><div class="chips">${holders.map(([i, pct]) => monChip(i, pct)).join("")}</div></div>` : ""}
     </article>`;
   }
