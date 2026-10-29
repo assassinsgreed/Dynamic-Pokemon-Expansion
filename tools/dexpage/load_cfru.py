@@ -59,6 +59,7 @@ def moves(p: Paths) -> dict[str, dict]:
     table = parse_designated_array(source(p, "src/Tables/battle_moves.c"), "gBattleMoves")
     result = {}
     first_z = ids[collect_defines(p.cfru / "include/constants/moves.h")["FIRST_Z_MOVE"]]  # Z and Max moves can't be learned, and their names don't line up
+    descriptions = move_descriptions(p)
     for const, body in table.items():
         if const not in names or const == "MOVE_NONE" or ids[const] >= first_z:
             continue
@@ -71,7 +72,29 @@ def moves(p: Paths) -> dict[str, dict]:
             "power": _int(f.get("power")),
             "accuracy": _int(f.get("accuracy")),
             "pp": _int(f.get("pp")),
+            "desc": descriptions.get(const, ""),
+            # chance of the secondary effect (Scald's burn: 30); 0 when the move has none or it always happens
+            "chance": c if 0 < (c := _int(f.get("secondaryEffectChance"))) < 100 else 0,
         }
+    return result
+
+
+@cache
+def move_descriptions(p: Paths) -> dict[str, str]:
+    """gMoveDescriptions (assembly/data/attack_description_table.s): entry N describes move N+1; each entry is a
+    vanilla ROM address or a symbol from strings/attack_descriptions.string."""
+    from .rom import read_text
+
+    by_id = {v: k for k, v in parse_int_defines(p.cfru / "include/constants/moves.h", "MOVE_").items()}
+    strings = _labelled_strings(p, "strings/attack_descriptions.string")
+    table = read(p.cfru / "assembly/data/attack_description_table.s")
+    entries = re.findall(r"^\.word\s+(\w+)", table[table.index("gMoveDescriptions:"):], flags=re.M)
+    result = {}
+    for n, target in enumerate(entries):
+        const = by_id.get(n + 1)
+        if const:
+            text = read_text(p.rom, int(target, 16)) if target.startswith("0x") else strings.get(target, "")
+            result[const] = " ".join(text.split())
     return result
 
 

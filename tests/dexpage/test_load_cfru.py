@@ -17,3 +17,11 @@ def test_status_move(paths):
 def test_ability_and_item_tables(paths):
     assert ability_names(paths)["ABILITY_OVERGROW"] == "Overgrow"
     assert item_ids(paths)["ITEM_LINK_STONE"] == 0x5B
+
+
+def test_move_descriptions_and_effect_chance(paths):
+    m = moves(paths)
+    assert m["MOVE_SCALD"]["desc"] == "Boiling water is shot at the foe. It may also cause a burn."
+    assert m["MOVE_SCALD"]["chance"] == 30
+    assert m["MOVE_POUND"]["desc"].startswith("A physical attack delivered")   # vanilla text read from the ROM
+    assert m["MOVE_POUND"]["chance"] == 0

@@ -238,3 +238,17 @@ def test_docs_in_page(data):
     mining = next(t for t in groups["Gameplay Features"]["topics"] if t["title"] == "Mining Minigame")
     assert "<table" in mining["html"] and "data:image/png;base64," in mining["html"]
     assert "hardstone" in mining["s"]
+
+
+def test_abilities_list(data):
+    abilities = {a["name"]: a for a in data["abilities"]}
+    mons = {m["key"]: i for i, m in enumerate(data["mons"])}
+    triage = abilities["Triage"]
+    assert triage["desc"] and [mons["SPECIES_VENUSAUR_GIGA"], 0] in triage["mons"]
+    assert [mons["SPECIES_CINDERACE"], 1] in abilities["Libero"]["mons"]                      # hidden, CFRU rename
+    assert all(i != mons["SPECIES_CINDERACE"] for i, _ in abilities.get("Protean", {"mons": []})["mons"])
+
+
+def test_docs_link_ability_cells(data):
+    mega = next(t for g in data["docs"] for t in g["topics"] if t["title"] == "Mega Pokemon")
+    assert 'data-ability="Triage"' in mega["html"]

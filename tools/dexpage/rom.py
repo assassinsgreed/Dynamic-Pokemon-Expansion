@@ -1,5 +1,6 @@
 """Reads in-game text that only exists in the built ROM (item names were edited there with HexManiac)."""
 
+from functools import cache
 from pathlib import Path
 
 from PIL import Image
@@ -143,10 +144,23 @@ def item_icons(rom_path: Path, item_ids: dict[str, int]) -> dict[str, Image.Imag
     return icons
 
 
+@cache
+def _rom_bytes(rom_path: Path) -> bytes:
+    return rom_path.read_bytes()
+
+
+@cache
+def _charmap() -> dict[int, str]:
+    return load_charmap()
+
+
 def read_text(rom_path: Path, address: int, limit: int = 200) -> str:
-    rom = rom_path.read_bytes()
+    """Game text at a ROM address, with its line/page breaks (\\n, \\l, \\p) as spaces."""
     o = address - ROM_BASE
-    return decode(rom[o:o + limit], load_charmap())
+    text = decode(_rom_bytes(rom_path)[o:o + limit], _charmap())
+    for brk in ("\\n", "\\l", "\\p"):
+        text = text.replace("-" + brk, "-").replace(brk, " ")  # "hide-" + break + "melting" is one word
+    return " ".join(text.split())
 
 
 def item_names(rom_path: Path, item_ids: dict[str, int]) -> dict[str, str]:
@@ -159,5 +173,5 @@ def item_names(rom_path: Path, item_ids: dict[str, int]) -> dict[str, str]:
     for const, idx in item_ids.items():
         offset = base + idx * ITEM_STRUCT_SIZE
         if offset + ITEM_NAME_LENGTH <= len(rom):
-            names[const] = decode(rom[offset:offset + ITEM_NAME_LENGTH], charmap).replace("\e", "é")
+            names[const] = decode(rom[offset:offset + ITEM_NAME_LENGTH], charmap).replace("\\e", "é")
     return names

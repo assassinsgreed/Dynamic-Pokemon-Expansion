@@ -85,7 +85,16 @@ def type_chips(text: str, whole_cell: bool = False) -> str:
                   text, flags=re.I)
 
 
-def _cleaned(topic: dict) -> list[dict]:
+def ability_link(cell: str, ability_names: set[str]) -> str:
+    """A table cell that is exactly an ability name ("Triage") links to the Abilities tab."""
+    import re
+    plain = html.unescape(re.sub(r"<[^>]+>", "", cell)).strip()
+    if plain in ability_names:
+        return f'<button class="mvname" data-ability="{html.escape(plain)}">{cell}</button>'
+    return cell
+
+
+def _cleaned(topic: dict, ability_names: set[str] = frozenset()) -> list[dict]:
     blocks = []
     for b in topic["blocks"]:
         if b["t"] in ("p", "h"):
@@ -99,7 +108,7 @@ def _cleaned(topic: dict) -> list[dict]:
                 blocks.append({**b, "items": items})
         elif b["t"] == "table":
             rows = [r for r in b["rows"] if not any("removed from pool" in c.lower() for c in r)]  # no longer in the game
-            rows = [[type_chips(clean_versions(c), whole_cell=True) for c in r] for r in rows]
+            rows = [[ability_link(type_chips(clean_versions(c), whole_cell=True), ability_names) for c in r] for r in rows]
             if len(rows) > 1:
                 blocks.append({**b, "rows": rows})
         else:
@@ -146,8 +155,8 @@ def _block_html(block: dict, images: dict[str, str]) -> str:
     raise ValueError(f"unknown doc block {kind!r}")
 
 
-def render_topic(topic: dict, images: dict[str, str]) -> str:
-    return "".join(_block_html(b, images) for b in _cleaned(topic))
+def render_topic(topic: dict, images: dict[str, str], ability_names: set[str] = frozenset()) -> str:
+    return "".join(_block_html(b, images) for b in _cleaned(topic, ability_names))
 
 
 def topic_text(topic: dict) -> str:

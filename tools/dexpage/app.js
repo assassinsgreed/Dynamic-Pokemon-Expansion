@@ -58,26 +58,27 @@
   // ---------------------------------------------------------------- state & navigation
   // state.view: dex | moves | items | places; move/item/place name the open card; open is the expanded Pokémon
   const state = { view: "dex", q: "", move: null, item: null, place: null, open: null, mode: "", type: "", tab: "level", tabFilter: "",
-    doc: null, layouts: { dex: "list", moves: "list", tutors: "list", items: "grid", places: "grid", docs: "list" } };  // list or cards, per view
+    doc: null, ability: null, layouts: { dex: "list", moves: "list", tutors: "list", abilities: "list", items: "grid", places: "grid", docs: "list" } };  // list or cards, per view
   try {
     state.mode = localStorage.getItem("dex-mode") || "";
     Object.assign(state.layouts, JSON.parse(localStorage.getItem("dex-layouts") || "{}"));
   } catch (e) {}
   let depth = 0, top = 0;  // position in this page's history, and how far Forward can go
 
-  const snapshot = () => ({ view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, doc: state.doc, open: state.open });
+  const snapshot = () => ({ view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, doc: state.doc, ability: state.ability, open: state.open });
   function hashFor(st) {
     if (st.view === "dex" && st.open !== null) return monSlug(st.open);
     if (st.move) return "move-" + slug(moves[st.move].name);
     if (st.item !== null) return "item-" + slug(items[st.item].name);
     if (st.place) return "place-" + slug(st.place);
     if (st.doc) return "doc-" + slug(st.doc);
-    return { dex: "", moves: "moves", tutors: "tutors", items: "items", places: "locations", docs: "docs" }[st.view];
+    if (st.ability) return "ability-" + slug(st.ability);
+    return { dex: "", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", places: "locations", docs: "docs" }[st.view];
   }
   const queries = {};  // each tab keeps its own search text
 
   function navigate(change) {
-    const next = Object.assign({ view: state.view, q: "", move: null, item: null, place: null, doc: null, open: null }, change);
+    const next = Object.assign({ view: state.view, q: "", move: null, item: null, place: null, doc: null, ability: null, open: null }, change);
     Object.assign(state, next, { tabFilter: "" });
     queries[state.view] = state.q;
     depth++;
@@ -167,7 +168,7 @@
   function moveRow(k, how, showHow) {
     const mv = moves[k];
     return `<tr>${showHow ? `<td class="h">${esc(how)}</td>` : ""}
-      <td><button class="mvname" data-move="${k}">${esc(mv.name)}</button></td>
+      <td><button class="mvname" data-move="${k}" title="${esc(mv.desc)}">${esc(mv.name)}</button></td>
       <td>${typeBadge(mv.type)}</td>
       <td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td>
       <td class="n">${mv.power || "—"}</td><td class="n hide-sm">${mv.acc || "—"}</td><td class="n hide-sm">${mv.pp}</td></tr>`;
@@ -250,7 +251,7 @@
 
   function detail(i) {
     const m = mons[i];
-    const ab = ([name, desc], hidden) => `<div class="ab"><b>${esc(name)}</b>${hidden ? '<span class="hid">Hidden</span>' : ""}${desc ? `<span class="desc">${esc(desc)}</span>` : ""}</div>`;
+    const ab = ([name, desc], hidden) => `<div class="ab"><button class="mvname" data-ability="${esc(name)}">${esc(name)}</button>${hidden ? '<span class="hid">Hidden</span>' : ""}${desc ? `<span class="desc">${esc(desc)}</span>` : ""}</div>`;
     const evs = m.evs.map((v, n) => (v ? `${v} ${STAT_LABELS[n]}` : "")).filter(Boolean).join(", ") || "—";
     return `<div class="detail">
       <div class="cols">
@@ -287,7 +288,8 @@
     return `<article class="movecard">${collapsible ? COLLAPSE : ""}
       <div class="top">${typeBadge(mv.type)}<span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span>
         <h2>${esc(mv.name)}${mv.official ? `<small>${esc(mv.official)}</small>` : ""}</h2></div>
-      <div class="specs"><span>${CAT_NAME[mv.split]}</span><span>Pow <b>${mv.power || "—"}</b></span><span>Acc <b>${mv.acc || "—"}</b></span><span>PP <b>${mv.pp}</b></span></div>
+      ${mv.desc ? `<div class="gamedesc">${esc(mv.desc)}</div>` : ""}
+      <div class="specs"><span>${CAT_NAME[mv.split]}</span><span>Pow <b>${mv.power || "—"}</b></span><span>Acc <b>${mv.acc || "—"}</b></span><span>PP <b>${mv.pp}</b></span>${mv.chance ? `<span>Effect chance <b>${mv.chance}%</b></span>` : ""}</div>
       ${mv.tm ? `<div class="tmloc"><b>${mv.tm.label}</b> · ${mv.tm.where.map(esc).join(" · ")}${mv.tm.requires ? ` · needs ${esc(mv.tm.requires)}` : ""}</div>` : ""}
       ${(mv.tutor || []).map((t) => `<div class="tmloc"><b>Tutor</b> · ${esc(t.where)} · ${esc(t.note)}</div>`).join("")}
       <div class="learners">${body}</div></article>`;
@@ -337,7 +339,8 @@
   function alsoLine(q) {  // from the Pokédex, point at matching moves, items and places
     if (q.length < 3) return "";
     const counts = [["moves", matchMoves(q).length, "move"], ["items", matchItems(q).length, "item"], ["places", matchPlaces(q).length, "location"],
-      ["docs", docTopics.filter((t) => t.s.includes(q)).length, "doc topic"]].filter(([, n]) => n);
+      ["abilities", abilityKeys.filter((k) => k.includes(q)).length, "ability"], ["docs", docTopics.filter((t) => t.s.includes(q)).length, "doc topic"]]
+      .filter(([, n]) => n).map(([v, n, w]) => [v, n, n > 1 && w === "ability" ? "abilitie" : w]);
     return counts.length ? `<div class="also">Also matching: ${counts.map(([v, n, w]) => `<button data-goto="${v}">${n} ${w}${n > 1 ? "s" : ""}</button>`).join("")}</div>` : "";
   }
 
@@ -376,7 +379,7 @@
     } else {
       const rows = list.map((k) => {
         const mv = moves[k];
-        return `<tr data-move="${k}"${k === open ? ' class="on"' : ""}><td><span class="mvname">${esc(mv.name)}</span>${mv.official ? ` <span class="note">${esc(mv.official)}</span>` : ""}</td><td>${typeBadge(mv.type)}</td>
+        return `<tr data-move="${k}"${k === open ? ' class="on"' : ""}><td><span class="mvname">${esc(mv.name)}</span>${mv.official ? ` <span class="note">${esc(mv.official)}</span>` : ""}<span class="mvdesc">${esc(mv.desc)}</span></td><td>${typeBadge(mv.type)}</td>
           <td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td><td class="n">${mv.power || "—"}</td>
           <td class="n hide-sm">${mv.acc || "—"}</td><td class="n hide-sm">${mv.pp}</td><td class="n hide-sm">${mv.tm ? mv.tm.label : ""}</td></tr>${k === open ? expandRow(7, moveCard(k, true)) : ""}`;
       }).join("");
@@ -446,6 +449,36 @@
     return [html, `${rows.length} tutor moves`];
   }
 
+  // Abilities: each ability as players see it, with its description and who can have it
+  const abilities = DEX.abilities;
+  const abilityIndex = new Map(abilities.map((a, n) => [a.name, n]));
+  const abilityKeys = abilities.map((a) => norm(a.name));
+
+  function abilityCard(a) {
+    const holders = a.mons.filter(([i]) => inMode(mons[i]) && inType(mons[i]));
+    const group = (hidden, title) => {
+      const l = holders.filter(([, h]) => h === hidden);
+      return l.length ? `<div><h4>${title} · ${l.length}</h4><div class="chips">${l.map(([i]) => monChip(i, "")).join("")}</div></div>` : "";
+    };
+    return `<article class="abilcard">${COLLAPSE}<h2>${esc(a.name)}</h2>${a.desc ? `<div class="gamedesc">${esc(a.desc)}</div>` : ""}
+      <div class="learners">${group(0, "Ability") + group(1, "Hidden ability") || '<p class="empty">No Pokémon match the current filters.</p>'}</div></article>`;
+  }
+
+  function abilitiesView(q) {
+    const list = exactFirst(abilities.filter((a, n) => !q || abilityKeys[n].includes(q) || norm(a.desc).includes(q)), (a) => norm(a.name) === q)
+      .filter((a) => a.mons.some(([i]) => inMode(mons[i]) && inType(mons[i])));
+    if (!list.length) return [`<div class="nores">No abilities match “${esc(state.q)}”.</div>`, "0 abilities"];
+    const open = state.ability || (q && norm(list[0].name) === q ? list[0].name : null);
+    const isOpen = (a) => a.name === open;
+    const count = (a) => a.mons.filter(([i]) => inMode(mons[i]) && inType(mons[i])).length;
+    const html = state.layouts.abilities === "grid"
+      ? chipsWithOpen(list, (a) => `<button class="chip${isOpen(a) ? " on" : ""}" data-ability="${esc(a.name)}"><span class="ln" style="padding-left:10px">${esc(a.name)}</span><span class="hw">${count(a)}</span></button>`, isOpen, abilityCard)
+      : `<div class="listtable"><table class="mv"><thead><tr><th>Ability</th><th class="c-num">Pokémon</th></tr></thead><tbody>${list.map((a) =>
+          `<tr data-ability="${esc(a.name)}"${isOpen(a) ? ' class="on"' : ""}><td><span class="mvname">${esc(a.name)}</span><span class="mvdesc">${esc(a.desc)}</span></td><td class="n">${count(a)}</td></tr>${
+            isOpen(a) ? expandRow(2, abilityCard(a)) : ""}`).join("")}</tbody></table></div>`;
+    return [html, `${list.length} abilities`];
+  }
+
   // Docs: the feature list's topics, grouped by its top-level headings
   const docTopics = DEX.docs.flatMap((g) => g.topics.map((t) => Object.assign({ group: g.title }, t)));
 
@@ -471,6 +504,7 @@
     dex: "Search Pokémon — e.g. Rockruff, Mega, Galarian, Fire",
     moves: "Search moves or TMs — e.g. Ceaseless Edge, TM02",
     tutors: "Search tutor moves or towns — e.g. Draco Meteor, Ferrox Village",
+    abilities: "Search abilities or what they do — e.g. Triage, Libero, weather",
     items: "Search items — e.g. Fire Stone, Berries",
     places: "Search locations — e.g. Route 2, Lake Laplaz",
     docs: "Search the docs — e.g. Frostbite, Battle Frontier, shiny",
@@ -478,7 +512,7 @@
 
   function render(scroll) {
     const q = norm(state.q);
-    const [html, count] = { dex: dexView, moves: movesView, tutors: tutorsView, items: itemsView, places: placesView, docs: docsView }[state.view](q);
+    const [html, count] = { dex: dexView, moves: movesView, tutors: tutorsView, abilities: abilitiesView, items: itemsView, places: placesView, docs: docsView }[state.view](q);
     $("#out").innerHTML = html;
     $("#count").textContent = count;
     $("#q").value = state.q;
@@ -494,7 +528,7 @@
     $("#type-label").innerHTML = state.type ? typeBadge(state.type) : "All types";
     syncConsoleHeight();
     if (scroll) {
-      const el = (state.open !== null && document.querySelector(`.mon[data-i="${state.open}"]`)) || ((state.move || state.item !== null || state.place || state.doc) && document.querySelector("tr.on, .chip.on"));
+      const el = (state.open !== null && document.querySelector(`.mon[data-i="${state.open}"]`)) || ((state.move || state.item !== null || state.place || state.doc || state.ability) && document.querySelector("tr.on, .chip.on"));
       if (el) el.scrollIntoView({ block: "start" }); else window.scrollTo({ top: 0 });
     }
   }
@@ -503,9 +537,9 @@
   let timer;
   $("#q").addEventListener("input", (e) => {
     clearTimeout(timer);
-    timer = setTimeout(() => { Object.assign(state, { q: e.target.value, open: null, move: null, item: null, place: null, doc: null }); queries[state.view] = state.q; remember(); render(); }, 120);
+    timer = setTimeout(() => { Object.assign(state, { q: e.target.value, open: null, move: null, item: null, place: null, doc: null, ability: null }); queries[state.view] = state.q; remember(); render(); }, 120);
   });
-  $("#clear").addEventListener("click", () => { Object.assign(state, { q: "", open: null, move: null, item: null, place: null, doc: null }); queries[state.view] = ""; remember(); render(); $("#q").focus(); });
+  $("#clear").addEventListener("click", () => { Object.assign(state, { q: "", open: null, move: null, item: null, place: null, doc: null, ability: null }); queries[state.view] = ""; remember(); render(); $("#q").focus(); });
   $("#back").addEventListener("click", () => history.back());
   $("#fwd").addEventListener("click", () => history.forward());
   // Switching tabs restores that tab's own search; clicking the current tab again clears it
@@ -566,6 +600,14 @@
       const k = mv.dataset.move;
       if ((state.view === "moves" || state.view === "tutors") && inList) navigate({ view: state.view, q: state.q, move: state.move === k ? null : k });
       else openMove(k);
+      return;
+    }
+    const ab = t.closest("[data-ability]");
+    if (ab) {
+      e.preventDefault();
+      const name = ab.dataset.ability;
+      if (state.view === "abilities" && inList) navigate({ view: "abilities", q: state.q, ability: state.ability === name ? null : name });
+      else navigate({ view: "abilities", ability: name });
       return;
     }
     const dc = t.closest("[data-doc]");
@@ -631,11 +673,12 @@
   // Links: #rockruff, #move-crunch, #item-fire-stone, #place-route-2, #items … (older #ceaseless-edge style still works)
   function fromHash() {
     const h = decodeURIComponent(location.hash.slice(1));
-    const views = { "": "dex", pokedex: "dex", moves: "moves", tutors: "tutors", items: "items", locations: "places", docs: "docs" };
-    Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, doc: null, open: null });
+    const views = { "": "dex", pokedex: "dex", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", locations: "places", docs: "docs" };
+    Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, doc: null, ability: null, open: null });
     if (h in views) state.view = views[h];
     else if (h.startsWith("move-")) { const k = moveKeys.find((x) => slug(moves[x].name) === h.slice(5)); Object.assign(state, k ? { view: "moves", move: k } : { view: "moves", q: h.slice(5).replace(/-/g, " ") }); }
     else if (h.startsWith("item-")) { const k = items.findIndex((it) => slug(it.name) === h.slice(5)); Object.assign(state, k >= 0 ? { view: "items", item: k } : { view: "items", q: h.slice(5).replace(/-/g, " ") }); }
+    else if (h.startsWith("ability-")) { const a = abilities.find((x) => slug(x.name) === h.slice(8)); Object.assign(state, { view: "abilities", ability: a ? a.name : null }); }
     else if (h.startsWith("doc-")) { const t = docTopics.find((x) => slug(x.title) === h.slice(4)); Object.assign(state, { view: "docs", doc: t ? t.title : null }); }
     else if (h.startsWith("place-")) { const p = placeList.find((x) => slug(x.name) === h.slice(6)); Object.assign(state, { view: "places", place: p ? p.name : h.slice(6).replace(/-/g, " ") }); }
     else {

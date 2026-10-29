@@ -71,7 +71,7 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   re-parses the multi-hundred-KB string on each style recalc (Items tab went 195 ms → 13 ms when moved into a
   plain stylesheet rule in app.js). Time changes with a load-event probe that clicks tabs and logs
   `performance.now()` deltas (run without `--virtual-time-budget`, which freezes the clock).
-- Views: Pokédex, Moves, Tutors, Items, Locations, Docs; each has its own list/cards layout (remembered per browser).
+- Views: Pokédex, Moves, Tutors, Abilities, Items, Locations, Docs; each has its own list/cards layout (remembered per browser).
   Back/Forward buttons sit right of the tabs, always visible, disabled when there's nowhere to go.
 - Tutor rows like "Fire Fang, or Flame Burst (v1.4+)" resolve to the move the game teaches for that tutor kind
   (move-tutor files for Regular, CFRU special tutors for Special); doc typos fuzzy-match (Breaking Strike → Breaking Swipe).
@@ -85,6 +85,11 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
 - Moves, Tutors, Items and Locations open an entry in place (under its row, or full-width under its card) with a
   collapse button, like Pokédex rows; links from inside a card open the entry in its own view. The type filter is
   hidden on Items and Locations.
+- Abilities tab: one entry per ability *as shown* (CFRU per-species renames make Libero/Protean separate), with
+  in-game description and who has it (normal/hidden, incl. Mega forms). Ability names in Pokédex profiles and
+  doc table cells that are exactly an ability name link to it.
+- Move descriptions come from gMoveDescriptions (entry N = move N+1; ROM address or CFRU string) and cards show
+  `secondaryEffectChance` as "Effect chance" when it's between 1 and 99%.
 - Every TM/HM is an item ("TM02 Dragon Claw", category TMs/HMs) linking to its move; typing a type name in the
   Pokédex lists that type.
 

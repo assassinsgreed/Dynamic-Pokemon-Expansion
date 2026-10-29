@@ -98,7 +98,7 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
         keys = search_keys(m["name"], m["official"], k.removeprefix("MOVE_"))
         moves[k] = {"name": m["name"], "official": m["official"] if _norm(m["official"]) != _norm(m["name"]) else None,
                     "type": m["type"], "split": m["split"], "power": m["power"],
-                    "acc": m["accuracy"], "pp": m["pp"], "s": keys, "learners": []}
+                    "acc": m["accuracy"], "pp": m["pp"], "desc": m["desc"], "chance": m["chance"], "s": keys, "learners": []}
     for i, e in enumerate(roster):
         if e.battle_form:
             continue  # listed under its base species instead
@@ -111,11 +111,14 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
     items, item_index, item_by_const, icon_sheet = _items(data, held, evo_links)
     _attach_machine_locations(data, moves)
     tutors = _attach_tutor_locations(moves)
+    mons = [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, []), held.get(e.key, []),
+                 item_index, item_by_const) for e in roster]
+    abilities = _abilities(mons)
     return {
-        "docs": _docs(),
+        "docs": _docs({a["name"] for a in abilities}),
+        "abilities": abilities,
         "tutors": tutors,
-        "mons": [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, []), held.get(e.key, []),
-                      item_index, item_by_const) for e in roster],
+        "mons": mons,
         "items": items,
         "itemSheet": icon_sheet,
         "moves": moves,
@@ -217,11 +220,23 @@ def _full_item_name(data: SourceData, const: str) -> str:
     return spelled if abbreviated else rom_name  # a renamed item (Link Stone → Linking Cord) keeps its game name
 
 
-def _docs() -> list[dict]:
+def _abilities(mons: list[dict]) -> list[dict]:
+    """Every ability as players see it, with the Pokémon that can have it ([index, 1 if hidden]).
+    Names are per species, so CFRU's renames (Protean shown as Libero on Cinderace) are separate entries."""
+    by_name: dict[str, dict] = {}
+    for i, m in enumerate(mons):
+        for (name, desc), hidden in [(a, 0) for a in m["abilities"]] + ([(m["hidden"], 1)] if m["hidden"] else []):
+            entry = by_name.setdefault(name, {"name": name, "desc": desc, "mons": []})
+            entry["desc"] = entry["desc"] or desc
+            entry["mons"].append([i, hidden])
+    return sorted(by_name.values(), key=lambda a: a["name"])
+
+
+def _docs(ability_names: set[str] = frozenset()) -> list[dict]:
     """Feature-list topics rendered to HTML, with their images embedded so the page stays one offline file."""
     images = {p.name: "data:image/png;base64," + base64.b64encode(p.read_bytes()).decode()
               for p in DOC_IMAGES.glob("*.png")} if DOC_IMAGES.exists() else {}
-    return [{"title": g["title"], "topics": [{"title": t["title"], "html": render_topic(t, images),
+    return [{"title": g["title"], "topics": [{"title": t["title"], "html": render_topic(t, images, ability_names),
                                               "s": _norm(t["title"] + " " + topic_text(t))} for t in g["topics"]]}
             for g in load_docs()]
 
