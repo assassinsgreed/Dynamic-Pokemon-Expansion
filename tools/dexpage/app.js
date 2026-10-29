@@ -74,9 +74,12 @@
     if (st.doc) return "doc-" + slug(st.doc);
     return { dex: "", moves: "moves", tutors: "tutors", items: "items", places: "locations", docs: "docs" }[st.view];
   }
+  const queries = {};  // each tab keeps its own search text
+
   function navigate(change) {
     const next = Object.assign({ view: state.view, q: "", move: null, item: null, place: null, doc: null, open: null }, change);
     Object.assign(state, next, { tabFilter: "" });
+    queries[state.view] = state.q;
     depth++;
     top = depth;  // a new step discards anything Forward could have returned to
     try { history.pushState({ dex: snapshot(), depth }, "", "#" + hashFor(state)); } catch (e) {}
@@ -500,12 +503,16 @@
   let timer;
   $("#q").addEventListener("input", (e) => {
     clearTimeout(timer);
-    timer = setTimeout(() => { Object.assign(state, { q: e.target.value, open: null, move: null, item: null, place: null }); remember(); render(); }, 120);
+    timer = setTimeout(() => { Object.assign(state, { q: e.target.value, open: null, move: null, item: null, place: null, doc: null }); queries[state.view] = state.q; remember(); render(); }, 120);
   });
-  $("#clear").addEventListener("click", () => { Object.assign(state, { q: "", open: null, move: null, item: null, place: null }); remember(); render(); $("#q").focus(); });
+  $("#clear").addEventListener("click", () => { Object.assign(state, { q: "", open: null, move: null, item: null, place: null, doc: null }); queries[state.view] = ""; remember(); render(); $("#q").focus(); });
   $("#back").addEventListener("click", () => history.back());
   $("#fwd").addEventListener("click", () => history.forward());
-  document.querySelectorAll("[data-viewtab]").forEach((b) => b.addEventListener("click", () => navigate({ view: b.dataset.viewtab, q: state.view === b.dataset.viewtab ? "" : state.q })));
+  // Switching tabs restores that tab's own search; clicking the current tab again clears it
+  document.querySelectorAll("[data-viewtab]").forEach((b) => b.addEventListener("click", () => {
+    const view = b.dataset.viewtab;
+    navigate({ view, q: view === state.view ? "" : queries[view] || "" });
+  }));
   document.querySelectorAll(".seg button[data-view]").forEach((b) => b.addEventListener("click", () => {
     state.layouts[state.view] = b.dataset.view;
     try { localStorage.setItem("dex-layouts", JSON.stringify(state.layouts)); } catch (e) {}
