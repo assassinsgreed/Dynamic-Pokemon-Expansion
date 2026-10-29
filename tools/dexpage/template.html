@@ -186,6 +186,9 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .evo .sep { color: var(--accent); font-size: 18px; line-height: 1; }
 .evcard { display: grid; gap: 2px; padding: 4px 12px 6px 4px; border: 1px solid var(--line); border-radius: 12px; background: var(--sunk); min-width: 0; }
 .evcard.current { border-color: var(--accent); background: var(--accent-soft); }
+.evcard:not(.current) { cursor: pointer; }
+.evcard:not(.current):hover { border-color: var(--muted); }
+.evcard:not(.current):hover .link .ln { text-decoration: underline; }
 .evcard .link { background: none; border: 0; padding: 0; }
 .evcard .how { font-size: 12px; color: var(--muted); padding-left: 42px; line-height: 1.3; display: flex; flex-wrap: wrap; align-items: center; column-gap: 4px; }
 .evcard .how .itembtn .ii { width: 24px; height: 24px; margin: -4px 0 -6px; }

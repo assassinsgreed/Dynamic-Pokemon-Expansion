@@ -175,7 +175,8 @@
       if (!next.length) break;
       stages.push(next);
     }
-    const card = ([n, how, k, written]) => `<div class="evcard${n === i ? " current" : ""}">${monLink(n, i)}${how ? `<span class="how">${howText(how, k, written)}</span>` : ""}</div>`;
+    // The whole card opens its Pokémon (an item named in the method still opens the item: data-item is handled first)
+    const card = ([n, how, k, written]) => `<div class="evcard${n === i ? " current" : ""}" data-open="${n}">${monLink(n, i)}${how ? `<span class="how">${howText(how, k, written)}</span>` : ""}</div>`;
     return `<div class="evo">${stages.map((stage, d) => `${d ? '<span class="sep" aria-hidden="true">›</span>' : ""}<div class="stage${stage.length > 3 ? " many" : ""}">${stage.map(card).join("")}</div>`).join("")}</div>`;
   }
 
