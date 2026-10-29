@@ -74,7 +74,7 @@ def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: 
     ability = lambda a: [*ability_display(data.paths, a, e.key, national, s["types"]),
                          ability_chances(data.paths).get(ability_ids(data.paths).get(a), 0)]
     official = e.key.removeprefix("SPECIES_").replace("_", " ").title()
-    # Modes where it has no dex number but turns up in swarms; the page lists these after every numbered entry
+    # Modes where it has no dex number but turns up in swarms; the page tags these "Swarm"
     swarm = [mode for mode, field in (("Standard", "std"), ("Divergent", "div")) if mode in e.modes and not e.dex.get(field)
              and any("Swarm" in l["method"] and l["mode"] in (mode, "Both") for l in locations)]
     return {
@@ -126,6 +126,8 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
     tutors = _attach_tutor_locations(moves)
     mons = [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, []), held.get(e.key, []),
                  item_index, item_by_const) for e in roster]
+    for m, shared in zip(mons, _shared_dex_numbers(roster)):
+        m["sharedDex"] = shared
     abilities = _abilities(mons, ability_officials(data.paths))
     _attach_ability_details(data.paths, abilities, moves)
     return {
@@ -138,6 +140,29 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
         "moves": moves,
         "unmatchedEncounters": unmatched,
     }
+
+
+def _shared_dex_numbers(roster: list[Entry]) -> list[dict[str, int]]:
+    """For entries without their own number in a dex, the number they share (the game's Pokédex lists alternate
+    forms under their base species, gAlternateDexEntries): their base form's, else a same-named entry's (Kanto
+    Farfetch'd shares Galarian Farfetch'd's #063). Empty where an entry has its own number or no relative has one."""
+    by_key = {e.key: e for e in roster}
+    by_name: dict[str, dict[str, int]] = {}
+    for e in roster:
+        for field, n in e.dex.items():
+            by_name.setdefault(e.name, {}).setdefault(field, n)
+    result = []
+    for e in roster:
+        base = by_key.get(e.base)
+        shared = {}
+        for field, mode in (("std", "Standard"), ("div", "Divergent")):
+            if e.dex.get(field) or mode not in e.modes:
+                continue
+            n = (base.dex.get(field) if base and base is not e else None) or by_name.get(e.name, {}).get(field)
+            if n:
+                shared[field] = n
+        result.append(shared)
+    return result
 
 
 def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tuple[list[dict], dict[str, int], dict[str, int], str]:

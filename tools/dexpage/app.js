@@ -119,12 +119,17 @@
   const formLabel = (m) => (m.form ? ` <small>${esc(m.form)}</small>` : "");
   const pad = (n) => String(n).padStart(3, "0");
   // One tag for the dex it's in ("Both" for the two), and its number on its own: a Pokémon in both dexes has the same
-  // number in each. Swarm Pokémon have no number; unnumbered forms show none.
+  // number in each.
   const modeBadge = (m) => m.modes.length > 1 ? '<span class="mode b">Both</span>'
     : `<span class="mode${m.modes[0] === "Divergent" ? " d" : ""}">${m.modes[0]}</span>`;
-  const dexNo = (m) => {
-    const n = m.dex.std || m.dex.div;
-    return n ? `<span class="dexno">#${pad(n)}</span>` : m.swarm.length ? '<span class="dexno">Swarm</span>' : "";
+  const dexNo = (m) => {  // own number "#384"; a form shares its base's: "#035 - Alt", or "#063 (Swarm)" for swarm Pokémon
+    const fields = state.mode ? [state.mode === "Standard" ? "std" : "div"] : ["std", "div"];
+    const own = fields.map((f) => m.dex[f]).find(Boolean);
+    if (own) return `<span class="dexno">#${pad(own)}</span>`;
+    const f = fields.find((x) => m.sharedDex[x]);
+    if (!f) return m.swarm.length ? '<span class="dexno">Swarm</span>' : "";
+    const swarm = m.swarm.includes(f === "std" ? "Standard" : "Divergent");
+    return `<span class="dexno">#${pad(m.sharedDex[f])}${swarm ? " (Swarm)" : " - Alt"}</span>`;
   };
   const bst = (m) => m.stats.reduce((a, b) => a + b, 0);
   const inMode = (m) => !state.mode || m.modes.includes(state.mode);

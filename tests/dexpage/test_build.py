@@ -301,6 +301,16 @@ def test_script_items(data):
     assert by["Burn Drive"]["category"] == by["Bug Memory"]["category"] == "Forme Changing Items"   # not "Bug Mem"
 
 
+def test_shared_dex_numbers(data):
+    # Forms and swarm Pokémon without their own number share their base species' (gAlternateDexEntries)
+    mons = {m["key"]: m for m in data["mons"]}
+    assert mons["SPECIES_RAICHU_A"]["sharedDex"] == {"std": 35}
+    assert mons["SPECIES_FARFETCHD"]["sharedDex"] == {"std": 63}             # same name as Galarian Farfetch'd #063
+    assert mons["SPECIES_NECROZMA_DUSK_MANE"]["sharedDex"] == {"std": 384, "div": 384}
+    assert mons["SPECIES_NECROZMA"]["sharedDex"] == {}                       # has its own number
+    assert mons["SPECIES_SNEASLER"]["sharedDex"] == {}                       # no base or namesake in the dex
+
+
 def test_docs_link_ability_cells(data):
     mega = next(t for g in data["docs"] for t in g["topics"] if t["title"] == "Mega Pokemon")
     assert 'data-ability="Triage"' in mega["html"]
