@@ -122,14 +122,14 @@
   // number in each.
   const modeBadge = (m) => m.modes.length > 1 ? '<span class="mode b">Both</span>'
     : `<span class="mode${m.modes[0] === "Divergent" ? " d" : ""}">${m.modes[0]}</span>`;
-  const dexNo = (m) => {  // own number "#384"; a form shares its base's: "#035 - Alt", or "#063 (Swarm)" for swarm Pokémon
+  const dexNo = (m) => {  // own number "#384"; a form shares its base's ("#384"), with "(Swarm)" for swarm Pokémon
     const fields = state.mode ? [state.mode === "Standard" ? "std" : "div"] : ["std", "div"];
     const own = fields.map((f) => m.dex[f]).find(Boolean);
     if (own) return `<span class="dexno">#${pad(own)}</span>`;
     const f = fields.find((x) => m.sharedDex[x]);
     if (!f) return m.swarm.length ? '<span class="dexno">Swarm</span>' : "";
     const swarm = m.swarm.includes(f === "std" ? "Standard" : "Divergent");
-    return `<span class="dexno">#${pad(m.sharedDex[f])}${swarm ? " (Swarm)" : " - Alt"}</span>`;
+    return `<span class="dexno">#${pad(m.sharedDex[f])}${swarm ? " (Swarm)" : ""}</span>`;
   };
   const bst = (m) => m.stats.reduce((a, b) => a + b, 0);
   const inMode = (m) => !state.mode || m.modes.includes(state.mode);
