@@ -338,7 +338,7 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .chip:hover { border-color: var(--muted); }
 .chip .ln { font-weight: 600; font-size: 13.5px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chip .ln small { color: var(--muted); font-weight: 400; }
-.chip .hw { font: 12px var(--font-data); color: var(--muted); margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.chip .hw { font: 12px var(--font-data); color: var(--muted); margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; min-width: 0; flex-shrink: 4; overflow: hidden; text-overflow: ellipsis; }
 .empty { color: var(--muted); font-style: italic; }
 .moreoves { display: flex; gap: 6px; flex-wrap: wrap; }
 .moreoves button { border: 1px solid var(--line); background: var(--surface); padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 13.5px; display: inline-flex; gap: 6px; align-items: center; }
@@ -354,7 +354,13 @@ body.sheet-open { overflow: hidden; }
 /* The panel keeps its rounded frame; only .sheet-body scrolls, so the scrollbar stays inside it */
 .sheet-panel { position: relative; display: flex; flex-direction: column; width: min(1040px, 100%); max-height: 100%; overflow: hidden; border: 1px solid var(--muted); border-radius: 14px; background: var(--bg); box-shadow: 0 18px 60px rgb(0 0 0 / .45); }
 .sheet-body { flex: 1 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
-.sheet-body > article, .sheet-body > .list > .mon { border: 0; border-radius: 0; }
+.sheet-body > article { border-top: 0; border-right: 0; border-bottom: 0; border-radius: 0; }
+.sheet-body > .list > .mon { border: 0; border-radius: 0; }
+/* The entry's header stays pinned while its body scrolls under it */
+.sheet-body .mon > summary, .sheet-body > article > .top, .sheet-body > :is(.loccard, .abilcard, .doccard) > h2 { position: sticky; top: 0; z-index: 1; border-bottom: 1px solid var(--line); }
+.sheet-body .mon > summary { background: var(--tint, none), var(--surface); border-radius: 0; }
+.sheet-body > article > .top, .sheet-body > :is(.loccard, .abilcard, .doccard) > h2 { margin: -14px -14px 0; padding: 14px 58px 12px 14px; background: var(--surface); }
+.sheet-body > .doccard > h2 { margin: -14px -16px 8px; padding-left: 16px; }
 .sheet-close { position: absolute; top: 12px; right: 12px; z-index: 2; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 20px; line-height: 1; cursor: pointer; }
 .sheet-close:hover { border-color: var(--accent); color: var(--accent); }
 .sheet-panel .collapse, .sheet-panel .mon > summary .chev { display: none; }

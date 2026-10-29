@@ -346,12 +346,14 @@
     rows.forEach((r) => { const g = methods.find(([mt]) => mt === r[1].method); g ? g[1].push(r) : methods.push([r[1].method, [r]]); });
     const re = placeRe(p.name);
     const found = [];
-    items.forEach((it, k) => { const line = it.where.find((w) => re.test(w.toLowerCase())); if (line) found.push([k, line]); });
+    // Chip hint is just the spot within the place ("Shady relic seller"); prices and notes are on the item's card
+    const spot = (line) => line.replace(/\s*\([^)]*\)/g, "").replace(p.name, "").replace(/^[\s·-]+/, "");
+    items.forEach((it, k) => { const line = it.where.find((w) => re.test(w.toLowerCase())); if (line) found.push([k, spot(line)]); });
     const body = (methods.length
       ? methods.map(([mt, l]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips">${l.map(([i, e]) => monChip(i, [e.levels && `Lv ${e.levels}`, e.rate].filter(Boolean).join(" · "), e.sub)).join("")}</div></div>`).join("")
       : `<p class="empty">No Pokémon match the current filters here.</p>`) +
       (found.length ? `<div><h4>Items · ${found.length}</h4><div class="chips">${found.map(([k, line]) =>
-        `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line.toLowerCase() !== p.name.toLowerCase() ? `<span class="hw">${esc(line.replace(p.name, "").replace(/^[\s·(-]+|\)$/g, "") || line)}</span>` : ""}</button>`).join("")}</div></div>` : "");
+        `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line ? `<span class="hw">${esc(line)}</span>` : ""}</button>`).join("")}</div></div>` : "");
     return `<article class="loccard">${collapsible ? COLLAPSE : ""}<h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2><div class="learners">${body}</div></article>`;
   }
 
