@@ -88,6 +88,9 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
 - Abilities tab: one entry per ability *as shown* (CFRU per-species renames make Libero/Protean separate), with
   in-game description and who has it (normal/hidden, incl. Mega forms). Ability names in Pokédex profiles and
   doc table cells that are exactly an ability name link to it.
+- Abilities resolve through **ids**: DPE's constant (its own spelling, e.g. ABILITY_GULPMISSLE) → DPE id → CFRU's
+  name/description/rename rules at that id (`ability_ids` in load_cfru.py). Effect chances (Poison Touch 30%,
+  Static 33%…) are parsed from the `case ABILITY_X:` blocks in CFRU's battle code (`ability_chances`).
 - Move descriptions come from gMoveDescriptions (entry N = move N+1; ROM address or CFRU string) and cards show
   `secondaryEffectChance` as "Effect chance" when it's between 1 and 99%.
 - Every TM/HM is an item ("TM02 Dragon Claw", category TMs/HMs) linking to its move; typing a type name in the

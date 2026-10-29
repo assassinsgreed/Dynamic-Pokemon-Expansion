@@ -251,7 +251,7 @@
 
   function detail(i) {
     const m = mons[i];
-    const ab = ([name, desc], hidden) => `<div class="ab"><button class="mvname" data-ability="${esc(name)}">${esc(name)}</button>${hidden ? '<span class="hid">Hidden</span>' : ""}${desc ? `<span class="desc">${esc(desc)}</span>` : ""}</div>`;
+    const ab = ([name, desc, chance], hidden) => `<div class="ab"><button class="mvname" data-ability="${esc(name)}">${esc(name)}</button>${hidden ? '<span class="hid">Hidden</span>' : ""}${desc ? `<span class="desc">${esc(desc)}${chance ? ` (${chance}% chance)` : ""}</span>` : ""}</div>`;
     const evs = m.evs.map((v, n) => (v ? `${v} ${STAT_LABELS[n]}` : "")).filter(Boolean).join(", ") || "—";
     return `<div class="detail">
       <div class="cols">
@@ -463,7 +463,7 @@
       const l = holders.filter(([, h]) => h === hidden);
       return l.length ? `<div><h4>${title} · ${l.length}</h4><div class="chips">${l.map(([i]) => monChip(i, "")).join("")}</div></div>` : "";
     };
-    return `<article class="abilcard">${COLLAPSE}<h2>${esc(a.name)}</h2>${a.desc ? `<div class="gamedesc">${esc(a.desc)}</div>` : ""}
+    return `<article class="abilcard">${COLLAPSE}<h2>${esc(a.name)}</h2>${a.desc ? `<div class="gamedesc">${esc(a.desc)}</div>` : ""}${a.chance ? `<div class="specs"><span>Effect chance <b>${a.chance}%</b></span></div>` : ""}
       <div class="learners">${group(0, "Ability") + group(1, "Hidden ability") || '<p class="empty">No Pokémon match the current filters.</p>'}</div></article>`;
   }
 

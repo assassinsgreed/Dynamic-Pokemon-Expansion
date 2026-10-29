@@ -99,9 +99,23 @@ def move_descriptions(p: Paths) -> dict[str, str]:
 
 
 @cache
+def ability_ids(p: Paths) -> dict[str, int]:
+    """Ability constant → id. DPE assigns the id a species gets (its own spellings, e.g. ABILITY_GULPMISSLE);
+    CFRU supplies the name, description and mechanic stored at that id."""
+    return {**parse_int_defines(p.cfru / "include/constants/abilities.h", "ABILITY_"),
+            **parse_int_defines(p.dpe / "include/abilities.h", "ABILITY_")}
+
+
+@cache
+def ability_names_by_id(p: Paths) -> dict[int, str]:
+    rows = parse_string_table(p.cfru / "strings/ability_name_table.string")  # positional: entry N names ability N
+    return {n: decode_text(text) for n, (_, text) in enumerate(rows)}
+
+
+@cache
 def ability_names(p: Paths) -> dict[str, str]:
-    ids = parse_int_defines(p.cfru / "include/constants/abilities.h", "ABILITY_")
-    return {k: v[0] for k, v in _positional_names(p, "strings/ability_name_table.string", ids).items()}
+    names = ability_names_by_id(p)
+    return {k: names[v] for k, v in ability_ids(p).items() if v in names}
 
 
 @cache
@@ -109,6 +123,7 @@ def item_ids(p: Paths) -> dict[str, int]:
     return parse_int_defines(p.cfru / "include/constants/items.h", "ITEM_")
 
 
+@cache
 def _labelled_strings(p: Paths, table: str) -> dict[str, str]:
     """Text of every #org @label in a .string file, by label (for strings referenced by symbol, not position).
     Consecutive labels share the text that follows them; #ifdef blocks are resolved first."""
@@ -124,22 +139,24 @@ def _labelled_strings(p: Paths, table: str) -> dict[str, str]:
 
 
 @cache
-def ability_descriptions(p: Paths) -> dict[str, str]:
-    """gAbilityDescriptions (assembly/data/ability_description_table.s): each entry is either a vanilla ROM
-    address or a symbol from strings/ability_descriptions.string."""
+def ability_descriptions_by_id(p: Paths) -> dict[int, str]:
+    """gAbilityDescriptions (assembly/data/ability_description_table.s): entry N describes ability N; each entry is
+    either a vanilla ROM address or a symbol from strings/ability_descriptions.string."""
     from .rom import read_text
 
     strings = _labelled_strings(p, "strings/ability_descriptions.string")
-    by_id = {v: k for k, v in parse_int_defines(p.cfru / "include/constants/abilities.h", "ABILITY_").items()}
     table = read(p.cfru / "assembly/data/ability_description_table.s")
     entries = re.findall(r"^\.word\s+(\w+)", table[table.index("gAbilityDescriptions:"):], flags=re.M)
     result = {}
-    for ability_id, target in enumerate(entries):  # positional: entry N describes ability N
-        if ability_id not in by_id:
-            continue
+    for ability_id, target in enumerate(entries):
         text = read_text(p.rom, int(target, 16)) if target.startswith("0x") else strings.get(target, "")
-        result[by_id[ability_id]] = " ".join(text.split())
+        result[ability_id] = " ".join(text.split())
     return result
+
+
+def ability_descriptions(p: Paths) -> dict[str, str]:
+    descriptions = ability_descriptions_by_id(p)
+    return {k: descriptions[v] for k, v in ability_ids(p).items() if v in descriptions}
 
 
 @cache
@@ -184,14 +201,18 @@ def ability_name_overrides(p: Paths) -> list[tuple[str, str, frozenset, frozense
 def ability_display(p: Paths, ability: str, species: str, national: str | None, types: list[str]) -> tuple[str, str]:
     """(name, description) as the game shows them for this species. A renamed ability keeps its base description
     unless the game has a matching gText_AbilityDescription_* string (GetAbilityDescriptionOverride)."""
+    ids = ability_ids(p)
+    ability_id = ids.get(ability)
+    if ability_id is None:
+        raise ValueError(f"unknown ability {ability} (not in DPE or CFRU abilities.h)")
     names = _labelled_strings(p, "strings/ability_name_table.string")
     descriptions = _labelled_strings(p, "strings/ability_descriptions.string")
-    description = ability_descriptions(p).get(ability, "")
-    for rule_ability, label, species_set, national_set, type_set in ability_name_overrides(p):
-        if rule_ability == ability and (species in species_set or national in national_set or set(types) & type_set):
+    description = ability_descriptions_by_id(p).get(ability_id, "")
+    for rule_ability, label, species_set, national_set, type_set in ability_name_overrides(p):  # rules name CFRU constants
+        if ids.get(rule_ability) == ability_id and (species in species_set or national in national_set or set(types) & type_set):
             override = descriptions.get(label.replace("AbilityName", "AbilityDescription"))
             return names[label], " ".join((override or description).split())
-    return ability_names(p).get(ability, ability), description
+    return ability_names_by_id(p).get(ability_id, ability), description
 
 
 BADGE_WORDS = {"No": 0, "One": 1, "Two": 2, "Three": 3, "Four": 4, "Five": 5, "Six": 6, "Seven": 7, "Eight": 8}
@@ -239,3 +260,41 @@ def marts(p: Paths) -> list[dict]:
             seen.add((where, label))
             result.append({"where": where, "items": items})
     return result
+
+
+# Battle code that rolls for ability effects: Poison Touch, Static, Stench, Shed Skin…
+ABILITY_EFFECT_FILES = ("src/ability_battle_effects.c", "src/cmd49.c", "src/new_bs_commands.c", "src/end_turn.c")
+
+
+@cache
+def ability_chances(p: Paths) -> dict[int, int]:
+    """Ability id → % chance its effect triggers, read from the `case ABILITY_X:` blocks of CFRU's battle code.
+    Recognises `Random() % N == 0` / `umodsi(Random(), N) == 0` (1 in N) and `... % 100 < K` (K%, where K may be a
+    `chance = K` set in the same block). Abilities without such a roll are left out."""
+    ids = ability_ids(p)
+    one_in = re.compile(r"(?:umodsi\(\s*Random\(\)\s*,\s*(\d+)\s*\)|Random\(\)\s*%\s*(\d+))\s*==\s*0")
+    percent = re.compile(r"(?:umodsi\(\s*Random\(\)\s*,\s*100\s*\)|Random\(\)\s*%\s*100)\s*<\s*(\d+|\w+)")
+    chances: dict[int, int] = {}
+    for rel in ABILITY_EFFECT_FILES:
+        text = strip_comments(read(p.cfru / rel))
+        parts = re.split(r"\bcase\s+(ABILITY_\w+)\s*:", text)
+        pending: list[str] = []  # fall-through labels share the next block
+        for ability, block in zip(parts[1::2], parts[2::2]):
+            pending.append(ability)
+            if not block.strip().strip(";"):
+                continue
+            block = block.split("break;")[0]
+            value = None
+            if m := one_in.search(block):
+                value = round(100 / int(m.group(1) or m.group(2)))
+            elif m := percent.search(block):
+                k = m.group(1)
+                if k.isdigit():
+                    value = int(k)
+                elif v := re.search(rf"\b{k}\s*=\s*(\d+)\s*;", block):
+                    value = int(v.group(1))
+            for a in pending:
+                if value and a in ids:
+                    chances.setdefault(ids[a], value)
+            pending = []
+    return chances

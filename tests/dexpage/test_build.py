@@ -159,7 +159,7 @@ def test_ability_names_follow_cfru_overrides(data):
 def test_ability_descriptions_from_the_game(data):
     by = {m["key"]: m for m in data["mons"]}
     cinderace = by["SPECIES_CINDERACE"]
-    assert cinderace["hidden"] == ["Libero", "Changes type to match move."]
+    assert cinderace["hidden"] == ["Libero", "Changes type to match move.", 0]
     assert cinderace["abilities"][0][0] == "Blaze" and cinderace["abilities"][0][1]   # vanilla text read from the ROM
 
 
@@ -252,3 +252,8 @@ def test_abilities_list(data):
 def test_docs_link_ability_cells(data):
     mega = next(t for g in data["docs"] for t in g["topics"] if t["title"] == "Mega Pokemon")
     assert 'data-ability="Triage"' in mega["html"]
+
+
+def test_ability_chance_in_page(data):
+    abilities = {a["name"]: a for a in data["abilities"]}
+    assert abilities["Poison Touch"]["chance"] == 30

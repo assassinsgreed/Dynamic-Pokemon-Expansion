@@ -15,7 +15,7 @@ from .docs import DOC_IMAGES, load_docs, render_topic, topic_text
 from .items import load_items, load_machine_locations, load_tutors
 import difflib
 
-from .load_cfru import ability_display, marts
+from .load_cfru import ability_chances, ability_display, ability_ids, marts
 from .locations import attach_encounters, load_encounters
 from .paths import DPE_ROOT, Paths
 from .roster import Entry, SourceData, build_roster, evolution_links, load_source_data
@@ -63,7 +63,9 @@ def _mon(data: SourceData, e: Entry, index: dict, links: list[dict], locations: 
     s = e.stats
     national = data.national.get(e.key) or data.national.get(e.base)
     # CFRU shows some abilities under another name for particular species (Protean is Libero on Cinderace)
-    ability = lambda a: list(ability_display(data.paths, a, e.key, national, s["types"]))
+    # [name, description, % chance its effect triggers or 0]
+    ability = lambda a: [*ability_display(data.paths, a, e.key, national, s["types"]),
+                         ability_chances(data.paths).get(ability_ids(data.paths).get(a), 0)]
     official = e.key.removeprefix("SPECIES_").replace("_", " ").title()
     return {
         "key": e.key,
@@ -225,8 +227,8 @@ def _abilities(mons: list[dict]) -> list[dict]:
     Names are per species, so CFRU's renames (Protean shown as Libero on Cinderace) are separate entries."""
     by_name: dict[str, dict] = {}
     for i, m in enumerate(mons):
-        for (name, desc), hidden in [(a, 0) for a in m["abilities"]] + ([(m["hidden"], 1)] if m["hidden"] else []):
-            entry = by_name.setdefault(name, {"name": name, "desc": desc, "mons": []})
+        for (name, desc, chance), hidden in [(a, 0) for a in m["abilities"]] + ([(m["hidden"], 1)] if m["hidden"] else []):
+            entry = by_name.setdefault(name, {"name": name, "desc": desc, "chance": chance, "mons": []})
             entry["desc"] = entry["desc"] or desc
             entry["mons"].append([i, hidden])
     return sorted(by_name.values(), key=lambda a: a["name"])
