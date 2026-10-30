@@ -34,6 +34,7 @@ NOT_PART_OF = {
     "Route 13": {(18, 6)},           # the upper square is only Carnelidge Volcano
     "Route 9": {(14, 3)},            # just the vertical bar; the square east of it is Daimyn Factory's overworld
     "Route 24": {(17, 4), (18, 4)},  # only the stretch north of Uteya Village
+    "Route 12 East": {(13, 1), (14, 1), (14, 2)},  # not the rest house's square or Peradon Forest / Lake Laplaz's
 }
 PLACED_AT = {
     "Hesson Pass": [(17, 4)],        # one square right of where the grid puts it

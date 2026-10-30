@@ -25,7 +25,7 @@ def test_town_squares_sit_on_town_markers(squares):
 
 def test_routes_cover_several_squares(squares):
     assert len(squares["Route 14"]) >= 5
-    assert len(squares["Route 12 West"]) == 2 and len(squares["Route 12 East"]) >= 2
+    assert len(squares["Route 12 West"]) == 2 and len(squares["Route 12 East"]) == 2
 
 
 def test_collins_corrections(squares):
@@ -34,6 +34,7 @@ def test_collins_corrections(squares):
     assert squares["Route 9"] == [[120, 32], [120, 40]]                  # the 2×1 bar only
     assert [128, 40] in squares["Daimyn Factory"]
     assert squares["Route 24"] == [[168, 32], [168, 40]]                 # north of Uteya Village
+    assert squares["Route 12 East"] == [[104, 24], [112, 24]]               # columns 11–12 only
     assert squares["Hesson Pass"] == [[152, 48]]
     assert squares["Heleo Ranch"] == [[128, 56]]
     assert squares["Daimyn Factory Overworld"] == squares["Daimyn Factory"]
