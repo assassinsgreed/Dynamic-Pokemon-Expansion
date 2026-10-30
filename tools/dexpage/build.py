@@ -311,10 +311,9 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
         if len(stock) > 1:
             first = min(stock, key=lambda w: int(re.sub(r"\D", "", w) or 0))
             item["where"] = [w for w in item["where"] if w not in stock or w == first]
-        # "Daimyn City Mall" from the doc is redundant next to "Daimyn City Mall · Gems shop"
-        places = {w.split(" · ")[0] for w in item["where"] if " · " in w}
-        # …and "PokeChip Crusher" next to "PokeChip Crusher (5 chips)"
-        item["where"] = [w for w in item["where"] if w not in places and not any(o.startswith(w + " (") for o in item["where"])]
+        item["where"] = _tidy_where(item["where"])
+        # "PokeChip Crusher" is redundant next to "PokeChip Crusher (5 chips)"
+        item["where"] = [w for w in item["where"] if not any(o.startswith(w + " (") for o in item["where"])]
     for names in held.values():
         for h in names:
             add(h.split(" (")[0], "Held by wild Pokémon", [], "")
@@ -379,6 +378,39 @@ def _full_item_name(data: SourceData, const: str) -> str:
     rom_words, full_words = rom_name.lower().split(), spelled.lower().split()
     clipped = len(rom_words) == len(full_words) and short != full and all(f.startswith(w) for w, f in zip(rom_words, full_words))
     return spelled if abbreviated or clipped else rom_name  # a renamed item (Link Stone → Linking Cord) keeps its game name
+
+
+MODE_NOTE = re.compile(r"\((Standard|Divergent) (?:Pokemon encounters|Mode) only\)", re.I)
+
+
+def _tidy_where(where: list[str]) -> list[str]:
+    """An item's places, with the feature list's lines said once next to the ROM's shop lines ("<place> · <shop>"):
+    version notes go (the page describes the latest release); a doc place a shop line covers goes ("Tsarvosa City
+    Market" or "Daimyn City Mall Incense Shop" next to "<that place> · ... shop"); and a mode note line ("(Divergent
+    Pokemon encounters only)") becomes a "(Divergent)" tag on the doc lines before it that have none."""
+    where = [re.sub(r"\s*\((?:Added in )?v[\d.]+\+?\)", "", re.sub(r", added in v[\d.]+", "", w, flags=re.I), flags=re.I)
+             for w in where]
+    shops = [(_norm(w.split(" · ")[0]), _norm(re.sub(r"\s*\((?:Standard|Divergent)\)$", "", w.split(" · ", 1)[1])))
+             for w in where if " · " in w]
+
+    def covered(piece: str) -> bool:
+        p = _norm(piece)
+        return any(p.startswith(place) and (p[len(place):] in ("", "market", "mall") or name.startswith(p[len(place):]))
+                   for place, name in shops)
+
+    out: list[str] = []
+    for w in where:
+        note = MODE_NOTE.fullmatch(w)
+        if note:
+            tag = f" ({note.group(1).title()})"
+            out = [o if " · " in o or o.endswith(("(Standard)", "(Divergent)")) else o + tag for o in out]
+        elif " · " in w:
+            out.append(w)
+        elif w:
+            kept = ", ".join(piece for piece in re.split(r",\s*(?![^()]*\))", w) if not covered(piece))  # "Route 7, Tsarvosa City Market"
+            if kept:
+                out.append(kept)
+    return list(dict.fromkeys(out))
 
 
 def _abilities(mons: list[dict], officials: dict[str, str]) -> list[dict]:

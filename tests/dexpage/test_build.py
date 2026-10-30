@@ -78,6 +78,19 @@ def test_every_place_is_on_the_town_map(data):
     assert {p for p in places if norm(p) not in on_map} == NOT_ON_TOWN_MAP
 
 
+def test_item_places_said_once():
+    from tools.dexpage.build import _tidy_where
+    shop = "Tsarvosa City · Evolution Items shop (Divergent)"
+    assert _tidy_where(["Tsarvosa City Market", "(Divergent Pokemon encounters only)", shop]) == [shop]
+    assert _tidy_where(["Route 7, Tsarvosa City Market", "(Divergent Pokemon encounters only)", shop]) == ["Route 7 (Divergent)", shop]
+    assert _tidy_where(["Daimyn City Mall Incense Shop", "(Divergent Mode only)", "Daimyn City Mall · Incense shop (Divergent)"]) \
+        == ["Daimyn City Mall · Incense shop (Divergent)"]
+    assert _tidy_where(["(Added in v1.4)", "Daimyn City Mall (v1.4+)", "Daimyn City Mall · Held Item shop"]) == ["Daimyn City Mall · Held Item shop"]
+    assert _tidy_where(["Uteyan Ruins", "(Divergent mode only)"]) == ["Uteyan Ruins (Divergent)"]
+    assert _tidy_where(["Route 18 flower girl, after catching Shaymin"]) == ["Route 18 flower girl, after catching Shaymin"]
+    assert _tidy_where(["Tsarvosa City Stats Dojo", "Tsarvosa City · Vitamins shop"]) == ["Tsarvosa City Stats Dojo", "Tsarvosa City · Vitamins shop"]
+
+
 def test_page_size(html):
     assert len(html.encode()) < 8_000_000
 
