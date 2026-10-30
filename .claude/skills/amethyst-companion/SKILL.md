@@ -99,6 +99,12 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   Static 33%…) are parsed from the `case ABILITY_X:` blocks in CFRU's battle code (`ability_chances`).
 - Move descriptions come from gMoveDescriptions (entry N = move N+1; ROM address or CFRU string) and cards show
   `secondaryEffectChance` as "Effect chance" when it's between 1 and 99%.
+- Page size: `render()` packs the two most repeated tables only in the written page (move learners as
+  `{how: [mon…]}`, Pokémon abilities as indexes into `DEX.abilities`); app.js unpacks them first thing, so
+  `page_data()`, the tests and the rest of app.js see the plain shapes. Docs images are embedded as lossless WebP.
+  To check a data change is lossless, dump `DEX` from the page in headless Chrome (`--dump-dom` with an injected
+  load-event script) and compare with the previous build; pixel-diff screenshots of each tab against it.
+  `#move-…` / `#ability-…` hashes open a pop-up that screenshots blank in headless Chrome (already so before this).
 - Every TM/HM is an item ("TM02 Dragon Claw", category TMs/HMs) linking to its move; typing a type name in the
   Pokédex lists that type.
 
