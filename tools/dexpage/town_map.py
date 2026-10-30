@@ -49,13 +49,15 @@ DOC_NAMES = {"Daimyn City Factory": "Daimyn Factory"}  # the design doc's name â
 
 def place_descriptions() -> dict[str, str]:
     """Place name â†’ its one-paragraph description from the PSS design doc's Towns / Dungeons / Key Locations tables
-    (| # | Name | Details |) and Routes table (| # | Details |, the number being the route's)."""
+    (| # | Name | Details |, # being "n/a" for places off the numbered map) and Routes table (| # | Details |, the
+    number being the route's)."""
     about = {}
     for line in REGION_LAYOUT.read_text(encoding="utf-8").splitlines():
         cells = [c.strip() for c in line.strip().strip("|").split("|")] if line.startswith("|") else []
-        if len(cells) >= 2 and cells[0].isdigit():
-            name = cells[1] if len(cells) == 3 else f"Route {cells[0]}"
-            about[DOC_NAMES.get(name, name)] = cells[-1]
+        if len(cells) == 3 and (cells[0].isdigit() or cells[0] == "n/a"):
+            about[DOC_NAMES.get(cells[1], cells[1])] = cells[2]
+        elif len(cells) == 2 and cells[0].isdigit():
+            about[f"Route {cells[0]}"] = cells[1]
     about[FACTORY_OVERWORLD] = about["Daimyn Factory"]
     return about
 

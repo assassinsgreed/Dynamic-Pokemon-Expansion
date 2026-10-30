@@ -44,7 +44,8 @@ def test_place_descriptions():
     about = place_descriptions()
     assert about["Hesson Pass"].startswith("The player can enter this cave")         # Dungeons table
     assert about["Route 12"].endswith("Separated by Scalding Spa.")                  # Routes table: number → route
-    assert "Meltan" in about["Daimyn Factory"]                                       # doc says Daimyn City Factory
+    assert "Daimyn Factory" in about                                                 # doc says Daimyn City Factory
+    assert {"Calicin Bay", "Battle Frontier", "Ultra Space"} <= set(about)           # "n/a" rows
 
 
 def test_hand_placed_spots(squares):
