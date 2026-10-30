@@ -630,7 +630,7 @@
     });
   }
 
-  function teamMon([i, lv, it, ab, mvs, nat, evs, custom], t) {
+  function teamMon([i, lv, it, ab, mvs, nat, evs, custom, gender], t) {
     const m = mons[i], hard = state.diff !== "std", xhard = state.diff === "xhard";
     const ability = TEAMS.abilities[ab].split(" or ").map((a) => (abilityIndex.has(a) ? `<button class="mvname" data-ability="${esc(a)}">${esc(a)}</button>` : esc(a))).join(" or ");
     const rows = [
@@ -644,7 +644,9 @@
       const k = TEAMS.moves[n], mv = moves[k];
       return `<button class="tmv" data-move="${k}" style="--c:${TYPE_COLOR[mv.type]}" title="${esc(mv.desc)}"><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span><span>${esc(mv.name)}</span></button>`;
     };
-    return `<div class="tmon" style="${tint(m)}"><div class="head">${monLink(i)}<span class="lv">${t.scaled ? `Scaling, minimum ${lv}` : `Lv ${lv}`}</span></div>
+    // Gender the game gives it (trainers.py _gender: the trainer's, unless the species can't be or is 75%+ female)
+    const sex = gender === "F" ? '<span class="tsex f" title="Female">♀</span>' : gender === "M" ? '<span class="tsex m" title="Male">♂</span>' : "";
+    return `<div class="tmon" style="${tint(m)}"><div class="head">${monLink(i)}${sex}<span class="lv">${t.scaled ? `Scaling, minimum ${lv}` : `Lv ${lv}`}</span></div>
       <dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>
       ${t.scaled && !custom  // the game picks these moves at the scaled level, so the listed level's moves would be wrong
         ? `<p class="note tmnote">Knows the last four moves it learns by level up, at the level it scales to.</p>`

@@ -392,11 +392,17 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .trainercard h4 { margin: 0 0 6px; font: 600 11.5px var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
 .tnote { font-size: 14px; }
 .tflags { display: flex; gap: 6px; flex-wrap: wrap; }
-.team { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 8px; }
+/* Three across, so a party of six is two even rows of three; two, then one, as the card narrows */
+.team { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 900px) { .team { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .team { grid-template-columns: minmax(0, 1fr); } }
 .tmon { border: 1px solid var(--line); border-radius: 10px; background: var(--tint, none), var(--sunk); padding: 6px 10px 10px 6px; display: grid; gap: 6px; align-content: start; }
 .tmon .head { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .tmon .head .link { min-width: 0; }
 .tmon .lv { margin-left: auto; font: 600 13px var(--font-data); white-space: nowrap; }
+.tsex { flex: none; font: 700 15px/1 var(--font-body); margin-left: 2px; }
+.tsex.m { color: #3d8be6; }
+.tsex.f { color: #e0559a; }
 .tmon dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 0 0 0 4px; font-size: 13px; }
 .tmon dt { color: var(--muted); }
 .tmon dd { margin: 0; min-width: 0; }

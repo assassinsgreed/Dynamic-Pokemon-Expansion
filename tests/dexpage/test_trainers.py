@@ -83,6 +83,14 @@ def test_rival_uses_rival_pic(paths):
     assert T._rom_pics(paths, {"TRAINER_RIVAL1": 1})["TRAINER_RIVAL1"] == 0x6A
 
 
+def test_pokemon_gender_from_trainer_gender():
+    g = lambda pct, female: T._gender({"gender": pct}, female)
+    assert g(50.0, True) == "F" and g(50.0, False) == "M"            # low byte 0x0F / 0x88 against ratio 127
+    assert g(12.5, True) == "F" and g(87.5, False) == "F"            # 31 > 15; 223 > 136
+    assert g(75.0, False) == "F" and g(25.0, False) == "M"           # 191 > 136 (Galarian Corsola); 63 < 136
+    assert g(0.0, True) == "M" and g(100.0, False) == "F" and g(None, True) is None
+
+
 def test_unnamed_ability_follows_trainer_gender():
     s = {"abilities": ["ABILITY_A", "ABILITY_B"], "hidden_ability": "ABILITY_H"}
     assert T._ability(None, s) == "ABILITY_A"                        # male trainer: personality 0x88, low bit 0

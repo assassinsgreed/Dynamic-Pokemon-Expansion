@@ -357,6 +357,20 @@ def _ability(choice: str | None, species_stats: dict, female: bool = False) -> s
     return pick or ""
 
 
+def _gender(species_stats: dict, female_trainer: bool) -> str | None:
+    """"M", "F" or None (genderless). The personality's low byte is the trainer's 0x88 (MALE) or 0x0F (FEMALE), and
+    FireRed's GetGenderFromSpeciesAndPersonality (0x803F78C, not hooked) makes a Pokémon female when its gender ratio
+    is above that byte. So a female trainer's Pokémon are female whenever they can be, and a male trainer's male,
+    except species 75%+ female (ratio 191 > 136; Galarian Corsola on Swimmer Huey)."""
+    pct = species_stats["gender"]
+    if pct is None:
+        return None
+    ratio = int(min(254, pct * 255 / 100))  # PERCENT_FEMALE, truncated to the u8 field
+    if ratio in (0, 254):
+        return "M" if ratio == 0 else "F"
+    return "F" if ratio > (0x0F if female_trainer else 0x88) else "M"
+
+
 @cache
 def move_effects(p: Paths) -> dict[str, str]:
     table = parse_designated_array(source(p, "src/Tables/battle_moves.c"), "gBattleMoves")
@@ -427,10 +441,12 @@ def _team(entry: dict, stats: dict, learnsets: dict, moves: dict, ability_name) 
         s = stats[species]
         known = ([m for m in re.findall(r"MOVE_\w+", mon.get("moves", "")) if m != "MOVE_NONE"] if custom
                  else default_moves(learnsets.get(species, []), level))
-        ability = _ability(mon.get("ability", "Ability_Hidden") if custom else None, s, entry.get("gender") == "FEMALE")
+        female = entry.get("gender") == "FEMALE"  # unset is 0, MALE
+        ability = _ability(mon.get("ability", "Ability_Hidden") if custom else None, s, female)
         team.append({
             "species": species,
             "level": level,
+            "gender": _gender(s, female),
             "item": mon.get("heldItem") if held and mon.get("heldItem") not in (None, "ITEM_NONE") else None,
             "ability": " or ".join(ability_name(a, species) for a in ability.split(" or ")) if ability else "",
             "moves": known,
