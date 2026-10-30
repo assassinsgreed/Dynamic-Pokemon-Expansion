@@ -153,9 +153,9 @@
   };
   const itemButton = (k, label) => `<button class="itembtn" data-item="${k}">${itemIcon(k)}<span class="in">${esc(label || items[k].name)}</span></button>`;
   const monLink = (i, current) => `<button class="link${i === current ? " current" : ""}" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${formLabel(mons[i])}</span></button>`;
-  // A chip's or Pokédex row's left edge shows a Pokémon (or encounter) found in only one mode; Both has none
-  const modeClass = (modes) => (modes.length > 1 ? "" : modes[0] === "Divergent" ? " m-div" : " m-std");
-  const modeEdge = (modes) => (modes.length > 1 ? "" : `${modeClass(modes)}" title="${modes[0]} only`);
+  // A chip's or Pokédex row's left edge shows the modes a Pokémon (or encounter) is found in
+  const modeClass = (modes) => (modes.length > 1 ? " m-both" : modes[0] === "Divergent" ? " m-div" : " m-std");
+  const modeEdge = (modes) => `${modeClass(modes)}" title="${modes.length > 1 ? "Standard and Divergent" : `${modes[0]} only`}`;
   const monChip = (i, note, sub, bare, modes = mons[i].modes) => `<button class="chip${modeEdge(modes)}" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${bare ? "" : formLabel(mons[i])}${
     sub ? ` <span class="sub">${esc(sub)}</span>` : ""}</span>${note ? `<span class="hw">${esc(note)}</span>` : ""}</button>`;
   const escapeRe = (text) => text.replace(/[.*+?^$()|[\]\\{}]/g, "\\$&");
