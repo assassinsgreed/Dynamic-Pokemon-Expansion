@@ -46,6 +46,8 @@ def test_place_descriptions():
     assert about["Route 12"].endswith("Separated by Scalding Spa.")                  # Routes table: number → route
     assert "Daimyn Factory" in about                                                 # doc says Daimyn City Factory
     assert {"Calicin Bay", "Battle Frontier", "Ultra Space"} <= set(about)           # "n/a" rows
+    assert "Victory Road" in about["Secret Trail"]                                   # named row in the Routes table
+    assert not any(k in ("#", "") or k.strip("-:") == "" for k in about)             # no header / separator rows
 
 
 def test_hand_placed_spots(squares):

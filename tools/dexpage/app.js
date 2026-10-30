@@ -382,7 +382,7 @@
       : `<p class="empty">No Pokémon match the current filters here.</p>`) +
       (found.length ? `<div><h4>Items · ${found.length}</h4><div class="chips">${found.map(([k, line]) =>
         `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line ? `<span class="hw">${esc(line)}</span>` : ""}</button>`).join("")}</div></div>` : "");
-    return `<article class="loccard">${collapsible ? COLLAPSE : ""}<h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2>${townMap(p.name)}${aboutPlace(p.name)}<div class="learners">${body}</div></article>`;
+    return `<article class="loccard">${collapsible ? COLLAPSE : ""}<h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2><div class="placehead">${townMap(p.name)}${aboutPlace(p.name)}</div><div class="learners">${body}</div></article>`;
   }
 
   // ---------------------------------------------------------------- views
