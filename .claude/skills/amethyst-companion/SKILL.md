@@ -51,6 +51,7 @@ He also tests `site/index.html` directly.
 | `field_items.py` | item balls + hidden items read from the ROM's map data (gMapGroups → events; item scripts resolved via CFRU `offsets.ini`); skips FireRed's unused Sevii maps, marks Treasure Beach hidden items as renewing |
 | `script_items.csv` | hand-written sources the feature list misses (Apricorn balls, Traveller balls, Memories, Drives, relics…), checked against CFRU's scripts |
 | `extra_forms.csv` | forms the Habitat table leaves out but players can get (Rotom appliances, Cosplay/Cap Pikachu), with a how-to-get row; never enable them in Habitat_Table.c |
+| `trainers.py` | Trainers tab: CFRU's 4 trainer tables with GetTrainerData's fallback order; teams finished like CreateNPCTrainerParty (class IVs / 31 on Extra Hard, Hard nature via GiveMonBestStatNature, Extra Hard EVs in the 2 best base stats, default moves = last 4 level-up); places from gTrainers `#region` headings; variant notes (rival = water starter gen, badge-count gym teams, rematches) from constants + `NOTES`; sprites and class names from the ROM |
 | `build.py` | page data JSON, item list merge (doc + shops + held + evolution items), sprite/icon sheets, site files |
 | `template.html` | CSS + markup; `app.js` is the whole UI, inlined at build (`__APP_SCRIPT__`) |
 | `sw.js` | service worker; cache name = content hash so installs update |
@@ -75,7 +76,7 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   re-parses the multi-hundred-KB string on each style recalc (Items tab went 195 ms → 13 ms when moved into a
   plain stylesheet rule in app.js). Time changes with a load-event probe that clicks tabs and logs
   `performance.now()` deltas (run without `--virtual-time-budget`, which freezes the clock).
-- Views: Pokédex, Moves, Tutors, Abilities, Items, Locations, Docs; each has its own list/cards layout (remembered per browser).
+- Views: Pokédex, Moves, Tutors, Abilities, Items, Trainers, Locations, Docs; each has its own list/cards layout (remembered per browser).
   Back/Forward buttons sit right of the tabs, always visible, disabled when there's nowhere to go.
 - Tutor rows like "Fire Fang, or Flame Burst (v1.4+)" resolve to the move the game teaches for that tutor kind
   (move-tutor files for Regular, CFRU special tutors for Special); doc typos fuzzy-match (Breaking Strike → Breaking Swipe).
