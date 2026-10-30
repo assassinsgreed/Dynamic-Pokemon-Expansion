@@ -323,6 +323,40 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .loccard h2 small { font: 500 13px var(--font-body); color: var(--muted); margin-left: 8px; }
 .chip .sub { font-size: 11.5px; color: var(--muted); font-weight: 400; }
 
+/* Trainers */
+.diffpick { display: inline-flex; align-items: center; gap: 6px; }
+.diffpick .lab { font-size: 12px; color: var(--muted); }
+.tp { display: inline-block; flex: none; width: 48px; height: 48px; overflow: hidden; vertical-align: middle; }
+.tp i { display: block; width: 64px; height: 64px; transform: scale(.75); transform-origin: 0 0; background-repeat: no-repeat; image-rendering: pixelated; }
+.tp.sm { width: 32px; height: 32px; }
+.tp.sm i { transform: scale(.5); }
+.tp.lg { width: 96px; height: 96px; }
+.tp.lg i { transform: scale(1.5); }
+.trainercard { position: relative; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px; display: grid; gap: 12px; }
+.trainercard .top { display: flex; align-items: center; gap: 12px; }
+.trainercard h2 { margin: 0; font: 600 24px/1.1 var(--font-display); }
+.trainercard h2 small { display: block; font: 500 13px var(--font-body); color: var(--muted); margin-top: 4px; }
+.trainercard h4 { margin: 0 0 6px; font: 600 11.5px var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.tnote { font-size: 14px; }
+.tflags { display: flex; gap: 6px; flex-wrap: wrap; }
+.team { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); gap: 8px; }
+.tmon { border: 1px solid var(--line); border-radius: 10px; background: var(--tint, none), var(--sunk); padding: 6px 10px 10px 6px; display: grid; gap: 6px; align-content: start; }
+.tmon .head { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.tmon .head .link { min-width: 0; }
+.tmon .lv { margin-left: auto; font: 600 13px var(--font-data); white-space: nowrap; }
+.tmon dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 0 0 0 4px; font-size: 13px; }
+.tmon dt { color: var(--muted); }
+.tmon dd { margin: 0; min-width: 0; }
+.tmon dd .itembtn { margin: -3px 0; }
+.tmoves { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-left: 4px; }
+.tmv { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 3px 8px 3px 0; border: 1px solid var(--line); border-left: 4px solid var(--c, var(--line)); border-radius: 6px; background: var(--surface); cursor: pointer; font-size: 12.5px; font-weight: 600; text-align: left; color: var(--ink); }
+.tmv .cat { flex: none; margin-left: 4px; }
+.tmv span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tmv:hover { border-color: var(--muted); border-left-color: var(--c); }
+.teamline { display: flex; flex-wrap: wrap; align-items: center; gap: 0; }
+.trow { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.trow .tn { display: grid; min-width: 0; }
+
 /* Move card */
 .movecard { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px; display: grid; gap: 12px; }
 .movecard .top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -423,6 +457,7 @@ body.sheet-open { overflow: hidden; }
       <button role="tab" data-viewtab="tutors" aria-selected="false">Tutors</button>
       <button role="tab" data-viewtab="abilities" aria-selected="false">Abilities</button>
       <button role="tab" data-viewtab="items" aria-selected="false">Items</button>
+      <button role="tab" data-viewtab="trainers" aria-selected="false">Trainers</button>
       <button role="tab" data-viewtab="places" aria-selected="false">Locations</button>
       <button role="tab" data-viewtab="docs" aria-selected="false">Docs</button>
     </nav>
@@ -440,6 +475,13 @@ body.sheet-open { overflow: hidden; }
         <button id="m-all" data-mode="" aria-pressed="true">All</button>
         <button id="m-std" data-mode="Standard" aria-pressed="false">Standard</button>
         <button id="m-div" data-mode="Divergent" aria-pressed="false">Divergent</button>
+      </div>
+      <div class="diffpick" id="diff-pick" hidden><span class="lab">Difficulty</span>
+        <div class="seg" role="group" aria-label="Difficulty">
+          <button data-diff="std" aria-pressed="true">Standard</button>
+          <button data-diff="hard" aria-pressed="false">Hard</button>
+          <button data-diff="xhard" aria-pressed="false">Extra Hard</button>
+        </div>
       </div>
       <div class="typepick" id="typepick">
         <button id="type-btn" aria-expanded="false" aria-haspopup="true"><span id="type-label">All types</span><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>

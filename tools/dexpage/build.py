@@ -22,6 +22,7 @@ from .paths import DPE_ROOT, Paths
 from .roster import Entry, SourceData, build_roster, evolution_links, load_extra_forms, load_source_data
 from .rom import POCKET_BERRIES, POCKET_KEY_ITEMS, POCKET_POKE_BALLS, item_fields, item_icons
 from .sprites import build_sheet, pack
+from .trainers import NATURES, load_trainers
 
 TEMPLATE = Path(__file__).with_name("template.html")
 SW_TEMPLATE = Path(__file__).with_name("sw.js")
@@ -135,6 +136,7 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
         m["sharedDex"] = shared
     abilities = _abilities(mons, ability_officials(data.paths))
     _attach_ability_details(data.paths, abilities, moves)
+    trainers, teams, trainer_sheet = _trainers(data, index, item_by_const)
     return {
         "docs": _docs({a["name"] for a in abilities}),
         "abilities": abilities,
@@ -143,8 +145,55 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
         "items": items,
         "itemSheet": icon_sheet,
         "moves": moves,
+        "trainers": trainers,
+        "teams": teams,
+        "trainerSheet": trainer_sheet,
         "unmatchedEncounters": unmatched,
     }
+
+
+TEAM_KEYS = ("std", "hard", "div", "hdiv")
+
+
+def _trainers(data: SourceData, index: dict, item_by_const: dict) -> tuple[list[dict], dict, str]:
+    """Trainers with a team per table (Standard, Hard, Divergent, Hard Divergent), and their battle sprites.
+    A team member is [Pokémon, level, item (index, or name when the Items tab doesn't list it), ability no., move nos.,
+    Hard-mode nature no., the two stats Very Hard maxes (in STAT_KEYS order)]."""
+    def mon_index(species: str) -> int:
+        key = species
+        while key not in index and "_" in key.removeprefix("SPECIES_"):
+            key = key.rsplit("_", 1)[0]  # a form the page doesn't list on its own falls back to its species
+        if key not in index:
+            raise ValueError(f"trainer Pokémon {species} matches no Pokémon on the page")
+        return index[key]
+
+    def ability_name(const: str, species: str) -> str:
+        s = data.stats[species]
+        return ability_display(data.paths, const, species, data.national.get(species), s["types"])[0]
+
+    def item(const: str | None):
+        if const is None:
+            return None
+        return item_by_const.get(const, _full_item_name(data, const) if const in data.items else const)
+
+    raw, raw_teams, pics = load_trainers(data.paths, data.stats, data.levelup, data.moves, ability_name)
+    # Moves and abilities are numbered (DEX.teamMoves / DEX.teamAbilities): written out, they'd double the size
+    move_list = sorted({k for team in raw_teams for m in team for k in m["moves"] if k in data.moves})
+    ability_list = sorted({m["ability"] for team in raw_teams for m in team})
+    move_no, ability_no = {k: n for n, k in enumerate(move_list)}, {a: n for n, a in enumerate(ability_list)}
+    teams = [[[mon_index(m["species"]), m["level"], item(m["item"]), ability_no[m["ability"]],
+               [move_no[k] for k in m["moves"] if k in move_no], NATURES.index(m["nature"]),
+               [STAT_KEYS.index(s) for s in m["evs"]]] for m in team] for team in raw_teams]
+    sheet, offsets = pack(pics, 64)
+    trainers = []
+    for t in raw:
+        trainers.append({
+            "cls": t["cls"], "name": t["name"], "rival": t["rival"], "pic": offsets.get(t["pic"]),
+            "place": t["place"], "note": t["note"], "double": t["double"], "partner": t["partner"],
+            "items": [item(i) for i in t["items"]], "iv": t["iv"], "teams": [t["teams"][k] for k in TEAM_KEYS],
+        })
+    return trainers, {"list": teams, "moves": move_list, "abilities": ability_list, "natures": NATURES}, \
+        "data:image/webp;base64," + base64.b64encode(sheet).decode()
 
 
 def _shared_dex_numbers(roster: list[Entry]) -> list[dict[str, int]]:

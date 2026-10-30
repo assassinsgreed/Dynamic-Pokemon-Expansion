@@ -1,0 +1,69 @@
+import pytest
+
+from tools.dexpage import trainers as T
+
+
+@pytest.fixture(scope="module")
+def loaded(paths, source_data):
+    return T.load_trainers(paths, source_data.stats, source_data.levelup, source_data.moves,
+                           lambda a, s: source_data.abilities.get(a, a))
+
+
+def by_const(loaded, const):
+    return next(t for t in loaded[0] if t["const"] == const)
+
+
+def test_default_moves_are_last_four_without_repeats():
+    learnset = [(1, "A"), (1, "B"), (5, "C"), (9, "B"), (12, "D"), (20, "E")]
+    assert T.default_moves(learnset, 12) == ["B", "C", "D"]  # last four entries are B C B D; the second B is skipped
+    assert T.default_moves(learnset, 4) == ["A", "B"]
+
+
+def test_best_two_stats_breaks_ties_toward_earlier_stats():
+    stats = {"hp": 50, "atk": 100, "def": 100, "spe": 60, "spa": 100, "spd": 50}
+    assert T.best_two_stats(stats) == ["atk", "def"]
+
+
+def test_nature_lowers_the_unused_attacking_stat():
+    stats = {"hp": 80, "atk": 120, "def": 80, "spe": 90, "spa": 60, "spd": 80}
+    moves = {"MOVE_X": {"split": "physical", "power": 80, "effect": "EFFECT_HIT"}}
+    assert T.best_stat_nature(stats, ["MOVE_X"], moves) == "Adamant"
+
+
+def test_trick_room_lowers_speed():
+    stats = {"hp": 80, "atk": 60, "def": 80, "spe": 30, "spa": 120, "spd": 80}
+    moves = {"MOVE_PSYCHIC": {"split": "special", "power": 90, "effect": "EFFECT_HIT"},
+             "MOVE_TRICKROOM": {"split": "status", "power": 0, "effect": "EFFECT_TRICK_ROOM"}}
+    assert T.best_stat_nature(stats, ["MOVE_PSYCHIC", "MOVE_TRICKROOM"], moves) == "Quiet"
+
+
+def test_missing_hard_entry_falls_back_to_standard(loaded):
+    rival1 = by_const(loaded, "TRAINER_RIVAL1")
+    assert rival1["teams"]["hard"] == rival1["teams"]["std"]
+
+
+def test_class_ivs(loaded):
+    assert by_const(loaded, "TRAINER_RIVAL1")["iv"] == 25           # not in the table: STANDARD_IV would be 10
+    assert by_const(loaded, "TRAINER_ROUTE_1_YOUNGSTER_PETER")["iv"] == 5
+
+
+def test_variant_notes(loaded):
+    assert "Squirtle" in by_const(loaded, "TRAINER_BRUCCIE_VILLAGE_RIVAL_V")["note"]
+    assert "Sobble" in by_const(loaded, "TRAINER_BRUCCIE_VILLAGE_RIVAL_S")["note"]
+    assert "1 of 4" in by_const(loaded, "TRAINER_LEADER_RAINE_REMATCH_1")["note"]
+    assert "3 badges" in by_const(loaded, "TRAINER_HELEO_CITY_GYM_LEADER_RAINE_2")["note"]
+
+
+def test_important_trainers_get_a_place(loaded):
+    assert by_const(loaded, "TRAINER_TORMA_CAVE_CASEY_F")["place"] == "Torma Cave"
+    assert all(t["place"] != "Important trainers" for t in loaded[0])
+
+
+def test_class_names_read_from_rom(paths):
+    names = T.class_names(paths)
+    assert names[0] == "PKMN Trainer"
+    assert "Rival" in names
+
+
+def test_every_trainer_pic_decodes(loaded):
+    assert all(img.size == (64, 64) for img in loaded[2].values())

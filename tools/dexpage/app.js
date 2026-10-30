@@ -5,7 +5,7 @@
   const root = document.documentElement;
   // The sheets go in one stylesheet rule each: a data URL in a CSS variable is re-parsed for every sprite on the page
   const sheets = document.createElement("style");
-  sheets.textContent = `.sp i { background-image: url("${SHEET}"); } .ii:not(.none) { background-image: url("${DEX.itemSheet}"); }`;
+  sheets.textContent = `.sp i { background-image: url("${SHEET}"); } .ii:not(.none) { background-image: url("${DEX.itemSheet}"); } .tp i { background-image: url("${DEX.trainerSheet}"); }`;
   document.head.appendChild(sheets);
   const consoleEl = $("header.console");
   const syncConsoleHeight = () => root.style.setProperty("--console-h", `${consoleEl.offsetHeight}px`);
@@ -70,14 +70,16 @@
   // ---------------------------------------------------------------- state & navigation
   // state.view: dex | moves | items | places; move/item/place name the open card; open is the expanded Pokémon
   const state = { view: "dex", q: "", move: null, item: null, place: null, open: null, mode: "", type: "", tab: "level", tabFilter: "",
-    doc: null, ability: null, layouts: { dex: "list", moves: "list", tutors: "list", abilities: "list", items: "grid", places: "grid", docs: "list" } };  // list or cards, per view
+    doc: null, ability: null, trainer: null, diff: "std",
+    layouts: { dex: "list", moves: "list", tutors: "list", abilities: "list", items: "grid", trainers: "list", places: "grid", docs: "list" } };  // list or cards, per view
   try {
     state.mode = localStorage.getItem("dex-mode") || "";
+    state.diff = localStorage.getItem("dex-diff") || "std";
     Object.assign(state.layouts, JSON.parse(localStorage.getItem("dex-layouts") || "{}"));
   } catch (e) {}
   let depth = 0, top = 0;  // position in this page's history, and how far Forward can go
 
-  const snapshot = () => ({ view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, doc: state.doc, ability: state.ability, open: state.open });
+  const snapshot = () => ({ view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, doc: state.doc, ability: state.ability, trainer: state.trainer, open: state.open });
   function hashFor(st) {
     if (st.view === "dex" && st.open !== null) return monSlug(st.open);
     if (st.move) return "move-" + slug(moves[st.move].name);
@@ -85,12 +87,13 @@
     if (st.place) return "place-" + slug(st.place);
     if (st.doc) return "doc-" + slug(st.doc);
     if (st.ability) return "ability-" + slug(st.ability);
-    return { dex: "", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", places: "locations", docs: "docs" }[st.view];
+    if (st.trainer !== null) return "trainer-" + trainerSlug(st.trainer);
+    return { dex: "", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", trainers: "trainers", places: "locations", docs: "docs" }[st.view];
   }
   const queries = {};  // each tab keeps its own search text
 
   function navigate(change) {
-    const next = Object.assign({ view: state.view, q: "", move: null, item: null, place: null, doc: null, ability: null, open: null }, change);
+    const next = Object.assign({ view: state.view, q: "", move: null, item: null, place: null, doc: null, ability: null, trainer: null, open: null }, change);
     Object.assign(state, next, { tabFilter: "" });
     queries[state.view] = state.q;
     depth++;
@@ -379,7 +382,7 @@
   // Above every view: how many results the same search has in the other tabs, each a chip that goes there
   const ALSO = [["dex", (q) => matchMons(q).length, "Pokémon", "Pokémon"], ["moves", (q) => matchMoves(q).filter((k) => !state.type || moves[k].type === state.type).length, "move", "moves"],
     ["tutors", (q) => matchTutors(q).length, "tutor move", "tutor moves"], ["abilities", (q) => matchAbilities(q).length, "ability", "abilities"],
-    ["items", (q) => matchItems(q).length, "item", "items"], ["places", (q) => matchPlaces(q).length, "location", "locations"], ["docs", (q) => matchDocs(q).length, "doc topic", "doc topics"]];
+    ["items", (q) => matchItems(q).length, "item", "items"], ["trainers", (q) => matchTrainers(q).length, "trainer", "trainers"], ["places", (q) => matchPlaces(q).length, "location", "locations"], ["docs", (q) => matchDocs(q).length, "doc topic", "doc topics"]];
   function alsoLine(q, here) {
     if (q.length < 3) return "";
     const counts = ALSO.filter(([v]) => v !== here).map(([v, count, one, many]) => [v, count(q), one, many]).filter(([, n]) => n);
@@ -544,19 +547,106 @@
     return [html, `${list.length} topics`];
   }
 
+  // Trainers: four teams each, from the Standard, Hard, Divergent and Hard Divergent tables (in that order)
+  const trainers = DEX.trainers, TEAMS = DEX.teams;
+  const DIFF_NAME = { std: "Standard", hard: "Hard", xhard: "Extra Hard" };
+  const NATURE_STATS = ["Atk", "Def", "Spe", "SpA", "SpD"];  // the order natures raise and lower stats in
+  const trainerTitle = (t) => (t.rival ? t.cls : `${t.cls} ${t.name}`.trim());
+  const trainerSlug = (n) => `${n}-${slug(trainerTitle(trainers[n]))}`;
+  const teamIndex = (t, mode) => t.teams[(mode === "Divergent" ? 2 : 0) + (state.diff === "std" ? 0 : 1)];
+  const teamOf = (t, mode) => TEAMS.list[teamIndex(t, mode)];
+  // On All, a trainer whose Divergent team differs shows both
+  const teamsShown = (t) => {
+    if (state.mode) return [["", teamIndex(t, state.mode)]];
+    const std = teamIndex(t, "Standard"), div = teamIndex(t, "Divergent");
+    return std === div ? [["", std]] : [["Standard mode", std], ["Divergent mode", div]];
+  };
+  const trainerKeys = trainers.map((t) => [norm(t.cls), norm(t.name), norm(t.cls + t.name), norm(t.place), t.rival ? "rival" : ""].filter(Boolean));
+  const natureText = (n) => {
+    const up = Math.floor(n / 5), down = n % 5;
+    return TEAMS.natures[n] + (up === down ? "" : ` (+${NATURE_STATS[up]} −${NATURE_STATS[down]})`);
+  };
+  const trainerPic = (t, size) => `<span class="tp${size ? " " + size : ""}" aria-hidden="true">${t.pic ? `<i style="background-position:-${t.pic[0]}px -${t.pic[1]}px"></i>` : ""}</span>`;
+  const trainerItem = (it) => (typeof it === "number" ? itemButton(it) : `<span>${esc(it)}</span>`);
+
+  function matchTrainers(q) {
+    // Pokémon count in every difficulty, but only in the modes being shown
+    const slots = state.mode === "Standard" ? [0, 1] : state.mode === "Divergent" ? [2, 3] : [0, 1, 2, 3];
+    const fw = words(state.q);
+    return trainers.map((_, n) => n).filter((n) => {
+      const t = trainers[n];
+      const team = slots.flatMap((s) => TEAMS.list[t.teams[s]]);
+      if (state.type && !team.some(([i]) => mons[i].types.includes(state.type))) return false;
+      return !q || trainerKeys[n].some((k) => k.includes(q)) || words(t.note).includes(fw) || team.some(([i]) => mons[i].s.some((s) => s.includes(q)));
+    });
+  }
+
+  function teamMon([i, lv, it, ab, mvs, nat, evs], t) {
+    const m = mons[i], hard = state.diff !== "std", xhard = state.diff === "xhard";
+    const ability = TEAMS.abilities[ab].split(" or ").map((a) => (abilityIndex.has(a) ? `<button class="mvname" data-ability="${esc(a)}">${esc(a)}</button>` : esc(a))).join(" or ");
+    // Partners fight on your side: the game gives them no Hard nature and keeps their class IVs on Extra Hard
+    const rows = [
+      it !== null && ["Item", trainerItem(it)],
+      ab !== null && TEAMS.abilities[ab] && ["Ability", ability],
+      hard && !t.partner && ["Nature", esc(natureText(nat))],
+      ["IVs", `${xhard && !t.partner ? 31 : t.iv} in every stat`],
+      xhard && ["EVs", evs.slice().sort().map((s) => `252 ${STAT_LABELS[s]}`).join(", ")],
+    ].filter(Boolean);
+    const moveBtn = (n) => {
+      const k = TEAMS.moves[n], mv = moves[k];
+      return `<button class="tmv" data-move="${k}" style="--c:${TYPE_COLOR[mv.type]}" title="${esc(mv.desc)}"><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span><span>${esc(mv.name)}</span></button>`;
+    };
+    return `<div class="tmon" style="${tint(m)}"><div class="head">${monLink(i)}<span class="lv">Lv ${lv}</span></div>
+      <dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>
+      <div class="tmoves">${mvs.map(moveBtn).join("")}</div></div>`;
+  }
+
+  function trainerCard(n) {
+    const t = trainers[n];
+    const flags = [t.double && "Double battle", t.partner && "Fights alongside you", t.rival && "Named whatever you named your rival"].filter(Boolean);
+    return `<article class="trainercard">${COLLAPSE}
+      <div class="top">${trainerPic(t, "lg")}<h2>${esc(trainerTitle(t))}<small>${esc(t.place)}</small></h2></div>
+      ${t.note ? `<div class="tnote">${esc(t.note)}</div>` : ""}
+      ${flags.length ? `<div class="tflags">${flags.map((f) => `<span class="mode">${f}</span>`).join("")}</div>` : ""}
+      ${t.items.length ? `<div><h4>Items the trainer uses</h4><div class="tflags">${t.items.map(trainerItem).join("")}</div></div>` : ""}
+      ${teamsShown(t).map(([label, k]) => `<div><h4>${label ? `${label} team` : "Team"} · ${DIFF_NAME[state.diff]} difficulty</h4><div class="team">${
+        TEAMS.list[k].map((mon) => teamMon(mon, t)).join("")}</div></div>`).join("")}
+    </article>`;
+  }
+
+  function trainersView(q) {
+    const list = matchTrainers(q);
+    if (!list.length) return [`<div class="nores">No trainers match “${esc(state.q)}”.</div>`, "0 trainers"];
+    const open = state.trainer, mode = state.mode || "Standard";
+    const groups = [];
+    list.forEach((n) => { const p = trainers[n].place || "Other"; const g = groups.find(([x]) => x === p); g ? g[1].push(n) : groups.push([p, [n]]); });
+    const maxLv = (n) => Math.max(...teamOf(trainers[n], mode).map(([, lv]) => lv));
+    const html = groups.map(([p, ns]) => `<div class="cat-head">${esc(p)} · ${ns.length}</div>${state.layouts.trainers === "grid"
+      ? chipsWithOpen(ns, (n) => `<button class="chip${n === open ? " on" : ""}" data-trainer="${n}">${trainerPic(trainers[n], "sm")}<span class="ln">${esc(trainerTitle(trainers[n]))}</span><span class="hw">Lv ${maxLv(n)}</span></button>`,
+        (n) => n === open, trainerCard)
+      : `<div class="listtable"><table class="mv"><thead><tr><th>Trainer</th><th>Team</th><th class="c-num">Lv</th></tr></thead><tbody>${ns.map((n) => {
+          const t = trainers[n];
+          return `<tr data-trainer="${n}"${n === open ? ' class="on"' : ""}><td><div class="trow">${trainerPic(t)}<span class="tn"><span class="mvname">${esc(trainerTitle(t))}</span>${
+            t.note ? `<span class="note">${esc(t.note)}</span>` : ""}</span></div></td><td><span class="teamline">${teamOf(t, mode).map(([i]) => sprite(mons[i], true)).join("")}</span></td>
+            <td class="n">${maxLv(n)}</td></tr>${n === open ? expandRow(3, trainerCard(n)) : ""}`;
+        }).join("")}</tbody></table></div>`}`).join("");
+    return [html, `${list.length} trainers`];
+  }
+
   const PLACEHOLDER = {
     dex: "Search Pokémon or dex # — e.g. Rockruff, 16, Mega, Galarian, Fire",
     moves: "Search moves or TMs — e.g. Ceaseless Edge, TM02",
     tutors: "Search tutor moves or towns — e.g. Draco Meteor, Ferrox Village",
     abilities: "Search abilities or what they do — e.g. Triage, Libero, weather",
     items: "Search items — e.g. Fire Stone, Berries",
+    trainers: "Search trainers, places or their Pokémon — e.g. Raine, Hiker, Route 8, Rockruff",
     places: "Search locations — e.g. Route 2, Lake Laplaz",
     docs: "Search the docs — e.g. Frostbite, Battle Frontier, shiny",
   };
 
   function render(scroll) {
     const q = norm(state.q);
-    const [html, count] = { dex: dexView, moves: movesView, tutors: tutorsView, abilities: abilitiesView, items: itemsView, places: placesView, docs: docsView }[state.view](q);
+    const [html, count] = { dex: dexView, moves: movesView, tutors: tutorsView, abilities: abilitiesView, items: itemsView, trainers: trainersView, places: placesView, docs: docsView }[state.view](q);
     $("#out").innerHTML = alsoLine(q, state.view) + html;
     $("#count").textContent = count;
     $("#q").value = state.q;
@@ -566,6 +656,8 @@
     $("#fwd").disabled = depth >= top;
     $("#typepick").hidden = ["abilities", "items", "places", "docs"].includes(state.view);  // these have no type
     $("#mode-seg").hidden = state.view === "docs";
+    $("#diff-pick").hidden = state.view !== "trainers";
+    document.querySelectorAll(".seg button[data-diff]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.diff === state.diff)));
     document.querySelectorAll("[data-viewtab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.viewtab === state.view)));
     document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
     document.querySelectorAll(".seg button[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.layouts[state.view])));
@@ -576,7 +668,7 @@
       const on = document.querySelector(".mon.on, .chip.on");
       if (on) on.scrollIntoView({ block: "nearest" });
     } else if (scroll) {
-      const el = (state.open !== null && document.querySelector(`.mon[data-i="${state.open}"]`)) || ((state.move || state.item !== null || state.place || state.doc || state.ability) && document.querySelector("tr.on, .chip.on"));
+      const el = (state.open !== null && document.querySelector(`.mon[data-i="${state.open}"]`)) || ((state.move || state.item !== null || state.place || state.doc || state.ability || state.trainer !== null) && document.querySelector("tr.on, .chip.on"));
       if (el) el.scrollIntoView({ block: "start" }); else window.scrollTo({ top: 0 });
     }
   }
@@ -585,9 +677,9 @@
   let timer;
   $("#q").addEventListener("input", (e) => {
     clearTimeout(timer);
-    timer = setTimeout(() => { Object.assign(state, { q: e.target.value, open: null, move: null, item: null, place: null, doc: null, ability: null }); queries[state.view] = state.q; remember(); render(); }, 120);
+    timer = setTimeout(() => { Object.assign(state, { q: e.target.value, open: null, move: null, item: null, place: null, doc: null, ability: null, trainer: null }); queries[state.view] = state.q; remember(); render(); }, 120);
   });
-  $("#clear").addEventListener("click", () => { Object.assign(state, { q: "", open: null, move: null, item: null, place: null, doc: null, ability: null }); queries[state.view] = ""; remember(); render(); $("#q").focus(); });
+  $("#clear").addEventListener("click", () => { Object.assign(state, { q: "", open: null, move: null, item: null, place: null, doc: null, ability: null, trainer: null }); queries[state.view] = ""; remember(); render(); $("#q").focus(); });
   $("#back").addEventListener("click", () => history.back());
   $("#fwd").addEventListener("click", () => history.forward());
   // Switching tabs restores that tab's own search; clicking the current tab again clears it
@@ -603,6 +695,11 @@
   document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.addEventListener("click", () => {
     state.mode = b.dataset.mode;
     try { localStorage.setItem("dex-mode", state.mode); } catch (e) {}
+    render();
+  }));
+  document.querySelectorAll(".seg button[data-diff]").forEach((b) => b.addEventListener("click", () => {
+    state.diff = b.dataset.diff;
+    try { localStorage.setItem("dex-diff", state.diff); } catch (e) {}
     render();
   }));
 
@@ -663,6 +760,13 @@
       const name = ab.dataset.ability;
       if (state.view === "abilities" && inList) navigate({ view: "abilities", q: state.q, ability: state.ability === name ? null : name });
       else navigate({ view: "abilities", ability: name });
+      return;
+    }
+    const tr = t.closest("[data-trainer]");
+    if (tr && inList) {
+      e.preventDefault();
+      const n = +tr.dataset.trainer;
+      navigate({ view: "trainers", q: state.q, trainer: state.trainer === n ? null : n });
       return;
     }
     const dc = t.closest("[data-doc]");
@@ -731,9 +835,10 @@
   // Links: #rockruff, #move-crunch, #item-fire-stone, #place-route-2, #items … (older #ceaseless-edge style still works)
   function fromHash() {
     const h = decodeURIComponent(location.hash.slice(1));
-    const views = { "": "dex", pokedex: "dex", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", locations: "places", docs: "docs" };
-    Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, doc: null, ability: null, open: null });
+    const views = { "": "dex", pokedex: "dex", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", trainers: "trainers", locations: "places", docs: "docs" };
+    Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, doc: null, ability: null, trainer: null, open: null });
     if (h in views) state.view = views[h];
+    else if (h.startsWith("trainer-")) { const n = parseInt(h.slice(8), 10); Object.assign(state, { view: "trainers", trainer: n >= 0 && n < trainers.length ? n : null }); }
     else if (h.startsWith("move-")) { const k = moveKeys.find((x) => slug(moves[x].name) === h.slice(5)); Object.assign(state, k ? { view: "moves", move: k } : { view: "moves", q: h.slice(5).replace(/-/g, " ") }); }
     else if (h.startsWith("item-")) { const k = items.findIndex((it) => slug(it.name) === h.slice(5)); Object.assign(state, k >= 0 ? { view: "items", item: k } : { view: "items", q: h.slice(5).replace(/-/g, " ") }); }
     else if (h.startsWith("ability-")) { const a = abilities.find((x) => slug(x.name) === h.slice(8)); Object.assign(state, { view: "abilities", ability: a ? a.name : null }); }
