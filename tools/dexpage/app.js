@@ -707,6 +707,12 @@
   document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.addEventListener("click", () => {
     state.mode = b.dataset.mode;
     try { localStorage.setItem("dex-mode", state.mode); } catch (e) {}
+    // An open trainer with separate Standard and Divergent teams switches to the same trainer in the new mode
+    const t = state.trainer;
+    if (t !== null && !entryInMode(t)) {
+      const other = entries.findIndex((x) => x.n === entries[t].n && x.mode === state.mode);
+      if (other >= 0) { state.trainer = other; remember(); render(true); return; }
+    }
     render();
   }));
   document.querySelectorAll(".seg button[data-diff]").forEach((b) => b.addEventListener("click", () => {
