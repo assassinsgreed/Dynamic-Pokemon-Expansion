@@ -106,7 +106,6 @@ header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 
 .count { margin-left: auto; color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
 
 main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
-.section-label { font: 600 12px/1 var(--font-display); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 6px 2px 0; }
 
 /* Types & categories */
 .type { display: inline-block; font: 600 11px/1 var(--font-display); text-transform: uppercase; letter-spacing: .06em; padding: 4px 7px 3px; border-radius: 4px; color: #fff; white-space: nowrap; }
@@ -261,7 +260,6 @@ table.loc td.meth { white-space: nowrap; font-size: 13px; }
 
 /* Browse views */
 .cat-head { font: 600 12px/1 var(--font-display); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 10px 2px 6px; }
-.browse { display: grid; gap: 4px; }
 .movelist { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px 8px; overflow-x: auto; }
 .movelist tr { cursor: pointer; }
 /* Highlight only the hovered row's own cells: an opened card sits inside a row, and its tables must not light up */
@@ -415,8 +413,6 @@ table.mv .c-lv { text-align: right; white-space: nowrap; }
 .chip .ln small { color: var(--muted); font-weight: 400; }
 .chip .hw { font: 12px var(--font-data); color: var(--muted); margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; min-width: 0; flex-shrink: 4; overflow: hidden; text-overflow: ellipsis; }
 .empty { color: var(--muted); font-style: italic; }
-.moreoves { display: flex; gap: 6px; flex-wrap: wrap; }
-.moreoves button { border: 1px solid var(--line); background: var(--surface); padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 13.5px; display: inline-flex; gap: 6px; align-items: center; }
 /* Rows off screen skip layout and paint until scrolled to */
 .mon:not([open]) { content-visibility: auto; contain-intrinsic-size: auto 70px; }
 /* …at the height a grid card really is, or off-screen cards collapse to 70px and the grid jumps when one opens */
