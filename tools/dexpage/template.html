@@ -176,11 +176,10 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 /* Detail */
 .detail { border-top: 1px solid var(--line); padding: 14px; display: grid; gap: 18px; }
 .detail h3 { margin: 0 0 8px; font: 600 12px/1 var(--font-display); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
-/* Base stats takes the spare width; Abilities and Profile are only as wide as their text, so they sit close together
-   instead of a third of the card each; everything wraps on narrow screens */
-.cols { display: flex; flex-wrap: wrap; gap: 18px 36px; align-items: flex-start; }
-.cols > * { min-width: 0; flex: 0 1 auto; max-width: 100%; }
-.cols > :first-child { flex: 1 1 280px; }
+/* Base stats, Abilities and Profile in equal columns of up to 320px, evenly spaced; any spare width goes to the right,
+   not between them; they wrap on narrow screens */
+.cols { display: grid; gap: 18px 32px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 320px)); }
+.cols > * { min-width: 0; }
 .stats { display: grid; grid-template-columns: 34px 32px minmax(0, 1fr); gap: 3px 8px; align-items: center; font: 12.5px var(--font-data); font-variant-numeric: tabular-nums; }
 .stats .lab { color: var(--muted); }
 .stats .val { text-align: right; font-weight: 600; }
