@@ -149,8 +149,12 @@ def _block_html(block: dict, images: dict[str, str]) -> str:
                    for cells in ([re.sub(r"<[^>]+>", "", r[i]).strip() for r in rows[1:] if i < len(r) and re.sub(r"<[^>]+>", "", r[i]).strip()]
                                  for i in range(width))]
         cls = lambda i: ' class="n"' if i < width and numeric[i] else ""
+        # Game Modifier passwords are spoilers: each one stays hidden until clicked (app.js toggles .shown)
+        secret = {i for i, c in enumerate(rows[0]) if re.sub(r"<[^>]+>", "", c).strip().lower() == "code"}
+        cell = lambda i, c: (f'<button class="reveal" title="Click to reveal"><span class="hint">Click to reveal</span>'
+                             f'<span class="code">{c}</span></button>' if i in secret and c.strip() else c)
         head = "".join(f"<th{cls(i)}>{c}</th>" for i, c in enumerate(rows[0]))
-        body = "".join("<tr>" + "".join(f"<td{cls(i)}>{c}</td>" for i, c in enumerate(r)) + "</tr>" for r in rows[1:])
+        body = "".join("<tr>" + "".join(f"<td{cls(i)}>{cell(i, c)}</td>" for i, c in enumerate(r)) + "</tr>" for r in rows[1:])
         return f'<div class="doctable"><table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>'
     raise ValueError(f"unknown doc block {kind!r}")
 

@@ -732,6 +732,8 @@
     const t = e.target;
     const go = t.closest("[data-goto]");
     if (go) { navigate({ view: go.dataset.goto, q: state.q }); return; }
+    const secret = t.closest(".reveal");
+    if (secret) { secret.classList.toggle("shown"); secret.title = secret.classList.contains("shown") ? "Click to hide" : "Click to reveal"; return; }
     if (t.closest("[data-collapse], [data-sheet-close]") || t.closest(".sheet .mon > summary")) {
       e.preventDefault(); navigate({ view: state.view, q: state.q }); return;
     }

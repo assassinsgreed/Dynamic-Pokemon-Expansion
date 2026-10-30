@@ -72,3 +72,12 @@ def test_numeric_table_columns_right_aligned():
     html = render_topic(topic, images={})
     assert '<th class="n"><b>HP</b></th>' in html and '<td class="n">80</td>' in html
     assert "<td>Even Bulkier</td>" in html
+
+
+def test_code_column_cells_hidden_until_clicked():
+    from tools.dexpage.docs import render_topic
+    topic = {"blocks": [{"t": "table", "rows": [["<b>Modifier</b>", "<b>Code</b>"],
+                                                ["Inverse Battles", "OPPOSITEDAY"], ["Shiny Pokemon", ""]]}]}
+    html = render_topic(topic, images={})
+    assert '<td><button class="reveal" title="Click to reveal"><span class="hint">Click to reveal</span><span class="code">OPPOSITEDAY</span></button></td>' in html
+    assert "<td></td>" in html  # empty cells stay empty
