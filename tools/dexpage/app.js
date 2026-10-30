@@ -611,9 +611,9 @@
     const flags = [t.double && "Double battle", t.rival && "Named whatever you named your rival"].filter(Boolean);
     return `<article class="trainercard">${COLLAPSE}
       <div class="top">${trainerPic(t, "lg")}
-        <div class="thead"><h2>${esc(trainerTitle(t))}<small>${esc(t.place)}</small></h2>
+        <div class="thead"><h2>${esc(trainerTitle(t))} ${entryMode(e)}<small>${esc(t.place)}</small></h2>
           ${t.note ? `<div class="tnote">${esc(t.note)}</div>` : ""}
-          <div class="tflags">${entryMode(e)}${flags.map((f) => `<span class="mode">${f}</span>`).join("")}</div></div>
+          ${flags.length ? `<div class="tflags">${flags.map((f) => `<span class="mode">${f}</span>`).join("")}</div>` : ""}</div>
         <div class="tside"><div><h4>Poké Ball</h4><div class="tflags">${trainerItem(t.ball)}</div></div>
           ${t.items.length ? `<div><h4>Items the trainer uses</h4><div class="tflags">${t.items.map(trainerItem).join("")}</div></div>` : ""}</div>
       </div>
