@@ -153,8 +153,9 @@
   };
   const itemButton = (k, label) => `<button class="itembtn" data-item="${k}">${itemIcon(k)}<span class="in">${esc(label || items[k].name)}</span></button>`;
   const monLink = (i, current) => `<button class="link${i === current ? " current" : ""}" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${formLabel(mons[i])}</span></button>`;
-  // A chip's left edge shows a Pokémon (or encounter) found in only one mode; Both has none
-  const modeEdge = (modes) => (modes.length > 1 ? "" : modes[0] === "Divergent" ? ' m-div" title="Divergent only' : ' m-std" title="Standard only');
+  // A chip's or Pokédex row's left edge shows a Pokémon (or encounter) found in only one mode; Both has none
+  const modeClass = (modes) => (modes.length > 1 ? "" : modes[0] === "Divergent" ? " m-div" : " m-std");
+  const modeEdge = (modes) => (modes.length > 1 ? "" : `${modeClass(modes)}" title="${modes[0]} only`);
   const monChip = (i, note, sub, bare, modes = mons[i].modes) => `<button class="chip${modeEdge(modes)}" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${bare ? "" : formLabel(mons[i])}${
     sub ? ` <span class="sub">${esc(sub)}</span>` : ""}</span>${note ? `<span class="hw">${esc(note)}</span>` : ""}</button>`;
   const escapeRe = (text) => text.replace(/[.*+?^$()|[\]\\{}]/g, "\\$&");
@@ -166,7 +167,7 @@
   // ---------------------------------------------------------------- Pokémon detail
   function row(m, i, inSheet = false) {
     const cards = state.layouts.dex === "grid" && !inSheet, open = state.open === i && !cards;
-    return `<details class="mon${cards && state.open === i ? " on" : ""}" data-i="${i}" style="${tint(m)}"${open ? " open" : ""}>
+    return `<details class="mon${modeClass(m.modes)}${cards && state.open === i ? " on" : ""}" data-i="${i}" style="${tint(m)}"${open ? " open" : ""}>
       <summary title="Show details"><span class="dexline">${dexNo(m)}${modeBadge(m)}</span>${sprite(m)}
         <span class="who"><span class="nm">${esc(m.name)}${formLabel(m)}</span>
           <span class="tags">${m.types.map(typeBadge).join("")}</span></span>
