@@ -564,7 +564,9 @@
   const entryInMode = (e) => !state.mode || entries[e].mode === "Both" || entries[e].mode === state.mode;
   const entryMode = (e) => (entries[e].mode === "Both" ? '<span class="mode b">Both</span>'
     : `<span class="mode${entries[e].mode === "Divergent" ? " d" : ""}">${entries[e].mode}</span>`);
-  const trainerKeys = trainers.map((t) => [norm(t.cls), norm(t.name), norm(t.cls + t.name), norm(t.place), t.rival ? "rival" : ""].filter(Boolean));
+  // Searched from the start of any word: "raine" finds Leader Raine but not every "Trainer"
+  const wordStarts = (s) => { const w = words(s).split(" "); return w.map((_, k) => w.slice(k).join("")); };
+  const trainerKeys = trainers.map((t) => [...wordStarts(`${t.cls} ${t.name}`), ...wordStarts(t.place), t.rival ? "rival" : ""].filter(Boolean));
   const natureText = (n) => {
     const up = Math.floor(n / 5), down = n % 5;
     return TEAMS.natures[n] + (up === down ? "" : ` (+${NATURE_STATS[up]} −${NATURE_STATS[down]})`);
@@ -578,7 +580,7 @@
       if (!entryInMode(e)) return false;
       const n = entries[e].n, t = trainers[n];
       // its Pokémon count in every difficulty
-      return !q || trainerKeys[n].some((k) => k.includes(q)) || words(t.note).includes(fw)
+      return !q || trainerKeys[n].some((k) => k.startsWith(q)) || words(t.note).includes(fw)
         || slots(e).some((s) => TEAMS.list[t.teams[s]].some(([i]) => mons[i].s.some((x) => x.includes(q))));
     });
   }
@@ -608,11 +610,13 @@
     const t = trainers[entries[e].n], team = teamOf(e);
     const flags = [t.double && "Double battle", t.rival && "Named whatever you named your rival"].filter(Boolean);
     return `<article class="trainercard">${COLLAPSE}
-      <div class="top">${trainerPic(t, "lg")}<h2>${esc(trainerTitle(t))}<small>${esc(t.place)}</small></h2></div>
-      ${t.note ? `<div class="tnote">${esc(t.note)}</div>` : ""}
-      <div class="tflags">${entryMode(e)}${flags.map((f) => `<span class="mode">${f}</span>`).join("")}</div>
-      <div><h4>Poké Ball</h4><div class="tflags">${trainerItem(t.ball)}</div></div>
-      ${t.items.length ? `<div><h4>Items the trainer uses</h4><div class="tflags">${t.items.map(trainerItem).join("")}</div></div>` : ""}
+      <div class="top">${trainerPic(t, "lg")}
+        <div class="thead"><h2>${esc(trainerTitle(t))}<small>${esc(t.place)}</small></h2>
+          ${t.note ? `<div class="tnote">${esc(t.note)}</div>` : ""}
+          <div class="tflags">${entryMode(e)}${flags.map((f) => `<span class="mode">${f}</span>`).join("")}</div></div>
+        <div class="tside"><div><h4>Poké Ball</h4><div class="tflags">${trainerItem(t.ball)}</div></div>
+          ${t.items.length ? `<div><h4>Items the trainer uses</h4><div class="tflags">${t.items.map(trainerItem).join("")}</div></div>` : ""}</div>
+      </div>
       <div><h4>Team · ${DIFF_NAME[state.diff]} difficulty · ${team.length} Pokémon</h4><div class="team">${team.map((mon) => teamMon(mon, t)).join("")}</div></div>
     </article>`;
   }
@@ -627,15 +631,16 @@
     // Scaled battles (Trainer Houses, Gym Trainees…) come out at your party's highest level
     const SCALE_TIP = "Levels scale to your party's highest";
     const minLv = (e) => Math.min(...teamOf(e).map(([, lv]) => lv));
-    const lvText = (e) => (trainers[entries[e].n].scaled ? `Scaling, min ${minLv(e)}` : `Max Lv ${maxLv(e)}`);
+    const lvRange = (e) => (minLv(e) === maxLv(e) ? `${minLv(e)}` : `${minLv(e)}–${maxLv(e)}`);
+    const lvText = (e) => (trainers[entries[e].n].scaled ? `Scaling, min ${minLv(e)}` : `Lv ${lvRange(e)}`);
     const html = groups.map(([p, es]) => `<div class="cat-head">${esc(p)} · ${es.length}</div>${state.layouts.trainers === "grid"
       ? '<div class="tchips">' + chipsWithOpen(es, (e) => `<button class="chip${e === open ? " on" : ""}" data-trainer="${e}">${trainerPic(trainers[entries[e].n], "sm")}<span class="ln">${esc(trainerTitle(trainers[entries[e].n]))}</span>${
-          state.mode ? "" : entryMode(e)}<span class="hw" title="${trainers[entries[e].n].scaled ? SCALE_TIP : "Highest level on the team"}">${lvText(e)}</span></button>`, (e) => e === open, trainerCard) + '</div>'
-      : `<div class="listtable"><table class="mv"><thead><tr><th>Trainer</th><th>Team</th><th class="c-lv">Level</th></tr></thead><tbody>${es.map((e) => {
-          const t = trainers[entries[e].n];
+          state.mode ? "" : entryMode(e)}<span class="hw" title="${trainers[entries[e].n].scaled ? SCALE_TIP : "Levels on the team"}">${lvText(e)}</span></button>`, (e) => e === open, trainerCard) + '</div>'
+      : `<div class="listtable"><table class="mv"><thead><tr><th>Trainer</th><th class="tteam">Team</th><th class="c-lv">Level</th></tr></thead><tbody>${es.map((e) => {
+          const t = trainers[entries[e].n], sprites = teamOf(e).map(([i]) => sprite(mons[i], true)).join("");
           return `<tr data-trainer="${e}"${e === open ? ' class="on"' : ""}><td><div class="trow">${trainerPic(t)}<span class="tn"><span class="tname"><span class="mvname">${esc(trainerTitle(t))}</span>${entryMode(e)}</span>${
-            t.note ? `<span class="note">${esc(t.note)}</span>` : ""}</span></div></td><td><span class="teamline">${teamOf(e).map(([i]) => sprite(mons[i], true)).join("")}</span></td>
-            <td class="n lvcell" title="${t.scaled ? SCALE_TIP : "Highest level on the team"}">${t.scaled ? `<span class="note">Scaling, min</span> ${minLv(e)}` : `<span class="note">Max</span> ${maxLv(e)}`}</td></tr>${e === open ? expandRow(3, trainerCard(e)) : ""}`;
+            t.note ? `<span class="note">${esc(t.note)}</span>` : ""}<span class="teamline tt-inline">${sprites}</span></span></div></td><td class="tteam"><span class="teamline">${sprites}</span></td>
+            <td class="n lvcell" title="${t.scaled ? SCALE_TIP : "Levels on the team"}">${t.scaled ? `<span class="note">Scaling, min</span> ${minLv(e)}` : lvRange(e)}</td></tr>${e === open ? expandRow(3, trainerCard(e)) : ""}`;
         }).join("")}</tbody></table></div>`}`).join("");
     return [html, `${list.length} trainers`];
   }
