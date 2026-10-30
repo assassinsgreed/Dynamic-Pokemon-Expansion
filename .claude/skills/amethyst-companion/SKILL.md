@@ -106,6 +106,9 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   To check a data change is lossless, dump `DEX` from the page in headless Chrome (`--dump-dom` with an injected
   load-event script) and compare with the previous build; pixel-diff screenshots of each tab against it.
   `#move-…` / `#ability-…` hashes open a pop-up that screenshots blank in headless Chrome (already so before this).
+- Locations search matches a place's name and what's there, in the chosen mode: Pokémon ("Bidoof"), encounter
+  methods ("Grass", "Wormhole") and items ("Full Heal"). The search box waits 120 ms after typing before it runs,
+  so a headless probe that types into `#q` must wait longer than that.
 - Every TM/HM is an item ("TM02 Dragon Claw", category TMs/HMs) linking to its move; typing a type name in the
   Pokédex lists that type.
 

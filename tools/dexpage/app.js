@@ -395,7 +395,19 @@
   const matchMoves = (q) => (q ? moveKeys.filter((k) => moves[k].s.some((x) => x.includes(q))) : moveKeys);
   const matchItems = (q) => items.map((_, k) => k).filter((k) => !q || itemKeys[k].includes(q)
     || (items[k].move && moves[items[k].move].s.includes(q)));
-  const matchPlaces = (q) => placeList.filter((p) => !q || norm(p.name).includes(q));
+  // A place also matches what's found there (in the chosen mode): a Pokémon ("bidoof"), an encounter method ("grass",
+  // "wormhole") or an item ("full heal"); the item lists are worked out once, on the first search
+  let placeItems = null;
+  const itemsAt = (p) => {
+    placeItems ??= new Map(placeList.map((pl) => {
+      const re = placeRe(pl.name);
+      return [pl, items.flatMap((it, k) => (it.where.some((w) => re.test(w.toLowerCase())) ? [k] : []))];
+    }));
+    return placeItems.get(p);
+  };
+  const matchPlaces = (q) => placeList.filter((p) => !q || norm(p.name).includes(q)
+    || p.rows.some(([i, l]) => rowInMode(l) && (mons[i].s.some((s) => s.includes(q)) || norm(l.method).includes(q)))
+    || itemsAt(p).some((k) => itemKeys[k].includes(q)));
   const exactFirst = (list, isExact) => list.filter(isExact).concat(list.filter((x) => !isExact(x)));
 
   function matchMons(q) {
@@ -685,7 +697,7 @@
     abilities: "Search abilities or what they do — e.g. Triage, Libero, weather",
     items: "Search items — e.g. Fire Stone, Berries",
     trainers: "Search trainers, places or their Pokémon — e.g. Raine, Hiker, Route 8, Rockruff",
-    places: "Search locations — e.g. Route 2, Lake Laplaz",
+    places: "Search places, or what's there — e.g. Route 2, Bidoof, Full Heal, Grass",
     docs: "Search the docs — e.g. Frostbite, Battle Frontier, shiny",
   };
 
