@@ -163,7 +163,13 @@
   // "Route 2" must match "Route 2" and "Route 2 (hidden)" but not "Route 20"
   const placeRe = (name) => new RegExp("(^|[^a-z0-9])" + escapeRe(name.toLowerCase()) + "($|[^a-z0-9])");
   const statColor = (v) => (v < 50 ? "#e2562a" : v < 80 ? "#f2a516" : v < 100 ? "#c9c21b" : v < 120 ? "#5fb83a" : "#2aa198");
-  const genderText = (g) => (g === null ? "Genderless" : g === 0 ? "♂ only" : g === 100 ? "♀ only" : `♂ ${+(100 - g).toFixed(1)}% · ♀ ${+g.toFixed(1)}%`);
+  // Drawn rather than the ♂/♀ characters, whose crossbar and arrow most fonts squeeze to nothing at this size
+  const FEMALE_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="5.5" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 9.5V15M5 12.5h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  const MALE_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="6.5" cy="9.5" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.5 6.5L14 2M10 2h4v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const MALE = `<span class="tsex m" title="Male" aria-label="Male">${MALE_ICON}</span>`;
+  const FEMALE = `<span class="tsex f" title="Female" aria-label="Female">${FEMALE_ICON}</span>`;
+  const genderText = (g) => (g === null ? "Genderless" : g === 0 ? `${MALE} only` : g === 100 ? `${FEMALE} only`
+    : `${MALE} ${+(100 - g).toFixed(1)}% · ${FEMALE} ${+g.toFixed(1)}%`);
 
   // ---------------------------------------------------------------- Pokémon detail
   function row(m, i, inSheet = false) {
@@ -294,8 +300,8 @@
       <div class="cols">
         <section><h3>Base stats · ${bst(m)}</h3><div class="stats">${m.stats.map((v, n) =>
           `<span class="lab">${STAT_LABELS[n]}</span><span class="val">${v}</span><span class="bar"><span style="width:${Math.min(100, v / 2)}%;background:${statColor(v)}"></span></span>`).join("")}</div></section>
+        <section><h3>Abilities</h3><div class="abilities">${m.abilities.map((a) => ab(a, false)).join("")}${m.hidden ? ab(m.hidden, true) : ""}</div></section>
         <section><h3>Profile</h3><dl class="facts">
-          <dt>Abilities</dt><dd class="abilities">${m.abilities.map((a) => ab(a, false)).join("")}${m.hidden ? ab(m.hidden, true) : ""}</dd>
           <dt>Gender</dt><dd>${genderText(m.gender)}</dd>
           <dt>Egg groups</dt><dd>${m.eggGroups.join(", ") || "—"}</dd>
           <dt>Catch rate</dt><dd>${m.catchRate}</dd>
@@ -630,10 +636,6 @@
     });
   }
 
-  // Drawn rather than the ♂/♀ characters, whose crossbar and arrow most fonts squeeze to nothing at this size
-  const FEMALE_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="5.5" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 9.5V15M5 12.5h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-  const MALE_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="6.5" cy="9.5" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.5 6.5L14 2M10 2h4v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-
   function teamMon([i, lv, it, ab, mvs, nat, evs, custom, gender], t) {
     const m = mons[i], hard = state.diff !== "std", xhard = state.diff === "xhard";
     const ability = TEAMS.abilities[ab].split(" or ").map((a) => (abilityIndex.has(a) ? `<button class="mvname" data-ability="${esc(a)}">${esc(a)}</button>` : esc(a))).join(" or ");
@@ -649,8 +651,7 @@
       return `<button class="tmv" data-move="${k}" style="--c:${TYPE_COLOR[mv.type]}" title="${esc(mv.desc)}"><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span><span>${esc(mv.name)}</span></button>`;
     };
     // Gender the game gives it (trainers.py _gender: the trainer's, unless the species can't be or is 75%+ female)
-    const sex = gender === "F" ? `<span class="tsex f" title="Female" aria-label="Female">${FEMALE_ICON}</span>`
-      : gender === "M" ? `<span class="tsex m" title="Male" aria-label="Male">${MALE_ICON}</span>` : "";
+    const sex = gender === "F" ? FEMALE : gender === "M" ? MALE : "";
     return `<div class="tmon" style="${tint(m)}"><div class="head">${monLink(i)}${sex}<span class="lv">${t.scaled ? `Scaling, minimum ${lv}` : `Lv ${lv}`}</span></div>
       <dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>
       ${t.scaled && !custom  // the game picks these moves at the scaled level, so the listed level's moves would be wrong
