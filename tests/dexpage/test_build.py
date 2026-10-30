@@ -63,6 +63,13 @@ def test_learners_packed_by_how(data):
         _pack_learners([[3, "Lv 1"], [3, "Lv 30"], [5, "Lv 30"], [5, "Lv 1"]])
 
 
+def test_factory_overworld_is_its_own_place(data):
+    places = {(l["location"], l.get("sub", "")) for m in data["mons"] for l in m["loc"]}
+    assert ("Daimyn Factory Overworld", "") in places
+    assert not any(loc == "Route 9" and "Factory" in sub for loc, sub in places)
+    assert any("Daimyn Factory Overworld" in w for it in data["items"] for w in it["where"])   # map 1.30's item balls
+
+
 def test_every_place_is_on_the_town_map(data):
     from tools.dexpage.build import NOT_ON_TOWN_MAP
     from tools.dexpage.town_map import norm

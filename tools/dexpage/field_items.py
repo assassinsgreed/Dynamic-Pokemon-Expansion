@@ -11,6 +11,7 @@ from functools import cache
 
 from .cparse import read
 from .load_cfru import item_ids
+from .locations import FACTORY_OVERWORLD
 from .paths import Paths
 from .rom import _charmap, _rom_bytes, decode
 
@@ -21,6 +22,7 @@ HIDDEN_ITEM = 7
 # FireRed's Sevii Islands are still in the ROM but no warp leads there in Amethyst
 UNUSED_MAPS = {"Water Path", "Memorial Pillar", "Outcast Island", "Trainer Tower", "Green Path", "Tanoby Ruins",
                "Canyon Entrance", "Sevault Canyon"}
+MAP_PLACES = {(1, 30): FACTORY_OVERWORLD}  # maps listed apart from their map section's place (group, number)
 RENEWING_HIDDEN = {"Treasure Beach"}  # its hidden items come back (feature list: Treasure Beach)
 SKIPPED_ITEMS = {"ITEM_NONE", "ITEM_ENIGMA_BERRY_OLD"}
 
@@ -80,13 +82,13 @@ def field_items(p: Paths) -> dict[str, list[str]]:
     while is_ptr(u32(groups + 4 * len(tables))):
         tables.append(off(u32(groups + 4 * len(tables))))
     starts = sorted(set(tables) | {groups})
-    for table in tables:
+    for group, table in enumerate(tables):
         end = min([s for s in starts if s > table] or [table + 4 * 256])  # each group's list ends where the next begins
         for slot in range(table, end, 4):
             if not is_ptr(u32(slot)):
                 break
             header = off(u32(slot))
-            place = names.get(u8(header + 0x14))
+            place = MAP_PLACES.get((group, (slot - table) // 4)) or names.get(u8(header + 0x14))
             events = u32(header + 4)
             if not place or place in UNUSED_MAPS or not is_ptr(events):
                 continue

@@ -35,6 +35,8 @@ def test_collins_corrections(squares):
     assert [128, 40] in squares["Daimyn Factory"]
     assert squares["Route 24"] == [[168, 32], [168, 40]]                 # north of Uteya Village
     assert squares["Hesson Pass"] == [[152, 48]]
+    assert squares["Heleo Ranch"] == [[128, 56]]
+    assert squares["Daimyn Factory Overworld"] == squares["Daimyn Factory"]
 
 
 def test_place_descriptions():

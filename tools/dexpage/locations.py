@@ -8,6 +8,10 @@ import unicodedata
 from pathlib import Path
 
 ENCOUNTERS_CSV = Path(__file__).with_name("encounters.csv")
+# Map 1.30, outside Daimyn Factory, is Route 9 to the game (its map section) and to the sheet (sub-area
+# "Daimyn City Factory"), but it has its own encounter table, so the page lists it as its own place (Collin)
+FACTORY_OVERWORLD = "Daimyn Factory Overworld"
+OWN_PLACES = {("Route 9", "Daimyn City Factory"): FACTORY_OVERWORLD}  # (location, sub-area) → place
 
 
 def _norm(s: str) -> str:
@@ -42,13 +46,14 @@ def load_encounters(path: Path = ENCOUNTERS_CSV) -> list[dict]:
         rate, notes = _by_time(_rate(r["Rate"]) if r["Rate"] else "", r["Notes"].strip())
         name = r["Pokémon"].replace("\\e", "é")  # the sheet keeps the game's \e escape for é
         m = re.fullmatch(r"(.*?)\s*\((.+)\)", name)
+        own = OWN_PLACES.get((r["Location"], r["Sub-area"]))
         result.append({
             "name": m.group(1) if m else name,
             "form": m.group(2) if m else None,
             "mode": r["Mode"],
             "method": r["Method"],
-            "location": r["Location"],
-            "sub": r["Sub-area"],
+            "location": own or r["Location"],
+            "sub": "" if own else r["Sub-area"],
             "rate": rate,
             "levels": r["Levels"],
             "item": r["Held item"],

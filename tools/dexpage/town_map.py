@@ -12,6 +12,7 @@ import re
 from PIL import Image
 
 from .field_items import map_section_names
+from .locations import FACTORY_OVERWORLD
 from .paths import DPE_ROOT, Paths
 from .rom import _rom_bytes
 
@@ -34,8 +35,10 @@ NOT_PART_OF = {
     "Route 9": {(14, 3)},            # just the vertical bar; the square east of it is Daimyn Factory's overworld
     "Route 24": {(17, 4), (18, 4)},  # only the stretch north of Uteya Village
 }
-MOVED_TO = {
+PLACED_AT = {
     "Hesson Pass": [(17, 4)],        # one square right of where the grid puts it
+    "Heleo Ranch": [(14, 5)],        # one square up
+    FACTORY_OVERWORLD: [(14, 3)],    # Route 9 to the game; the factory's square, east of Route 9's bar
 }
 
 
@@ -52,6 +55,7 @@ def place_descriptions() -> dict[str, str]:
         if len(cells) >= 2 and cells[0].isdigit():
             name = cells[1] if len(cells) == 3 else f"Route {cells[0]}"
             about[DOC_NAMES.get(name, name)] = cells[-1]
+    about[FACTORY_OVERWORLD] = about["Daimyn Factory"]
     return about
 
 
@@ -72,7 +76,7 @@ def town_map_squares(p: Paths) -> dict[str, list[list[int]]]:
                 name = names.get(section)
                 if section != EMPTY and (col, row) not in NOT_PART_OF.get(name, ()) and (col, row) not in cells.setdefault(name, []):
                     cells[name].append((col, row))
-    cells.update(MOVED_TO)
+    cells.update(PLACED_AT)
     squares = {name: [[ORIGIN + col * CELL - CROP[0], ORIGIN + row * CELL - CROP[1]] for col, row in c]
                for name, c in cells.items()}
     for name, (x, y) in SPOTS.items():

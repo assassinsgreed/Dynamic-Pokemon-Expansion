@@ -347,8 +347,7 @@
     </article>`;
   }
 
-  // The Town Map with everything but the place's 8×8 squares (town_map.py) dimmed, and the squares outlined as one
-  // shape; a lone square also gets a ring so a dungeon's spot stands out
+  // The Town Map with everything but the place's 8×8 squares (town_map.py) dimmed, and the squares outlined as one shape
   const townSpots = new Map(Object.entries(DEX.townMap.places).map(([name, sq]) => [norm(name), sq]));
   // The design doc's description (region-layout.md); a split route ("Route 11 North") uses its route's entry
   const placeAbout = new Map(Object.entries(DEX.townMap.about).map(([name, text]) => [norm(name), text]));
@@ -362,10 +361,9 @@
     const has = new Set(sq.map(([x, y]) => `${x},${y}`));
     const edges = sq.flatMap(([x, y]) => [!has.has(`${x},${y - 8}`) && `M${x} ${y}h8`, !has.has(`${x},${y + 8}`) && `M${x} ${y + 8}h8`,
       !has.has(`${x - 8},${y}`) && `M${x} ${y}v8`, !has.has(`${x + 8},${y}`) && `M${x + 8} ${y}v8`]).filter(Boolean).join("");
-    const ring = sq.length === 1 ? `<circle cx="${sq[0][0] + 4}" cy="${sq[0][1] + 4}" r="10"/>` : "";
     const holes = sq.map(([x, y]) => `M${x} ${y}h8v8h-8z`).join("");  // even-odd: the squares cut through the dimming
     return `<figure class="townmap"><img src="${DEX.townMap.img}" alt="" width="208" height="144" draggable="false"><svg viewBox="0 0 208 144" aria-hidden="true">
-      <path class="dim" fill-rule="evenodd" d="M0 0h208v144H0z${holes}"/><path class="edge-o" d="${edges}"/><path class="edge" d="${edges}"/>${ring}</svg></figure>`;
+      <path class="dim" fill-rule="evenodd" d="M0 0h208v144H0z${holes}"/><path class="edge-o" d="${edges}"/><path class="edge" d="${edges}"/></svg></figure>`;
   }
 
   function placeCard(p, collapsible) {
