@@ -23,6 +23,8 @@
   --accent-soft: #ece2fb;
   --console: #faf7fe;
   --focus: #7c4ddb;
+  --std: #2f7fe6;  /* Standard-only mark */
+  --div: #9a5cf0;  /* Divergent-only mark */
   --font-display: "Bahnschrift", "DIN Alternate", "Avenir Next Condensed", "Roboto Condensed", "Arial Narrow", system-ui, sans-serif;
   --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --font-data: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
@@ -32,11 +34,13 @@
   :root:not([data-theme="light"]) {
     --bg: #140f1d; --surface: #1c1528; --sunk: #231b32; --ink: #ece6f5; --muted: #a497b8;
     --line: #342a46; --accent: #b27cfa; --accent-soft: #2e2145; --console: #1a1326; --focus: #c9a3ff; color-scheme: dark;
+    --std: #5aa2ff; --div: #b27cfa;
   }
 }
 :root[data-theme="dark"] {
   --bg: #140f1d; --surface: #1c1528; --sunk: #231b32; --ink: #ece6f5; --muted: #a497b8;
   --line: #342a46; --accent: #b27cfa; --accent-soft: #2e2145; --console: #1a1326; --focus: #c9a3ff; color-scheme: dark;
+  --std: #5aa2ff; --div: #b27cfa;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -418,6 +422,11 @@ table.mv .c-lv { text-align: right; white-space: nowrap; }
 .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 6px; }  /* 5 across a full-width card on desktop */
 .chip { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 2px 12px 2px 2px; border: 1px solid var(--line); border-radius: 999px; background: var(--sunk); cursor: pointer; text-align: left; }
 .chip:hover { border-color: var(--muted); }
+/* Mode-only Pokémon: a cap on the chip's left edge (Standard blue, Divergent amethyst), matched by dots on the mode filter */
+.chip.m-std { box-shadow: inset 5px 0 0 var(--std); }
+.chip.m-div { box-shadow: inset 5px 0 0 var(--div); }
+#m-std::before, #m-div::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 0; background: var(--std); }
+#m-div::before { background: var(--div); }
 .chip .ln { font-weight: 600; font-size: 13.5px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chip .ln small { color: var(--muted); font-weight: 400; }
 .chip .hw { font: 12px var(--font-data); color: var(--muted); margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; min-width: 0; flex-shrink: 4; overflow: hidden; text-overflow: ellipsis; }

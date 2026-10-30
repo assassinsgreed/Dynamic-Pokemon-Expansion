@@ -153,7 +153,9 @@
   };
   const itemButton = (k, label) => `<button class="itembtn" data-item="${k}">${itemIcon(k)}<span class="in">${esc(label || items[k].name)}</span></button>`;
   const monLink = (i, current) => `<button class="link${i === current ? " current" : ""}" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${formLabel(mons[i])}</span></button>`;
-  const monChip = (i, note, sub, bare) => `<button class="chip" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${bare ? "" : formLabel(mons[i])}${
+  // A chip's left edge shows a Pokémon (or encounter) found in only one mode; Both has none
+  const modeEdge = (modes) => (modes.length > 1 ? "" : modes[0] === "Divergent" ? ' m-div" title="Divergent only' : ' m-std" title="Standard only');
+  const monChip = (i, note, sub, bare, modes = mons[i].modes) => `<button class="chip${modeEdge(modes)}" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${bare ? "" : formLabel(mons[i])}${
     sub ? ` <span class="sub">${esc(sub)}</span>` : ""}</span>${note ? `<span class="hw">${esc(note)}</span>` : ""}</button>`;
   const escapeRe = (text) => text.replace(/[.*+?^$()|[\]\\{}]/g, "\\$&");
   // "Route 2" must match "Route 2" and "Route 2 (hidden)" but not "Route 20"
@@ -376,7 +378,7 @@
     const spot = (line) => line.replace(/\s*\([^)]*\)/g, "").replace(p.name, "").replace(/^[\s·-]+/, "");
     items.forEach((it, k) => { const line = it.where.find((w) => re.test(w.toLowerCase())); if (line) found.push([k, spot(line)]); });
     const body = (methods.length
-      ? methods.map(([mt, l]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips">${l.map(([i, e]) => monChip(i, [e.levels && `Lv ${e.levels}`, e.rate].filter(Boolean).join(" · "), e.sub)).join("")}</div></div>`).join("")
+      ? methods.map(([mt, l]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips">${l.map(([i, e]) => monChip(i, [e.levels && `Lv ${e.levels}`, e.rate].filter(Boolean).join(" · "), e.sub, false, e.mode === "Both" ? ["Standard", "Divergent"] : [e.mode])).join("")}</div></div>`).join("")
       : `<p class="empty">No Pokémon match the current filters here.</p>`) +
       (found.length ? `<div><h4>Items · ${found.length}</h4><div class="chips">${found.map(([k, line]) =>
         `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line ? `<span class="hw">${esc(line)}</span>` : ""}</button>`).join("")}</div></div>` : "");
