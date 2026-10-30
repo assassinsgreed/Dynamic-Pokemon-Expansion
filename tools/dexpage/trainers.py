@@ -200,6 +200,14 @@ def _class_ids(p: Paths) -> dict[str, int]:
 
 
 @cache
+def class_balls(p: Paths) -> dict[str, str]:
+    """Trainer class → the Poké Ball its Pokémon come out of (gClassPokeBalls, as an item constant). A class the table
+    leaves out reads ball type 0, the Master Ball."""
+    table = parse_designated_array(source(p, "src/Tables/class_based_pokeball_table.c"), "gClassPokeBalls")
+    return {cls: "ITEM_" + ball.strip().removeprefix("BALL_TYPE_") for cls, ball in table.items()}
+
+
+@cache
 def _class_ivs(p: Paths) -> dict[str, int]:
     text = source(p, "src/Tables/trainers_with_evs_table.h")
     return {k: min(31, int(v, 0)) for k, v in parse_designated_array(text, "gBaseIVsByTrainerClass").items()}
@@ -376,6 +384,7 @@ def load_trainers(p: Paths, stats: dict, learnsets: dict, move_data: dict, abili
             "double": std.get("doubleBattle") == "TRUE",
             "items": [i for i in re.findall(r"ITEM_\w+", std.get("items", "")) if i != "ITEM_NONE"],
             "iv": class_ivs.get(cls) or standard_iv,
+            "ball": class_balls(p).get(cls, "ITEM_MASTER_BALL"),
             "teams": found,
         })
     trainers.sort(key=lambda t: place_order.get(t["place"], len(place_order)))  # stable: ID order within a place

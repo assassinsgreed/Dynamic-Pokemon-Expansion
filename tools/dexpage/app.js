@@ -609,6 +609,7 @@
       <div class="top">${trainerPic(t, "lg")}<h2>${esc(trainerTitle(t))}<small>${esc(t.place)}</small></h2></div>
       ${t.note ? `<div class="tnote">${esc(t.note)}</div>` : ""}
       <div class="tflags">${entryMode(e)}${flags.map((f) => `<span class="mode">${f}</span>`).join("")}</div>
+      <div><h4>Poké Ball</h4><div class="tflags">${trainerItem(t.ball)}</div></div>
       ${t.items.length ? `<div><h4>Items the trainer uses</h4><div class="tflags">${t.items.map(trainerItem).join("")}</div></div>` : ""}
       <div><h4>Team · ${DIFF_NAME[state.diff]} difficulty · ${team.length} Pokémon</h4><div class="team">${team.map((mon) => teamMon(mon, t)).join("")}</div></div>
     </article>`;

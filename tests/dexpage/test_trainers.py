@@ -89,5 +89,11 @@ def test_unnamed_ability_is_either_regular_one():
     assert T._ability("Ability_Hidden", s) == "ABILITY_H"
 
 
+def test_class_poke_balls(paths, loaded):
+    balls = T.class_balls(paths)
+    assert balls["CLASS_RICH_BOY"] == "ITEM_LUXURY_BALL"
+    assert all(t["ball"].startswith("ITEM_") for t in loaded[0])
+
+
 def test_every_trainer_pic_decodes(loaded):
     assert all(img.size == (64, 64) for img in loaded[2].values())
