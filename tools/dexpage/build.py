@@ -406,10 +406,18 @@ def _attach_ability_details(paths: Paths, abilities: list[dict], moves: dict, de
         a["moves"] = list(dict.fromkeys(m for t in entry.get("moves", []) for m in tables[t] if m in moves))
 
 
+def _smallest_image(path: Path) -> str:
+    """A PNG as a data URL, re-encoded as lossless WebP when that's smaller (Braille Puzzles: 186 KB → 39 KB)."""
+    png = path.read_bytes()
+    out = io.BytesIO()
+    Image.open(path).save(out, "WEBP", lossless=True, exact=True, method=6)
+    kind, data = min(("png", png), ("webp", out.getvalue()), key=lambda x: len(x[1]))
+    return f"data:image/{kind};base64," + base64.b64encode(data).decode()
+
+
 def _docs(ability_names: set[str] = frozenset()) -> list[dict]:
     """Feature-list topics rendered to HTML, with their images embedded so the page stays one offline file."""
-    images = {p.name: "data:image/png;base64," + base64.b64encode(p.read_bytes()).decode()
-              for p in DOC_IMAGES.glob("*.png")} if DOC_IMAGES.exists() else {}
+    images = {p.name: _smallest_image(p) for p in DOC_IMAGES.glob("*.png")} if DOC_IMAGES.exists() else {}
     return [{"title": g["title"], "topics": [{"title": t["title"], "html": render_topic(t, images, ability_names),
                                               "s": _words(t["title"] + " " + topic_text(t))} for t in g["topics"]]}
             for g in load_docs()]
