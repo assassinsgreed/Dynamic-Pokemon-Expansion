@@ -312,6 +312,7 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
             first = min(stock, key=lambda w: int(re.sub(r"\D", "", w) or 0))
             item["where"] = [w for w in item["where"] if w not in stock or w == first]
         item["where"] = _tidy_where(item["where"])
+        item["use"] = _drop_versions(item["use"])
         # "PokeChip Crusher" is redundant next to "PokeChip Crusher (5 chips)"
         item["where"] = [w for w in item["where"] if not any(o.startswith(w + " (") for o in item["where"])]
     for names in held.values():
@@ -383,13 +384,20 @@ def _full_item_name(data: SourceData, const: str) -> str:
 MODE_NOTE = re.compile(r"\((Standard|Divergent) (?:Pokemon encounters|Mode) only\)", re.I)
 
 
+def _drop_versions(text: str) -> str:
+    """Version history out of a doc line, since the page describes the latest release: ", added in v1.4" goes from a
+    note, and a note naming a version goes whole ("(v1.4+)", "(Added in v1.4)", "(Farfetch’d-G only >v1.1.5)" — Collin:
+    the Stick works for both Farfetch’d)."""
+    text = re.sub(r", added in v[\d.]+", "", text, flags=re.I)
+    return re.sub(r"\s*\([^()]*\bv\d+(?:\.\d+)+\+?\)", "", text, flags=re.I).strip()
+
+
 def _tidy_where(where: list[str]) -> list[str]:
     """An item's places, with the feature list's lines said once next to the ROM's shop lines ("<place> · <shop>"):
     version notes go (the page describes the latest release); a doc place a shop line covers goes ("Tsarvosa City
     Market" or "Daimyn City Mall Incense Shop" next to "<that place> · ... shop"); and a mode note line ("(Divergent
     Pokemon encounters only)") becomes a "(Divergent)" tag on the doc lines before it that have none."""
-    where = [re.sub(r"\s*\((?:Added in )?v[\d.]+\+?\)", "", re.sub(r", added in v[\d.]+", "", w, flags=re.I), flags=re.I)
-             for w in where]
+    where = [_drop_versions(w) for w in where]
     shops = [(_norm(w.split(" · ")[0]), _norm(re.sub(r"\s*\((?:Standard|Divergent)\)$", "", w.split(" · ", 1)[1])))
              for w in where if " · " in w]
 
