@@ -42,6 +42,19 @@ def _script_items(p: Paths) -> dict[int, str]:
 
 
 @cache
+def map_section_names(p: Paths) -> dict[int, str]:
+    """Region map section id → its in-game name ("Route 12 East"), from the ROM's sMapNames."""
+    rom = _rom_bytes(p.rom)
+    names = {}
+    for i in range(256):
+        v = struct.unpack_from("<I", rom, MAP_NAMES + 4 * i)[0]
+        if not 0x08000000 <= v < 0x08000000 + len(rom):
+            break
+        names[FIRST_NAMED_MAPSEC + i] = decode(rom[v - 0x08000000:v - 0x08000000 + 40], _charmap())
+    return names
+
+
+@cache
 def field_items(p: Paths) -> dict[str, list[str]]:
     """Item constant → places it's found ("Route 8", "Route 8 (hidden)"), in map order."""
     rom = _rom_bytes(p.rom)
@@ -51,12 +64,7 @@ def field_items(p: Paths) -> dict[str, list[str]]:
     is_ptr = lambda v: 0x08000000 <= v < 0x08000000 + len(rom)
     off = lambda v: v - 0x08000000
 
-    names = {}
-    for i in range(256):
-        v = u32(MAP_NAMES + 4 * i)
-        if not is_ptr(v):
-            break
-        names[FIRST_NAMED_MAPSEC + i] = decode(rom[off(v):off(v) + 40], _charmap())
+    names = map_section_names(p)
     by_id = {}
     for const, i in sorted(item_ids(p).items(), key=lambda kv: bool(re.fullmatch(r"ITEM_0[0-9A-F]{2}", kv[0]))):
         by_id.setdefault(i, const)  # prefer the real name over a numbered alias (ITEM_072 is the Rare Bone)

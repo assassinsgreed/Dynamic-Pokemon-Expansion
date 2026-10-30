@@ -23,6 +23,7 @@ from .paths import DPE_ROOT, Paths
 from .roster import Entry, SourceData, build_roster, evolution_links, load_extra_forms, load_source_data
 from .rom import POCKET_BERRIES, POCKET_KEY_ITEMS, POCKET_POKE_BALLS, item_fields, item_icons
 from .sprites import build_sheet, pack
+from .town_map import norm as place_key, town_map_png, town_map_squares
 from .trainers import NATURES, load_trainers
 
 TEMPLATE = Path(__file__).with_name("template.html")
@@ -149,6 +150,7 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
         "trainers": trainers,
         "teams": teams,
         "trainerSheet": trainer_sheet,
+        "townMap": {"img": _smallest_image(town_map_png()), "places": town_map_squares(data.paths)},
         "unmatchedEncounters": unmatched,
     }
 
@@ -406,11 +408,11 @@ def _attach_ability_details(paths: Paths, abilities: list[dict], moves: dict, de
         a["moves"] = list(dict.fromkeys(m for t in entry.get("moves", []) for m in tables[t] if m in moves))
 
 
-def _smallest_image(path: Path) -> str:
-    """A PNG as a data URL, re-encoded as lossless WebP when that's smaller (Braille Puzzles: 186 KB → 39 KB)."""
-    png = path.read_bytes()
+def _smallest_image(source: Path | bytes) -> str:
+    """A PNG (file or bytes) as a data URL, re-encoded as lossless WebP when that's smaller (Braille Puzzles: 186 KB → 39 KB)."""
+    png = source if isinstance(source, bytes) else source.read_bytes()
     out = io.BytesIO()
-    Image.open(path).save(out, "WEBP", lossless=True, exact=True, method=6)
+    Image.open(io.BytesIO(png)).save(out, "WEBP", lossless=True, exact=True, method=6)
     kind, data = min(("png", png), ("webp", out.getvalue()), key=lambda x: len(x[1]))
     return f"data:image/{kind};base64," + base64.b64encode(data).decode()
 
@@ -499,6 +501,9 @@ MANIFEST = {
 }
 
 
+NOT_ON_TOWN_MAP = {"Roaming", "Ultra Space"}
+
+
 def build(paths: Paths, out: Path) -> None:
     data = load_source_data(paths)
     roster = build_roster(data)
@@ -507,6 +512,10 @@ def build(paths: Paths, out: Path) -> None:
     page = page_data(data, roster, links)
     for name in page["unmatchedEncounters"]:
         print(f"warning: encounters.csv row for {name!r} matches no Pokémon on the page", file=sys.stderr)
+    on_map = {place_key(p) for p in page["townMap"]["places"]}
+    for place in sorted({l["location"] for m in page["mons"] for l in m["loc"]} - NOT_ON_TOWN_MAP):
+        if place_key(place) not in on_map:
+            print(f"warning: {place!r} has no spot on the Town Map (town_map.SPOTS)", file=sys.stderr)
     html = render(page, sheet, offsets).encode("utf-8")
 
     out.mkdir(parents=True, exist_ok=True)

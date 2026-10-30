@@ -63,6 +63,14 @@ def test_learners_packed_by_how(data):
         _pack_learners([[3, "Lv 1"], [3, "Lv 30"], [5, "Lv 30"], [5, "Lv 1"]])
 
 
+def test_every_place_is_on_the_town_map(data):
+    from tools.dexpage.build import NOT_ON_TOWN_MAP
+    from tools.dexpage.town_map import norm
+    on_map = {norm(p) for p in data["townMap"]["places"]}
+    places = {l["location"] for m in data["mons"] for l in m["loc"]}
+    assert {p for p in places if norm(p) not in on_map} == NOT_ON_TOWN_MAP
+
+
 def test_page_size(html):
     assert len(html.encode()) < 8_000_000
 

@@ -347,6 +347,20 @@
     </article>`;
   }
 
+  // The Town Map with the place's 8×8 squares (town_map.py) filled and outlined as one shape; a lone square also gets
+  // a ring so a dungeon's spot stands out
+  const townSpots = new Map(Object.entries(DEX.townMap.places).map(([name, sq]) => [norm(name), sq]));
+  function townMap(name) {
+    const sq = townSpots.get(norm(name));
+    if (!sq) return "";
+    const has = new Set(sq.map(([x, y]) => `${x},${y}`));
+    const edges = sq.flatMap(([x, y]) => [!has.has(`${x},${y - 8}`) && `M${x} ${y}h8`, !has.has(`${x},${y + 8}`) && `M${x} ${y + 8}h8`,
+      !has.has(`${x - 8},${y}`) && `M${x} ${y}v8`, !has.has(`${x + 8},${y}`) && `M${x + 8} ${y}v8`]).filter(Boolean).join("");
+    const ring = sq.length === 1 ? `<circle cx="${sq[0][0] + 4}" cy="${sq[0][1] + 4}" r="10"/>` : "";
+    return `<figure class="townmap"><img src="${DEX.townMap.img}" alt="" width="208" height="144" draggable="false"><svg viewBox="0 0 208 144" aria-hidden="true">
+      ${sq.map(([x, y]) => `<rect x="${x}" y="${y}" width="8" height="8"/>`).join("")}<path d="${edges}"/>${ring}</svg></figure>`;
+  }
+
   function placeCard(p, collapsible) {
     const rows = p.rows.filter(([, l]) => rowInMode(l));
     const methods = [];
@@ -361,7 +375,7 @@
       : `<p class="empty">No Pokémon match the current filters here.</p>`) +
       (found.length ? `<div><h4>Items · ${found.length}</h4><div class="chips">${found.map(([k, line]) =>
         `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line ? `<span class="hw">${esc(line)}</span>` : ""}</button>`).join("")}</div></div>` : "");
-    return `<article class="loccard">${collapsible ? COLLAPSE : ""}<h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2><div class="learners">${body}</div></article>`;
+    return `<article class="loccard">${collapsible ? COLLAPSE : ""}<h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2>${townMap(p.name)}<div class="learners">${body}</div></article>`;
   }
 
   // ---------------------------------------------------------------- views
