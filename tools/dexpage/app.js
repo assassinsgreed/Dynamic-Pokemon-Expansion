@@ -636,11 +636,11 @@
     const html = groups.map(([p, es]) => `<div class="cat-head">${esc(p)} · ${es.length}</div>${state.layouts.trainers === "grid"
       ? '<div class="tchips">' + chipsWithOpen(es, (e) => `<button class="chip${e === open ? " on" : ""}" data-trainer="${e}">${trainerPic(trainers[entries[e].n], "sm")}<span class="ln">${esc(trainerTitle(trainers[entries[e].n]))}</span>${
           state.mode ? "" : entryMode(e)}<span class="hw" title="${trainers[entries[e].n].scaled ? SCALE_TIP : "Levels on the team"}">${lvText(e)}</span></button>`, (e) => e === open, trainerCard) + '</div>'
-      : `<div class="listtable"><table class="mv"><thead><tr><th>Trainer</th><th class="tteam">Team</th><th class="c-lv">Level</th></tr></thead><tbody>${es.map((e) => {
-          const t = trainers[entries[e].n], sprites = teamOf(e).map(([i]) => sprite(mons[i], true)).join("");
-          return `<tr data-trainer="${e}"${e === open ? ' class="on"' : ""}><td><div class="trow">${trainerPic(t)}<span class="tn"><span class="tname"><span class="mvname">${esc(trainerTitle(t))}</span>${entryMode(e)}</span>${
+      : `<div class="listtable"><table class="mv"><thead><tr><th>Trainer</th><th class="tteam">Team</th><th class="c-lv tlvcol">Level</th></tr></thead><tbody>${es.map((e) => {
+          const t = trainers[entries[e].n], sprites = teamOf(e).map(([i]) => sprite(mons[i], true)).join(""), lvLabel = lvText(e);
+          return `<tr data-trainer="${e}"${e === open ? ' class="on"' : ""}><td><div class="trow">${trainerPic(t)}<span class="tn"><span class="tname"><span class="mvname">${esc(trainerTitle(t))}</span>${entryMode(e)}<span class="note tlv-inline">${lvLabel}</span></span>${
             t.note ? `<span class="note">${esc(t.note)}</span>` : ""}<span class="teamline tt-inline">${sprites}</span></span></div></td><td class="tteam"><span class="teamline">${sprites}</span></td>
-            <td class="n lvcell" title="${t.scaled ? SCALE_TIP : "Levels on the team"}">${t.scaled ? `<span class="note">Scaling, min</span> ${minLv(e)}` : lvRange(e)}</td></tr>${e === open ? expandRow(3, trainerCard(e)) : ""}`;
+            <td class="n lvcell tlvcol" title="${t.scaled ? SCALE_TIP : "Levels on the team"}">${t.scaled ? `<span class="note">Scaling, min</span> ${minLv(e)}` : lvRange(e)}</td></tr>${e === open ? expandRow(3, trainerCard(e)) : ""}`;
         }).join("")}</tbody></table></div>`}`).join("");
     return [html, `${list.length} trainers`];
   }

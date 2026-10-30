@@ -345,16 +345,29 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .thead { display: grid; gap: 8px; min-width: 0; flex: 1 1 180px; }  /* beside the picture, even on phones */
 .tside { display: flex; flex-wrap: wrap; gap: 12px 28px; margin-left: auto; }
 .teamline.tt-inline { display: none; }
+.tlv-inline { display: none; }
 /* Phones: the team moves under the trainer's name (its column shrinks to nothing rather than being removed, so the
    opened row's colspan still matches), and the picture shrinks to sit beside the name */
 @media (max-width: 600px) {
   .tside { margin-left: 0; }
   .teamline.tt-inline { display: flex; }
-  table.mv .tteam { width: 0; padding: 0; font-size: 0; }
-  table.mv .tteam > * { display: none; }
+  table.mv .tteam, table.mv .tlvcol { width: 0; padding: 0; font-size: 0; }
+  table.mv .tteam > *, table.mv .tlvcol > * { display: none; }
+  .tlv-inline { display: inline; }
   .trainercard .tp.lg { width: 64px; height: 64px; }
   .trainercard .tp.lg i { transform: none; }
   .trainercard .top > .tp { margin-right: -14px; }
+  /* one row of smaller sprites, and a smaller picture so the name keeps its width */
+  .teamline.tt-inline { flex-wrap: nowrap; margin-top: 2px; }
+  .tt-inline .sp.sm { width: 28px; height: 28px; }
+  .tt-inline .sp.sm i { transform: scale(.4375); }
+  .trow .tp { width: 32px; height: 32px; }
+  .trow .tp i { transform: scale(.5); }
+  .trow { gap: 6px; }
+  /* Difficulty gets its own full line under Mode / Layout / count */
+  .diffpick { order: 10; flex-basis: 100%; margin-left: 0; }
+  .diffpick .seg { flex: 1; }
+  .diffpick .seg button { flex: 1; }
 }
 .trainercard h2 { margin: 0; font: 600 24px/1.1 var(--font-display); }
 .trainercard h2 small { display: block; font: 500 13px var(--font-body); color: var(--muted); margin-top: 4px; }

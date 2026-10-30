@@ -159,6 +159,18 @@ def _regions(p: Paths) -> tuple[dict[str, str], dict[str, int]]:
         if place not in order:  # a place with no trainers of its own: beside a region named like it, else first
             near = [order[r] for r in names if _place_words(r)[:len(_place_words(place))] == _place_words(place)]
             order[place] = min(near) - 0.5 if near else -1
+    # Gym and Trainer House trainers get their building in the place name (TRAINER_LAPLAZ_TRAINER_HOUSE_… → Laplaz
+    # Town Trainer House), listed right after their town; the Gym Trainees' café isn't a gym
+    for const, region in regions.items():
+        m = re.match(r"TRAINER_(\w+?)_(GYM|TRAINER_HOUSE|LIBRARY)_", const)
+        if not m or "_GYM_TRAINEE_" in const or region.endswith(" Gym"):
+            continue
+        prefix = _place_words(m.group(1))
+        towns = [part for part in re.split(r"\s*(?:&|\band\b)\s*", region) if _place_words(part)[:len(prefix)] == prefix]
+        building = {"GYM": " Gym", "TRAINER_HOUSE": " Trainer House", "LIBRARY": " Library"}[m.group(2)]
+        place = (towns[0] if towns else region) + building
+        regions[const] = place
+        order.setdefault(place, order.get(region, len(order)) + (0.25 if building == " Gym" else 0.5))
     return regions, order
 
 

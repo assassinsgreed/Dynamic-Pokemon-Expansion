@@ -97,3 +97,10 @@ def test_class_poke_balls(paths, loaded):
 
 def test_every_trainer_pic_decodes(loaded):
     assert all(img.size == (64, 64) for img in loaded[2].values())
+
+
+def test_gym_and_trainer_house_places(loaded):
+    assert by_const(loaded, "TRAINER_RHODANZI_GYM_ALONSO")["place"] == "Rhodanzi City Gym"
+    assert by_const(loaded, "TRAINER_LAPLAZ_TRAINER_HOUSE_COLLECTOR_DIRK")["place"] == "Laplaz Town Trainer House"
+    assert by_const(loaded, "TRAINER_BRUCCIE_VILLAGE_GYM_LEADER_ABBY")["place"] == "Bruccie Village Gym"
+    assert by_const(loaded, "TRAINER_TSARVOSA_CITY_GYM_TRAINEE_NOAM")["place"] == "Tsarvosa City"
