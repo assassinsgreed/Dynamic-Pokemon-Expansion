@@ -104,3 +104,7 @@ def test_gym_and_trainer_house_places(loaded):
     assert by_const(loaded, "TRAINER_LAPLAZ_TRAINER_HOUSE_COLLECTOR_DIRK")["place"] == "Laplaz Town Trainer House"
     assert by_const(loaded, "TRAINER_BRUCCIE_VILLAGE_GYM_LEADER_ABBY")["place"] == "Bruccie Village Gym"
     assert by_const(loaded, "TRAINER_TSARVOSA_CITY_GYM_TRAINEE_NOAM")["place"] == "Tsarvosa City"
+
+
+def test_ferrox_library(loaded):
+    assert by_const(loaded, "TRAINER_FERROX_LIBRARY_LAURENA")["place"] == "Ferrox Library"

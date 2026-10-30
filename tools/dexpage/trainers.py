@@ -169,6 +169,8 @@ def _regions(p: Paths) -> tuple[dict[str, str], dict[str, int]]:
         towns = [part for part in re.split(r"\s*(?:&|\band\b)\s*", region) if _place_words(part)[:len(prefix)] == prefix]
         building = {"GYM": " Gym", "TRAINER_HOUSE": " Trainer House", "LIBRARY": " Library"}[m.group(2)]
         place = (towns[0] if towns else region) + building
+        if building == " Library":  # the game calls it Ferrox Library, not Ferrox Village Library
+            place = m.group(1).replace("_", " ").title() + building
         regions[const] = place
         order.setdefault(place, order.get(region, len(order)) + (0.25 if building == " Gym" else 0.5))
     return regions, order
