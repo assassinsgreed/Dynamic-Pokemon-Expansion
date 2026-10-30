@@ -128,8 +128,9 @@
   const pad = (n) => String(n).padStart(3, "0");
   // One tag for the dex it's in ("Both" for the two), and its number on its own: a Pokémon in both dexes has the same
   // number in each.
-  const modeBadge = (m) => m.modes.length > 1 ? '<span class="mode b">Both</span>'
-    : `<span class="mode${m.modes[0] === "Divergent" ? " d" : ""}">${m.modes[0]}</span>`;
+  // "Standard" / "Divergent" / "Both" tag, coloured like the mode filter's dots (modeClass below)
+  const modeTag = (mode) => `<span class="mode${modeClass(mode === "Both" ? ["Standard", "Divergent"] : [mode])}">${esc(mode)}</span>`;
+  const modeBadge = (m) => modeTag(m.modes.length > 1 ? "Both" : m.modes[0]);
   const dexNo = (m) => {  // own number "#384"; a form shares its base's ("#384"), with "(Swarm)" for swarm Pokémon
     const fields = state.mode ? [state.mode === "Standard" ? "std" : "div"] : ["std", "div"];
     const own = fields.map((f) => m.dex[f]).find(Boolean);
@@ -239,7 +240,7 @@
       rows.map((l) => `<tr><td><button class="mvname" data-place="${esc(l.location)}">${esc(l.location)}</button>${l.sub ? `<div class="note">${esc(l.sub)}</div>` : ""}${
         l.variant ? `<div class="note">${esc(l.variant)}</div>` : ""}${l.notes ? `<div class="note">${esc(l.notes)}</div>` : ""}</td>
         <td class="meth">${esc(l.method)}</td><td class="n">${esc(l.levels || "—")}</td><td class="n">${esc(l.rate || "—")}</td>
-        <td class="hide-sm"><span class="mode${l.mode === "Divergent" ? " d" : ""}">${esc(l.mode)}</span></td></tr>`).join("")}</tbody></table></div>`;
+        <td class="hide-sm">${modeTag(l.mode)}</td></tr>`).join("")}</tbody></table></div>`;
   }
 
   function panel(i) {
@@ -378,12 +379,16 @@
     // Chip hint is just the spot within the place ("Shady relic seller"); prices and notes are on the item's card
     const spot = (line) => line.replace(/\s*\([^)]*\)/g, "").replace(p.name, "").replace(/^[\s·-]+/, "");
     items.forEach((it, k) => { const line = it.where.find((w) => re.test(w.toLowerCase())); if (line) found.push([k, spot(line)]); });
-    const body = (methods.length
+    // Three parts, each set apart: the map and description, the encounters by method, the items found here
+    const encounters = methods.length
       ? methods.map(([mt, l]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips">${l.map(([i, e]) => monChip(i, [e.levels && `Lv ${e.levels}`, e.rate].filter(Boolean).join(" · "), e.sub, false, e.mode === "Both" ? ["Standard", "Divergent"] : [e.mode])).join("")}</div></div>`).join("")
-      : `<p class="empty">No Pokémon match the current filters here.</p>`) +
-      (found.length ? `<div><h4>Items · ${found.length}</h4><div class="chips">${found.map(([k, line]) =>
-        `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line ? `<span class="hw">${esc(line)}</span>` : ""}</button>`).join("")}</div></div>` : "");
-    return `<article class="loccard">${collapsible ? COLLAPSE : ""}<h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2><div class="placehead">${townMap(p.name)}${aboutPlace(p.name)}</div><div class="learners">${body}</div></article>`;
+      : `<p class="empty">No Pokémon match the current filters here.</p>`;
+    const itemChips = found.map(([k, line]) =>
+      `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line ? `<span class="hw">${esc(line)}</span>` : ""}</button>`).join("");
+    return `<article class="loccard">${collapsible ? COLLAPSE : ""}<h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2>
+      <div class="placehead">${townMap(p.name)}${aboutPlace(p.name)}</div>
+      <section class="placesec"><h3>Encounters · ${rows.length}</h3><div class="learners">${encounters}</div></section>
+      ${found.length ? `<section class="placesec"><h3>Items · ${found.length}</h3><div class="chips">${itemChips}</div></section>` : ""}</article>`;
   }
 
   // ---------------------------------------------------------------- views
@@ -591,8 +596,7 @@
   const slots = (e) => (entries[e].mode === "Divergent" ? [2, 3] : [0, 1]);  // [this mode's team, its Hard team]
   const teamOf = (e) => TEAMS.list[trainers[entries[e].n].teams[slots(e)[state.diff === "std" ? 0 : 1]]];
   const entryInMode = (e) => !state.mode || entries[e].mode === "Both" || entries[e].mode === state.mode;
-  const entryMode = (e) => (entries[e].mode === "Both" ? '<span class="mode b">Both</span>'
-    : `<span class="mode${entries[e].mode === "Divergent" ? " d" : ""}">${entries[e].mode}</span>`);
+  const entryMode = (e) => modeTag(entries[e].mode);
   // Searched from the start of any word: "raine" finds Leader Raine but not every "Trainer"
   const wordStarts = (s) => { const w = words(s).split(" "); return w.map((_, k) => w.slice(k).join("")); };
   const trainerKeys = trainers.map((t) => [...wordStarts(`${t.cls} ${t.name}`), ...wordStarts(t.place), t.rival ? "rival" : ""].filter(Boolean));

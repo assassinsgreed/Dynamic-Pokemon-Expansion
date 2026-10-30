@@ -161,8 +161,9 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .who .nm small { font: 500 13px var(--font-body); color: var(--muted); margin-left: 6px; letter-spacing: 0; }
 .tags { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
 .mode { font: 600 10.5px/1 var(--font-body); padding: 3px 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
-.mode.d { border-color: var(--accent); color: var(--accent); }
-.mode.b { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); color: var(--ink); }
+/* Mode tags: the filter's dot and a tinted outline (the m-* classes set --edge / --edge-line); plain .mode is a neutral flag */
+.mode.m-std, .mode.m-div, .mode.m-both { border-color: color-mix(in srgb, var(--edge-line) 70%, var(--line)); color: var(--ink); }
+.mode.m-std::before, .mode.m-div::before, .mode.m-both::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; background: var(--edge); }
 /* Dex number and mode tag: a header row at the top of a grid card; in list rows, right-aligned beside the expand arrow */
 .mon > summary { position: relative; }
 .dexline { position: absolute; top: 50%; right: 56px; transform: translateY(-50%); display: flex; align-items: center; gap: 6px; pointer-events: none; }
@@ -340,6 +341,9 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .placehead { display: grid; gap: 12px; }
 .placehead:empty { display: none; }
 .placeabout { margin: 0; font-style: italic; color: var(--muted); }
+/* Encounters and Items: set apart from the map and each other, headed larger than the method groups inside */
+.placesec { display: grid; gap: 10px; border-top: 1px solid var(--line); padding-top: 14px; margin-top: 6px; }
+.placesec h3 { margin: 0; font: 600 16px/1.1 var(--font-display); letter-spacing: .02em; color: var(--ink); }
 .loccard h2 small { font: 500 13px var(--font-body); color: var(--muted); margin-left: 8px; }
 .chip .sub { font-size: 11.5px; color: var(--muted); font-weight: 400; }
 
