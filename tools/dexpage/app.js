@@ -630,6 +630,10 @@
     });
   }
 
+  // Drawn rather than the ♂/♀ characters, whose crossbar and arrow most fonts squeeze to nothing at this size
+  const FEMALE_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="5.5" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 9.5V15M5 12.5h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  const MALE_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="6.5" cy="9.5" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.5 6.5L14 2M10 2h4v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
   function teamMon([i, lv, it, ab, mvs, nat, evs, custom, gender], t) {
     const m = mons[i], hard = state.diff !== "std", xhard = state.diff === "xhard";
     const ability = TEAMS.abilities[ab].split(" or ").map((a) => (abilityIndex.has(a) ? `<button class="mvname" data-ability="${esc(a)}">${esc(a)}</button>` : esc(a))).join(" or ");
@@ -645,7 +649,8 @@
       return `<button class="tmv" data-move="${k}" style="--c:${TYPE_COLOR[mv.type]}" title="${esc(mv.desc)}"><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span><span>${esc(mv.name)}</span></button>`;
     };
     // Gender the game gives it (trainers.py _gender: the trainer's, unless the species can't be or is 75%+ female)
-    const sex = gender === "F" ? '<span class="tsex f" title="Female">♀</span>' : gender === "M" ? '<span class="tsex m" title="Male">♂</span>' : "";
+    const sex = gender === "F" ? `<span class="tsex f" title="Female" aria-label="Female">${FEMALE_ICON}</span>`
+      : gender === "M" ? `<span class="tsex m" title="Male" aria-label="Male">${MALE_ICON}</span>` : "";
     return `<div class="tmon" style="${tint(m)}"><div class="head">${monLink(i)}${sex}<span class="lv">${t.scaled ? `Scaling, minimum ${lv}` : `Lv ${lv}`}</span></div>
       <dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>
       ${t.scaled && !custom  // the game picks these moves at the scaled level, so the listed level's moves would be wrong
