@@ -43,6 +43,9 @@
   for (const mv of Object.values(DEX.moves)) {
     mv.learners = Object.entries(mv.learners).flatMap(([how, ids]) => ids.map((i) => [i, how])).sort((a, b) => a[0] - b[0]);
   }
+  // …and a Pokémon's abilities as indexes into DEX.abilities where the text is the same
+  const unpackAbility = (a) => (typeof a === "number" ? [DEX.abilities[a].name, DEX.abilities[a].desc, DEX.abilities[a].chance] : a);
+  for (const m of DEX.mons) { m.abilities = m.abilities.map(unpackAbility); m.hidden = unpackAbility(m.hidden); }
   const mons = DEX.mons, moves = DEX.moves, items = DEX.items;
   const moveKeys = Object.keys(moves).sort((a, b) => moves[a].name.localeCompare(moves[b].name));
   const monMoves = mons.map(() => []);  // per-Pokémon move lists, rebuilt from the move → learners table

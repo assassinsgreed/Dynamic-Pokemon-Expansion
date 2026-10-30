@@ -561,8 +561,16 @@ def _pack_learners(learners: list) -> dict[str, list[int]]:
     return packed
 
 
+def _pack_ability(ability: list | None, index: dict[tuple, int]) -> list | int | None:
+    """A Pokémon's [name, description, chance] as its index in DEX.abilities when that entry has the same text,
+    so each description is written once (app.js swaps the index back). Anything that differs is left as it is."""
+    return index.get(tuple(ability), ability) if ability else ability
+
+
 def render(data: dict, sheet: bytes, offsets: dict) -> str:
-    data = dict(data, mons=[dict(m, sp=offsets[m["key"]]) for m in data["mons"]],
+    index = {(a["name"], a["desc"], a["chance"]): n for n, a in enumerate(data["abilities"])}
+    data = dict(data, mons=[dict(m, sp=offsets[m["key"]], abilities=[_pack_ability(a, index) for a in m["abilities"]],
+                                 hidden=_pack_ability(m["hidden"], index)) for m in data["mons"]],
                 moves={k: dict(m, learners=_pack_learners(m["learners"])) for k, m in data["moves"].items()})
     # Keys keep the move table compact and stable; the page only needs them as ids.
     blob = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
