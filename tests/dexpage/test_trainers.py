@@ -65,5 +65,29 @@ def test_class_names_read_from_rom(paths):
     assert "Rival" in names
 
 
+def test_rom_trainer_table_matches_source(paths):
+    # The trainerPic read relies on gTrainers' ROM address; the class byte beside it must match the source table
+    import re, struct
+    from tools.dexpage.cparse import collect_defines, read
+    from tools.dexpage.rom import _rom_bytes
+    base = int(re.search(r"^gTrainers:\s+([0-9A-Fa-f]{8})", read(paths.cfru / "offsets.ini"), flags=re.M).group(1), 16) - 0x08000000
+    rom = _rom_bytes(paths.rom)
+    ids = {k: int(v) for k, v in collect_defines(paths.cfru / "include/constants/opponents.h").items() if (v or "").isdigit()}
+    classes = T._class_ids(paths)
+    std = T.load_tables(paths)["std"]
+    for const, entry in std.items():
+        assert rom[base + T.TRAINER_STRUCT_SIZE * ids[const] + 1] == classes[entry["trainerClass"]], const
+
+
+def test_rival_uses_rival_pic(paths):
+    assert T._rom_pics(paths, {"TRAINER_RIVAL1": 1})["TRAINER_RIVAL1"] == 0x6A
+
+
+def test_unnamed_ability_is_either_regular_one():
+    s = {"abilities": ["ABILITY_A", "ABILITY_B"], "hidden_ability": "ABILITY_H"}
+    assert T._ability(None, s) == "ABILITY_A or ABILITY_B"
+    assert T._ability("Ability_Hidden", s) == "ABILITY_H"
+
+
 def test_every_trainer_pic_decodes(loaded):
     assert all(img.size == (64, 64) for img in loaded[2].values())

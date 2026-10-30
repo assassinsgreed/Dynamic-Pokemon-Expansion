@@ -547,20 +547,23 @@
     return [html, `${list.length} topics`];
   }
 
-  // Trainers: four teams each, from the Standard, Hard, Divergent and Hard Divergent tables (in that order)
+  // Trainers: four teams each, from the Standard, Hard, Divergent and Hard Divergent tables (in that order).
+  // A trainer is one entry tagged Both when Divergent mode fights the same teams, else one entry per mode.
   const trainers = DEX.trainers, TEAMS = DEX.teams;
   const DIFF_NAME = { std: "Standard", hard: "Hard", xhard: "Extra Hard" };
   const NATURE_STATS = ["Atk", "Def", "Spe", "SpA", "SpD"];  // the order natures raise and lower stats in
+  const entries = [];
+  trainers.forEach((t, n) => {
+    if (t.teams[0] === t.teams[2] && t.teams[1] === t.teams[3]) entries.push({ n, mode: "Both" });
+    else entries.push({ n, mode: "Standard" }, { n, mode: "Divergent" });
+  });
   const trainerTitle = (t) => (t.rival ? t.cls : `${t.cls} ${t.name}`.trim());
-  const trainerSlug = (n) => `${n}-${slug(trainerTitle(trainers[n]))}`;
-  const teamIndex = (t, mode) => t.teams[(mode === "Divergent" ? 2 : 0) + (state.diff === "std" ? 0 : 1)];
-  const teamOf = (t, mode) => TEAMS.list[teamIndex(t, mode)];
-  // On All, a trainer whose Divergent team differs shows both
-  const teamsShown = (t) => {
-    if (state.mode) return [["", teamIndex(t, state.mode)]];
-    const std = teamIndex(t, "Standard"), div = teamIndex(t, "Divergent");
-    return std === div ? [["", std]] : [["Standard mode", std], ["Divergent mode", div]];
-  };
+  const trainerSlug = (e) => `${e}-${slug(trainerTitle(trainers[entries[e].n]))}`;
+  const slots = (e) => (entries[e].mode === "Divergent" ? [2, 3] : [0, 1]);  // [this mode's team, its Hard team]
+  const teamOf = (e) => TEAMS.list[trainers[entries[e].n].teams[slots(e)[state.diff === "std" ? 0 : 1]]];
+  const entryInMode = (e) => !state.mode || entries[e].mode === "Both" || entries[e].mode === state.mode;
+  const entryMode = (e) => (entries[e].mode === "Both" ? '<span class="mode b">Both</span>'
+    : `<span class="mode${entries[e].mode === "Divergent" ? " d" : ""}">${entries[e].mode}</span>`);
   const trainerKeys = trainers.map((t) => [norm(t.cls), norm(t.name), norm(t.cls + t.name), norm(t.place), t.rival ? "rival" : ""].filter(Boolean));
   const natureText = (n) => {
     const up = Math.floor(n / 5), down = n % 5;
@@ -570,26 +573,24 @@
   const trainerItem = (it) => (typeof it === "number" ? itemButton(it) : `<span>${esc(it)}</span>`);
 
   function matchTrainers(q) {
-    // Pokémon count in every difficulty, but only in the modes being shown
-    const slots = state.mode === "Standard" ? [0, 1] : state.mode === "Divergent" ? [2, 3] : [0, 1, 2, 3];
     const fw = words(state.q);
-    return trainers.map((_, n) => n).filter((n) => {
-      const t = trainers[n];
-      const team = slots.flatMap((s) => TEAMS.list[t.teams[s]]);
-      if (state.type && !team.some(([i]) => mons[i].types.includes(state.type))) return false;
-      return !q || trainerKeys[n].some((k) => k.includes(q)) || words(t.note).includes(fw) || team.some(([i]) => mons[i].s.some((s) => s.includes(q)));
+    return entries.map((_, e) => e).filter((e) => {
+      if (!entryInMode(e)) return false;
+      const n = entries[e].n, t = trainers[n];
+      // its Pokémon count in every difficulty
+      return !q || trainerKeys[n].some((k) => k.includes(q)) || words(t.note).includes(fw)
+        || slots(e).some((s) => TEAMS.list[t.teams[s]].some(([i]) => mons[i].s.some((x) => x.includes(q))));
     });
   }
 
   function teamMon([i, lv, it, ab, mvs, nat, evs], t) {
     const m = mons[i], hard = state.diff !== "std", xhard = state.diff === "xhard";
     const ability = TEAMS.abilities[ab].split(" or ").map((a) => (abilityIndex.has(a) ? `<button class="mvname" data-ability="${esc(a)}">${esc(a)}</button>` : esc(a))).join(" or ");
-    // Partners fight on your side: the game gives them no Hard nature and keeps their class IVs on Extra Hard
     const rows = [
       it !== null && ["Item", trainerItem(it)],
       ab !== null && TEAMS.abilities[ab] && ["Ability", ability],
-      hard && !t.partner && ["Nature", esc(natureText(nat))],
-      ["IVs", `${xhard && !t.partner ? 31 : t.iv} in every stat`],
+      hard && ["Nature", esc(natureText(nat))],
+      ["IVs", `${xhard ? 31 : t.iv} in every stat`],
       xhard && ["EVs", evs.slice().sort().map((s) => `252 ${STAT_LABELS[s]}`).join(", ")],
     ].filter(Boolean);
     const moveBtn = (n) => {
@@ -601,34 +602,33 @@
       <div class="tmoves">${mvs.map(moveBtn).join("")}</div></div>`;
   }
 
-  function trainerCard(n) {
-    const t = trainers[n];
-    const flags = [t.double && "Double battle", t.partner && "Fights alongside you", t.rival && "Named whatever you named your rival"].filter(Boolean);
+  function trainerCard(e) {
+    const t = trainers[entries[e].n], team = teamOf(e);
+    const flags = [t.double && "Double battle", t.rival && "Named whatever you named your rival"].filter(Boolean);
     return `<article class="trainercard">${COLLAPSE}
       <div class="top">${trainerPic(t, "lg")}<h2>${esc(trainerTitle(t))}<small>${esc(t.place)}</small></h2></div>
       ${t.note ? `<div class="tnote">${esc(t.note)}</div>` : ""}
-      ${flags.length ? `<div class="tflags">${flags.map((f) => `<span class="mode">${f}</span>`).join("")}</div>` : ""}
+      <div class="tflags">${entryMode(e)}${flags.map((f) => `<span class="mode">${f}</span>`).join("")}</div>
       ${t.items.length ? `<div><h4>Items the trainer uses</h4><div class="tflags">${t.items.map(trainerItem).join("")}</div></div>` : ""}
-      ${teamsShown(t).map(([label, k]) => `<div><h4>${label ? `${label} team` : "Team"} · ${DIFF_NAME[state.diff]} difficulty</h4><div class="team">${
-        TEAMS.list[k].map((mon) => teamMon(mon, t)).join("")}</div></div>`).join("")}
+      <div><h4>Team · ${DIFF_NAME[state.diff]} difficulty · ${team.length} Pokémon</h4><div class="team">${team.map((mon) => teamMon(mon, t)).join("")}</div></div>
     </article>`;
   }
 
   function trainersView(q) {
     const list = matchTrainers(q);
-    if (!list.length) return [`<div class="nores">No trainers match “${esc(state.q)}”.</div>`, "0 trainers"];
-    const open = state.trainer, mode = state.mode || "Standard";
+    if (!list.length) return [`<div class="nores">No trainers match “${esc(state.q)}”${state.mode ? ` in ${state.mode} mode` : ""}.</div>`, "0 trainers"];
+    const open = state.trainer;
     const groups = [];
-    list.forEach((n) => { const p = trainers[n].place || "Other"; const g = groups.find(([x]) => x === p); g ? g[1].push(n) : groups.push([p, [n]]); });
-    const maxLv = (n) => Math.max(...teamOf(trainers[n], mode).map(([, lv]) => lv));
-    const html = groups.map(([p, ns]) => `<div class="cat-head">${esc(p)} · ${ns.length}</div>${state.layouts.trainers === "grid"
-      ? chipsWithOpen(ns, (n) => `<button class="chip${n === open ? " on" : ""}" data-trainer="${n}">${trainerPic(trainers[n], "sm")}<span class="ln">${esc(trainerTitle(trainers[n]))}</span><span class="hw">Lv ${maxLv(n)}</span></button>`,
-        (n) => n === open, trainerCard)
-      : `<div class="listtable"><table class="mv"><thead><tr><th>Trainer</th><th>Team</th><th class="c-num">Lv</th></tr></thead><tbody>${ns.map((n) => {
-          const t = trainers[n];
-          return `<tr data-trainer="${n}"${n === open ? ' class="on"' : ""}><td><div class="trow">${trainerPic(t)}<span class="tn"><span class="mvname">${esc(trainerTitle(t))}</span>${
-            t.note ? `<span class="note">${esc(t.note)}</span>` : ""}</span></div></td><td><span class="teamline">${teamOf(t, mode).map(([i]) => sprite(mons[i], true)).join("")}</span></td>
-            <td class="n">${maxLv(n)}</td></tr>${n === open ? expandRow(3, trainerCard(n)) : ""}`;
+    list.forEach((e) => { const p = trainers[entries[e].n].place || "Other"; const g = groups.find(([x]) => x === p); g ? g[1].push(e) : groups.push([p, [e]]); });
+    const maxLv = (e) => Math.max(...teamOf(e).map(([, lv]) => lv));
+    const html = groups.map(([p, es]) => `<div class="cat-head">${esc(p)} · ${es.length}</div>${state.layouts.trainers === "grid"
+      ? '<div class="tchips">' + chipsWithOpen(es, (e) => `<button class="chip${e === open ? " on" : ""}" data-trainer="${e}">${trainerPic(trainers[entries[e].n], "sm")}<span class="ln">${esc(trainerTitle(trainers[entries[e].n]))}</span>${
+          state.mode ? "" : entryMode(e)}<span class="hw" title="Highest level on the team">Max Lv ${maxLv(e)}</span></button>`, (e) => e === open, trainerCard) + '</div>'
+      : `<div class="listtable"><table class="mv"><thead><tr><th>Trainer</th><th>Team</th><th class="c-num" title="Highest level on the team">Max Lv</th></tr></thead><tbody>${es.map((e) => {
+          const t = trainers[entries[e].n];
+          return `<tr data-trainer="${e}"${e === open ? ' class="on"' : ""}><td><div class="trow">${trainerPic(t)}<span class="tn"><span class="tname"><span class="mvname">${esc(trainerTitle(t))}</span>${entryMode(e)}</span>${
+            t.note ? `<span class="note">${esc(t.note)}</span>` : ""}</span></div></td><td><span class="teamline">${teamOf(e).map(([i]) => sprite(mons[i], true)).join("")}</span></td>
+            <td class="n">${maxLv(e)}</td></tr>${e === open ? expandRow(3, trainerCard(e)) : ""}`;
         }).join("")}</tbody></table></div>`}`).join("");
     return [html, `${list.length} trainers`];
   }
@@ -654,7 +654,7 @@
     $("#clear").hidden = !$("#q").value;
     $("#back").disabled = depth <= 0;
     $("#fwd").disabled = depth >= top;
-    $("#typepick").hidden = ["abilities", "items", "places", "docs"].includes(state.view);  // these have no type
+    $("#typepick").hidden = ["abilities", "items", "trainers", "places", "docs"].includes(state.view);  // these have no type
     $("#mode-seg").hidden = state.view === "docs";
     $("#diff-pick").hidden = state.view !== "trainers";
     document.querySelectorAll(".seg button[data-diff]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.diff === state.diff)));
@@ -838,7 +838,7 @@
     const views = { "": "dex", pokedex: "dex", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", trainers: "trainers", locations: "places", docs: "docs" };
     Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, doc: null, ability: null, trainer: null, open: null });
     if (h in views) state.view = views[h];
-    else if (h.startsWith("trainer-")) { const n = parseInt(h.slice(8), 10); Object.assign(state, { view: "trainers", trainer: n >= 0 && n < trainers.length ? n : null }); }
+    else if (h.startsWith("trainer-")) { const n = parseInt(h.slice(8), 10); Object.assign(state, { view: "trainers", trainer: n >= 0 && n < entries.length ? n : null }); }
     else if (h.startsWith("move-")) { const k = moveKeys.find((x) => slug(moves[x].name) === h.slice(5)); Object.assign(state, k ? { view: "moves", move: k } : { view: "moves", q: h.slice(5).replace(/-/g, " ") }); }
     else if (h.startsWith("item-")) { const k = items.findIndex((it) => slug(it.name) === h.slice(5)); Object.assign(state, k >= 0 ? { view: "items", item: k } : { view: "items", q: h.slice(5).replace(/-/g, " ") }); }
     else if (h.startsWith("ability-")) { const a = abilities.find((x) => slug(x.name) === h.slice(8)); Object.assign(state, { view: "abilities", ability: a ? a.name : null }); }

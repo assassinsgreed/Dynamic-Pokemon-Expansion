@@ -12,8 +12,10 @@ How each Pokémon is finished (CreateNPCTrainerParty), with CFRU's config (no le
   EVs: none, except Very Hard: 252 in the two best base stats (GiveMon2BestBaseStatEVs)
   Nature: on Hard and Very Hard, chosen from base stats and moves (GiveMonBestStatNature, opponents only)
   Moves: the table's, or the last four level-up moves at that level (GiveBoxMonInitialMoveset)
-  Ability: the table's Ability_* choice; teams without one take ability 1 for a male trainer, 2 for a female
-  (the personality CreateNPCTrainerParty picks has bit 0 set only for female trainers)"""
+  Ability: the table's Ability_* choice; teams without one get either regular ability at random
+
+Trainer sprites come from the built ROM: each trainer's trainerPic byte is read from the compiled gTrainers (address
+from offsets.ini), since TRAINER_PIC_* constants have #ifdef'd duplicates and many pictures are inserted at build time."""
 
 import re
 import struct
@@ -203,9 +205,16 @@ def _class_ivs(p: Paths) -> dict[str, int]:
     return {k: min(31, int(v, 0)) for k, v in parse_designated_array(text, "gBaseIVsByTrainerClass").items()}
 
 
-def _pic_ids(p: Paths) -> dict[str, int]:
-    return {k: int(v, 0) for k, v in collect_defines(p.cfru / "include/constants/trainers.h").items()
-            if k.startswith("TRAINER_PIC_") and re.fullmatch(r"0x[0-9A-Fa-f]+|\d+", v or "")}
+TRAINER_STRUCT_SIZE = 0x28
+TRAINER_PIC_OFFSET = 3
+
+
+def _rom_pics(p: Paths, ids: dict[str, int]) -> dict[str, int]:
+    """Trainer constant → the trainerPic byte of its compiled gTrainers entry in the ROM."""
+    m = re.search(r"^gTrainers:\s+([0-9A-Fa-f]{8})", read(p.cfru / "offsets.ini"), flags=re.M)
+    base = int(m.group(1), 16) - 0x08000000
+    rom = _rom_bytes(p.rom)
+    return {const: rom[base + TRAINER_STRUCT_SIZE * n + TRAINER_PIC_OFFSET] for const, n in ids.items()}
 
 
 def trainer_pic(p: Paths, pic: int) -> Image.Image:
@@ -303,16 +312,15 @@ def best_two_stats(stats: dict) -> list[str]:
     return [b1, b2]
 
 
-def _ability(choice: str | None, species_stats: dict, female: bool, abilities: dict) -> str:
-    """The ability the game gives: Ability_1 / _2 / _Hidden / _Random_1_2, or (no choice) the trainer's gender bit."""
+def _ability(choice: str | None, species_stats: dict) -> str:
+    """The ability the game gives: Ability_1 / _2 / _Hidden, or either of the two regular ones for Ability_Random_1_2
+    and for teams that name none (default-move teams, which get a random one). Several are joined with " or "."""
     a1 = species_stats["abilities"][0] if species_stats["abilities"] else None
     a2 = species_stats["abilities"][1] if len(species_stats["abilities"]) > 1 else a1
-    by_bit = a2 if female else a1
-    pick = {"Ability_1": a1, "Ability_2": a2, "Ability_Hidden": species_stats["hidden_ability"] or by_bit,
-            None: by_bit}.get(choice)
-    if choice == "Ability_Random_1_2":
-        return " or ".join(dict.fromkeys(abilities.get(a, a) for a in (a1, a2) if a))
-    return abilities.get(pick, pick) if pick else ""
+    if choice in (None, "Ability_Random_1_2"):
+        return " or ".join(dict.fromkeys(a for a in (a1, a2) if a))
+    pick = {"Ability_1": a1, "Ability_2": a2, "Ability_Hidden": species_stats["hidden_ability"] or a1}.get(choice)
+    return pick or ""
 
 
 @cache
@@ -326,12 +334,14 @@ def load_trainers(p: Paths, stats: dict, learnsets: dict, move_data: dict, abili
     ability_name(const, species) gives the name a species shows for an ability."""
     tables = load_tables(p)
     regions, place_order = _regions(p)
-    class_ids, names, class_ivs, pic_ids = _class_ids(p), class_names(p), _class_ivs(p), _pic_ids(p)
+    class_ids, names, class_ivs = _class_ids(p), class_names(p), _class_ivs(p)
     standard_iv = int(collect_defines(p.cfru / "src/config.h")["STANDARD_IV"].split()[0])
     effects = move_effects(p)
     moves = {k: dict(m, effect=effects.get(k, "")) for k, m in move_data.items()}
-    order = [k for k, _ in sorted(((k, int(v)) for k, v in collect_defines(p.cfru / "include/constants/opponents.h").items()
-                                   if k.startswith("TRAINER_") and (v or "").isdigit()), key=lambda kv: kv[1])]
+    ids = {k: int(v) for k, v in collect_defines(p.cfru / "include/constants/opponents.h").items()
+           if k.startswith("TRAINER_") and (v or "").isdigit()}
+    order = sorted(ids, key=ids.get)
+    rom_pics = _rom_pics(p, ids)
 
     teams: list[list[dict]] = []
     team_index: dict[str, int] = {}
@@ -339,24 +349,22 @@ def load_trainers(p: Paths, stats: dict, learnsets: dict, move_data: dict, abili
     trainers = []
     for const in order:
         std = tables["std"].get(const)
-        if not std:
-            continue
-        female = std.get("gender", "MALE") == "FEMALE"
+        if not std or "PARTNER" in const:
+            continue  # partners fight on your side; the page lists only opponents
         found = {}
         for key, chain in FALLBACK.items():
             table = next(t for t in chain if const in tables[t] or t == "std")
             entry = tables[table][const]
-            team = _team(entry, female, stats, learnsets, moves, ability_name)
+            team = _team(entry, stats, learnsets, moves, ability_name)
             sig = repr(team)
             if sig not in team_index:
                 team_index[sig] = len(teams)
                 teams.append(team)
             found[key] = team_index[sig]
         cls = std["trainerClass"]
-        pic = pic_ids.get(std.get("trainerPic", ""), None)
-        if pic is not None and pic not in pics:
+        pic = rom_pics[const]
+        if pic not in pics:
             pics[pic] = trainer_pic(p, pic)
-        partner = "PARTNER" in const
         trainers.append({
             "const": const,
             "cls": names[class_ids[cls]] if cls in class_ids else cls,
@@ -366,7 +374,6 @@ def load_trainers(p: Paths, stats: dict, learnsets: dict, move_data: dict, abili
             "place": regions.get(const, ""),
             "note": _const_note(const),
             "double": std.get("doubleBattle") == "TRUE",
-            "partner": partner,
             "items": [i for i in re.findall(r"ITEM_\w+", std.get("items", "")) if i != "ITEM_NONE"],
             "iv": class_ivs.get(cls) or standard_iv,
             "teams": found,
@@ -375,7 +382,7 @@ def load_trainers(p: Paths, stats: dict, learnsets: dict, move_data: dict, abili
     return trainers, teams, pics
 
 
-def _team(entry: dict, female: bool, stats: dict, learnsets: dict, moves: dict, ability_name) -> list[dict]:
+def _team(entry: dict, stats: dict, learnsets: dict, moves: dict, ability_name) -> list[dict]:
     flags = entry.get("partyFlags", "0")
     custom, held = "PARTY_FLAG_CUSTOM_MOVES" in flags, "PARTY_FLAG_HAS_ITEM" in flags
     team = []
@@ -384,7 +391,7 @@ def _team(entry: dict, female: bool, stats: dict, learnsets: dict, moves: dict, 
         s = stats[species]
         known = ([m for m in re.findall(r"MOVE_\w+", mon.get("moves", "")) if m != "MOVE_NONE"] if custom
                  else default_moves(learnsets.get(species, []), level))
-        ability = _ability(mon.get("ability", "Ability_Hidden") if custom else None, s, female, {})
+        ability = _ability(mon.get("ability", "Ability_Hidden") if custom else None, s)
         team.append({
             "species": species,
             "level": level,

@@ -189,7 +189,7 @@ def _trainers(data: SourceData, index: dict, item_by_const: dict) -> tuple[list[
     for t in raw:
         trainers.append({
             "cls": t["cls"], "name": t["name"], "rival": t["rival"], "pic": offsets.get(t["pic"]),
-            "place": t["place"], "note": t["note"], "double": t["double"], "partner": t["partner"],
+            "place": t["place"], "note": t["note"], "double": t["double"],
             "items": [item(i) for i in t["items"]], "iv": t["iv"], "teams": [t["teams"][k] for k in TEAM_KEYS],
         })
     return trainers, {"list": teams, "moves": move_list, "abilities": ability_list, "natures": NATURES}, \
