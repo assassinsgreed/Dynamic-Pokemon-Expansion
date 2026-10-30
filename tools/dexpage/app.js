@@ -583,7 +583,7 @@
     });
   }
 
-  function teamMon([i, lv, it, ab, mvs, nat, evs], t) {
+  function teamMon([i, lv, it, ab, mvs, nat, evs, custom], t) {
     const m = mons[i], hard = state.diff !== "std", xhard = state.diff === "xhard";
     const ability = TEAMS.abilities[ab].split(" or ").map((a) => (abilityIndex.has(a) ? `<button class="mvname" data-ability="${esc(a)}">${esc(a)}</button>` : esc(a))).join(" or ");
     const rows = [
@@ -597,9 +597,11 @@
       const k = TEAMS.moves[n], mv = moves[k];
       return `<button class="tmv" data-move="${k}" style="--c:${TYPE_COLOR[mv.type]}" title="${esc(mv.desc)}"><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span><span>${esc(mv.name)}</span></button>`;
     };
-    return `<div class="tmon" style="${tint(m)}"><div class="head">${monLink(i)}<span class="lv">Lv ${lv}</span></div>
+    return `<div class="tmon" style="${tint(m)}"><div class="head">${monLink(i)}<span class="lv">${t.scaled ? `Scaling, minimum ${lv}` : `Lv ${lv}`}</span></div>
       <dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>
-      <div class="tmoves">${mvs.map(moveBtn).join("")}</div></div>`;
+      ${t.scaled && !custom  // the game picks these moves at the scaled level, so the listed level's moves would be wrong
+        ? `<p class="note tmnote">Knows the last four moves it learns by level up, at the level it scales to.</p>`
+        : `<div class="tmoves">${mvs.map(moveBtn).join("")}</div>`}</div>`;
   }
 
   function trainerCard(e) {
@@ -622,14 +624,18 @@
     const groups = [];
     list.forEach((e) => { const p = trainers[entries[e].n].place || "Other"; const g = groups.find(([x]) => x === p); g ? g[1].push(e) : groups.push([p, [e]]); });
     const maxLv = (e) => Math.max(...teamOf(e).map(([, lv]) => lv));
+    // Scaled battles (Trainer Houses, Gym Trainees…) come out at your party's highest level
+    const SCALE_TIP = "Levels scale to your party's highest";
+    const minLv = (e) => Math.min(...teamOf(e).map(([, lv]) => lv));
+    const lvText = (e) => (trainers[entries[e].n].scaled ? `Scaling, min ${minLv(e)}` : `Max Lv ${maxLv(e)}`);
     const html = groups.map(([p, es]) => `<div class="cat-head">${esc(p)} · ${es.length}</div>${state.layouts.trainers === "grid"
       ? '<div class="tchips">' + chipsWithOpen(es, (e) => `<button class="chip${e === open ? " on" : ""}" data-trainer="${e}">${trainerPic(trainers[entries[e].n], "sm")}<span class="ln">${esc(trainerTitle(trainers[entries[e].n]))}</span>${
-          state.mode ? "" : entryMode(e)}<span class="hw" title="Highest level on the team">Max Lv ${maxLv(e)}</span></button>`, (e) => e === open, trainerCard) + '</div>'
-      : `<div class="listtable"><table class="mv"><thead><tr><th>Trainer</th><th>Team</th><th class="c-num" title="Highest level on the team">Max Lv</th></tr></thead><tbody>${es.map((e) => {
+          state.mode ? "" : entryMode(e)}<span class="hw" title="${trainers[entries[e].n].scaled ? SCALE_TIP : "Highest level on the team"}">${lvText(e)}</span></button>`, (e) => e === open, trainerCard) + '</div>'
+      : `<div class="listtable"><table class="mv"><thead><tr><th>Trainer</th><th>Team</th><th class="c-lv">Level</th></tr></thead><tbody>${es.map((e) => {
           const t = trainers[entries[e].n];
           return `<tr data-trainer="${e}"${e === open ? ' class="on"' : ""}><td><div class="trow">${trainerPic(t)}<span class="tn"><span class="tname"><span class="mvname">${esc(trainerTitle(t))}</span>${entryMode(e)}</span>${
             t.note ? `<span class="note">${esc(t.note)}</span>` : ""}</span></div></td><td><span class="teamline">${teamOf(e).map(([i]) => sprite(mons[i], true)).join("")}</span></td>
-            <td class="n">${maxLv(e)}</td></tr>${e === open ? expandRow(3, trainerCard(e)) : ""}`;
+            <td class="n lvcell" title="${t.scaled ? SCALE_TIP : "Highest level on the team"}">${t.scaled ? `<span class="note">Scaling, min</span> ${minLv(e)}` : `<span class="note">Max</span> ${maxLv(e)}`}</td></tr>${e === open ? expandRow(3, trainerCard(e)) : ""}`;
         }).join("")}</tbody></table></div>`}`).join("");
     return [html, `${list.length} trainers`];
   }

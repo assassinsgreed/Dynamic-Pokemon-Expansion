@@ -158,7 +158,7 @@ TEAM_KEYS = ("std", "hard", "div", "hdiv")
 def _trainers(data: SourceData, index: dict, item_by_const: dict) -> tuple[list[dict], dict, str]:
     """Trainers with a team per table (Standard, Hard, Divergent, Hard Divergent), and their battle sprites.
     A team member is [Pokémon, level, item (index, or name when the Items tab doesn't list it), ability no., move nos.,
-    Hard-mode nature no., the two stats Very Hard maxes (in STAT_KEYS order)]."""
+    Hard-mode nature no., the two stats Very Hard maxes (in STAT_KEYS order), 1 if the table sets its moves]."""
     def mon_index(species: str) -> int:
         key = species
         while key not in index and "_" in key.removeprefix("SPECIES_"):
@@ -183,13 +183,13 @@ def _trainers(data: SourceData, index: dict, item_by_const: dict) -> tuple[list[
     move_no, ability_no = {k: n for n, k in enumerate(move_list)}, {a: n for n, a in enumerate(ability_list)}
     teams = [[[mon_index(m["species"]), m["level"], item(m["item"]), ability_no[m["ability"]],
                [move_no[k] for k in m["moves"] if k in move_no], NATURES.index(m["nature"]),
-               [STAT_KEYS.index(s) for s in m["evs"]]] for m in team] for team in raw_teams]
+               [STAT_KEYS.index(s) for s in m["evs"]], int(m["custom"])] for m in team] for team in raw_teams]
     sheet, offsets = pack(pics, 64)
     trainers = []
     for t in raw:
         trainers.append({
             "cls": t["cls"], "name": t["name"], "rival": t["rival"], "pic": offsets.get(t["pic"]),
-            "place": t["place"], "note": t["note"], "double": t["double"],
+            "place": t["place"], "note": t["note"], "double": t["double"], "scaled": t["scaled"],
             "items": [item(i) for i in t["items"]], "ball": item(t["ball"]), "iv": t["iv"], "teams": [t["teams"][k] for k in TEAM_KEYS],
         })
     return trainers, {"list": teams, "moves": move_list, "abilities": ability_list, "natures": NATURES}, \

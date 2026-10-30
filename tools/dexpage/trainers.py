@@ -70,6 +70,10 @@ NOTES = {
 }
 # "Important trainers" sit in their own region of gTrainers; most constants start with their place's name
 RIVAL_PLACES = {"TRAINER_RIVAL1": "Route 17", "TRAINER_RIVAL2": "Route 3", "TRAINER_RIVAL3": "Daimyn City"}
+# Battles fought with FLAG_SCALE_TRAINER_LEVELS (0x90E) set, so every Pokémon comes out at your party's highest level:
+# the Trainer Houses, Nurse Brianne, the dev team and the Gym Trainees set it in their scripts; Collin lists the Stats
+# Dojo disciples too (not Kaito, the dojo master)
+SCALED = re.compile(r"TRAINER_HOUSE|_NURSE_BRIANNE$|_DEV_TEAM_|_GYM_TRAINEE_|_STATS_DOJO_\w+_\d$")
 CASEY_NOTE = {"F": "Female Casey: battled when you play as a boy", "M": "Male Casey: battled when you play as a girl"}
 
 
@@ -382,6 +386,7 @@ def load_trainers(p: Paths, stats: dict, learnsets: dict, move_data: dict, abili
             "place": regions.get(const, ""),
             "note": _const_note(const),
             "double": std.get("doubleBattle") == "TRUE",
+            "scaled": bool(SCALED.search(const)),
             "items": [i for i in re.findall(r"ITEM_\w+", std.get("items", "")) if i != "ITEM_NONE"],
             "iv": class_ivs.get(cls) or standard_iv,
             "ball": class_balls(p).get(cls, "ITEM_MASTER_BALL"),
@@ -407,6 +412,7 @@ def _team(entry: dict, stats: dict, learnsets: dict, moves: dict, ability_name) 
             "item": mon.get("heldItem") if held and mon.get("heldItem") not in (None, "ITEM_NONE") else None,
             "ability": " or ".join(ability_name(a, species) for a in ability.split(" or ")) if ability else "",
             "moves": known,
+            "custom": custom,  # False: the game picks the moves for the level the Pokémon is made at
             "nature": best_stat_nature(s, known, moves),
             "evs": best_two_stats(s),
         })
