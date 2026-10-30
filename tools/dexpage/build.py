@@ -1,6 +1,7 @@
 """Turns the roster into the page: one JSON blob + sprite sheet embedded in template.html."""
 
 import base64
+import graphlib
 import hashlib
 import io
 import json
@@ -535,8 +536,26 @@ def _brand_icon() -> str:
     return "data:image/png;base64," + base64.b64encode(BRAND_ICON.read_bytes()).decode()
 
 
+def _pack_learners(learners: list) -> dict[str, list[int]]:
+    """[[mon, how], ...] as {how: [mon, ...]}: "TM10" or "Special: Water types" is written once per move, not once per
+    Pokémon (865 KB → 294 KB). app.js unpacks it by listing each group and sorting by mon (a stable sort), so the
+    groups go in an order that keeps each Pokémon's own ways in sequence (Meowth: Lv 12, then Special); the build
+    stops if the packing doesn't give back the same list."""
+    order = graphlib.TopologicalSorter()
+    for (i, a), (j, b) in zip([[None, None]] + learners, learners):
+        order.add(b, *([a] if i == j and a != b else []))
+    packed: dict[str, list[int]] = {how: [] for how in order.static_order()}
+    for i, how in learners:
+        packed[how].append(i)
+    unpacked = sorted(([i, how] for how, ids in packed.items() for i in ids), key=lambda x: x[0])
+    if unpacked != learners:
+        raise ValueError(f"learner list doesn't survive packing: {learners[:5]}...")
+    return packed
+
+
 def render(data: dict, sheet: bytes, offsets: dict) -> str:
-    data = dict(data, mons=[dict(m, sp=offsets[m["key"]]) for m in data["mons"]])
+    data = dict(data, mons=[dict(m, sp=offsets[m["key"]]) for m in data["mons"]],
+                moves={k: dict(m, learners=_pack_learners(m["learners"])) for k, m in data["moves"].items()})
     # Keys keep the move table compact and stable; the page only needs them as ids.
     blob = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     sprites = "data:image/webp;base64," + base64.b64encode(sheet).decode()

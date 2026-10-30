@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from tools.dexpage.build import page_data, render, search_keys
+from tools.dexpage.build import _pack_learners, page_data, render, search_keys
 from tools.dexpage.roster import evolution_links
 from tools.dexpage.sprites import build_sheet
 
@@ -52,6 +52,15 @@ def test_evolution_links_use_indices(data):
 def test_page_is_self_contained(html):
     assert not re.search(r'(src|href)=["\']https?://', html)
     assert "@import" not in html and "fonts.googleapis" not in html
+
+
+def test_learners_packed_by_how(data):
+    mons = {m["key"]: i for i, m in enumerate(data["mons"])}
+    packed = _pack_learners(data["moves"]["MOVE_CUT"]["learners"])
+    assert mons["SPECIES_BULBASAUR"] in packed["HM01"]
+    assert list(_pack_learners([[3, "Lv 30"], [5, "Lv 1"], [5, "Lv 30"]])) == ["Lv 1", "Lv 30"]  # keeps 5's order
+    with pytest.raises(ValueError):             # two Pokémon with opposite orders can't both be kept
+        _pack_learners([[3, "Lv 1"], [3, "Lv 30"], [5, "Lv 30"], [5, "Lv 1"]])
 
 
 def test_page_size(html):

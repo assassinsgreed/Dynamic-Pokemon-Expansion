@@ -39,6 +39,10 @@
   const CHEVRON = '<span class="chev" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
 
   // ---------------------------------------------------------------- data
+  // build.py writes each move's learners as {how: [mon, ...]}; back to [[mon, how], ...] in Pokémon order
+  for (const mv of Object.values(DEX.moves)) {
+    mv.learners = Object.entries(mv.learners).flatMap(([how, ids]) => ids.map((i) => [i, how])).sort((a, b) => a[0] - b[0]);
+  }
   const mons = DEX.mons, moves = DEX.moves, items = DEX.items;
   const moveKeys = Object.keys(moves).sort((a, b) => moves[a].name.localeCompare(moves[b].name));
   const monMoves = mons.map(() => []);  // per-Pokémon move lists, rebuilt from the move → learners table
