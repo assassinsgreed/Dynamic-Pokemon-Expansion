@@ -236,9 +236,9 @@
     return { level, egg, tm, tutor, special };
   }
 
-  const TABS = [["level", "Level up"], ["egg", "Egg moves"], ["tm", "TM / HM"], ["tutor", "Tutor"], ["loc", "Locations"]];
+  const TABS = [["level", "Level up"], ["egg", "Egg moves"], ["tm", "TM / HM"], ["tutor", "Tutor"]];
   const locRows = (i) => mons[i].loc.filter(rowInMode);
-  const tabCount = (i, tab, lists) => (tab === "loc" ? locRows(i).length : tab === "tutor" ? lists.tutor.length + lists.special.length : lists[tab].length);
+  const tabCount = (i, tab, lists) => (tab === "tutor" ? lists.tutor.length + lists.special.length : lists[tab].length);
   const moveMatches = (f) => ([k, how]) => !f || [moves[k].name, moves[k].official || "", moves[k].type, CAT_NAME[moves[k].split], how].some((s) => norm(s).includes(f));
 
   function locTable(rows) {
@@ -249,18 +249,18 @@
         <td class="hide-sm">${modeTag(l.mode)}</td></tr>`).join("")}</tbody></table></div>`;
   }
 
+  // Where to find it: its own section of the profile, apart from the move tabs
+  function locations(i) {
+    const m = mons[i], rows = locRows(i);
+    if (rows.length) return locTable(rows);
+    if (m.movesOf !== null) return `<p class="note">Appears in battle from ${monLink(m.movesOf, i)}.</p>`;
+    const from = parent.has(i) ? parent.get(i) : null;
+    return `<p class="note">Not found in the wild${state.mode ? ` in ${state.mode} mode` : ""}.${from !== null ? ` Evolve it from ${monLink(from, i)}` : ""}</p>`;
+  }
+
   function panel(i) {
     const m = mons[i];
-    const f = norm(state.tabFilter), fw = words(state.tabFilter);
-    if (state.tab === "loc") {
-      if (!locRows(i).length) {
-        if (m.movesOf !== null) return `<p class="note">Appears in battle from ${monLink(m.movesOf, i)}.</p>`;
-        const from = parent.has(i) ? parent.get(i) : null;
-        return `<p class="note">Not found in the wild${state.mode ? ` in ${state.mode} mode` : ""}.${from !== null ? ` Evolve it from ${monLink(from, i)}` : ""}</p>`;
-      }
-      const rows = locRows(i).filter((l) => !f || ([l.location, l.sub || "", l.method, l.variant || ""].some((s) => norm(s).includes(f)) || words(l.notes).includes(fw)));
-      return rows.length ? locTable(rows) : `<p class="note">No locations match “${esc(state.tabFilter)}”.</p>`;
-    }
+    const f = norm(state.tabFilter);
     const battleNote = m.movesOf !== null ? `<p class="note">Exists only in battle, so it knows whatever ${monLink(m.movesOf, i)} knows.</p>` : "";
     const lists = moveLists(m.movesOf ?? i);
     const keep = moveMatches(f);
@@ -283,7 +283,7 @@
 
   function tabsBlock(i) {
     const lists = moveLists(mons[i].movesOf ?? i);
-    const placeholder = state.tab === "loc" ? "Filter locations, e.g. Route 10, Surf, Night" : "Filter moves, e.g. Fire, Physical, TM2";
+    const placeholder = "Filter moves, e.g. Fire, Physical, TM2";
     return `<div class="tabs" data-tabs="${i}">
       <div class="tablist" role="tablist">${TABS.map(([id, label]) =>
         `<button role="tab" data-tab="${id}" aria-selected="${state.tab === id}">${label} <span class="c">${tabCount(i, id, lists)}</span></button>`).join("")}</div>
@@ -311,7 +311,8 @@
         </dl></section>
       </div>
       <section><h3>Evolution</h3>${evoTree(i)}</section>
-      <section><h3>Moves &amp; locations</h3>${tabsBlock(i)}</section>
+      <section><h3>Locations · ${locRows(i).length}</h3>${locations(i)}</section>
+      <section><h3>Moves</h3>${tabsBlock(i)}</section>
     </div>`;
   }
 
