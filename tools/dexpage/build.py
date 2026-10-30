@@ -23,7 +23,7 @@ from .paths import DPE_ROOT, Paths
 from .roster import Entry, SourceData, build_roster, evolution_links, load_extra_forms, load_source_data
 from .rom import POCKET_BERRIES, POCKET_KEY_ITEMS, POCKET_POKE_BALLS, item_fields, item_icons
 from .sprites import build_sheet, pack
-from .town_map import norm as place_key, town_map_png, town_map_squares
+from .town_map import norm as place_key, place_descriptions, town_map_png, town_map_squares
 from .trainers import NATURES, load_trainers
 
 TEMPLATE = Path(__file__).with_name("template.html")
@@ -150,7 +150,7 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
         "trainers": trainers,
         "teams": teams,
         "trainerSheet": trainer_sheet,
-        "townMap": {"img": _smallest_image(town_map_png()), "places": town_map_squares(data.paths)},
+        "townMap": {"img": _smallest_image(town_map_png()), "places": town_map_squares(data.paths), "about": place_descriptions()},
         "unmatchedEncounters": unmatched,
     }
 

@@ -28,6 +28,33 @@ SPOTS = {
 }
 
 
+# Where the game's grid says more than the place really covers, by grid square (column, row) (Collin, 2026-10-30)
+NOT_PART_OF = {
+    "Route 13": {(18, 6)},           # the upper square is only Carnelidge Volcano
+    "Route 9": {(14, 3)},            # just the vertical bar; the square east of it is Daimyn Factory's overworld
+    "Route 24": {(17, 4), (18, 4)},  # only the stretch north of Uteya Village
+}
+MOVED_TO = {
+    "Hesson Pass": [(17, 4)],        # one square right of where the grid puts it
+}
+
+
+REGION_LAYOUT = DPE_ROOT.parent / "PokemonShootingStars" / "designdocs" / "region" / "region-layout.md"
+DOC_NAMES = {"Daimyn City Factory": "Daimyn Factory"}  # the design doc's name → the game's
+
+
+def place_descriptions() -> dict[str, str]:
+    """Place name → its one-paragraph description from the PSS design doc's Towns / Dungeons / Key Locations tables
+    (| # | Name | Details |) and Routes table (| # | Details |, the number being the route's)."""
+    about = {}
+    for line in REGION_LAYOUT.read_text(encoding="utf-8").splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")] if line.startswith("|") else []
+        if len(cells) >= 2 and cells[0].isdigit():
+            name = cells[1] if len(cells) == 3 else f"Route {cells[0]}"
+            about[DOC_NAMES.get(name, name)] = cells[-1]
+    return about
+
+
 def town_map_png() -> bytes:
     out = io.BytesIO()
     Image.open(TOWN_MAP).crop(CROP).save(out, "PNG", optimize=True)
@@ -37,16 +64,17 @@ def town_map_png() -> bytes:
 def town_map_squares(p: Paths) -> dict[str, list[list[int]]]:
     """In-game place name → top-left corners of its 8×8 squares, in pixels of the cropped Town Map."""
     rom, names = _rom_bytes(p.rom), map_section_names(p)
-    squares: dict[str, list[list[int]]] = {}
+    cells: dict[str, list[tuple[int, int]]] = {}
     for layer in range(LAYERS):
         for row in range(ROWS):
             for col in range(COLS):
                 section = rom[SECTIONS + (layer * ROWS + row) * COLS + col]
-                if section == EMPTY:
-                    continue
-                square = [ORIGIN + col * CELL - CROP[0], ORIGIN + row * CELL - CROP[1]]
-                if square not in squares.setdefault(names[section], []):
-                    squares[names[section]].append(square)
+                name = names.get(section)
+                if section != EMPTY and (col, row) not in NOT_PART_OF.get(name, ()) and (col, row) not in cells.setdefault(name, []):
+                    cells[name].append((col, row))
+    cells.update(MOVED_TO)
+    squares = {name: [[ORIGIN + col * CELL - CROP[0], ORIGIN + row * CELL - CROP[1]] for col, row in c]
+               for name, c in cells.items()}
     for name, (x, y) in SPOTS.items():
         squares[name] = [[x - CELL // 2 - CROP[0], y - CELL // 2 - CROP[1]]]
     return squares
