@@ -83,9 +83,13 @@ def test_rival_uses_rival_pic(paths):
     assert T._rom_pics(paths, {"TRAINER_RIVAL1": 1})["TRAINER_RIVAL1"] == 0x6A
 
 
-def test_unnamed_ability_is_either_regular_one():
+def test_unnamed_ability_follows_trainer_gender():
     s = {"abilities": ["ABILITY_A", "ABILITY_B"], "hidden_ability": "ABILITY_H"}
-    assert T._ability(None, s) == "ABILITY_A or ABILITY_B"
+    assert T._ability(None, s) == "ABILITY_A"                        # male trainer: personality 0x88, low bit 0
+    assert T._ability(None, s, female=True) == "ABILITY_B"           # female trainer: 0x0F, low bit 1
+    assert T._ability(None, {"abilities": ["ABILITY_A"], "hidden_ability": None}, female=True) == "ABILITY_A"
+    assert T._ability("Ability_Random_1_2", s) == "ABILITY_A or ABILITY_B"   # rolled in battle
+    assert T._ability("Ability_RandomAll", s) == "ABILITY_A or ABILITY_B or ABILITY_H"
     assert T._ability("Ability_Hidden", s) == "ABILITY_H"
 
 

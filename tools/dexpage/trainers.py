@@ -12,7 +12,11 @@ How each Pokémon is finished (CreateNPCTrainerParty), with CFRU's config (no le
   EVs: none, except Very Hard: 252 in the two best base stats (GiveMon2BestBaseStatEVs)
   Nature: on Hard and Very Hard, chosen from base stats and moves (GiveMonBestStatNature, opponents only)
   Moves: the table's, or the last four level-up moves at that level (GiveBoxMonInitialMoveset)
-  Ability: the table's Ability_* choice; teams without one get either regular ability at random
+  Ability: the table's Ability_* choice (a custom team that names none gets Ability_Hidden, the enum's 0). A
+    default-move team gets no choice: each Pokémon's personality starts at 0x88 for a MALE trainer or 0x0F for a
+    FEMALE one (setMonGender = trainer->gender always, so the name-length branch is never taken), its species-name
+    hash is added << 8, and the low bit picks the ability, kept through Hard's nature reroll. So a male trainer's
+    Pokémon have their first ability and a female trainer's their second (the first if the species has only one)
 
 Trainer sprites come from the built ROM: each trainer's trainerPic byte is read from the compiled gTrainers (address
 from offsets.ini), since TRAINER_PIC_* constants have #ifdef'd duplicates and many pictures are inserted at build time."""
@@ -338,13 +342,17 @@ def best_two_stats(stats: dict) -> list[str]:
     return [b1, b2]
 
 
-def _ability(choice: str | None, species_stats: dict) -> str:
-    """The ability the game gives: Ability_1 / _2 / _Hidden, or either of the two regular ones for Ability_Random_1_2
-    and for teams that name none (default-move teams, which get a random one). Several are joined with " or "."""
+def _ability(choice: str | None, species_stats: dict, female: bool = False) -> str:
+    """The ability the game gives: Ability_1 / _2 / _Hidden; either of the two regular ones for Ability_Random_1_2
+    (rolled in battle), joined with " or "; and for a default-move team, which names none, the one its trainer's
+    gender sets (module docstring): the first for a male trainer, the second for a female one."""
     a1 = species_stats["abilities"][0] if species_stats["abilities"] else None
     a2 = species_stats["abilities"][1] if len(species_stats["abilities"]) > 1 else a1
-    if choice in (None, "Ability_Random_1_2"):
-        return " or ".join(dict.fromkeys(a for a in (a1, a2) if a))
+    if choice is None:
+        return (a2 if female else a1) or ""
+    if choice in ("Ability_Random_1_2", "Ability_RandomAll"):  # RandomAll: the hidden one a third of the time
+        extra = (species_stats["hidden_ability"],) if choice == "Ability_RandomAll" else ()
+        return " or ".join(dict.fromkeys(a for a in (a1, a2, *extra) if a))
     pick = {"Ability_1": a1, "Ability_2": a2, "Ability_Hidden": species_stats["hidden_ability"] or a1}.get(choice)
     return pick or ""
 
@@ -419,7 +427,7 @@ def _team(entry: dict, stats: dict, learnsets: dict, moves: dict, ability_name) 
         s = stats[species]
         known = ([m for m in re.findall(r"MOVE_\w+", mon.get("moves", "")) if m != "MOVE_NONE"] if custom
                  else default_moves(learnsets.get(species, []), level))
-        ability = _ability(mon.get("ability", "Ability_Hidden") if custom else None, s)
+        ability = _ability(mon.get("ability", "Ability_Hidden") if custom else None, s, entry.get("gender") == "FEMALE")
         team.append({
             "species": species,
             "level": level,
