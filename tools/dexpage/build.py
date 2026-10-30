@@ -393,8 +393,14 @@ def _tidy_where(where: list[str]) -> list[str]:
     shops = [(_norm(w.split(" · ")[0]), _norm(re.sub(r"\s*\((?:Standard|Divergent)\)$", "", w.split(" · ", 1)[1])))
              for w in where if " · " in w]
 
+    marts = any(w.startswith("Poké Marts") for w in where)  # the ROM's stock, with the badges it needs
+
     def covered(piece: str) -> bool:
         p = _norm(piece)
+        if piece.startswith("Poké Marts"):
+            return False
+        if marts and p in ("pokemart", "pokemarts"):  # the doc's "Pokemarts" / "PokeMarts"
+            return True
         return any(p.startswith(place) and (p[len(place):] in ("", "market", "mall") or name.startswith(p[len(place):]))
                    for place, name in shops)
 

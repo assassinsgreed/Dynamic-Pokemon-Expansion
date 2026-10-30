@@ -87,6 +87,8 @@ def test_item_places_said_once():
         == ["Daimyn City Mall · Incense shop (Divergent)"]
     assert _tidy_where(["(Added in v1.4)", "Daimyn City Mall (v1.4+)", "Daimyn City Mall · Held Item shop"]) == ["Daimyn City Mall · Held Item shop"]
     assert _tidy_where(["Uteyan Ruins", "(Divergent mode only)"]) == ["Uteyan Ruins (Divergent)"]
+    assert _tidy_where(["PokeMarts", "Poké Marts (after 2 badges)"]) == ["Poké Marts (after 2 badges)"]
+    assert _tidy_where(["Pokemarts", "Poké Marts"]) == ["Poké Marts"]
     assert _tidy_where(["Route 18 flower girl, after catching Shaymin"]) == ["Route 18 flower girl, after catching Shaymin"]
     assert _tidy_where(["Tsarvosa City Stats Dojo", "Tsarvosa City · Vitamins shop"]) == ["Tsarvosa City Stats Dojo", "Tsarvosa City · Vitamins shop"]
 
