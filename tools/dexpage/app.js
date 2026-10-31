@@ -388,17 +388,13 @@
     const rows = p.rows.filter(([, l]) => rowInMode(l));
     const methods = [];
     rows.forEach((r) => { const g = methods.find(([mt]) => mt === r[1].method); g ? g[1].push(r) : methods.push([r[1].method, [r]]); });
-    // Encounters that depend on the time of day get their own list beside the method's all-day ones, each chip saying
-    // when ("☀️ 20%" Pikipek by day, "🌙 20%" Hoothoot by night, "☀️ 10% 🌙 15%"), so the all-day list's rates aren't
-    // mixed with ones that never apply at once. Each list runs from the likeliest encounter down.
+    // An encounter that depends on the time of day says when on its chip ("☀️ 20%" Pikipek by day, "🌙 20%" Hoothoot
+    // by night, "☀️ 10% 🌙 15%"); a bare rate is all day. Each list runs from the likeliest encounter down.
     const TIME_ICON = { day: "☀️", night: "🌙" };
     const pct = (rate) => Math.max(-1, ...(String(rate).match(/\d+(\.\d+)?(?=%)/g) || []).map(Number));
-    const byRate = (l) => l.sort((a, b) => pct(b[2]) - pct(a[2]));
-    const groups = methods.flatMap(([mt, l]) => [
-      [mt, byRate(l.filter(([, e]) => !e.times).map(([i, e]) => [i, e, e.rate]))],
-      [`${mt} · ☀️/🌙 By time of day`, byRate(l.filter(([, e]) => e.times)
-        .map(([i, e]) => [i, e, Object.entries(e.times).map(([t, r]) => `${TIME_ICON[t]} ${r}`).join(" ")])), true],
-    ]).filter(([, l]) => l.length);
+    const groups = methods.map(([mt, l]) => [mt, l.map(([i, e]) =>
+      [i, e, e.times ? Object.entries(e.times).map(([t, r]) => `${TIME_ICON[t]} ${r}`).join(" ") : e.rate])
+      .sort((a, b) => pct(b[2]) - pct(a[2]))]);
     const re = placeRe(p.name);
     const found = [];
     // Chip hint is just the spot within the place ("Shady relic seller"); prices and notes are on the item's card
@@ -406,7 +402,8 @@
     items.forEach((it, k) => { const line = it.where.find((w) => re.test(w.toLowerCase())); if (line) found.push([k, spot(line)]); });
     // Three parts, each set apart: the map and description, the encounters by method, the items found here
     const encounters = groups.length
-      ? groups.map(([mt, l, timed]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips${timed ? " timed" : ""}">${l.map(([i, e, rate]) => monChip(i, [e.levels && `Lv ${e.levels}`, rate].filter(Boolean).join(" · "), e.sub, false, e.mode === "Both" ? ["Standard", "Divergent"] : [e.mode])).join("")}</div></div>`).join("")
+      ? groups.map(([mt, l]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips wild${
+        l.some(([, e]) => e.times && Object.keys(e.times).length > 1) ? " two" : ""}">${l.map(([i, e, rate]) => monChip(i, [e.levels && `Lv ${e.levels}`, rate].filter(Boolean).join(" · "), e.sub, false, e.mode === "Both" ? ["Standard", "Divergent"] : [e.mode])).join("")}</div></div>`).join("")
       : `<p class="empty">No Pokémon match the current filters here.</p>`;
     const itemChips = found.map(([k, line]) =>
       `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line ? `<span class="hw">${esc(line)}</span>` : ""}</button>`).join("");
