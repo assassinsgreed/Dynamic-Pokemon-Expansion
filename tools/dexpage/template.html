@@ -197,10 +197,32 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 
 /* Evolution: stages left to right; each card is a Pokémon with the method that reaches it underneath.
    A stage with several branches (Eevee, Rockruff) stacks its cards, wrapping into a grid when there are many. */
-.evo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.evo .stage { display: grid; gap: 6px; align-content: center; }
-.evo .stage.many { flex: 1 1 440px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-.evo .sep { color: var(--accent); font-size: 18px; line-height: 1; }
+/* Evolution tree: card, arrow, then the evolutions; rows are equal height so the fork's lines meet each card's middle */
+.evo { container-type: inline-size; }
+.evnode { display: flex; align-items: center; }
+.evnode > .evcard { flex: none; }
+.evkids { display: flex; align-items: center; flex: none; }
+.evkids.many { flex: 1 1 auto; min-width: 0; }
+.evkids.fork { align-items: stretch; }
+.evlist { display: grid; grid-auto-rows: 1fr; }
+.evlist > .evnode { padding: 3px 0; }
+.evlist.many { flex: 1 1 440px; min-width: 0; grid-auto-rows: auto; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); column-gap: 6px; }
+.evlist.many > .evnode { min-width: 0; align-items: stretch; }
+.evlist.many > .evnode > .evcard { flex: 1 1 auto; }
+.evo .sep { color: var(--accent); font-size: 18px; line-height: 1; padding: 0 8px; }
+.evo .evarrows { flex: none; width: 32px; height: auto; margin-left: 6px; color: var(--accent); fill: none; stroke: currentColor; stroke-width: 1.5px; stroke-linecap: round; }
+.evo .evarrows path { vector-effect: non-scaling-stroke; }
+.evkids.fork > .evlist > .evnode::before { content: ""; flex: none; width: 0; height: 0; margin-right: 6px; border-left: 7px solid var(--accent); border-block: 5px solid transparent; }
+/* Narrow: an indented tree, each evolution hanging off its own branch line */
+@container (max-width: 560px) {
+  .evnode { flex-direction: column; align-items: stretch; }
+  .evkids, .evkids.fork, .evkids.many { display: block; padding-left: 14px; }
+  .evo .sep, .evo .evarrows { display: none; }
+  .evlist, .evlist.many { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; }
+  .evlist > .evnode { position: relative; padding: 6px 0 0 16px; }
+  .evlist > .evnode::before, .evkids.fork > .evlist > .evnode::before { content: ""; position: absolute; left: 0; top: 0; width: 12px; height: 26px; margin: 0; border: 0 solid var(--accent); border-width: 0 0 2px 2px; border-bottom-left-radius: 8px; }
+  .evlist > .evnode:not(:last-child)::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; border-left: 2px solid var(--accent); }
+}
 .evcard { display: grid; gap: 2px; padding: 4px 12px 6px 4px; border: 1px solid var(--line); border-radius: 12px; background: var(--sunk); min-width: 0; }
 .evcard.current { border-color: var(--accent); background: var(--accent-soft); }
 .evcard:not(.current) { cursor: pointer; }

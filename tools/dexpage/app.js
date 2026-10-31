@@ -195,17 +195,21 @@
     const seen = new Set();
     while (parent.has(first) && !seen.has(first)) { seen.add(first); first = parent.get(first); }
     if (first === i && !mons[i].evo.length) return '<p class="note">Does not evolve.</p>';
-    const stages = [[[first, "", null]]];
-    const placed = new Set([first]);
-    while (stages.length < 8) {
-      const next = [];
-      for (const [n] of stages[stages.length - 1]) for (const [to, how, k, written] of mons[n].evo) if (!placed.has(to)) { placed.add(to); next.push([to, how, k, written]); }
-      if (!next.length) break;
-      stages.push(next);
-    }
     // The whole card opens its Pokémon (an item named in the method still opens the item: data-item is handled first)
     const card = ([n, how, k, written]) => `<div class="evcard${n === i ? " current" : ""}" data-open="${n}">${monLink(n, i)}${how ? `<span class="how">${howText(how, k, written)}</span>` : ""}</div>`;
-    return `<div class="evo">${stages.map((stage, d) => `${d ? '<span class="sep" aria-hidden="true">›</span>' : ""}<div class="stage${stage.length > 3 ? " many" : ""}">${stage.map(card).join("")}</div>`).join("")}</div>`;
+    // A tree, so each branch keeps its own line: two or three evolutions fan out from one point (only one can be taken);
+    // more (Eevee) sit in a grid behind a single arrow
+    const placed = new Set([first]);
+    const node = (e, depth) => {
+      const kids = depth < 8 ? mons[e[0]].evo.filter(([to]) => !placed.has(to) && placed.add(to)) : [];
+      if (!kids.length) return `<div class="evnode">${card(e)}</div>`;
+      const n = kids.length, fork = n > 1 && n <= 3;
+      const arrow = fork
+        ? `<svg class="evarrows" viewBox="0 0 32 100" preserveAspectRatio="none" aria-hidden="true">${kids.map((_, j) => `<path d="M0 50L32 ${(j + 0.5) * 100 / n}"/>`).join("")}</svg>`
+        : '<span class="sep" aria-hidden="true">›</span>';
+      return `<div class="evnode">${card(e)}<div class="evkids${fork ? " fork" : n > 3 ? " many" : ""}">${arrow}<div class="evlist${n > 3 ? " many" : ""}">${kids.map((x) => node(x, depth + 1)).join("")}</div></div></div>`;
+    };
+    return `<div class="evo">${node([first, "", null], 1)}</div>`;
   }
 
   function moveRow(k, how, showHow) {
