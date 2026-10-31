@@ -87,6 +87,19 @@ def test_form_labels_for_dex_forms(roster):
     assert by["SPECIES_TOXTRICITY_LOW_KEY_GIGA"].form == "Low Key Mega G"
 
 
+def test_forms_without_a_plain_constant_are_labelled(roster):
+    by = {e.key: e for e in roster}
+    assert by["SPECIES_ALCREMIE_STRAWBERRY"].form == "Strawberry Sweet"
+    assert by["SPECIES_ALCREMIE_STAR"].form == "Star Sweet"
+    assert by["SPECIES_ALCREMIE_GIGA"].form == "Mega G"     # one Giga form for every Alcremie
+    assert by["SPECIES_URSHIFU_RAPID"].form == "Rapid Strike"
+    assert by["SPECIES_URSHIFU_SINGLE_GIGA"].form == "Single Strike Mega G"
+    assert by["SPECIES_MINIOR_SHIELD"].form is None         # its Cores have no rows
+    assert by["SPECIES_MR_MIME"].form is None
+    labels = [(e.name, e.form) for e in roster]
+    assert len(labels) == len(set(labels))
+
+
 def test_dusk_time_range_is_exact(evo_links):
     dusk = [l["text"] for l in evo_links["SPECIES_ROCKRUFF"] if l["to"] == "SPECIES_LYCANROC_DUSK"]
     assert dusk == ["Lv. 25, 5 PM–7:59 PM"]

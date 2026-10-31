@@ -166,6 +166,7 @@ def test_wild_held_items_on_profile(data):
     by = {m["key"]: m for m in data["mons"]}
     assert "Oran Berry (50%)" in [h for h, _ in by["SPECIES_BIBAREL"]["held"]]
     assert all("item" not in l for m in data["mons"] for l in m["loc"])   # moved out of location rows
+    assert not by["SPECIES_PIDGEOT"]["held"]   # only the Heleo Ranch event Pidgeot holds a Sitrus Berry
 
 
 def test_header_icon_embedded(html):

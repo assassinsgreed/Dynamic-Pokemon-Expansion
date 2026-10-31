@@ -25,6 +25,8 @@ KEY_FORM_LABELS = {
     "SPECIES_ORICORIO_Y": "Pom-Pom", "SPECIES_ORICORIO_P": "Pa'u", "SPECIES_ORICORIO_S": "Sensu",
     "SPECIES_WISHIWASHI_S": "School",
     "SPECIES_PIKACHU_CAP_ORIGINAL": "Original Cap", "SPECIES_PIKACHU_PHD": "PhD",
+    "SPECIES_URSHIFU_SINGLE": "Single Strike", "SPECIES_URSHIFU_RAPID": "Rapid Strike",
+    **{f"SPECIES_ALCREMIE_{s}": f"{s.title()} Sweet" for s in ("STRAWBERRY", "BERRY", "LOVE", "CLOVER", "FLOWER", "RIBBON", "STAR")},
 }
 # Forms the Habitat table leaves out but players can get (by form change or as a gift), with how to get them
 EXTRA_FORMS_CSV = Path(__file__).with_name("extra_forms.csv")
@@ -157,6 +159,16 @@ def _split_form(key: str, ids: dict, names: dict) -> tuple[str, str | None]:
         if base in ids and names.get(base) == names.get(key):
             suffix = "_".join(parts[cut:])
             return base, KEY_FORM_LABELS.get(key) or FORM_LABELS.get(suffix, suffix.replace("_", " ").title())
+    # Every form has a suffix when there's no plain constant (SPECIES_ALCREMIE_STRAWBERRY, SPECIES_URSHIFU_SINGLE):
+    # the base is the lowest-numbered one sharing the name
+    stem = "_".join(parts[:2])
+    named = [k for k in ids if k.startswith(stem + "_") and names.get(k) == names.get(key)]
+    siblings = [k for k in named if not any(k.startswith(o + "_") for o in named)]  # not Mr. Mime's MR_MIME_G
+    if stem not in ids and len(siblings) > 1 and key in siblings:
+        base, suffix = min(siblings, key=ids.get), key[len(stem) + 1:]
+        if key == base:  # labelled only where the page lists its siblings too (not Minior's Shield, whose Cores aren't)
+            return key, KEY_FORM_LABELS.get(key)
+        return base, KEY_FORM_LABELS.get(key) or FORM_LABELS.get(suffix, suffix.replace("_", " ").title())
     return key, None
 
 
@@ -285,8 +297,9 @@ def build_roster(data: SourceData) -> list[Entry]:
         for _, _, target, _ in _mega_links(data, source):
             if target not in modes:
                 mega = _split_form(target, data.ids, data.names)[1]
-                # e.g. Low Key Toxtricity's Giga form reads "Low Key Mega G"
-                label = " ".join(x for x in (form_of(source), mega) if x)
+                # e.g. Low Key Toxtricity's Giga form reads "Low Key Mega G"; one Giga shared by every Alcremie doesn't
+                own = target.startswith(source + "_")
+                label = " ".join(x for x in (form_of(source) if own else None, mega) if x)
                 bases[target] = (source, label or None)
                 modes[target] = set(modes[source])
 
@@ -343,9 +356,12 @@ def _ordered(data: SourceData, entries: dict, bases: dict, roots: dict) -> list[
                        next((k for k in order if k != key and data.names.get(k) == name), None),
                        pre_evo.get(key)):
             if anchor in placed and anchor != key:
-                # after the anchor and any forms already placed after it
+                # after the anchor and any forms already placed after it; a Mega only passes the anchor's other Megas,
+                # so Single Strike Urshifu's Giga form sits before Rapid Strike Urshifu
+                mega = entries[key].battle_form
                 i = order.index(anchor) + 1
-                while i < len(order) and bases.get(order[i], (None,))[0] == anchor:
+                while i < len(order) and bases.get(order[i], (None,))[0] == anchor and (
+                        not mega or entries[order[i]].battle_form):
                     i += 1
                 order.insert(i, key)
                 return True

@@ -1,0 +1,34 @@
+Dex #,Pokémon,Mode,Location,Sub-area,You give,Level,Requirement,Nickname,Held item,Nature,Ability
+54,Boldore,Standard,Scalding Spa,Spa Room,Any Pokémon (Lv30+),Same as sent,Rival event: send any Pokémon at Lv30+ and the rival sends one of 3 Pokémon at random (1/3 each). One-time.,Rocky,Sitrus Berry,Impish,Sand Force (Hidden Ability)
+59,Chinchou,Standard,Ferrox Village,House 3,Snom,Same as sent,,Cosmo,,Calm,Volt Absorb
+81,Scraggy (Egg),Standard,Route 5,Pokémon Day Care,Any Egg,Egg,Rival event: give the rival one of your Eggs and get one of 3 Eggs at random (1/3 each). One-time.,,,,
+129,Noibat,Standard,Daimyn City,Trade House,Lillipup,Same as sent,Offered only if your Fire starter is Litten (Alola); this trader has one trade per save.,Boomer,Sitrus Berry,Sassy,Frisk
+150,Frillish (Female),Standard,Daimyn City,Trade House,Magikarp,Same as sent,Offered only if your Fire starter is Chimchar (Sinnoh); this trader has one trade per save.,Lacey,Sitrus Berry,Calm,Water Absorb
+157,Gurdurr,Standard,Scalding Spa,Spa Room,Any Pokémon (Lv30+),Same as sent,Rival event: send any Pokémon at Lv30+ and the rival sends one of 3 Pokémon at random (1/3 each). One-time.,Chopper,Sitrus Berry,Adamant,Iron Fist (Hidden Ability)
+163,Mr. Mime (Galarian),Standard,Daimyn City,Trade House,Farfetch'd (Galarian),Same as sent,Offered only if your Fire starter is Charmander (Kanto); this trader has one trade per save.,Mimmers,Sitrus Berry,Bashful,Screen Cleaner
+167,Hatenna,Standard,Daimyn City,Trade House,Cacnea,Same as sent,Offered only if your Fire starter is Scorbunny (Galar); this trader has one trade per save.,Strawberry,Sitrus Berry,Modest,Healer
+181,Ditto,Both,Battle Frontier,Pokémon Center,Rotom (Heat),Same as sent,Needs a 5-win streak at any Battle Frontier facility.,Junichi,Destiny Knot,Quirky,Imposter (Hidden Ability)
+182,Eevee,Standard,Daimyn City,Trade House,Riolu,Same as sent,Offered only if your Fire starter is Fennekin (Kalos); this trader has one trade per save.,Pip,Sitrus Berry,Impish,Adaptability
+208,Dratini,Standard,Daimyn City,Trade House,Bonsly,Same as sent,Offered only if your Fire starter is Cyndaquil (Johto); this trader has one trade per save.,Drago,Sitrus Berry,Jolly,Shed Skin
+223,Shellos (Egg),Standard,Route 5,Pokémon Day Care,Any Egg,Egg,Rival event: give the rival one of your Eggs and get one of 3 Eggs at random (1/3 each). One-time.,,,,
+229,Emolga,Standard,Daimyn City,Trade House,Boldore,Same as sent,Offered only if your Fire starter is Tepig (Unova); this trader has one trade per save.,Pinky,Sitrus Berry,Jolly,Static
+258,Phantump,Standard,Scalding Spa,Spa Room,Any Pokémon (Lv30+),Same as sent,Rival event: send any Pokémon at Lv30+ and the rival sends one of 3 Pokémon at random (1/3 each). One-time.,Autumn,Sitrus Berry,Jolly,Harvest (Hidden Ability)
+263,Slowbro (Galarian),Standard,Tsarvosa City,House 3,Slowbro,Same as sent,,Boris,Lagging Tail,Bold,Regenerator (Hidden Ability)
+265,Corsola (Galarian),Standard,Daimyn City,Trade House,Slakoth,Same as sent,Offered only if your Fire starter is Torchic (Hoenn); this trader has one trade per save.,Cork,Sitrus Berry,Timid,Weak Armor
+284,Litleo (Egg),Standard,Route 5,Pokémon Day Care,Any Egg,Egg,Rival event: give the rival one of your Eggs and get one of 3 Eggs at random (1/3 each). One-time.,,,,
+27,Steenee,Divergent,Daimyn City,Trade House,Granbull,Same as sent,Offered only if your Fire starter is Litten (Alola); this trader has one trade per save.,Raspberry,Sitrus Berry,Sassy,Leaf Guard
+63,Makuhita,Divergent,Daimyn City,Trade House,Sentret,Same as sent,Offered only if your Fire starter is Torchic (Hoenn); this trader has one trade per save.,Tsu,Sitrus Berry,Brave,Thick Fat
+84,Machoke,Divergent,Scalding Spa,Spa Room,Any Pokémon (Lv30+),Same as sent,Rival event: send any Pokémon at Lv30+ and the rival sends one of 3 Pokémon at random (1/3 each). One-time.,Chopper,Sitrus Berry,Adamant,Steadfast (Hidden Ability)
+87,Kadabra,Divergent,Scalding Spa,Spa Room,Any Pokémon (Lv30+),Same as sent,Rival event: send any Pokémon at Lv30+ and the rival sends one of 3 Pokémon at random (1/3 each). One-time.,Pascal,Sitrus Berry,Timid,Magic Guard (Hidden Ability)
+91,Meowth,Divergent,Daimyn City,Trade House,Meowth (Galarian),Same as sent,Offered only if your Fire starter is Scorbunny (Galar); this trader has one trade per save.,Cookie,Sitrus Berry,Bashful,Pickup
+97,Xatu,Divergent,Daimyn City,Trade House,Haunter,Same as sent,Offered only if your Fire starter is Cyndaquil (Johto); this trader has one trade per save.,Otto,Sitrus Berry,Modest,Synchronize
+99,Eelektrik,Divergent,Ferrox Village,House 3,Vanillite,Same as sent,,Tommy,,Bold,Levitate
+113,Spheal (Egg),Divergent,Route 5,Pokémon Day Care,Any Egg,Egg,Rival event: give the rival one of your Eggs and get one of 3 Eggs at random (1/3 each). One-time.,,,,
+117,Graveler (Alolan),Divergent,Scalding Spa,Spa Room,Any Pokémon (Lv30+),Same as sent,Rival event: send any Pokémon at Lv30+ and the rival sends one of 3 Pokémon at random (1/3 each). One-time.,Rocky,Sitrus Berry,Impish,Galvanize (Hidden Ability)
+120,Jynx,Divergent,Daimyn City,Trade House,Poliwhirl,Same as sent,Offered only if your Fire starter is Charmander (Kanto); this trader has one trade per save.,Diva,Sitrus Berry,Timid,Oblivious
+198,Haunter,Divergent,Daimyn City,Trade House,Medicham,Same as sent,Offered only if your Fire starter is Chimchar (Sinnoh); this trader has one trade per save.,Peeks,Sitrus Berry,Naughty,Levitate
+205,Aipom (Egg),Divergent,Route 5,Pokémon Day Care,Any Egg,Egg,Rival event: give the rival one of your Eggs and get one of 3 Eggs at random (1/3 each). One-time.,,,,
+207,Munchlax,Divergent,Daimyn City,Trade House,Ditto,Same as sent,Offered only if your Fire starter is Tepig (Unova); this trader has one trade per save.,Chompy,Sitrus Berry,Jolly,Pickup
+214,Rapidash (Galarian),Divergent,Tsarvosa City,House 3,Rapidash,Same as sent,,Tina,Berry Juice,Bold,Anticipation (Hidden Ability)
+227,Steelix,Divergent,Daimyn City,Trade House,Vileplume,Same as sent,Offered only if your Fire starter is Fennekin (Kalos); this trader has one trade per save.,Bruce,Sitrus Berry,Adamant,Rock Head
+239,Impidimp (Egg),Divergent,Route 5,Pokémon Day Care,Any Egg,Egg,Rival event: give the rival one of your Eggs and get one of 3 Eggs at random (1/3 each). One-time.,,,,

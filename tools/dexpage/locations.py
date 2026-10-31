@@ -1,6 +1,7 @@
 """Encounter locations, from the Encounters tab of the "Pokémon Amethyst: Where to Find Every Pokémon" sheet.
 
-encounters.csv is a hand-exported copy (File → Download → CSV on that tab); replace it when the sheet changes."""
+encounters.csv is a hand-exported copy (File → Download → CSV on that tab); replace it when the sheet changes.
+trades.csv is the same for the Trades tab, which says what each trader wants (the Encounters tab's notes often don't)."""
 
 import csv
 import re
@@ -8,6 +9,9 @@ import unicodedata
 from pathlib import Path
 
 ENCOUNTERS_CSV = Path(__file__).with_name("encounters.csv")
+TRADES_CSV = Path(__file__).with_name("trades.csv")
+# Methods where the Pokémon is an ordinary wild one; held items from other rows (events, legendaries) aren't wild items
+WILD_METHODS = ("Grass", "Cave", "Indoors", "Surfing", "Rod", "Rock Smash", "Swarm")
 # Map 1.30, outside Daimyn Factory, is Route 9 to the game (its map section) and to the sheet (sub-area
 # "Daimyn City Factory"), but it has its own encounter table, so the page lists it as its own place (Collin)
 FACTORY_OVERWORLD = "Daimyn Factory Overworld"
@@ -42,12 +46,31 @@ def _by_time(rate: str, notes: str) -> tuple[str, str, dict[str, str]]:
     return rate, notes.replace("Morning/Day only", "☀️ Morning/Day only").replace("Evening/Night only", "🌙 Evening/Night only"), times
 
 
+def _trade_asks(path: Path = TRADES_CSV) -> dict[tuple[str, str, str], str]:
+    """(Pokémon, mode, location) → what the trader wants, from the Trades tab ("Lillipup", "Any Egg")."""
+    with path.open(encoding="utf-8-sig", newline="") as f:
+        return {(r["Pokémon"].removesuffix(" (Egg)"), r["Mode"], r["Location"]): r["You give"].strip()
+                for r in csv.DictReader(f)}
+
+
+def _with_ask(notes: str, ask: str | None) -> str:
+    """Trade House notes only say which starter unlocks the trade; add what to send unless the note already says."""
+    if not ask or "any" in notes.lower() or ask.lower() in notes.lower():
+        return notes
+    give = f"Trade any {ask[4:]}." if ask.lower().startswith("any ") else f"Trade your {ask}."
+    return f"{give} {notes}".strip()
+
+
 def load_encounters(path: Path = ENCOUNTERS_CSV) -> list[dict]:
     with path.open(encoding="utf-8-sig", newline="") as f:
         rows = list(csv.DictReader(f))
+    asks = _trade_asks()
     result = []
     for r in rows:
-        rate, notes, times = _by_time(_rate(r["Rate"]) if r["Rate"] else "", r["Notes"].strip())
+        notes = r["Notes"].strip()
+        if "trade" in r["Method"] or "Egg" in r["Method"]:
+            notes = _with_ask(notes, asks.get((r["Pokémon"], r["Mode"], r["Location"])))
+        rate, notes, times = _by_time(_rate(r["Rate"]) if r["Rate"] else "", notes)
         name = r["Pokémon"].replace("\\e", "é")  # the sheet keeps the game's \e escape for é
         m = re.fullmatch(r"(.*?)\s*\((.+)\)", name)
         own = OWN_PLACES.get((r["Location"], r["Sub-area"]))
@@ -88,9 +111,11 @@ def attach_encounters(rows: list[dict], entries: list) -> tuple[dict[str, list[d
             if label not in unmatched:
                 unmatched.append(label)
             continue
-        # Held items describe the Pokémon, not the place, so they go on the profile instead
+        # Held items describe the Pokémon, not the place, so they go on the profile instead; only wild ones count
+        # (the Heleo Ranch Ampharos's Sitrus Berry isn't one wild Ampharos carry)
         row = {k: v for k, v in r.items() if k not in ("name", "form", "item") and v}
-        for held in filter(None, (h.strip() for h in r["item"].split(","))):
+        wild = any(m in r["method"] for m in WILD_METHODS)
+        for held in filter(None, (h.strip() for h in r["item"].split(",") if wild)):
             held_items.setdefault(key, [])
             if held not in held_items[key]:
                 held_items[key].append(held)

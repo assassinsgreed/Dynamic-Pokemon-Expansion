@@ -7,6 +7,13 @@ def test_notes_drop_references_to_other_sheet_tabs():
     assert "Trade your Snom." in notes
 
 
+def test_trade_notes_say_what_to_send():
+    rows = {(r["name"], r["mode"], r["method"]): r["notes"] for r in load_encounters()}
+    assert rows["Noibat", "Standard", "🔄 In-game trade"].startswith("Trade your Lillipup. Offered only if")
+    assert rows["Scraggy", "Standard", "🥚 Egg"] == "Trade any Egg. Rival Egg swap."
+    assert rows["Chinchou", "Standard", "🔄 In-game trade"] == "Trade your Snom."   # not said twice
+
+
 def test_swarm_notes_say_when_swarming():
     notes = [r["notes"] for r in load_encounters()]
     assert not any("Swarm days only" in n for n in notes)
