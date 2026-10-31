@@ -207,7 +207,10 @@
       const arrow = fork
         ? `<svg class="evarrows" viewBox="0 0 32 100" preserveAspectRatio="none" aria-hidden="true">${kids.map((_, j) => `<path d="M0 50L32 ${(j + 0.5) * 100 / n}"/>`).join("")}</svg>`
         : '<span class="sep" aria-hidden="true">›</span>';
-      return `<div class="evnode">${card(e)}<div class="evkids${fork ? " fork" : n > 3 ? " many" : ""}">${arrow}<div class="evlist${n > 3 ? " many" : ""}">${kids.map((x) => node(x, depth + 1)).join("")}</div></div></div>`;
+      // The grid's own evolutions (Alcremie's shared Mega G) follow the whole grid, not the one card that lists them
+      const next = n > 3 ? kids.flatMap(([k]) => mons[k].evo.filter(([to]) => !placed.has(to) && placed.add(to))) : [];
+      const after = next.length ? `<div class="evkids"><span class="sep" aria-hidden="true">›</span><div class="evlist">${next.map((x) => node(x, depth + 2)).join("")}</div></div>` : "";
+      return `<div class="evnode">${card(e)}<div class="evkids${fork ? " fork" : n > 3 ? " many" : ""}">${arrow}<div class="evlist${n > 3 ? " many" : ""}">${kids.map((x) => node(x, depth + 1)).join("")}</div>${after}</div></div>`;
     };
     return `<div class="evo">${node([first, "", null], 1)}</div>`;
   }
