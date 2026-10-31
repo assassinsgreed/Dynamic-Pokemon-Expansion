@@ -8,6 +8,12 @@ def test_docs_grouped_by_heading_one():
     assert {"Critical Captures", "Frostbite", "Mega Pokemon"} <= topics
 
 
+def test_unstyled_heading_size_paragraphs_are_topics():
+    groups = {g["title"]: g for g in load_docs()}
+    assert {"Trainer Card Progress", "Breeding", "Multiple Rare Candies"} <= {t["title"] for t in groups["Gameplay Features"]["topics"]}
+    assert "New Game Plus" in {t["title"] for t in groups["Postgame Content"]["topics"]}
+
+
 def test_overlapping_topics_skipped():
     groups = {g["title"]: g for g in load_docs()}
     assert "Locations" not in groups and "Dungeon Maps" not in groups

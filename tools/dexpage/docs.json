@@ -2224,11 +2224,12 @@
         "Deposit Pokemon"
        ]
       ]
-     },
-     {
-      "t": "p",
-      "html": "Trainer Card Progress"
-     },
+     }
+    ]
+   },
+   {
+    "title": "Trainer Card Progress",
+    "blocks": [
      {
       "t": "p",
       "html": "Starting in v1.4, the player can upgrade their trainer card by achieving various feats in the game. For each accomplishment, a star is added and the card’s colour upgrades. The back of the card now features statistics about the player’s journey, and the player can print their current party on the card by visiting an NPC in Ascension Tower.<br><br>Requirements:"
@@ -2294,11 +2295,12 @@
      {
       "t": "img",
       "src": "image1.png"
-     },
-     {
-      "t": "p",
-      "html": "Breeding"
-     },
+     }
+    ]
+   },
+   {
+    "title": "Breeding",
+    "blocks": [
      {
       "t": "p",
       "html": "Pokemon can be bred at the daycare on Route 5. Breeding has been enhanced to be more convenient in Amethyst:<br>"
@@ -2348,11 +2350,12 @@
         "Has Magma Stone, with flame body in party (12 passes)"
        ]
       ]
-     },
-     {
-      "t": "p",
-      "html": "Multiple Rare Candies"
-     },
+     }
+    ]
+   },
+   {
+    "title": "Multiple Rare Candies",
+    "blocks": [
      {
       "t": "p",
       "html": "As of v1.4.3 you can now use multiple rare candies at once. The following rules apply:<br>"
@@ -5662,11 +5665,12 @@
      {
       "t": "p",
       "html": "In the battle observatory, the player brings a team of 3 (4 in doubles) Pokemon. The player and opponent reveal their entire teams before choosing 1 (2 in doubles) to duel each other with. The player can view the full summary of their opponent’s team and is encouraged to do so - the AI will read the player’s party to find the best Pokemon to bring in response. In this facility, megas and Z-Crystals are disabled."
-     },
-     {
-      "t": "p",
-      "html": "New Game Plus"
-     },
+     }
+    ]
+   },
+   {
+    "title": "New Game Plus",
+    "blocks": [
      {
       "t": "p",
       "html": "After completing the game, the player will have the option to restart the game as either a traditional New Game, or a New Game Plus from the main menu. New Game Plus carries the following forward into a new save:<br>"

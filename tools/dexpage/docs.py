@@ -222,6 +222,15 @@ def import_docx(docx_path: Path) -> None:
                 names.append(name)
         return names
 
+    def looks_like_heading2(el) -> bool:
+        """A few topics (New Game Plus, Breeding…) are plain paragraphs typed at Heading 2's 16 pt."""
+        sizes = []
+        for run in el.iter(qn("w:r")):
+            if "".join(t.text or "" for t in run.iter(qn("w:t"))).strip():
+                size = run.find(qn("w:rPr") + "/" + qn("w:sz"))
+                sizes.append(int(size.get(qn("w:val"))) if size is not None else 0)
+        return bool(sizes) and min(sizes) >= 32  # half-points
+
     def cell_html(cell_el) -> str:
         lines = [inline(p) for p in cell_el.iter(qn("w:p"))]
         return "<br>".join(line for line in lines if line.strip())
@@ -245,6 +254,8 @@ def import_docx(docx_path: Path) -> None:
         style_el = el.find(".//" + qn("w:pStyle"))
         style = style_el.get(qn("w:val")) if style_el is not None else ""
         text = "".join(t.text or "" for t in el.iter(qn("w:t"))).strip()
+        if not style and text and looks_like_heading2(el):
+            style = "Heading2"
         if style == "Heading1":
             if text:
                 group = None if text in SKIP_GROUPS else {"title": text, "topics": []}
