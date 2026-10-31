@@ -113,9 +113,10 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
 - Locations search matches a place's name and what's there, in the chosen mode: Pokémon ("Bidoof"), encounter
   methods ("Grass", "Wormhole") and items ("Full Heal"). The search box waits 120 ms after typing before it runs,
   so a headless probe that types into `#q` must wait longer than that.
-- Place cards split a method whose table changes by time of day into ☀️ Morning/Day and 🌙 Evening/Night lists
-  (`times` on encounter rows, from locations.py `_by_time`), so each list's rates add up to 100% (Collin: Varisi
-  Forest read as 120%).
+- Place cards list each method's all-day encounters, then its time-of-day ones in a separate "☀️/🌙 By time of day"
+  list whose chips say when ("☀️ 20%", "🌙 20%", "☀️ 10% 🌙 15%"; `times` on encounter rows, from locations.py
+  `_by_time`). Collin: never put day encounters in the main list, which is only for encounters the day/night system
+  doesn't change (Varisi Forest read as 120% when mixed). Every list is sorted by rate, highest first.
 - Every TM/HM is an item ("TM02 Dragon Claw", category TMs/HMs) linking to its move; typing a type name in the
   Pokédex lists that type.
 

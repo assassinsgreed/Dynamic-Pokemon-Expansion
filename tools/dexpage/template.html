@@ -464,6 +464,8 @@ table.mv .c-lv { text-align: right; white-space: nowrap; }
 .learners h4 { margin: 0 0 6px; font: 600 11.5px var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
 /* Equal-width pills in a grid: name on the left, detail right-aligned */
 .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 6px; }  /* 5 across a full-width card on desktop */
+.chips.timed { grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); }  /* room for "☀️ 10% 🌙 15%" */
+.chips.timed .hw { flex-shrink: 0; }  /* when it's found is the point of the list; a long sub-area gives way instead */
 .chip { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 2px 12px 2px 2px; border: 1px solid var(--line); border-radius: 999px; background: var(--sunk); cursor: pointer; text-align: left; }
 .chip:hover, .chip.m-std:hover, .chip.m-div:hover, .chip.m-both:hover { border-color: var(--muted); }
 /* The mode a Pokémon is found in: a stripe on the chip's left edge and a tinted outline (Standard teal, Divergent
