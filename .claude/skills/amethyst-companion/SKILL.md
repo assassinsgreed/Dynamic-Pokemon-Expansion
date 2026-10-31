@@ -70,6 +70,10 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
 - Battle-only forms (Megas) aren't listed as move learners; their entry says they know what the base knows.
 - Wild held items belong in the profile, not the location rows. "Used on" is hidden for evolution items that
   already show under Evolves, but kept for form-changing items (Gracidea, Drives, Nectars).
+- Evolutions with special conditions (male Kirlia → Gallade, Sneasel → Weavile at night) **must** show that
+  condition wherever the evolution appears. The text comes from `evolution_text` (roster.py) over
+  `src/Evolution Table.c`; item cards list every evolution that is more than "Use <item>" under the Evolves chips,
+  since hiding "Used on" dropped the doc's "(male)" / "(Must hold @ night)".
 - Look: Amethyst purple palette (game label art: #b27cfa / #320077), Trozei Jirachi header icon
   (`jirachi-trozei.png`, embedded), type-colour tints, equal-width chips, offline help for PC and phone.
 - Everything must work from the single downloaded file: no network, no CDNs, no fonts.

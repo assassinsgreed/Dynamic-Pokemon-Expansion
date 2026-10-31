@@ -344,7 +344,9 @@
     const holders = [];
     mons.forEach((m, i) => m.held.forEach(([h, hk]) => { if (hk === k && inMode(m)) holders.push([i, (h.match(/\(([^)]*)\)/) || [])[1] || ""]); }));
     const evolves = [];
-    mons.forEach((m, i) => m.evo.forEach(([to, how, ik]) => { if ((ik === k || norm(how).includes(itemKeys[k])) && inMode(mons[to])) evolves.push([i, to]); }));
+    mons.forEach((m, i) => m.evo.forEach(([to, how, ik, written]) => { if ((ik === k || norm(how).includes(itemKeys[k])) && inMode(mons[to])) evolves.push([i, to, how, written || it.name]); }));
+    // Conditions beyond using the item (male Kirlia, holding Razor Claw at night) are spelled out under the chips
+    const conditions = evolves.filter(([, , how, name]) => how !== `Use ${name}` && how !== `Mega Evolve holding ${name}`);
     // "Used on" repeats Evolves for evolution items; form-changing items (Gracidea, Drives, Nectars) still need it
     const showUse = it.use && !(evolves.length && it.category === "Evolution");
     const useTitle = /Forme|Primal|Evolution/.test(it.category) ? "Used on" : "Effect";
@@ -353,7 +355,8 @@
       ${it.where.length ? `<div><h4>Where to find</h4><ul class="where">${it.where.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>` : '<p class="note">No known location.</p>'}
       ${it.move ? `<div><h4>Teaches</h4><div class="chips"><button class="chip" data-move="${it.move}">${typeBadge(moves[it.move].type)}<span class="ln">${esc(moves[it.move].name)}</span><span class="hw">${moves[it.move].learners.filter(([, h]) => /^(TM|HM)\d/.test(h)).length} Pokémon</span></button></div></div>` : ""}
       ${showUse ? `<div><h4>${it.move ? "Note" : useTitle}</h4><div class="use">${esc(it.use)}</div></div>` : ""}
-      ${evolves.length ? `<div><h4>${it.category === "Mega Stones" ? "Mega Evolves" : "Evolves"} · ${evolves.length}</h4><div class="chips">${evolves.map(([i, to]) => monChip(to, "", "", it.category === "Mega Stones")).join("")}</div></div>` : ""}
+      ${evolves.length ? `<div><h4>${it.category === "Mega Stones" ? "Mega Evolves" : "Evolves"} · ${evolves.length}</h4><div class="chips">${evolves.map(([i, to]) => monChip(to, "", "", it.category === "Mega Stones")).join("")}</div>${
+        conditions.length ? `<ul class="evocond">${conditions.map(([i, to, how]) => `<li><b>${esc(mons[i].name)}${formLabel(mons[i])}</b> → <b>${esc(mons[to].name)}${formLabel(mons[to])}</b>: ${esc(how)}</li>`).join("")}</ul>` : ""}</div>` : ""}
       ${holders.length ? `<div><h4>Held by wild Pokémon · ${holders.length}</h4><div class="chips">${holders.map(([i, pct]) => monChip(i, pct)).join("")}</div></div>` : ""}
     </article>`;
   }
