@@ -423,7 +423,7 @@
      },
      {
       "t": "img",
-      "src": "image16.png"
+      "src": "image9.png"
      }
     ]
    },
@@ -445,7 +445,7 @@
      },
      {
       "t": "img",
-      "src": "image5.png"
+      "src": "image7.png"
      }
     ]
    },
@@ -569,7 +569,7 @@
      },
      {
       "t": "img",
-      "src": "image1.png"
+      "src": "image12.png"
      },
      {
       "t": "p",
@@ -1290,7 +1290,7 @@
      },
      {
       "t": "img",
-      "src": "image15.png"
+      "src": "image13.png"
      }
     ]
    },
@@ -1761,7 +1761,7 @@
     "blocks": [
      {
       "t": "img",
-      "src": "image13.png"
+      "src": "image5.png"
      },
      {
       "t": "p",
@@ -2088,7 +2088,7 @@
      },
      {
       "t": "img",
-      "src": "image12.png"
+      "src": "image11.png"
      },
      {
       "t": "p",
@@ -2193,7 +2193,7 @@
      },
      {
       "t": "img",
-      "src": "image18.png"
+      "src": "image2.png"
      }
     ]
    },
@@ -2294,7 +2294,7 @@
      },
      {
       "t": "img",
-      "src": "image6.png"
+      "src": "image18.png"
      }
     ]
    },
@@ -2451,7 +2451,7 @@
      },
      {
       "t": "img",
-      "src": "image17.png"
+      "src": "image16.png"
      },
      {
       "t": "p",
@@ -2614,7 +2614,7 @@
      },
      {
       "t": "img",
-      "src": "image3.png"
+      "src": "image8.png"
      },
      {
       "t": "p",
@@ -3113,7 +3113,7 @@
         "<b>3</b>",
         "In daycare on Route 5",
         "Trade an egg",
-        "Another egg with egg moves. Can be Litleo, Shellos, or Scraggy"
+        "Another egg with egg moves. Can be Litleo, Shellos, or Scraggy (standard) <b>or</b> Aipom, Impidimp, or Spheal (divergent)"
        ],
        [
         "<b>4</b>",
@@ -3131,7 +3131,7 @@
         "<b>6</b>",
         "Scalding Spa",
         "Trade any Pokemon",
-        "Boldore, Gurdurr, or Phantump, chosen at random, with its hidden ability"
+        "Boldore, Gurdurr, or Phantump (standard) <b>or</b> Graveler-A, Machoke, or Kadabra (divergent) chosen at random, with its hidden ability"
        ],
        [
         "<b>7</b>",
@@ -3545,7 +3545,7 @@
      },
      {
       "t": "img",
-      "src": "image10.png"
+      "src": "image19.png"
      }
     ]
    },
@@ -3558,7 +3558,7 @@
      },
      {
       "t": "img",
-      "src": "image14.png"
+      "src": "image15.png"
      }
     ]
    },
@@ -4244,7 +4244,7 @@
     "blocks": [
      {
       "t": "img",
-      "src": "image4.png"
+      "src": "image10.png"
      },
      {
       "t": "p",
@@ -4421,7 +4421,7 @@
      },
      {
       "t": "p",
-      "html": "On starting a new save, you can choose between 2 game modes:"
+      "html": "On starting a new save, you can choose between 3 game modes:"
      },
      {
       "t": "list",
