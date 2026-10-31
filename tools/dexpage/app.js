@@ -381,14 +381,19 @@
     const rows = p.rows.filter(([, l]) => rowInMode(l));
     const methods = [];
     rows.forEach((r) => { const g = methods.find(([mt]) => mt === r[1].method); g ? g[1].push(r) : methods.push([r[1].method, [r]]); });
+    // A method whose table changes with the time of day lists each time apart, so each list's rates add up to 100%
+    // (Pikipek by day and Hoothoot by night are both 20% of Varisi Forest's grass, never at once)
+    const groups = methods.flatMap(([mt, l]) => !l.some(([, e]) => e.times) ? [[mt, l.map(([i, e]) => [i, e, e.rate])]]
+      : [["day", "☀️ Morning/Day"], ["night", "🌙 Evening/Night"]].map(([t, label]) =>
+        [`${mt} · ${label}`, l.filter(([, e]) => !e.times || e.times[t]).map(([i, e]) => [i, e, e.times ? e.times[t] : e.rate])]));
     const re = placeRe(p.name);
     const found = [];
     // Chip hint is just the spot within the place ("Shady relic seller"); prices and notes are on the item's card
     const spot = (line) => line.replace(/\s*\([^)]*\)/g, "").replace(p.name, "").replace(/^[\s·-]+/, "");
     items.forEach((it, k) => { const line = it.where.find((w) => re.test(w.toLowerCase())); if (line) found.push([k, spot(line)]); });
     // Three parts, each set apart: the map and description, the encounters by method, the items found here
-    const encounters = methods.length
-      ? methods.map(([mt, l]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips">${l.map(([i, e]) => monChip(i, [e.levels && `Lv ${e.levels}`, e.rate].filter(Boolean).join(" · "), e.sub, false, e.mode === "Both" ? ["Standard", "Divergent"] : [e.mode])).join("")}</div></div>`).join("")
+    const encounters = groups.length
+      ? groups.map(([mt, l]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips">${l.map(([i, e, rate]) => monChip(i, [e.levels && `Lv ${e.levels}`, rate].filter(Boolean).join(" · "), e.sub, false, e.mode === "Both" ? ["Standard", "Divergent"] : [e.mode])).join("")}</div></div>`).join("")
       : `<p class="empty">No Pokémon match the current filters here.</p>`;
     const itemChips = found.map(([k, line]) =>
       `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line ? `<span class="hw">${esc(line)}</span>` : ""}</button>`).join("");

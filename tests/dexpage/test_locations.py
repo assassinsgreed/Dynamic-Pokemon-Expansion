@@ -11,3 +11,18 @@ def test_swarm_notes_say_when_swarming():
     notes = [r["notes"] for r in load_encounters()]
     assert not any("Swarm days only" in n for n in notes)
     assert "When swarming (one random swarm per day)." in notes
+
+
+def test_time_of_day_rates_are_split_out():
+    rows = {(r["name"], r["mode"]): r for r in load_encounters() if r["location"] == "Varisi Forest" and "Grass" in r["method"]}
+    assert rows["Pikipek", "Standard"]["times"] == {"day": "20%"}
+    assert rows["Hoothoot", "Standard"]["times"] == {"night": "20%"}
+    assert not rows["Blipbug", "Standard"]["times"]
+    # Each time of day's grass rates add up to 100%, like the game's tables
+    for mode in ("Standard", "Divergent"):
+        for time in ("day", "night"):
+            total = sum(float((r["times"] or {time: r["rate"]}).get(time, "0%").rstrip("%"))
+                        for (_, m), r in rows.items() if m == mode)
+            assert round(total) == 100, (mode, time, total)
+    both = [r["times"] for r in load_encounters() if len(r.get("times", {})) == 2]
+    assert {"day": "10%", "night": "15%"} in both

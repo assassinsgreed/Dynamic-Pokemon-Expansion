@@ -27,15 +27,19 @@ def _rate(value: str) -> str:
     return f"{pct:.0f}%" if pct >= 1 or pct == 0 else f"{pct:.1f}%"
 
 
-def _by_time(rate: str, notes: str) -> tuple[str, str]:
-    """Rows that differ by time of day show both rates in the rate cell ("☀️ 10% 🌙 15%") instead of a note."""
+def _by_time(rate: str, notes: str) -> tuple[str, str, dict[str, str]]:
+    """Rows that differ by time of day show both rates in the rate cell ("☀️ 10% 🌙 15%") instead of a note.
+
+    Also returns the rate per time of day ({"day": "20%"} for a Morning/Day-only row), so a place can list each
+    time's encounters apart: the sheet's rates add up to 100% per time, not across both."""
     m = re.fullmatch(r"By time: Morning/Day (\d+%) · Evening/Night (\d+%)\.?", notes)
     if m:
-        return f"☀️ {m.group(1)} 🌙 {m.group(2)}", ""
+        return f"☀️ {m.group(1)} 🌙 {m.group(2)}", "", {"day": m.group(1), "night": m.group(2)}
     m = re.fullmatch(r"(\d+%) during evening/night", notes)
     if m and rate:
-        return f"☀️ {rate} 🌙 {m.group(1)}", ""
-    return rate, notes.replace("Morning/Day only", "☀️ Morning/Day only").replace("Evening/Night only", "🌙 Evening/Night only")
+        return f"☀️ {rate} 🌙 {m.group(1)}", "", {"day": rate, "night": m.group(1)}
+    times = {"day": rate} if "Morning/Day only" in notes else {"night": rate} if "Evening/Night only" in notes else {}
+    return rate, notes.replace("Morning/Day only", "☀️ Morning/Day only").replace("Evening/Night only", "🌙 Evening/Night only"), times
 
 
 def load_encounters(path: Path = ENCOUNTERS_CSV) -> list[dict]:
@@ -43,7 +47,7 @@ def load_encounters(path: Path = ENCOUNTERS_CSV) -> list[dict]:
         rows = list(csv.DictReader(f))
     result = []
     for r in rows:
-        rate, notes = _by_time(_rate(r["Rate"]) if r["Rate"] else "", r["Notes"].strip())
+        rate, notes, times = _by_time(_rate(r["Rate"]) if r["Rate"] else "", r["Notes"].strip())
         name = r["Pokémon"].replace("\\e", "é")  # the sheet keeps the game's \e escape for é
         m = re.fullmatch(r"(.*?)\s*\((.+)\)", name)
         own = OWN_PLACES.get((r["Location"], r["Sub-area"]))
@@ -56,6 +60,7 @@ def load_encounters(path: Path = ENCOUNTERS_CSV) -> list[dict]:
             "sub": "" if own else r["Sub-area"],
             "rate": rate,
             "levels": r["Levels"],
+            "times": times,
             "item": r["Held item"],
             # The sheet's other tabs don't exist on the page
             "notes": re.sub(r"\s*Details on the \w+ tab\.", "", notes).strip().replace("Swarm days only", "When swarming"),
