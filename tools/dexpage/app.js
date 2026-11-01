@@ -69,7 +69,13 @@
     const re = placeRe(name);
     if (!places.has(norm(name)) && items.some((it) => it.where.some((w) => re.test(w.toLowerCase())))) places.set(norm(name), { name, rows: [] });
   }
+  // Interactive maps (mapview.js): a place's map is found by name, or through DEX.maps.alias where the companion's
+  // place is filed under another map (the Route 12 rest house is part of Route 12 East's map)
+  const mapByName = new Map(DEX.maps.places.map((m) => [norm(m.name), m]));
+  const mapFor = (name) => mapByName.get(norm(DEX.maps.alias[name] || name));
+  for (const m of DEX.maps.places) if (![...places.values()].some((p) => mapFor(p.name) === m)) places.set(norm(m.name), { name: m.name, rows: [] });
   const placeList = [...places.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+  const placeOfMap = (slug) => (placeList.find((p) => mapFor(p.name)?.slug === slug) || {}).name;
 
   // Sort keys per mode: that mode's dex number; unnumbered forms sit just after the entry before them (their base)
   const order = { Standard: new Float64Array(mons.length), Divergent: new Float64Array(mons.length) };
@@ -84,7 +90,7 @@
 
   // ---------------------------------------------------------------- state & navigation
   // state.view: dex | moves | items | places; move/item/place name the open card; open is the expanded Pokémon
-  const state = { view: "dex", q: "", move: null, item: null, place: null, open: null, mode: "", type: "", tab: "level", tabFilter: "",
+  const state = { view: "dex", q: "", move: null, item: null, place: null, map: null, open: null, mode: "", type: "", tab: "level", tabFilter: "",
     doc: null, ability: null, trainer: null, diff: "std",
     layouts: { dex: "list", moves: "list", tutors: "list", abilities: "list", items: "grid", trainers: "list", places: "grid", docs: "list" } };  // list or cards, per view
   try {
@@ -94,11 +100,12 @@
   } catch (e) {}
   let depth = 0, top = 0;  // position in this page's history, and how far Forward can go
 
-  const snapshot = () => ({ view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, doc: state.doc, ability: state.ability, trainer: state.trainer, open: state.open });
+  const snapshot = () => ({ view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, map: state.map, doc: state.doc, ability: state.ability, trainer: state.trainer, open: state.open });
   function hashFor(st) {
     if (st.view === "dex" && st.open !== null) return monSlug(st.open);
     if (st.move) return "move-" + slug(moves[st.move].name);
     if (st.item !== null) return "item-" + slug(items[st.item].name);
+    if (st.map) return "map-" + st.map;
     if (st.place) return "place-" + slug(st.place);
     if (st.doc) return "doc-" + slug(st.doc);
     if (st.ability) return "ability-" + slug(st.ability);
@@ -108,7 +115,7 @@
   const queries = {};  // each tab keeps its own search text
 
   function navigate(change) {
-    const next = Object.assign({ view: state.view, q: "", move: null, item: null, place: null, doc: null, ability: null, trainer: null, open: null }, change);
+    const next = Object.assign({ view: state.view, q: "", move: null, item: null, place: null, map: null, doc: null, ability: null, trainer: null, open: null }, change);
     Object.assign(state, next, { tabFilter: "" });
     queries[state.view] = state.q;
     depth++;
@@ -128,6 +135,9 @@
   const openMove = (k) => navigate({ view: "moves", move: k });
   const openItem = (k) => navigate({ view: "items", item: k });
   const openPlace = (name) => navigate({ view: "places", place: name });
+  // Back from a map returns to its place's details; a way out on the map opens the next place's map
+  const closeMap = () => navigate({ view: "places", q: state.q, place: state.place });
+  MapView.init({ onClose: closeMap, onLink: (slug) => navigate({ view: "places", place: placeOfMap(slug) || null, map: slug }) });
 
   // ---------------------------------------------------------------- small pieces
   const typeBadge = (t) => `<span class="type t-${t}">${t === "MYSTERY" ? "???" : t[0] + t.slice(1).toLowerCase()}</span>`;
@@ -414,9 +424,12 @@
     // by night, "☀️ 10% 🌙 15%"); a bare rate is all day. Each list runs from the likeliest encounter down.
     const TIME_ICON = { day: "☀️", night: "🌙" };
     const pct = (rate) => Math.max(-1, ...(String(rate).match(/\d+(\.\d+)?(?=%)/g) || []).map(Number));
-    const groups = methods.map(([mt, l]) => [mt, l.map(([i, e]) =>
-      [i, e, e.times ? Object.entries(e.times).map(([t, r]) => `${TIME_ICON[t]} ${r}`).join(" ") : e.rate])
-      .sort((a, b) => pct(b[2]) - pct(a[2]))]);
+    // Trades come at the level sent: "Same Lv as sent" rather than "Lv Same as sent"
+    const lvNote = (lv) => (!lv ? "" : /^\d/.test(lv) ? `Lv ${lv}` : lv === "Same as sent" ? "Same Lv as sent" : lv);
+    const groups = methods.map(([mt, l]) => [mt, l.map(([i, e]) => {
+      const rate = e.times ? Object.entries(e.times).map(([t, r]) => `${TIME_ICON[t]} ${r}`).join(" ") : e.rate;
+      return [i, e, rate, [lvNote(e.levels), rate].filter(Boolean).join(" · ")];
+    }).sort((a, b) => pct(b[2]) - pct(a[2]))]);
     const re = placeRe(p.name);
     const found = [];
     // Chip hint is just the spot within the place ("Shady relic seller"); prices and notes are on the item's card
@@ -425,12 +438,12 @@
     // Three parts, each set apart: the map and description, the encounters by method, the items found here
     const encounters = groups.length
       ? groups.map(([mt, l]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips wild${
-        l.some(([, e]) => e.times && Object.keys(e.times).length > 1) ? " two" : ""}">${l.map(([i, e, rate]) => monChip(i, [e.levels && `Lv ${e.levels}`, rate].filter(Boolean).join(" · "), e.sub, false, e.mode === "Both" ? ["Standard", "Divergent"] : [e.mode])).join("")}</div></div>`).join("")
+        l.some(([, e, , note]) => (e.times && Object.keys(e.times).length > 1) || (e.levels && !/^\d/.test(e.levels))) ? " two" : ""}">${l.map(([i, e, , note]) => monChip(i, note, e.sub, false, e.mode === "Both" ? ["Standard", "Divergent"] : [e.mode])).join("")}</div></div>`).join("")
       : `<p class="empty">No Pokémon match the current filters here.</p>`;
     const itemChips = found.map(([k, line]) =>
       `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line ? `<span class="hw">${esc(line)}</span>` : ""}</button>`).join("");
     return `<article class="loccard">${collapsible ? COLLAPSE : ""}<h2>${esc(p.name)}<small>${p.rows.length ? `${rows.length} encounter${rows.length === 1 ? "" : "s"}` : "No wild Pokémon"}</small></h2>
-      <div class="placehead">${townMap(p.name)}${aboutPlace(p.name)}</div>
+      <div class="placehead">${townMap(p.name)}${aboutPlace(p.name)}${mapFor(p.name) ? `<button class="mapbtn" data-map="${mapFor(p.name).slug}" data-of="${esc(p.name)}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 3.5l4.5-2 5 2 4.5-2v11l-4.5 2-5-2-4.5 2zM5.5 1.5v11M10.5 3.5v11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>View Interactive Map</button>` : ""}</div>
       ${p.rows.length ? `<section class="placesec"><h3>Encounters · ${rows.length}</h3><div class="learners">${encounters}</div></section>` : ""}
       ${found.length ? `<section class="placesec"><h3>Items · ${found.length}</h3><div class="chips">${itemChips}</div></section>` : ""}</article>`;
   }
@@ -770,6 +783,8 @@
     $("#type-label").innerHTML = state.type ? typeBadge(state.type) : "All types";
     syncConsoleHeight();
     document.body.classList.toggle("sheet-open", !!$("#out .sheet"));
+    if (state.map && MapView.open(state.map)) return;
+    MapView.close();
     // Closing a pop-up (×, backdrop, Escape, Back) leaves the cards behind it where they were
     if (hadSheet && !$("#out .sheet")) return;
     if (scroll && $("#out .sheet")) {
@@ -785,9 +800,9 @@
   let timer;
   $("#q").addEventListener("input", (e) => {
     clearTimeout(timer);
-    timer = setTimeout(() => { Object.assign(state, { q: e.target.value, open: null, move: null, item: null, place: null, doc: null, ability: null, trainer: null }); queries[state.view] = state.q; remember(); render(); }, 120);
+    timer = setTimeout(() => { Object.assign(state, { q: e.target.value, open: null, move: null, item: null, place: null, map: null, doc: null, ability: null, trainer: null }); queries[state.view] = state.q; remember(); render(); }, 120);
   });
-  $("#clear").addEventListener("click", () => { Object.assign(state, { q: "", open: null, move: null, item: null, place: null, doc: null, ability: null, trainer: null }); queries[state.view] = ""; remember(); render(); $("#q").focus(); });
+  $("#clear").addEventListener("click", () => { Object.assign(state, { q: "", open: null, move: null, item: null, place: null, map: null, doc: null, ability: null, trainer: null }); queries[state.view] = ""; remember(); render(); $("#q").focus(); });
   $("#back").addEventListener("click", () => history.back());
   $("#fwd").addEventListener("click", () => history.forward());
   // Switching tabs restores that tab's own search; clicking the current tab again clears it
@@ -838,6 +853,7 @@
   document.addEventListener("click", (e) => { if (!menu.hidden && !e.target.closest("#typepick")) closeMenu(); });
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
+    if (MapView.isOpen()) { if (!MapView.escape()) closeMap(); return; }
     if ($("#out .sheet")) navigate({ view: state.view, q: state.q }); else closeMenu();
   });
 
@@ -891,6 +907,8 @@
       navigate({ view: "docs", q: state.q, doc: state.doc === dc.dataset.doc ? null : dc.dataset.doc });
       return;
     }
+    const mb = t.closest("[data-map]");
+    if (mb) { e.preventDefault(); navigate({ view: "places", q: state.q, place: mb.dataset.of, map: mb.dataset.map }); return; }
     const pl = t.closest("[data-place]");
     if (pl) {
       e.preventDefault();
@@ -952,13 +970,14 @@
   function fromHash() {
     const h = decodeURIComponent(location.hash.slice(1));
     const views = { "": "dex", pokedex: "dex", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", trainers: "trainers", locations: "places", docs: "docs" };
-    Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, doc: null, ability: null, trainer: null, open: null });
+    Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, map: null, doc: null, ability: null, trainer: null, open: null });
     if (h in views) state.view = views[h];
     else if (h.startsWith("trainer-")) { const n = parseInt(h.slice(8), 10); Object.assign(state, { view: "trainers", trainer: n >= 0 && n < entries.length ? n : null }); }
     else if (h.startsWith("move-")) { const k = moveKeys.find((x) => slug(moves[x].name) === h.slice(5)); Object.assign(state, k ? { view: "moves", move: k } : { view: "moves", q: h.slice(5).replace(/-/g, " ") }); }
     else if (h.startsWith("item-")) { const k = items.findIndex((it) => slug(it.name) === h.slice(5)); Object.assign(state, k >= 0 ? { view: "items", item: k } : { view: "items", q: h.slice(5).replace(/-/g, " ") }); }
     else if (h.startsWith("ability-")) { const a = abilities.find((x) => slug(x.name) === h.slice(8)); Object.assign(state, { view: "abilities", ability: a ? a.name : null }); }
     else if (h.startsWith("doc-")) { const t = docTopics.find((x) => slug(x.title) === h.slice(4)); Object.assign(state, { view: "docs", doc: t ? t.title : null }); }
+    else if (h.startsWith("map-") && placeOfMap(h.slice(4))) Object.assign(state, { view: "places", place: placeOfMap(h.slice(4)), map: h.slice(4) });
     else if (h.startsWith("place-")) { const p = placeList.find((x) => slug(x.name) === h.slice(6)); Object.assign(state, { view: "places", place: p ? p.name : h.slice(6).replace(/-/g, " ") }); }
     else {
       const bySlug = mons.findIndex((_, i) => monSlug(i) === h);

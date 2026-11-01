@@ -468,11 +468,9 @@ table.mv .c-lv { text-align: right; white-space: nowrap; }
 /* Equal-width pills in a grid: name on the left, detail right-aligned */
 .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 6px; }  /* 5 across a full-width card on desktop */
 .chips.wild { grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }  /* 4 across: room for "Lv 3-6 · ☀️ 10% 🌙 15%" */
-.chips.wild.two { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }  /* 3 across when rates come in pairs */
-.chips.wild .hw { flex-shrink: 0; }  /* when and how often it's found stay whole; a long sub-area gives way instead */
-.chips.wild .ln { display: flex; align-items: baseline; gap: 4px; }  /* ...and so does the form, before the name */
-.chips.wild .ln > :is(small, .sub) { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.chips.wild .ln > .sub { flex-shrink: 1000; }  /* the sub-area goes before the form ("Alolan") */
+.chips.wild.two { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }  /* 3 across when rates come in pairs or a note is long */
+.chips.wild .hw { flex-shrink: 0; white-space: nowrap; }  /* when and how often it's found stay whole on one line */
+.chips.wild .ln { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 4px; }  /* the form and sub-area drop to the next line rather than being cut off */
 .chip { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 2px 12px 2px 2px; border: 1px solid var(--line); border-radius: 999px; background: var(--sunk); cursor: pointer; text-align: left; }
 .chip:hover, .chip.m-std:hover, .chip.m-div:hover, .chip.m-both:hover { border-color: var(--muted); }
 /* The mode a Pokémon is found in: a stripe on the chip's left edge and a tinted outline (Standard teal, Divergent
@@ -486,9 +484,10 @@ table.mv .c-lv { text-align: right; white-space: nowrap; }
 #m-div::before { background: var(--div); }
 #m-all::before { background: linear-gradient(var(--std) 50%, var(--div) 50%); }
 .seg button[aria-pressed="true"]::before { box-shadow: 0 0 0 1.5px #fff; }  /* stays visible on the selected button's purple */
-.chip .ln { font-weight: 600; font-size: 13.5px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* A chip grows taller to show all of its text instead of cutting it off; chips in a grid row stretch to match */
+.chip .ln { font-weight: 600; font-size: 13.5px; min-width: 0; overflow-wrap: break-word; }
 .chip .ln small { color: var(--muted); font-weight: 400; }
-.chip .hw { font: 12px var(--font-data); color: var(--muted); margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; min-width: 0; flex-shrink: 4; overflow: hidden; text-overflow: ellipsis; }
+.chip .hw { font: 12px var(--font-data); color: var(--muted); margin-left: auto; text-align: right; font-variant-numeric: tabular-nums; min-width: 0; flex-shrink: 4; overflow-wrap: break-word; }
 .empty { color: var(--muted); font-style: italic; }
 /* Rows off screen skip layout and paint until scrolled to */
 .mon:not([open]) { content-visibility: auto; contain-intrinsic-size: auto 70px; }
@@ -550,6 +549,85 @@ body.sheet-open { overflow: hidden; }
   .mon { transition: border-color .15s; }
   .chev { transition: transform .15s; }
 }
+/* Interactive maps (mapview.js): a layer over the page body, under the console so its tabs and Back/Forward stay usable. Floors flow left; the key and numbered
+   list ride alongside (below on phones); one card at the bottom describes whatever is pointed at or tapped.
+   Marker colours are Okabe-Ito and every kind also has its own shape. */
+.mapbtn { justify-self: start; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 9px; padding: 8px 14px;
+  background: var(--accent); color: #fff; font: 600 14px/1.2 var(--font-body); cursor: pointer; }
+:root[data-theme="dark"] .mapbtn { color: #1a0b33; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mapbtn { color: #1a0b33; } }
+.mapbtn svg { width: 16px; height: 16px; }
+body.map-open { overflow: hidden; }
+body.map-open .sheet { display: none; }  /* the place's pop-up waits behind the map */
+#mapview { position: fixed; inset: calc(env(safe-area-inset-top, 0px) + var(--console-h, 150px)) 0 0; z-index: 4; overflow: auto; overscroll-behavior: contain; background: var(--bg);
+  --map-bg: #1b1426; --flash: #ffd400; --k-item: #d55e00; --k-hidden: #f0e442; --k-npc: #009e73; --k-wild: #cc79a7; --k-statue: #56b4e9; }
+#mapview .mv-bar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--console); border-bottom: 1px solid var(--line);
+  padding: 10px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); }
+#mapview .mv-close { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 12px; font-weight: 600; cursor: pointer; }
+#mapview .mv-page { padding: 14px max(16px, env(safe-area-inset-right, 0px)) 140px max(16px, env(safe-area-inset-left, 0px));
+  display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
+@media (max-width: 960px) { #mapview .mv-page { grid-template-columns: minmax(0, 1fr); } }
+#mapview h2 { margin: 0 0 4px; font: 700 clamp(24px, 4vw, 32px)/1.1 var(--font-display); }
+#mapview .mv-note { margin: 0 0 8px; font-weight: 600; }
+#mapview .mv-help { margin: 0 0 14px; color: var(--muted); max-width: 70ch; }
+#mapview .mv-help b { color: var(--ink); font-weight: 600; }
+#mapview .mv-maps { position: relative; overflow-x: auto; min-width: 0; display: flex; flex-wrap: wrap; gap: 22px 20px; align-items: flex-start; padding-bottom: 6px; }
+#mapview .mv-floor { margin: 0; max-width: 100%; flex: 0 1 auto; }
+#mapview .mv-floor figcaption { font-weight: 650; margin-bottom: 6px; }
+#mapview .mv-map { position: relative; background: var(--map-bg); line-height: 0; border-radius: 4px; }
+#mapview .mv-map img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+#mapview .zoom2 .mv-floor { max-width: none; }
+#mapview .mv-wire { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; z-index: 3; }
+#mapview .mk { position: absolute; z-index: 2; padding: 0; border: 0; background: none; cursor: pointer; line-height: 1;
+  width: 22px; height: 22px; transform: translate(-30%, -78%); display: grid; place-items: center; }
+#mapview .mk svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+#mapview .mk .n { position: relative; font: 700 11px/1 var(--font-body); color: #fff; font-variant-numeric: tabular-nums; }
+#mapview .mk.k-hidden .n, #mapview .mk.k-wild .n, #mapview .mk.k-statue .n { color: #111; }
+#mapview .mk .tags { position: absolute; left: calc(100% + 1px); top: -3px; display: flex; gap: 2px; }
+#mapview .tag { font: 700 9px/1 var(--font-body); background: #fff; color: #111; border: 1.5px solid #111; border-radius: 4px; padding: 2px 3px; white-space: nowrap; }
+#mapview .warp { position: absolute; z-index: 2; width: 18px; height: 18px; transform: translate(-50%, -50%); border-radius: 50%;
+  background: #111; border: 2.5px solid #fff; box-shadow: 0 0 0 1.5px #111; padding: 0; cursor: pointer;
+  color: #fff; font: 700 11px/1 var(--font-body); display: grid; place-items: center; }
+#mapview .door, #mapview .edge { position: absolute; z-index: 2; transform: translate(-50%, -50%); white-space: nowrap; cursor: pointer;
+  background: #fff; color: #111; border: 2px solid #111; border-radius: 6px; padding: 3px 7px 3px 6px; font: 650 12px/1.1 var(--font-body); }
+#mapview .door::before { content: ""; display: inline-block; width: 8px; height: 10px; border: 2px solid #111; border-bottom: 0;
+  border-radius: 4px 4px 0 0; margin-right: 5px; vertical-align: -1px; }
+#mapview .edge.up { transform: translate(-50%, 4px); } #mapview .edge.down { transform: translate(-50%, calc(-100% - 4px)); }
+#mapview .edge.left { transform: translate(4px, -50%); } #mapview .edge.right { transform: translate(calc(-100% - 4px), -50%); }
+#mapview .on { z-index: 4; }
+#mapview .warp.on, #mapview .warp.mate { box-shadow: 0 0 0 1.5px #111, 0 0 0 6px var(--flash); }
+#mapview .mk.on svg, #mapview .mk.mate svg { filter: drop-shadow(0 0 0 var(--flash)) drop-shadow(0 0 3px var(--flash)) drop-shadow(0 0 3px var(--flash)); }
+#mapview .door.on, #mapview .edge.on { box-shadow: 0 0 0 4px var(--flash); }
+@keyframes mv-ping { from { box-shadow: 0 0 0 0 var(--flash); } to { box-shadow: 0 0 0 26px transparent; } }
+#mapview .ping { animation: mv-ping .7s ease-out 3; }
+@media (prefers-reduced-motion: reduce) { #mapview .ping { animation: none; } }
+#mapview .mv-side { min-width: 0; position: sticky; top: 66px; max-height: calc(100vh - var(--console-h, 150px) - 86px); overflow: auto;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+@media (max-width: 960px) { #mapview .mv-side { position: static; max-height: none; } }
+#mapview .mv-side h3 { font: 600 12px/1 var(--font-display); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 14px 0 8px; }
+#mapview .mv-side h3:first-child { margin-top: 0; }
+#mapview .mv-key, #mapview .mv-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+#mapview .mv-key li { display: flex; align-items: center; gap: 10px; min-height: 26px; }
+#mapview .sw { flex: none; width: 22px; display: grid; place-items: center; }
+#mapview .sw svg { width: 18px; height: 18px; }
+#mapview .sw .warp, #mapview .sw .door { position: static; transform: none; cursor: default; }
+#mapview .mv-list button { display: grid; grid-template-columns: 22px 2.2em minmax(0, 1fr); gap: 6px; align-items: start; width: 100%; text-align: left;
+  background: none; border: 0; border-radius: 6px; padding: 4px 6px; cursor: pointer; }
+#mapview .mv-list button:hover, #mapview .mv-list button.on { background: var(--accent-soft); }
+#mapview .mv-list .num { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--muted); }
+#mapview .mv-list svg { width: 16px; height: 16px; margin-top: 2px; }
+#mapview .mv-list .pg { font-weight: 700; }
+#mapview .mv-list .tag { margin-left: 4px; vertical-align: 1px; }
+#mapview .mv-floorhead { font-weight: 650; margin: 10px 0 2px; font-size: 14px; }
+#mapview .mv-none { color: var(--muted); margin: 0; }
+#mapview .mv-card { position: fixed; z-index: 8; left: 50%; transform: translateX(-50%);
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px)); width: min(560px, calc(100% - 24px));
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 10px 30px rgba(20, 8, 40, .28); padding: 12px 44px 12px 14px; }
+#mapview .mv-card .what { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 0 0 2px; }
+#mapview .mv-card .text { margin: 0; font-weight: 600; }
+#mapview .mv-card .acts:empty { display: none; }
+#mapview .mv-card .x { position: absolute; right: 8px; top: 8px; width: 30px; height: 30px; border-radius: 8px; border: 0; background: var(--accent-soft); cursor: pointer; font-size: 18px; line-height: 1; }
 </style>
 </head>
 <body>
@@ -615,6 +693,10 @@ body.sheet-open { overflow: hidden; }
 const DEX = __DEX_DATA__;
 const SHEET = "__SPRITE_SHEET__";
 const CAT_ICONS = __CAT_ICONS__;
+</script>
+<script type="application/json" id="mapdata">__MAP_DATA__</script>
+<script>
+__MAP_SCRIPT__
 </script>
 <script>
 __APP_SCRIPT__

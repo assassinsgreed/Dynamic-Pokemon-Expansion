@@ -19,6 +19,7 @@ import difflib
 
 from .load_cfru import ability_chances, ability_display, ability_ids, ability_officials, marts, z_crystal_sources
 from .locations import attach_encounters, load_encounters
+from .maps.export import place_maps
 from .paths import DPE_ROOT, Paths
 from .roster import Entry, SourceData, build_roster, evolution_links, load_extra_forms, load_source_data
 from .rom import POCKET_BERRIES, POCKET_KEY_ITEMS, POCKET_POKE_BALLS, item_fields, item_icons
@@ -29,6 +30,7 @@ from .trainers import NATURES, load_trainers
 TEMPLATE = Path(__file__).with_name("template.html")
 SW_TEMPLATE = Path(__file__).with_name("sw.js")
 APP_SCRIPT = Path(__file__).with_name("app.js")  # the page's script, inlined so the page stays one file
+MAP_SCRIPT = Path(__file__).with_name("mapview.js")  # the interactive map viewer app.js opens from place cards
 ABILITY_DETAILS = Path(__file__).with_name("ability_details.json")  # hand-written, checked against CFRU's code
 BALL_EFFECTS = Path(__file__).with_name("ball_effects.json")  # hand-written from CFRU's catching.c
 STAT_KEYS = ("hp", "atk", "def", "spa", "spd", "spe")
@@ -588,6 +590,15 @@ MANIFEST = {
 
 
 NOT_ON_TOWN_MAP = {"Roaming", "Ultra Space"}
+# Companion places whose interactive map is filed under another name (the map pages follow the PSS map files)
+MAP_OF = {"Daimyn Factory Overworld": "Daimyn Factory", "Rt. 12 Rest House": "Route 12 East", "Rt. 13 Rest House": "Route 13"}
+NO_MAP = {"Roaming"}
+
+
+def map_index(maps: list[dict]) -> dict:
+    """What the page knows about the maps before any is opened: each one's name and link, and the companion places
+    filed under another map's name. The pictures themselves go in #mapdata, read on first open."""
+    return {"places": [{"name": m["name"], "slug": m["slug"]} for m in maps], "alias": MAP_OF}
 
 
 def build(paths: Paths, out: Path) -> None:
@@ -597,13 +608,20 @@ def build(paths: Paths, out: Path) -> None:
     sheet, offsets = build_sheet({e.key: data.sprites[e.key] for e in roster},
                                  {e.key: (data.sprites[e.key], data.shiny[e.key]) for e in roster if e.key in data.shiny})
     page = page_data(data, roster, links)
+    maps = place_maps(paths)
+    page["maps"] = map_index(maps)
+    have = {place_key(m["name"]) for m in maps}
+    places = {l["location"] for m in page["mons"] for l in m["loc"]} | set(page["townMap"]["places"])
+    for place in sorted(places - NO_MAP):
+        if place_key(MAP_OF.get(place, place)) not in have:
+            print(f"warning: {place!r} has no interactive map (build.MAP_OF)", file=sys.stderr)
     for name in page["unmatchedEncounters"]:
         print(f"warning: encounters.csv row for {name!r} matches no Pokémon on the page", file=sys.stderr)
     on_map = {place_key(p) for p in page["townMap"]["places"]}
     for place in sorted({l["location"] for m in page["mons"] for l in m["loc"]} - NOT_ON_TOWN_MAP):
         if place_key(place) not in on_map:
             print(f"warning: {place!r} has no spot on the Town Map (town_map.SPOTS)", file=sys.stderr)
-    html = render(page, sheet, offsets).encode("utf-8")
+    html = render(page, sheet, offsets, maps).encode("utf-8")
 
     out.mkdir(parents=True, exist_ok=True)
     (out / "index.html").write_bytes(html)
@@ -663,7 +681,7 @@ def _pack_ability(ability: list | None, index: dict[tuple, int]) -> list | int |
     return index.get(tuple(ability), ability) if ability else ability
 
 
-def render(data: dict, sheet: bytes, offsets: dict) -> str:
+def render(data: dict, sheet: bytes, offsets: dict, maps: list[dict] = ()) -> str:
     index = {(a["name"], a["desc"], a["chance"]): n for n, a in enumerate(data["abilities"])}
     data = dict(data, mons=[dict(m, sp=offsets[m["key"]], ss=offsets.get(f"shiny:{m['key']}"), abilities=[_pack_ability(a, index) for a in m["abilities"]],
                                  hidden=_pack_ability(m["hidden"], index)) for m in data["mons"]],
@@ -677,4 +695,6 @@ def render(data: dict, sheet: bytes, offsets: dict) -> str:
             .replace("__BRAND_ICON__", _brand_icon())
             .replace("__CAT_ICONS__", _cat_icons())
             .replace("__GAME_VERSION__", game_version())
+            .replace("__MAP_DATA__", json.dumps(list(maps), ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/"))
+            .replace("__MAP_SCRIPT__", MAP_SCRIPT.read_text(encoding="utf-8").replace("</", "<\\/"))
             .replace("__APP_SCRIPT__", APP_SCRIPT.read_text(encoding="utf-8").replace("</", "<\/")))

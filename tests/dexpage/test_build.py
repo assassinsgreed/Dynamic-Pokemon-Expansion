@@ -377,3 +377,26 @@ def test_swarm_entries(data):
     assert mons["SPECIES_ZIGZAGOON"]["swarm"] == ["Divergent"]
     assert mons["SPECIES_FARFETCHD_G"]["swarm"] == []            # numbered
     assert "swarm" in mons["SPECIES_FARFETCHD"]["s"]
+
+
+def test_interactive_maps_in_site(site):
+    import json
+    import re
+    html = (site / "index.html").read_text(encoding="utf-8")
+    blob = re.search(r'<script type="application/json" id="mapdata">(.*?)</script>', html, re.S).group(1)
+    maps = {m["slug"]: m for m in json.loads(blob)}
+    rubarr = maps["rubarr-desert"]
+    assert [f["name"] for f in rubarr["floors"]][0] == "Desert" and len(rubarr["floors"]) == 4
+    assert all(f["img"].startswith("data:image/webp;base64,") for f in rubarr["floors"])
+    assert any(m["k"] == "statue" for m in rubarr["markers"])
+    assert "Route 11 South" in {m["name"] for m in maps.values()}
+    assert len(html.encode()) < 9_500_000  # Collin: full-size map pictures are fine at ~8 MB
+
+
+def test_every_place_has_an_interactive_map(data, paths):
+    from tools.dexpage.build import MAP_OF, NO_MAP
+    from tools.dexpage.maps.export import place_maps
+    from tools.dexpage.town_map import norm
+    have = {norm(m["name"]) for m in place_maps(paths)}
+    places = {l["location"] for m in data["mons"] for l in m["loc"]} | set(data["townMap"]["places"])
+    assert {p for p in places - NO_MAP if norm(MAP_OF.get(p, p)) not in have} == set()

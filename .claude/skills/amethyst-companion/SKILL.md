@@ -55,6 +55,8 @@ He also tests `site/index.html` directly.
 | `extra_forms.csv` | forms the Habitat table leaves out but players can get (Rotom appliances, Cosplay/Cap Pikachu), with a how-to-get row; never enable them in Habitat_Table.c |
 | `trainers.py` | Trainers tab: CFRU's 4 trainer tables with GetTrainerData's fallback order; teams finished like CreateNPCTrainerParty (class IVs / 31 on Extra Hard, Hard nature via GiveMonBestStatNature, Extra Hard EVs in the 2 best base stats, default moves = last 4 level-up); places from gTrainers `#region` headings; variant notes (rival = water starter gen, badge-count gym teams, rematches) from constants + `NOTES`; sprites and class names from the ROM |
 | `build.py` | page data JSON, item list merge (doc + shops + held + evolution items), sprite/icon sheets, site files |
+| `maps/` | interactive place maps drawn from the ROM: `rom_maps.py` (headers, tilesets, metatile renderer, offsets.ini labels; `init(paths)` before importing `places.py`), `places.py` (which PSS map files form each place, objects + sprites + what each NPC does, floor names/order, stitching edge-joined maps, Rubarr's sand-statue pits), `export.py` (per place: floor pictures as lossless WebP data URIs + markers/warps/exits/edges; `place_maps()` caches in `maps/.cache/` keyed on the ROM, CFRU scripts/offsets, PSS map list and this package — a cold build redraws for ~4 min), `curation.py` (**Collin's per-NPC review**, by script label: NO_MARKER, NO_SPRITE, NOTES, WILD_NOTES, FINAL_SPOT, NO_HIDDEN, NO_EXIT, PLACE_OF, CATEGORY, PLACE_NOTES). `python -m tools.dexpage.maps.export "Route 17"` prints a place's markers |
+| `mapview.js` | the map viewer, inlined before app.js; maps live in `<script id="mapdata">` (parsed on first open); app.js links a place to its map by name or `DEX.maps.alias` (`build.MAP_OF`) |
 | `template.html` | CSS + markup; `app.js` is the whole UI, inlined at build (`__APP_SCRIPT__`) |
 | `sw.js` | service worker; cache name = content hash so installs update |
 
@@ -124,6 +126,15 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   Doc "*" footnotes the item import misses go in `ITEM_FOOTNOTES` (build.py; Ability Capsule/Patch → Battle Bond).
 - Every TM/HM is an item ("TM02 Dragon Claw", category TMs/HMs) linking to its move; typing a type name in the
   Pokédex lists that type.
+
+- Interactive maps: a place card's **View Interactive Map** button opens `#map-<slug>` as a layer over the page
+  body, under the console (tabs and Back/Forward stay usable); its Back button returns to the place details. Clicking
+  a warp scrolls to its other end, a way out opens that place's map, a key row jumps to its marker; on-page help is
+  Collin's three "Click or tap…" lines. Never mark Pokémon Center nurses or anyone in a Poké Mart; each marker kind
+  numbers on its own; warps show ↑/↓ for stairs and → otherwise; mode-picked encounters read "A (B in Divergent)"
+  with an S/D tag (no extra "differs" sentence); people a scene moves are drawn at their final spot. Change what's
+  marked in `maps/curation.py`, never by special-casing in places.py.
+- Pillow's `getbbox()` on an RGBA difference only looks at alpha: convert to RGB before comparing map pictures.
 
 ## Known gaps / ideas not done yet
 
