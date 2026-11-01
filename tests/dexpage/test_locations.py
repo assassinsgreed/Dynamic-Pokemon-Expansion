@@ -12,6 +12,9 @@ def test_trade_notes_say_what_to_send():
     assert rows["Noibat", "Standard", "🔄 In-game trade"].startswith("Trade your Lillipup. Offered only if")
     assert rows["Scraggy", "Standard", "🥚 Egg"] == "Trade any Egg. Rival Egg swap."
     assert rows["Chinchou", "Standard", "🔄 In-game trade"] == "Trade your Snom."   # not said twice
+    # "at any Battle Frontier facility" isn't an "any Pokémon" trade; forms read the way the page names them
+    assert rows["Ditto", "Both", "🔄 In-game trade"].startswith("Trade your Heat Rotom. Needs a 5-win streak")
+    assert rows["Boldore", "Standard", "🔄 In-game trade"].startswith("Rival event: send any Pokémon")
 
 
 def test_swarm_notes_say_when_swarming():

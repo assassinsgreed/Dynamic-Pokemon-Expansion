@@ -162,6 +162,18 @@
   const escapeRe = (text) => text.replace(/[.*+?^$()|[\]\\{}]/g, "\\$&");
   // "Route 2" must match "Route 2" and "Route 2 (hidden)" but not "Route 20"
   const placeRe = (name) => new RegExp("(^|[^a-z0-9])" + escapeRe(name.toLowerCase()) + "($|[^a-z0-9])");
+  // Escaped text whose place names ("Secret Trail (need Strength)") open that place's card; longest name first
+  let anyPlace = null;
+  const placeLinks = (text) => {
+    anyPlace ??= new RegExp(`(?<![a-z0-9])(${placeList.map((p) => p.name).sort((a, b) => b.length - a.length).map(escapeRe).join("|")})(?![a-z0-9])`, "gi");
+    let out = "", at = 0;
+    for (const m of text.matchAll(anyPlace)) {
+      const p = placeList.find((pl) => pl.name.toLowerCase() === m[0].toLowerCase());
+      out += `${esc(text.slice(at, m.index))}<button class="mvname" data-place="${esc(p.name)}">${esc(m[0])}</button>`;
+      at = m.index + m[0].length;
+    }
+    return out + esc(text.slice(at));
+  };
   const statColor = (v) => (v < 50 ? "#e2562a" : v < 80 ? "#f2a516" : v < 100 ? "#c9c21b" : v < 120 ? "#5fb83a" : "#2aa198");
   // Drawn rather than the ♂/♀ characters, whose crossbar and arrow most fonts squeeze to nothing at this size
   const FEMALE_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="5.5" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 9.5V15M5 12.5h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
@@ -341,8 +353,8 @@
         <h2>${esc(mv.name)}${mv.official ? `<small>${esc(mv.official)}</small>` : ""}</h2></div>
       ${mv.desc ? `<div class="gamedesc">${esc(mv.desc)}</div>` : ""}
       <div class="specs"><span>${CAT_NAME[mv.split]}</span><span>Pow <b>${mv.power || "—"}</b></span><span>Acc <b>${mv.acc || "—"}</b></span><span>PP <b>${mv.pp}</b></span>${mv.chance ? `<span>Effect chance <b>${mv.chance}%</b></span>` : ""}</div>
-      ${mv.tm ? `<div class="tmloc"><b>${mv.tm.label}</b> · ${mv.tm.where.map(esc).join(" · ")}${mv.tm.requires ? ` · needs ${esc(mv.tm.requires)}` : ""}</div>` : ""}
-      ${(mv.tutor || []).map((t) => `<div class="tmloc"><b>Tutor</b> · ${esc(t.where)} · ${esc(t.note)}</div>`).join("")}
+      ${mv.tm ? `<div class="tmloc"><b>${mv.tm.label}</b> · ${mv.tm.where.map(placeLinks).join(" · ")}${mv.tm.requires ? ` · needs ${esc(mv.tm.requires)}` : ""}</div>` : ""}
+      ${(mv.tutor || []).map((t) => `<div class="tmloc"><b>Tutor</b> · ${placeLinks(t.where)} · ${esc(t.note)}</div>`).join("")}
       <div class="learners">${body}</div></article>`;
   }
 
@@ -359,7 +371,7 @@
     const useTitle = /Forme|Primal|Evolution/.test(it.category) ? "Used on" : "Effect";
     return `<article class="itemcard">${collapsible ? COLLAPSE : ""}
       <div class="top">${itemIcon(k)}<h2>${esc(it.name)}<small>${esc(it.category)}</small></h2></div>
-      ${it.where.length ? `<div><h4>Where to find</h4><ul class="where">${it.where.map((w) => `<li>${esc(w)}</li>`).join("")}</ul></div>` : '<p class="note">No known location.</p>'}
+      ${it.where.length ? `<div><h4>Where to find</h4><ul class="where">${it.where.map((w) => `<li>${placeLinks(w)}</li>`).join("")}</ul></div>` : '<p class="note">No known location.</p>'}
       ${it.move ? `<div><h4>Teaches</h4><div class="chips"><button class="chip" data-move="${it.move}">${typeBadge(moves[it.move].type)}<span class="ln">${esc(moves[it.move].name)}</span><span class="hw">${moves[it.move].learners.filter(([, h]) => /^(TM|HM)\d/.test(h)).length} Pokémon</span></button></div></div>` : ""}
       ${showUse ? `<div><h4>${it.move ? "Note" : useTitle}</h4><div class="use">${esc(it.use)}</div></div>` : ""}
       ${evolves.length ? `<div><h4>${it.category === "Mega Stones" ? "Mega Evolves" : "Evolves"} · ${evolves.length}</h4><div class="chips">${evolves.map(([i, to]) => monChip(to, "", "", it.category === "Mega Stones")).join("")}</div>${

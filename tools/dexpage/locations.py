@@ -55,8 +55,9 @@ def _trade_asks(path: Path = TRADES_CSV) -> dict[tuple[str, str, str], str]:
 
 def _with_ask(notes: str, ask: str | None) -> str:
     """Trade House notes only say which starter unlocks the trade; add what to send unless the note already says."""
-    if not ask or "any" in notes.lower() or ask.lower() in notes.lower():
+    if not ask or re.search(r"\b(send|trade) any\b", notes, re.I) or ask.lower() in notes.lower():
         return notes
+    ask = re.sub(r"(.+?) \((.+)\)", r"\2 \1", ask)  # "Rotom (Heat)" → "Heat Rotom"
     give = f"Trade any {ask[4:]}." if ask.lower().startswith("any ") else f"Trade your {ask}."
     return f"{give} {notes}".strip()
 
