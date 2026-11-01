@@ -130,16 +130,72 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
 - Every TM/HM is an item ("TM02 Dragon Claw", category TMs/HMs) linking to its move; typing a type name in the
   Pokédex lists that type.
 
-- Interactive maps: a place card's **View Interactive Map** button opens `#map-<slug>` as a layer over the page
-  body, under the console (tabs and Back/Forward stay usable); its Back button returns to the place details. Clicking
-  a warp scrolls to its other end, a way out opens that place's map, a key row jumps to its marker; on-page help is
-  Collin's three "Click or tap…" lines. Never mark Pokémon Center nurses or anyone in a Poké Mart; each marker kind
-  numbers on its own; warps show ↑/↓ for stairs and → otherwise; mode-picked encounters read "A (B in Divergent)"
-  with an S/D tag (no extra "differs" sentence); people a scene moves are drawn at their final spot. Change what's
-  marked in `maps/curation.py`, never by special-casing in places.py.
-- Pillow's `getbbox()` on an RGBA difference only looks at alpha: convert to RGB before comparing map pictures.
+- Interactive maps: see the section below.
+
+## Interactive maps (`maps/` + `mapview.js`)
+
+Each place card has a **View Interactive Map** button that opens `#map-<slug>`: every floor and room of the place
+(PSS map files grouped into places), drawn from the ROM with its sprites, with markers laid over it.
+
+**Iterating on what's marked** (Collin's usual feedback: "remove person 4", "X should read Y", "add a marker for Z",
+"hide this sprite"):
+1. Find the marker's script label: `python -m tools.dexpage.maps.export "Daimyn City"` prints each place's markers
+   by kind and number. Numbers count per kind (items 1–4, people 1–4) in floor order, and the label is the CFRU
+   `EventScript_…` at that object (grep `assembly/overworld_scripts` for what it does; read the script before writing
+   text — e.g. the "Cherish Ball Guy" only chats, the swapper stands next to him).
+2. Edit `maps/curation.py` only: `NO_MARKER` (sprite stays), `NO_SPRITE` (gone entirely: intro/cutscene actors),
+   `NOTES` (label → text, mode-specific, postgame; also works for signs and step triggers that have no sprite),
+   `WILD_NOTES` (legendaries picked by mode: "A (B in Divergent)", postgame), `FINAL_SPOT` (where `movesprite2` leaves
+   someone), `NO_HIDDEN` ((map, x, y) of unreachable hidden items), `NO_EXIT`, `PLACE_OF`/`FLOOR_NAMES`,
+   `CATEGORY`, `PLACE_NOTES`, `BROKEN_MAPS`. Never special-case in places.py.
+3. `python -m tools.dexpage --out site`. Any change in `maps/` (or the ROM, CFRU scripts/offsets.ini, the PSS map
+   list) invalidates `maps/.cache/` and the build redraws every map (~4 min); app.js/mapview.js/template changes don't.
+4. Check in headless Chrome with `#map-<slug>` (see below), run the tests, commit.
+
+**Collin's rules:**
+- Players care about warps, items (incl. hidden) and special NPCs. Never mark Pokémon Center nurses or anyone in a
+  Poké Mart (rule in export.py), trainers, gym leaders, chat-only people, obstacles (rocks/boulders/trees: the sprite
+  shows them), or anything that spawns in for a scene (unscripted trainer-type objects, every `*Rival*` object except
+  the rival side events, flag-hidden actors with no script).
+- Rival side events show what they ask and give (`RIVAL_EVENTS` in places.py, from `rival_events.s`).
+- TM pickups read "TM67 Smart Strike". Mode-picked things read "A (B in Divergent)" with an S/D tag; no extra
+  "differs between Standard and Divergent" sentence. Postgame things carry PG.
+- Marker kinds each have an Okabe-Ito colour *and* a shape; the key lists only the kinds on that map.
+- Warps: ↑/↓ for stairs between numbered floors (`floor_rank`; BF/Underground count as −1), → for any other warp.
+  Clicking a warp scrolls to its other end (both ends light up; a line only if it crosses no other map). Clicking a
+  way out opens that place's map. Clicking a key row jumps to its marker; clicking a marker scrolls the key to its
+  row (only where the key scrolls beside the maps, never on phones). No action buttons on the card.
+- On-page help is exactly: "Click or tap a warp to see where it leads." / "Click or tap a marker in the map to see
+  what it is." / "Click or tap a marker in the key to highlight it in the map." (+ a 2× hint on touch screens).
+- The map layer sits under the console (`--console-h`), so tabs and Back/Forward stay usable; its own
+  "← Back to place details" button, Escape and the header's Back return to the card. A place pop-up behind it is
+  hidden (`body.map-open .sheet`). Typing a search or switching tabs closes the map.
+- Fit scales floors to the frame and must never scroll inside the maps area (fractional widths at 125% display
+  scaling made stray scrollbars); 2× scrolls sideways with `flex-shrink: 0` floors.
+- Full-size lossless WebP pictures are fine (~4.4 MB of the ~8 MB page); they sit in `<script id="mapdata">` and are
+  parsed on first open.
+
+**How it's built:** `places.py` groups PSS map files into places (image names beat stale `.map` names, longest
+whole-word match; `PLACE_OF` fixes the rest), classifies each object (items, hidden items, wild, NPC role from its
+script, postgame from hide flags 0x9D/0x6C or a cleared-game load script, Standard/Divergent from `checkflag 0x945`),
+draws each sprite's starting frame from CFRU's overworld tables (`gOverworldTableSwitcher` from **offsets.ini** — the
+address moves every CFRU build), and stitches edge-joined maps into one picture (Battle Frontier, Mimmett Jungle).
+Runtime-changeable sprites (0xFF0n) take the value the map's own load script sets; read those scripts from the
+map's own file, because files reuse local labels (four dungeons each have `MapLoadScript_SetLegendarySprite`).
+Rubarr's sand-statue pits come from `MapEntryScript_RubarrDesertBF2_SetSand` (`rubarr()`).
+
+**Checking a map:** open `site/index.html#map-rubarr-desert` headless (same recipe as above); inject a load-event
+script that clicks `.mapbtn`, `.warp`, `.door`, `.mk` or `.mv-list button` and writes results to `document.title`,
+then `--dump-dom`. Smooth scrolling doesn't finish under `--virtual-time-budget`: add `--force-prefers-reduced-motion`
+when measuring scroll positions. `--force-device-scale-factor=1.25` reproduces a 1080p monitor at 125%. The page has
+no `</body>` inside `#mapdata`, so append probes before the final `</body>`.
+Pillow's `getbbox()` on an RGBA difference only looks at alpha: convert to RGB before comparing map pictures.
 
 ## Known gaps / ideas not done yet
+
+- Maps: the rival's story appearances (e.g. the HM02 hand-over on Route 11 South) are hidden, so those gifts aren't
+  marked; Heleo Ranch's "Ampharos, Pidgeot" may be a mode split (unconfirmed, left as is); Rubarr's
+  `FillBigHole_Level2/3` use x=0x450 (should be 0x50) — a game script bug, ask Collin before touching CFRU.
 
 - Battle-only habitat forms (Aegislash Blade, Cramorant Gulping, Eiscue Noice, Wishiwashi School, Necrozma Ultra)
   still appear as separate move learners.
