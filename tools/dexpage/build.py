@@ -307,6 +307,13 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
             refiner = [w for w in item["where"] if w.startswith("Bought from Mega Stone Refiner")]
             if refiner:
                 item["where"] = refiner[:1]
+            # The doc's Mega Stone table puts the mode it's found in ("Standard", "Divergent", "Both") where other
+            # tables put the effect; it belongs with where to find it, and the game's description is the effect
+            if item["use"] in ("Standard", "Divergent", "Both"):
+                if item["use"] != "Both":
+                    note = f"{item['use']} mode"
+                    item["where"] = [f"{w[:-1]}; {note})" if w.endswith(")") else f"{w} ({note})" for w in item["where"]]
+                item["use"] = ""
     for item in items:
         # Poké Mart stock only grows with badges: "after 6 badges" covers 7 and 8 (plain "Poké Marts" covers all)
         stock = [w for w in item["where"] if re.fullmatch(r"Poké Marts( \(after \d+ badges?\))?", w)]
@@ -326,6 +333,10 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
             if ball not in balls:
                 raise ValueError(f"ball_effects.json: no entry for {ball} ({item['name']})")
             item["use"] = balls[ball]
+    # The doc's "*" footnotes, which sit in a separate paragraph the item import doesn't read
+    for item in items:
+        if item["use"].endswith("*") and item["name"] in ITEM_FOOTNOTES:
+            item["use"] += "\n* " + ITEM_FOOTNOTES[item["name"]]
     for names in held.values():
         for h in names:
             add(h.split(" (")[0], "Held by wild Pokémon", [], "")
@@ -333,6 +344,11 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
         for link in links:
             if link.get("item") and link["item"] in data.items and _norm(data.items[link["item"]]) not in index:
                 add(data.items[link["item"]], "Evolution", [], "")
+    # Anything the doc doesn't explain (Potions, Repels, most of FireRed's own items) uses the game's bag description;
+    # a TM's would only repeat its move's
+    for item in items:
+        if not item["use"] and not item.get("move") and item["key"] in fields:
+            item["use"] = fields[item["key"]]["desc"]
 
     items.sort(key=lambda it: ITEM_CATEGORY_ORDER.index(it["category"]) if it["category"] in ITEM_CATEGORY_ORDER else len(ITEM_CATEGORY_ORDER) - 1)
     index.clear()
@@ -351,6 +367,12 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
     for item in items:
         item["icon"] = offsets.get(item.pop("key"))
     return items, index, by_const, "data:image/webp;base64," + base64.b64encode(sheet).decode()
+
+
+# Checked against CFRU's GetAbilityCapsuleNewAbility (party_menu.c): Greninja can still be changed away from Battle Bond
+_BATTLE_BOND = ("Greninja can't be changed to Battle Bond this way; in the postgame, Selene on Route 19 does it for a "
+                "Greninja with max friendship.")
+ITEM_FOOTNOTES = {"Ability Capsule": _BATTLE_BOND, "Ability Patch": _BATTLE_BOND}
 
 
 def _ball_types(paths: Paths) -> list[str]:

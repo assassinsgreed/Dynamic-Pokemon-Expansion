@@ -163,12 +163,13 @@ def read_text(rom_path: Path, address: int, limit: int = 200) -> str:
     text = decode(_rom_bytes(rom_path)[o:o + limit], _charmap())
     for brk in ("\\n", "\\l", "\\p"):
         text = text.replace("-" + brk, "-").replace(brk, " ")  # "hide-" + break + "melting" is one word
-    return " ".join(text.split())
+    return " ".join(text.replace("\\e", "é").split())
 
 
 def item_fields(rom_path: Path, item_ids: dict[str, int]) -> dict[str, dict]:
     """What the game's item table says about each item: its bag pocket, hold effect, and whether it has a field or
-    battle use (FireRed struct Item: pocket at +26, type at +27 — a ball's BALL_TYPE —, fieldUseFunc at +28, battleUsage at +32)."""
+    battle use, and its bag description (FireRed struct Item: description at +20, pocket at +26, type at +27 — a
+    ball's BALL_TYPE —, fieldUseFunc at +28, battleUsage at +32)."""
     rom = _rom_bytes(rom_path)
     base = _find_item_table(rom, _charmap())
     fields = {}
@@ -176,7 +177,9 @@ def item_fields(rom_path: Path, item_ids: dict[str, int]) -> dict[str, dict]:
         o = base + idx * ITEM_STRUCT_SIZE
         if o + ITEM_STRUCT_SIZE <= len(rom):
             b = rom[o:o + ITEM_STRUCT_SIZE]
-            fields[const] = {"hold": b[18], "pocket": b[26], "type": b[27], "field_use": int.from_bytes(b[28:32], "little"), "battle_use": b[32]}
+            desc = int.from_bytes(b[20:24], "little")
+            fields[const] = {"hold": b[18], "pocket": b[26], "type": b[27], "field_use": int.from_bytes(b[28:32], "little"), "battle_use": b[32],
+                             "desc": read_text(rom_path, desc) if ROM_BASE <= desc < ROM_BASE + len(rom) else ""}
     return fields
 
 

@@ -8,7 +8,7 @@
   "BALL_TYPE_SPORT_BALL": "1.5x catch rate.",
   "BALL_TYPE_PARK_BALL": "1.5x catch rate.",
   "BALL_TYPE_PREMIER_BALL": "1x catch rate.",
-  "BALL_TYPE_LUXURY_BALL": "1x catch rate.",
+  "BALL_TYPE_LUXURY_BALL": "1x catch rate. The caught Pokémon makes friends faster: whenever its friendship goes up, it goes up 1 more.",
   "BALL_TYPE_CHERISH_BALL": "1x catch rate.",
   "BALL_TYPE_NET_BALL": "3.5x catch rate on Water and Bug types, 1x otherwise.",
   "BALL_TYPE_DIVE_BALL": "3.5x catch rate while surfing, fishing or underwater, 1x otherwise.",

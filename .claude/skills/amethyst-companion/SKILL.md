@@ -118,6 +118,10 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   ("☀️ 20%", "🌙 20%", "☀️ 10% 🌙 15%"; `times` on encounter rows, from locations.py `_by_time`); a bare rate means
   all day (Collin: Varisi Forest read as 120% when day/night rows looked like all-day ones). Wild chips are 4 across
   (`.chips.wild`), 3 when a list has paired rates; the rate and name stay whole, the sub-area gives way first.
+- An item's Effect is the doc's text, else (`ball_effects.json` for balls, then) the game's bag description from the
+  ROM item table (+20); TMs/HMs leave it empty since Teaches shows the move. The doc's Mega Stone "Standard /
+  Divergent / Both" column is *where-to-find* info: it becomes "(Standard mode)" on the where lines, not the effect.
+  Doc "*" footnotes the item import misses go in `ITEM_FOOTNOTES` (build.py; Ability Capsule/Patch → Battle Bond).
 - Every TM/HM is an item ("TM02 Dragon Claw", category TMs/HMs) linking to its move; typing a type name in the
   Pokédex lists that type.
 
