@@ -62,7 +62,7 @@ const MapView = (() => {
         const x = t.dataset.x !== undefined ? place.exits[t.dataset.x] : place.edges[t.dataset.e];
         if (x.slug && bySlug[x.slug]) { opts.onLink(x.slug); return; }
       }
-      if (t && !t.closest(".mv-key")) { show(t, true); return; }
+      if (t && !t.closest(".mv-key")) { show(t, true); if (t.matches(".mk")) revealInKey(t.dataset.m); return; }
       if (!e.target.closest(".mv-card, .mv-bar")) unpin();
     });
     if (!touch) {
@@ -203,6 +203,15 @@ const MapView = (() => {
     $("cacts").innerHTML = "";
     $("card").hidden = false;
     drawWire();
+  }
+
+  // A marker clicked on the map also brings its row into view in the key. Only where the key scrolls by itself
+  // (beside the maps); on phones it sits below them, and scrolling there would carry the page away from the map.
+  function revealInKey(i) {
+    const side = $("side"), row = side.querySelector(`.mv-list [data-m="${i}"]`);
+    if (!row || side.scrollHeight <= side.clientHeight) return;
+    const r = row.getBoundingClientRect(), b = side.getBoundingClientRect();
+    if (r.top < b.top || r.bottom > b.bottom) side.scrollTo({ top: side.scrollTop + r.top - b.top - (b.height - r.height) / 2, behavior: smooth() });
   }
 
   function clearMarks() {
