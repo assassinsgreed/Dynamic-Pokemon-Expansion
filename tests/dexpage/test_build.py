@@ -80,19 +80,28 @@ def test_every_place_is_on_the_town_map(data):
 
 def test_item_places_said_once():
     from tools.dexpage.build import _tidy_where
-    shop = "Tsarvosa City · Evolution Items shop (Divergent)"
+    shop = "Tsarvosa City · Evolution Items Shop (Divergent)"
     assert _tidy_where(["Tsarvosa City Market", "(Divergent Pokemon encounters only)", shop]) == [shop]
     assert _tidy_where(["Route 7, Tsarvosa City Market", "(Divergent Pokemon encounters only)", shop]) == ["Route 7 (Divergent)", shop]
-    assert _tidy_where(["Daimyn City Mall Incense Shop", "(Divergent Mode only)", "Daimyn City Mall · Incense shop (Divergent)"]) \
-        == ["Daimyn City Mall · Incense shop (Divergent)"]
-    assert _tidy_where(["(Added in v1.4)", "Daimyn City Mall (v1.4+)", "Daimyn City Mall · Held Item shop"]) == ["Daimyn City Mall · Held Item shop"]
+    assert _tidy_where(["Daimyn City Mall Incense Shop", "(Divergent Mode only)", "Daimyn City Mall · Incense Shop (Divergent)"]) \
+        == ["Daimyn City Mall · Incense Shop (Divergent)"]
+    assert _tidy_where(["(Added in v1.4)", "Daimyn City Mall (v1.4+)", "Daimyn City Mall · Held Item Shop"]) == ["Daimyn City Mall · Held Item Shop"]
     assert _tidy_where(["Uteyan Ruins", "(Divergent mode only)"]) == ["Uteyan Ruins (Divergent)"]
     assert _tidy_where(["Wild Farfetch’d & Farfetch’d-G (Farfetch’d-G only >v1.1.5)"]) == ["Wild Farfetch’d & Farfetch’d-G"]
     assert _tidy_where(["Emraldin Quay", "(Divergent Pokemon encounters only, added in v1.4)"]) == ["Emraldin Quay (Divergent)"]
     assert _tidy_where(["PokeMarts", "Poké Marts (after 2 badges)"]) == ["Poké Marts (after 2 badges)"]
     assert _tidy_where(["Pokemarts", "Poké Marts"]) == ["Poké Marts"]
     assert _tidy_where(["Route 18 flower girl, after catching Shaymin"]) == ["Route 18 flower girl, after catching Shaymin"]
-    assert _tidy_where(["Tsarvosa City Stats Dojo", "Tsarvosa City · Vitamins shop"]) == ["Tsarvosa City Stats Dojo", "Tsarvosa City · Vitamins shop"]
+    assert _tidy_where(["Tsarvosa City Stats Dojo", "Tsarvosa City · Vitamins Shop"]) == ["Tsarvosa City Stats Dojo", "Tsarvosa City · Vitamins Shop"]
+
+
+def test_shop_names():
+    from tools.dexpage.load_cfru import _shop
+    assert _shop("HeldItemsShop4") == "Held Items Shop 4"   # not "Held Items Shop 4 shop"
+    assert _shop("BattleItems1") == "Battle Items Shop 1"
+    assert _shop("PPItemsShop") == "PP Items Shop"
+    assert _shop("PokeBallShop") == "Poké Ball Shop"
+    assert _shop("DivergentMegaStoneShopStock") == "Divergent Mega Stone Shop"
 
 
 def test_page_size(html):

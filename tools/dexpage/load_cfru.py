@@ -252,7 +252,19 @@ PLACE_ALIASES = {"FerroxFacilities": "Ferrox Village", "HeleoFacilities": "Heleo
 
 
 def _words(camel: str) -> str:
-    return re.sub(r"(?<=[a-z])(?=[A-Z0-9])|(?<=[0-9])(?=[A-Z])", " ", camel)
+    return re.sub(r"(?<=[a-z])(?=[A-Z0-9])|(?<=[0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", " ", camel)  # "PPItems" → "PP Items"
+
+
+# Shop names as players read them, after the camel case is split
+SHOP_NAMES = {"Poke Ball": "Poké Ball", "Pokeball": "Poké Ball", "Z Crystals": "Z-Crystals", "EV Reducing Berries": "EV-Reducing Berries"}
+
+
+def _shop(label: str) -> str:
+    """A pokemart list's shop name, "<Name> Shop" with any number last: HeldItemsShop4 → "Held Items Shop 4",
+    PPItemsShop → "PP Items Shop", BattleItems1 → "Battle Items Shop 1"."""
+    m = re.fullmatch(r"(.*?)(?:Shop|Stock|Mart|Items(?=Divergent|$))?(\d*)(Divergent)?", label.split("_")[-1])
+    name = re.sub(r" Shop$", "", _words(m.group(1))) or label  # DivergentMegaStoneShopStock
+    return f"{SHOP_NAMES.get(name, name)} Shop" + (f" {m.group(2)}" if m.group(2) else "")  # the number never wraps alone
 
 
 @cache
@@ -284,8 +296,7 @@ def marts(p: Paths) -> list[dict]:
             else:
                 prefix = script.removeprefix("EventScript_").split("_")[0] if script.startswith("EventScript_") else ""
                 place = PLACE_ALIASES.get(prefix) or (_words(prefix) if prefix else _words(path.stem.replace("_", " ").title().replace(" ", "")))
-                shop = _words(re.sub(r"(Shop|Stock|Items|Mart)(Divergent)?$", "", label.split("_")[-1]) or label).replace("ZCrystals", "Z-Crystals")
-                where = f"{place} · {shop} shop" + (" (Divergent)" if "Divergent" in label + script else "")
+                where = f"{place} · {_shop(label)}" + (" (Divergent)" if "Divergent" in label + script else "")
             if (where, label) in seen:
                 continue
             seen.add((where, label))
