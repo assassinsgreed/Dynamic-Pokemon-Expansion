@@ -214,14 +214,30 @@ def species_names(p: Paths) -> dict[str, str]:
     return names
 
 
+def _graphic(p: Paths, folder: str, name: str) -> Path:
+    path = p.dpe / "graphics" / folder / f"{name}.png"
+    if not path.exists():  # e.g. Castform keeps its sprites in graphics/castform
+        path = next((p.dpe / "graphics").rglob(f"{name}.png"), path)
+    return path
+
+
 @cache
 def front_pic(p: Paths) -> dict[str, Path]:
     result = {}
     for species, body in parse_designated_array(_source(p, "src/Front_Pic_Table.c"), "gMonFrontPicTable").items():
         m = re.match(r"(gFrontSprite\w+?)Tiles\b", body.strip())
         if m:
-            path = p.dpe / "graphics/frontspr" / f"{m.group(1)}.png"
-            if not path.exists():  # e.g. Castform keeps its sprites in graphics/castform
-                path = next((p.dpe / "graphics").rglob(f"{m.group(1)}.png"), path)
-            result[species] = path
+            result[species] = _graphic(p, "frontspr", m.group(1))
+    return result
+
+
+@cache
+def shiny_pal(p: Paths) -> dict[str, Path]:
+    """gMonShinyPaletteTable names each species' shiny palette after a back sprite (gBackShinySprite…Pal); the game
+    compiles that PNG's own palette, so the PNG is the source."""
+    result = {}
+    for species, body in parse_designated_array(_source(p, "src/Shiny_Palette_Table.c"), "gMonShinyPaletteTable").items():
+        m = re.match(r"(gBackShinySprite\w+?)Pal\b", body.strip())
+        if m:
+            result[species] = _graphic(p, "backspr", m.group(1))
     return result

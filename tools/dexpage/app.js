@@ -132,6 +132,8 @@
   // ---------------------------------------------------------------- small pieces
   const typeBadge = (t) => `<span class="type t-${t}">${t === "MYSTERY" ? "???" : t[0] + t.slice(1).toLowerCase()}</span>`;
   const sprite = (m, small) => `<span class="sp${small ? " sm" : ""}" aria-hidden="true"><i style="background-position:-${m.sp[0]}px -${m.sp[1]}px"></i></span>`;
+  // Pokédex rows only: the shiny colours beside the normal sprite, so the two can be told apart
+  const pics = (m) => `<span class="pics">${sprite(m)}${m.ss ? `<span class="shiny" title="Shiny"><span class="sp" aria-hidden="true"><i style="background-position:-${m.ss[0]}px -${m.ss[1]}px"></i></span></span>` : ""}</span>`;
   const formLabel = (m) => (m.form ? ` <small>${esc(m.form)}</small>` : "");
   const pad = (n) => String(n).padStart(3, "0");
   // One tag for the dex it's in ("Both" for the two), and its number on its own: a Pokémon in both dexes has the same
@@ -192,7 +194,7 @@
   function row(m, i, inSheet = false) {
     const cards = state.layouts.dex === "grid" && !inSheet, open = state.open === i && !cards;
     return `<details class="mon${modeClass(m.modes)}${cards && state.open === i ? " on" : ""}" data-i="${i}" style="${tint(m)}"${open ? " open" : ""}>
-      <summary title="Show details"><span class="dexline">${dexNo(m)}${modeBadge(m)}</span>${sprite(m)}
+      <summary title="Show details"><span class="dexline">${dexNo(m)}${modeBadge(m)}</span>${pics(m)}
         <span class="who"><span class="nm">${esc(m.name)}${formLabel(m)}</span>
           <span class="tags">${m.types.map(typeBadge).join("")}</span></span>
         ${CHEVRON}

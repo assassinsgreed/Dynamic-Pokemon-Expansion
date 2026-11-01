@@ -49,6 +49,7 @@ class SourceData:
     evolutions: dict
     names: dict
     sprites: dict
+    shiny: dict
     national: dict
     moves: dict
     items: dict
@@ -83,7 +84,7 @@ def load_source_data(p: Paths) -> SourceData:
         habitat=load_dpe.habitat_forms(p), stats=load_dpe.base_stats(p),
         levelup=load_dpe.levelup(p), egg=load_dpe.egg_moves(p),
         machines=load_dpe.machine_compat(p), evolutions=load_dpe.evolutions(p),
-        names=load_dpe.species_names(p), sprites=load_dpe.front_pic(p),
+        names=load_dpe.species_names(p), sprites=load_dpe.front_pic(p), shiny=load_dpe.shiny_pal(p),
         national=_national_dex(p), moves=load_cfru.moves(p),
         items=item_names(p.rom, item_ids), item_ids=item_ids, abilities=load_cfru.ability_names(p),
     )

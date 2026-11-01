@@ -18,8 +18,19 @@ def load_sprite(path: Path) -> Image.Image:
     return img.crop((0, 0, CELL, CELL)).convert("RGBA")
 
 
-def build_sheet(pngs: dict[str, Path]) -> tuple[bytes, dict[str, tuple[int, int]]]:
-    return pack({key: load_sprite(path) for key, path in pngs.items()}, CELL)
+def load_shiny(path: Path, palette: Path) -> Image.Image:
+    """The front sprite drawn with its shiny palette (same pixel indices, other colours)."""
+    img = Image.open(path).copy()
+    img.putpalette(Image.open(palette).getpalette())
+    img.info["transparency"] = 0
+    return img.crop((0, 0, CELL, CELL)).convert("RGBA")
+
+
+def build_sheet(pngs: dict[str, Path], shiny: dict[str, tuple[Path, Path]] = {}) -> tuple[bytes, dict[str, tuple[int, int]]]:
+    """Front sprites keyed as given, plus each shiny one keyed "shiny:<key>"."""
+    images = {key: load_sprite(path) for key, path in pngs.items()}
+    images |= {f"shiny:{key}": load_shiny(path, palette) for key, (path, palette) in shiny.items()}
+    return pack(images, CELL)
 
 
 def pack(images: dict[str, Image.Image], cell: int) -> tuple[bytes, dict[str, tuple[int, int]]]:
