@@ -740,7 +740,10 @@
     docs: "Search the docs — e.g. Frostbite, Battle Frontier, shiny",
   };
 
+  let shownView = null;
   function render(scroll) {
+    const hadSheet = shownView === state.view && !!$("#out .sheet");
+    shownView = state.view;
     const q = norm(state.q);
     const [html, count] = { dex: dexView, moves: movesView, tutors: tutorsView, abilities: abilitiesView, items: itemsView, trainers: trainersView, places: placesView, docs: docsView }[state.view](q);
     $("#out").innerHTML = alsoLine(q, state.view) + html;
@@ -760,6 +763,8 @@
     $("#type-label").innerHTML = state.type ? typeBadge(state.type) : "All types";
     syncConsoleHeight();
     document.body.classList.toggle("sheet-open", !!$("#out .sheet"));
+    // Closing a pop-up (×, backdrop, Escape, Back) leaves the cards behind it where they were
+    if (hadSheet && !$("#out .sheet")) return;
     if (scroll && $("#out .sheet")) {
       const on = document.querySelector(".mon.on, .chip.on");
       if (on) on.scrollIntoView({ block: "nearest" });
