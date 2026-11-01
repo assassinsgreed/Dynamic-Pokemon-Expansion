@@ -54,6 +54,9 @@
   mons.forEach((m, i) => m.evo.forEach(([to]) => { if (!parent.has(to)) parent.set(to, i); }));
   const itemKeys = items.map((it) => norm(it.name));
 
+  const escapeRe = (text) => text.replace(/[.*+?^$()|[\]\\{}]/g, "\\$&");
+  // "Route 2" must match "Route 2" and "Route 2 (hidden)" but not "Route 20"
+  const placeRe = (name) => new RegExp("(^|[^a-z0-9])" + escapeRe(name.toLowerCase()) + "($|[^a-z0-9])");
   // Places: every location in the encounter data, with the Pokémon found there
   const places = new Map();
   mons.forEach((m, i) => m.loc.forEach((l) => {
@@ -61,6 +64,11 @@
     if (!places.has(k)) places.set(k, { name: l.location, rows: [] });
     places.get(k).rows.push([i, l]);
   }));
+  // Town Map places with items but no wild Pokémon (Treasure Beach, towns with shops) get cards too
+  for (const name of Object.keys(DEX.townMap.places)) {
+    const re = placeRe(name);
+    if (!places.has(norm(name)) && items.some((it) => it.where.some((w) => re.test(w.toLowerCase())))) places.set(norm(name), { name, rows: [] });
+  }
   const placeList = [...places.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
 
   // Sort keys per mode: that mode's dex number; unnumbered forms sit just after the entry before them (their base)
@@ -159,9 +167,6 @@
   const modeEdge = (modes) => `${modeClass(modes)}" title="${modes.length > 1 ? "Standard and Divergent" : `${modes[0]} only`}`;
   const monChip = (i, note, sub, bare, modes = mons[i].modes) => `<button class="chip${modeEdge(modes)}" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${bare ? "" : formLabel(mons[i])}${
     sub ? ` <span class="sub">${esc(sub)}</span>` : ""}</span>${note ? `<span class="hw">${esc(note)}</span>` : ""}</button>`;
-  const escapeRe = (text) => text.replace(/[.*+?^$()|[\]\\{}]/g, "\\$&");
-  // "Route 2" must match "Route 2" and "Route 2 (hidden)" but not "Route 20"
-  const placeRe = (name) => new RegExp("(^|[^a-z0-9])" + escapeRe(name.toLowerCase()) + "($|[^a-z0-9])");
   // Escaped text whose place names ("Secret Trail (need Strength)") open that place's card; longest name first
   let anyPlace = null;
   const placeLinks = (text) => {
@@ -371,11 +376,11 @@
     const useTitle = /Forme|Primal|Evolution/.test(it.category) ? "Used on" : "Effect";
     return `<article class="itemcard">${collapsible ? COLLAPSE : ""}
       <div class="top">${itemIcon(k)}<h2>${esc(it.name)}<small>${esc(it.category)}</small></h2></div>
-      ${it.where.length ? `<div><h4>Where to find</h4><ul class="where">${it.where.map((w) => `<li>${placeLinks(w)}</li>`).join("")}</ul></div>` : '<p class="note">No known location.</p>'}
       ${it.move ? `<div><h4>Teaches</h4><div class="chips"><button class="chip" data-move="${it.move}">${typeBadge(moves[it.move].type)}<span class="ln">${esc(moves[it.move].name)}</span><span class="hw">${moves[it.move].learners.filter(([, h]) => /^(TM|HM)\d/.test(h)).length} Pokémon</span></button></div></div>` : ""}
       ${showUse ? `<div><h4>${it.move ? "Note" : useTitle}</h4><div class="use">${esc(it.use)}</div></div>` : ""}
       ${evolves.length ? `<div><h4>${it.category === "Mega Stones" ? "Mega Evolves" : "Evolves"} · ${evolves.length}</h4><div class="chips">${evolves.map(([i, to]) => monChip(to, "", "", it.category === "Mega Stones")).join("")}</div>${
         conditions.length ? `<ul class="evocond">${conditions.map(([i, to, how]) => `<li><b>${esc(mons[i].name)}${formLabel(mons[i])}</b> → <b>${esc(mons[to].name)}${formLabel(mons[to])}</b>: ${esc(how)}</li>`).join("")}</ul>` : ""}</div>` : ""}
+      ${it.where.length ? `<div><h4>Where to find</h4><ul class="where">${it.where.map((w) => `<li>${placeLinks(w)}</li>`).join("")}</ul></div>` : '<p class="note">No known location.</p>'}
       ${holders.length ? `<div><h4>Held by wild Pokémon · ${holders.length}</h4><div class="chips">${holders.map(([i, pct]) => monChip(i, pct)).join("")}</div></div>` : ""}
     </article>`;
   }
@@ -422,9 +427,9 @@
       : `<p class="empty">No Pokémon match the current filters here.</p>`;
     const itemChips = found.map(([k, line]) =>
       `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line ? `<span class="hw">${esc(line)}</span>` : ""}</button>`).join("");
-    return `<article class="loccard">${collapsible ? COLLAPSE : ""}<h2>${esc(p.name)}<small>${rows.length} encounter${rows.length === 1 ? "" : "s"}</small></h2>
+    return `<article class="loccard">${collapsible ? COLLAPSE : ""}<h2>${esc(p.name)}<small>${p.rows.length ? `${rows.length} encounter${rows.length === 1 ? "" : "s"}` : "No wild Pokémon"}</small></h2>
       <div class="placehead">${townMap(p.name)}${aboutPlace(p.name)}</div>
-      <section class="placesec"><h3>Encounters · ${rows.length}</h3><div class="learners">${encounters}</div></section>
+      ${p.rows.length ? `<section class="placesec"><h3>Encounters · ${rows.length}</h3><div class="learners">${encounters}</div></section>` : ""}
       ${found.length ? `<section class="placesec"><h3>Items · ${found.length}</h3><div class="chips">${itemChips}</div></section>` : ""}</article>`;
   }
 
@@ -536,9 +541,9 @@
     const open = state.place ? norm(state.place) : null;
     const isOpen = (p) => norm(p.name) === open;
     const encounters = (p) => p.rows.filter(([, l]) => rowInMode(l)).length;
-    const methods = (p) => [...new Set(p.rows.filter(([, l]) => rowInMode(l)).map(([, l]) => l.method))].join(" · ");
+    const methods = (p) => (p.rows.length ? [...new Set(p.rows.filter(([, l]) => rowInMode(l)).map(([, l]) => l.method))].join(" · ") : "Items only");
     const html = state.layouts.places === "grid"
-      ? chipsWithOpen(list, (p) => `<button class="chip${isOpen(p) ? " on" : ""}" data-place="${esc(p.name)}"><span class="ln" style="padding-left:10px">${esc(p.name)}</span><span class="hw">${encounters(p)}</span></button>`, isOpen, (p) => placeCard(p, true))
+      ? chipsWithOpen(list, (p) => `<button class="chip${isOpen(p) ? " on" : ""}" data-place="${esc(p.name)}"><span class="ln" style="padding-left:10px">${esc(p.name)}</span><span class="hw">${p.rows.length ? encounters(p) : ""}</span></button>`, isOpen, (p) => placeCard(p, true))
       : `<div class="listtable"><table class="mv"><thead><tr><th>Location</th><th class="hide-sm">Found by</th><th class="c-num">Pokémon</th></tr></thead><tbody>${list.map((p) =>
           `<tr data-place="${esc(p.name)}"${isOpen(p) ? ' class="on"' : ""}><td><span class="mvname">${esc(p.name)}</span></td><td class="note hide-sm">${esc(methods(p))}</td><td class="n">${encounters(p)}</td></tr>${
             isOpen(p) ? expandRow(3, placeCard(p, true)) : ""}`).join("")}</tbody></table></div>`;

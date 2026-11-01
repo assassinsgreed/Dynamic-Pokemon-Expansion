@@ -48,6 +48,7 @@ He also tests `site/index.html` directly.
 | `items.py` + `items.csv`, `machines.csv`, `tutors.csv` | item, TM and tutor locations imported from the feature-list Google Doc (`python -m tools.dexpage.items doc.docx`, needs python-docx) |
 | `docs.py` + `docs.json`, `doc_images/` | Docs tab: feature-list topics (H1 group / H2 topic), imported with `python -m tools.dexpage.docs doc.docx`; overlapping topics skipped via `SKIP_GROUPS`/`SKIP_TOPICS` |
 | `ability_details.json` | Abilities tab's longer explanation per ability (keyed by the name shown) + `moves`: CFRU move-table names (`gPunchingMoves`…) whose moves show as chips. Hand-written from CFRU's code, not Bulbapedia; the build fails if it's out of step with the page's abilities |
+| `ball_effects.json` | Poké Ball "Effect" text (the feature list has none), keyed by CFRU's `BALL_TYPE_*` = the ROM item table's type byte (+27), since some balls have placeholder constants (Heal Ball is `ITEM_03D`). Hand-written from CFRU's `GetBaseBallCatchOdds` / `ApplyBallSpecialEffect` (Quick Ball is 5x here, Dusk 3x); the build fails if a ball on the page has no entry |
 | `town_map.py` | place cards' Town Map: FireRed's region-map section grid in the ROM (`0x3F2490`, [2 layers][15][22], 8×8 px squares from (32, 32)) + section names (`map_section_names`) → each place's squares over `../PokemonShootingStars/graphics/Maps/TownMap.png` (cropped to 208×144); places inside another's square (Pluto HQ, Scalding Spa) are hand-placed in `SPOTS`, and where the grid overstates a place Collin's corrections are in `NOT_PART_OF` / `PLACED_AT`; the italic description under the map comes from `../PokemonShootingStars/designdocs/region/region-layout.md` (`place_descriptions`; split routes use their route's entry) |
 | `field_items.py` | item balls + hidden items read from the ROM's map data (gMapGroups → events; item scripts resolved via CFRU `offsets.ini`); skips FireRed's unused Sevii maps, marks Treasure Beach hidden items as renewing |
 | `script_items.csv` | hand-written sources the feature list misses (Apricorn balls, Traveller balls, Memories, Drives, relics…), checked against CFRU's scripts |
@@ -126,4 +127,5 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   still appear as separate move learners.
 - Service worker install not verified on a real phone (headless Chrome CacheStorage error).
 - Items with no icon: Running Shoes, Pokedex (no bag icon in game).
-- Place cards only list encounter places; item-only places (shops) are reachable through item cards.
+- Item-only places get a card only if they're a Town Map place (`DEX.townMap.places`) named in some item's where
+  line (Treasure Beach, towns with shops); other item-only spots are reachable through item cards.

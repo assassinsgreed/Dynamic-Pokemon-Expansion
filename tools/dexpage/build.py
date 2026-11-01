@@ -30,6 +30,7 @@ TEMPLATE = Path(__file__).with_name("template.html")
 SW_TEMPLATE = Path(__file__).with_name("sw.js")
 APP_SCRIPT = Path(__file__).with_name("app.js")  # the page's script, inlined so the page stays one file
 ABILITY_DETAILS = Path(__file__).with_name("ability_details.json")  # hand-written, checked against CFRU's code
+BALL_EFFECTS = Path(__file__).with_name("ball_effects.json")  # hand-written from CFRU's catching.c
 STAT_KEYS = ("hp", "atk", "def", "spa", "spd", "spe")
 
 
@@ -316,6 +317,15 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
         item["use"] = _drop_versions(item["use"])
         # "PokeChip Crusher" is redundant next to "PokeChip Crusher (5 chips)"
         item["where"] = [w for w in item["where"] if not any(o.startswith(w + " (") for o in item["where"])]
+    # The feature list doesn't say what a Poké Ball does; ball_effects.json does, from CFRU's catch code
+    # (keyed by the ball type the game reads from the item table, since some balls have placeholder constants)
+    balls, ball_types = json.loads(BALL_EFFECTS.read_text(encoding="utf-8")), _ball_types(data.paths)
+    for item in items:
+        if item["category"] == "Poké Balls" and not item["use"]:
+            ball = ball_types[fields[item["key"]]["type"]]
+            if ball not in balls:
+                raise ValueError(f"ball_effects.json: no entry for {ball} ({item['name']})")
+            item["use"] = balls[ball]
     for names in held.values():
         for h in names:
             add(h.split(" (")[0], "Held by wild Pokémon", [], "")
@@ -341,6 +351,13 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
     for item in items:
         item["icon"] = offsets.get(item.pop("key"))
     return items, index, by_const, "data:image/webp;base64," + base64.b64encode(sheet).decode()
+
+
+def _ball_types(paths: Paths) -> list[str]:
+    """CFRU's BALL_TYPE_* enum (include/new/catching.h), in order: index = an item's type byte."""
+    text = (paths.cfru / "include" / "new" / "catching.h").read_text(encoding="utf-8")
+    body = re.search(r"enum BallTypes\s*\{([^}]*)\}", text).group(1)
+    return re.findall(r"^\s*(BALL_TYPE_\w+)\s*,", body, re.M)
 
 
 ITEM_CATEGORY_ORDER = ["Poké Balls", "Consumables", "Held Items", "Berries", "Breeding", "Evolution", "Mega Stones", "Z-Crystals",
