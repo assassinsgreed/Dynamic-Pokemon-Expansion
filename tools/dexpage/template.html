@@ -533,7 +533,12 @@ body.sheet-open { overflow: hidden; }
   .sheet-close { top: calc(12px + env(safe-area-inset-top, 0px)); }
 }
 @media (max-width: 520px) {
-  .list:not(.grid) .mon > summary .dexline, .list.grid .mon[open] > summary .dexline { top: auto; bottom: 11px; transform: none; right: 50px; }
+  /* the dex number and mode tag get their own line under the types: beside them they ran into the type badges */
+  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary { row-gap: 4px; }
+  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .dexline { position: static; transform: none; grid-column: 2; grid-row: 2; }
+  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .pics { grid-column: 1; grid-row: 1 / span 2; }
+  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .who { grid-column: 2; grid-row: 1; align-self: end; }
+  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .chev { grid-column: 3; grid-row: 1 / span 2; }
   .mon > summary .who { padding-right: 0; }
   .brand .meta .long { display: none; }
   .list:not(.grid) .mon > summary { grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; }

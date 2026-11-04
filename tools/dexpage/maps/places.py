@@ -225,7 +225,7 @@ def script_texts():
 
 
 def words(s):
-    s = re.sub(r"(?<=[a-z])(?=[A-Z0-9])|(?<=[A-Z])(?=[A-Z][a-z])", " ", s)
+    s = re.sub(r"(?<=[a-z])(?=[A-Z0-9])|(?<=[A-Z])(?=[A-Z][a-z])(?![A-Z]s\b)", " ", s)  # "TMs" stays whole
     return s.replace("Pokemon", "Pokémon").strip()
 
 

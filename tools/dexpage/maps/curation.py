@@ -30,7 +30,7 @@ NO_MARKER = {
     "EventScript_DaimynCityNPCHouses_TutorsDaughter", "EventScript_DaimynCityNPCHouses_TutorsSon",
     "EventScript_DaimynCityNPCHouses_MoveDeleterReminderSon", "EventScript_DaimynCityNPCHouses_TradeBuddy",
     "EventScript_DaimynCityMall_GarageSaleMan", "EventScript_DaimynCityMall_RareCollectiblesMan",
-    "EventScript_DaimynCityMall_MagazineSeller", "EventScript_DaimynCityGym_GymExpert",
+    "EventScript_DaimynCityGym_GymExpert",
     "EventScript_EmraldinQuayNPCHouses_CamperMom", "EventScript_EmraldinQuayNPCHouses_TutorSon",
     "EventScript_EmraldinQuayNPCHouses_TutorYoungSon",
     "EventScript_FerroxNPCHouses_TutorsInTowns", "EventScript_FerroxNPCHouses_TradeGirlDad",
@@ -126,6 +126,9 @@ NOTES = {
     "EventScript_FerroxNPCHouses_ChinchouTrade": ("Trade: gives you a Chinchou (Eelektrik in Divergent)", True, False),
     "EventScript_FerroxVillage_UndergroundMiner": ("Digging Minigame", False, False),
     "EventScript_Route11SouthRefiner_RefinerShop": ("Mega Stone Refiner: shop", False, False),
+    # a magazine seller who only chats in Standard mode
+    "EventScript_DaimynCityMall_MagazineSeller":
+        ("Sweets Seller (Divergent only): sells Tart Apple, Sweet Apple, Cracked Pot and the seven Sweets", True, False),
     "SignScript_ForgottenManseStorage_ApplianceCatalog":
         ("Appliance catalog: changes Rotom into its Fan, Frost, Heat, Mow or Wash form, or back", False, False),
 }
