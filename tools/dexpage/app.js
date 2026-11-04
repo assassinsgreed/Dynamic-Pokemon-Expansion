@@ -90,7 +90,7 @@
 
   // ---------------------------------------------------------------- state & navigation
   // state.view: dex | moves | items | places; move/item/place name the open card; open is the expanded Pokémon
-  const state = { view: "dex", q: "", move: null, item: null, place: null, map: null, open: null, mode: "", type: "", tab: "level", tabFilter: "",
+  const state = { view: "dex", q: "", move: null, item: null, place: null, map: null, mark: null, open: null, mode: "", type: "", tab: "level", tabFilter: "",
     doc: null, ability: null, trainer: null, diff: "std",
     layouts: { dex: "list", moves: "list", tutors: "list", abilities: "list", items: "grid", trainers: "list", places: "grid", docs: "list" } };  // list or cards, per view
   try {
@@ -100,12 +100,12 @@
   } catch (e) {}
   let depth = 0, top = 0;  // position in this page's history, and how far Forward can go
 
-  const snapshot = () => ({ view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, map: state.map, doc: state.doc, ability: state.ability, trainer: state.trainer, open: state.open });
+  const snapshot = () => ({ view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, map: state.map, mark: state.mark, doc: state.doc, ability: state.ability, trainer: state.trainer, open: state.open });
   function hashFor(st) {
     if (st.view === "dex" && st.open !== null) return monSlug(st.open);
     if (st.move) return "move-" + slug(moves[st.move].name);
     if (st.item !== null) return "item-" + slug(items[st.item].name);
-    if (st.map) return "map-" + st.map;
+    if (st.map) return "map-" + st.map + (st.mark ? "/" + st.mark : "");
     if (st.place) return "place-" + slug(st.place);
     if (st.doc) return "doc-" + slug(st.doc);
     if (st.ability) return "ability-" + slug(st.ability);
@@ -115,7 +115,7 @@
   const queries = {};  // each tab keeps its own search text
 
   function navigate(change) {
-    const next = Object.assign({ view: state.view, q: "", move: null, item: null, place: null, map: null, doc: null, ability: null, trainer: null, open: null }, change);
+    const next = Object.assign({ view: state.view, q: "", move: null, item: null, place: null, map: null, mark: null, doc: null, ability: null, trainer: null, open: null }, change);
     Object.assign(state, next, { tabFilter: "" });
     queries[state.view] = state.q;
     depth++;
@@ -137,7 +137,8 @@
   const openPlace = (name) => navigate({ view: "places", place: name });
   // Back from a map returns to its place's details; a way out on the map opens the next place's map
   const closeMap = () => navigate({ view: "places", q: state.q, place: state.place });
-  MapView.init({ onClose: closeMap, onLink: (slug) => navigate({ view: "places", place: placeOfMap(slug) || null, map: slug }) });
+  MapView.init({ onClose: closeMap, onLink: (slug) => navigate({ view: "places", place: placeOfMap(slug) || null, map: slug }),
+    onMark: (mark) => { if (state.map) { state.mark = mark; remember(); } } });  // #map-<place>/<marker> links to one marker
 
   // ---------------------------------------------------------------- small pieces
   const typeBadge = (t) => `<span class="type t-${t}">${t === "MYSTERY" ? "???" : t[0] + t.slice(1).toLowerCase()}</span>`;
@@ -783,7 +784,7 @@
     $("#type-label").innerHTML = state.type ? typeBadge(state.type) : "All types";
     syncConsoleHeight();
     document.body.classList.toggle("sheet-open", !!$("#out .sheet"));
-    if (state.map && MapView.open(state.map)) return;
+    if (state.map && MapView.open(state.map, state.mark)) return;
     MapView.close();
     // Closing a pop-up (×, backdrop, Escape, Back) leaves the cards behind it where they were
     if (hadSheet && !$("#out .sheet")) return;
@@ -966,18 +967,21 @@
     $("#offline-web").hidden = true; $("#offline-web2").hidden = true; $("#offline-file").hidden = false;
   }
 
-  // Links: #rockruff, #move-crunch, #item-fire-stone, #place-route-2, #items … (older #ceaseless-edge style still works)
+  // Links: #rockruff, #move-crunch, #item-fire-stone, #place-route-2, #map-daimyn-city/item-2, #items … (older #ceaseless-edge style still works)
   function fromHash() {
     const h = decodeURIComponent(location.hash.slice(1));
     const views = { "": "dex", pokedex: "dex", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", trainers: "trainers", locations: "places", docs: "docs" };
-    Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, map: null, doc: null, ability: null, trainer: null, open: null });
+    Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, map: null, mark: null, doc: null, ability: null, trainer: null, open: null });
     if (h in views) state.view = views[h];
     else if (h.startsWith("trainer-")) { const n = parseInt(h.slice(8), 10); Object.assign(state, { view: "trainers", trainer: n >= 0 && n < entries.length ? n : null }); }
     else if (h.startsWith("move-")) { const k = moveKeys.find((x) => slug(moves[x].name) === h.slice(5)); Object.assign(state, k ? { view: "moves", move: k } : { view: "moves", q: h.slice(5).replace(/-/g, " ") }); }
     else if (h.startsWith("item-")) { const k = items.findIndex((it) => slug(it.name) === h.slice(5)); Object.assign(state, k >= 0 ? { view: "items", item: k } : { view: "items", q: h.slice(5).replace(/-/g, " ") }); }
     else if (h.startsWith("ability-")) { const a = abilities.find((x) => slug(x.name) === h.slice(8)); Object.assign(state, { view: "abilities", ability: a ? a.name : null }); }
     else if (h.startsWith("doc-")) { const t = docTopics.find((x) => slug(x.title) === h.slice(4)); Object.assign(state, { view: "docs", doc: t ? t.title : null }); }
-    else if (h.startsWith("map-") && placeOfMap(h.slice(4))) Object.assign(state, { view: "places", place: placeOfMap(h.slice(4)), map: h.slice(4) });
+    else if (h.startsWith("map-") && placeOfMap(h.slice(4).split("/")[0])) {  // #map-daimyn-city/item-2: one marker on that map
+      const [m, mark] = h.slice(4).split("/");
+      Object.assign(state, { view: "places", place: placeOfMap(m), map: m, mark: mark || null });
+    }
     else if (h.startsWith("place-")) { const p = placeList.find((x) => slug(x.name) === h.slice(6)); Object.assign(state, { view: "places", place: p ? p.name : h.slice(6).replace(/-/g, " ") }); }
     else {
       const bySlug = mons.findIndex((_, i) => monSlug(i) === h);

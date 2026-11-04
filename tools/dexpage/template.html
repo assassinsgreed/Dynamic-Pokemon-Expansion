@@ -613,6 +613,7 @@ body.map-open .sheet { display: none; }  /* the place's pop-up waits behind the 
 #mapview .door.on, #mapview .edge.on { box-shadow: 0 0 0 4px var(--flash); }
 @keyframes mv-ping { from { box-shadow: 0 0 0 0 var(--flash); } to { box-shadow: 0 0 0 26px transparent; } }
 #mapview .ping { animation: mv-ping .7s ease-out 3; }
+#mapview .ping.long { animation-iteration-count: 6; }  /* opened from a shared link */
 @media (prefers-reduced-motion: reduce) { #mapview .ping { animation: none; } }
 #mapview .mv-side { min-width: 0; position: sticky; top: 66px; max-height: calc(100vh - var(--console-h, 150px) - 86px); overflow: auto;
   background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }

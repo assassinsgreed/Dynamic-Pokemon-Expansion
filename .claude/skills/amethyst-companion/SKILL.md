@@ -165,6 +165,9 @@ Each place card has a **View Interactive Map** button that opens `#map-<slug>`: 
   Clicking a warp scrolls to its other end (both ends light up; a line only if it crosses no other map). Clicking a
   way out opens that place's map. Clicking a key row jumps to its marker; clicking a marker scrolls the key to its
   row (only where the key scrolls beside the maps, never on phones). No action buttons on the card.
+- Marker links (for Collin to share): `#map-<place>/<kind>-<n>` (`item-2`, `hidden-4`, `person-15`, `wild-1`,
+  `statue-3`). Selecting a marker puts its link in the address bar (replaceState); opening one scrolls to the
+  marker, selects it and pulses it 6 times (`.ping.long`). Numbers shift if curation adds or removes a marker of that kind.
 - On-page help is exactly: "Click or tap a warp to see where it leads." / "Click or tap a marker in the map to see
   what it is." / "Click or tap a marker in the key to highlight it in the map." (+ a 2× hint on touch screens).
 - The map layer sits under the console (`--console-h`), so tabs and Back/Forward stay usable; its own

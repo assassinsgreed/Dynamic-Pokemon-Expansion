@@ -23,6 +23,10 @@ const MapView = (() => {
   const HELP = ["Click or tap a warp to see where it leads.", "Click or tap a marker in the map to see what it is.",
                 "Click or tap a marker in the key to highlight it in the map."];
 
+  // A marker's link name, "#map-<place>/<this>": its kind and its number on that place's map (item-2, person-15)
+  const LINK = { npc: "person" };
+  const markId = (m) => `${LINK[m.k] || m.k}-${m.n}`;
+
   let data = null, bySlug = null;  // parsed on first open
   let root, place = null, sel = null, zoom = 1, opts = {};
   const $ = (id) => document.getElementById("mv-" + id);
@@ -52,7 +56,7 @@ const MapView = (() => {
     $("z1").onclick = () => setZoom(1);
     $("z2").onclick = () => setZoom(2);
     $("close").onclick = () => opts.onClose();
-    $("cx").onclick = unpin;
+    $("cx").onclick = () => unpin();
     const target = (e) => e.target.closest(".warp, .mk, .door, .edge, .mv-list button");
     root.addEventListener("click", (e) => {
       const t = target(e);
@@ -194,6 +198,7 @@ const MapView = (() => {
   function show(t, pinned) {
     clearMarks();
     const info = describe(t);
+    if (pinned && opts.onMark) opts.onMark(t.matches(".mk") ? markId(place.markers[t.dataset.m]) : null);  // the address bar links to it
     sel = pinned ? t : sel;
     t.classList.add("on");
     (info.mates || []).forEach((s) => root.querySelectorAll(s).forEach((el) => el.classList.add("mate")));
@@ -218,11 +223,15 @@ const MapView = (() => {
     root.querySelectorAll(".on, .mate").forEach((el) => el.classList.remove("on", "mate"));
   }
 
-  function unpin() { sel = null; clearMarks(); $("card").hidden = true; drawWire(); }
+  function unpin(quiet) {
+    if (sel && !quiet && opts.onMark) opts.onMark(null);
+    sel = null; clearMarks(); $("card").hidden = true; drawWire();
+  }
 
-  function ping(el) {
+  function ping(el, long) {
     el.scrollIntoView({ block: "center", inline: "center", behavior: smooth() });
-    el.classList.remove("ping"); void el.offsetWidth; el.classList.add("ping");
+    el.classList.remove("ping", "long"); void el.offsetWidth; el.classList.add("ping");
+    el.classList.toggle("long", !!long);  // a shared link pulses longer, so whoever opened it spots it
   }
 
   function jump(selector) {
@@ -276,10 +285,24 @@ const MapView = (() => {
     }
   }
 
+  // the marker a link names: scroll to it, select it and pulse it (nothing happens if the map has no such marker)
+  function goMark(mark) {
+    const cur = sel && sel.matches(".mk") ? markId(place.markers[sel.dataset.m]) : null;
+    if (mark === cur) return;
+    if (!mark) { if (cur) unpin(true); return; }
+    const i = place.markers.findIndex((m) => markId(m) === mark);
+    const el = i >= 0 && root.querySelector(`.mv-maps [data-m="${i}"]`);
+    if (!el) return;
+    show(el, true);
+    revealInKey(i);
+    requestAnimationFrame(() => ping(el, true));
+  }
+
   return {
     // onLink(slug): a way out was clicked; onClose(): the Back button. The companion turns both into history steps.
+    // onMark(id | null): a marker was selected or let go, so the companion can put its link in the address bar.
     init(o) { opts = o; },
-    open(slug) {
+    open(slug, mark) {
       load();
       const p = bySlug[slug];
       if (!p) return false;
@@ -287,13 +310,14 @@ const MapView = (() => {
       if (p !== place) { render(p); root.scrollTop = 0; }
       root.hidden = false;
       document.body.classList.add("map-open");
+      goMark(mark || null);
       requestAnimationFrame(drawWire);
       return true;
     },
     close() {
       if (!root || root.hidden) return;
       root.hidden = true;
-      unpin();
+      unpin(true);
       document.body.classList.remove("map-open");
     },
     isOpen: () => !!root && !root.hidden,
