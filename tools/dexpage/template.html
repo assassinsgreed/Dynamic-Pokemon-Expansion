@@ -455,6 +455,8 @@ table.mv .c-lv { text-align: right; white-space: nowrap; }
 .lvcell { white-space: nowrap; }
 .tmnote { margin: 0 0 0 4px; }
 .tchips .chips { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }  /* room for the name, mode tag and level */
+.dchips .chips { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }  /* Docs: 4 across, so topic titles fit on one line */
+.dchips .chip .ln { max-width: none; flex-shrink: 1; }  /* the title is all a Docs chip shows */
 
 /* Move card */
 .movecard { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px; display: grid; gap: 12px; }
