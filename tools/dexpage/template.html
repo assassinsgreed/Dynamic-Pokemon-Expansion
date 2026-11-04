@@ -444,7 +444,8 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .tmoves { display: grid; gap: 4px; margin-left: 4px; }  /* one move per line, so long names read in full */
 .tmv { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 3px 8px 3px 0; border: 1px solid var(--line); border-left: 4px solid var(--c, var(--line)); border-radius: 6px; background: var(--surface); cursor: pointer; font-size: 12.5px; font-weight: 600; text-align: left; color: var(--ink); }
 .tmv .cat { flex: none; margin-left: 4px; }
-.tmv span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tmv .tmvname { min-width: 0; flex: 1; overflow-wrap: break-word; }  /* wraps, never "…" */
+.tmv .type { flex: none; margin-left: auto; }
 .tmv:hover { border-color: var(--muted); border-left-color: var(--c); }
 .teamline { display: flex; flex-wrap: wrap; align-items: center; gap: 0; }
 .trow { display: flex; align-items: center; gap: 8px; min-width: 0; }

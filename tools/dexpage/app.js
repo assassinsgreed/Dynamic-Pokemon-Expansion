@@ -692,6 +692,7 @@
     const m = mons[i], hard = state.diff !== "std", xhard = state.diff === "xhard";
     const ability = TEAMS.abilities[ab].split(" or ").map((a) => (abilityIndex.has(a) ? `<button class="mvname" data-ability="${esc(a)}">${esc(a)}</button>` : esc(a))).join(" or ");
     const rows = [
+      ["Type", `<span class="tags">${m.types.map(typeBadge).join("")}</span>`],
       it !== null && ["Item", trainerItem(it)],
       ab !== null && TEAMS.abilities[ab] && ["Ability", ability],
       hard && ["Nature", esc(natureText(nat))],
@@ -700,7 +701,7 @@
     ].filter(Boolean);
     const moveBtn = (n) => {
       const k = TEAMS.moves[n], mv = moves[k];
-      return `<button class="tmv" data-move="${k}" style="--c:${TYPE_COLOR[mv.type]}" title="${esc(mv.desc)}"><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span><span>${esc(mv.name)}</span></button>`;
+      return `<button class="tmv" data-move="${k}" style="--c:${TYPE_COLOR[mv.type]}" title="${esc(mv.desc)}"><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span><span class="tmvname">${esc(mv.name)}</span>${typeBadge(mv.type)}</button>`;
     };
     // Gender the game gives it (trainers.py _gender: the trainer's, unless the species can't be or is 75%+ female)
     const sex = gender === "F" ? FEMALE : gender === "M" ? MALE : "";
