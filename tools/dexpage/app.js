@@ -381,7 +381,10 @@
     const holders = [];
     mons.forEach((m, i) => m.held.forEach(([h, hk]) => { if (hk === k && inMode(m)) holders.push([i, (h.match(/\(([^)]*)\)/) || [])[1] || ""]); }));
     const evolves = [];
-    mons.forEach((m, i) => m.evo.forEach(([to, how, ik, written]) => { if ((ik === k || norm(how).includes(itemKeys[k])) && inMode(mons[to])) evolves.push([i, to, how, written || it.name]); }));
+    // The name match catches a second item in the text (Hisui Rock, Shedinja's Poké Ball), but not one that's only
+    // part of the evolution's own item's name (Gengarite inside "Gengarite-G")
+    const named = (how, ik) => norm(how).includes(itemKeys[k]) && !(ik != null && itemKeys[ik].includes(itemKeys[k]));
+    mons.forEach((m, i) => m.evo.forEach(([to, how, ik, written]) => { if ((ik === k || named(how, ik)) && inMode(mons[to])) evolves.push([i, to, how, written || it.name]); }));
     // Conditions beyond using the item (male Kirlia, holding Razor Claw at night) are spelled out under the chips
     const conditions = evolves.filter(([, , how, name]) => how !== `Use ${name}` && how !== `Mega Evolve holding ${name}`);
     // "Used on" repeats Evolves for evolution items; form-changing items (Gracidea, Drives, Nectars) still need it
