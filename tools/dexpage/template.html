@@ -59,7 +59,7 @@ button { font: inherit; color: inherit; }
 header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--console); border-bottom: 1px solid var(--line); }
 .console .wrap { padding-block: 12px; display: grid; gap: 10px; }
 .console .wrap > * { min-width: 0; }  /* let the tab strip scroll instead of widening the header */
-.brand { display: grid; gap: 8px; }
+.brand { display: grid; gap: 0; }
 .brand-top { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
 .brand .links { display: flex; gap: 6px; flex: none; align-items: center; }
 .brand .links .sep { width: 1px; height: 22px; background: var(--line); margin: 0 4px; }
@@ -70,7 +70,7 @@ header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 
 .brand h1 .version:empty { display: none; }
 .brand h1 .brand-icon { width: 34px; height: 34px; flex: none; margin: -6px 0 -6px -2px; }
 /* tagline lines up with the title text: icon 34px − 2px margin + 8px gap */
-.brand .meta { margin: 0; padding-left: 40px; color: var(--muted); font-size: 12.5px; font-style: italic; }
+.brand .meta { margin: -4px 0 0; padding-left: 40px; color: var(--muted); font-size: 12.5px; font-style: italic; }
 .brand a { color: var(--accent); font-weight: 600; text-decoration: none; }
 .brand a:hover { text-decoration: underline; }
 /* View tabs: underlined tabs on a baseline, so they don't read as one more pill button like the filters below */
@@ -552,7 +552,8 @@ body.sheet-open { overflow: hidden; }
   .brand .meta { display: none; }
   /* no room beside the title: the links and download button get their own row */
   .brand-top { flex-wrap: wrap; row-gap: 8px; }
-  .brand h1 { flex: 1 0 100%; }
+  /* title on one line: font scales with the screen (icon + version badge take ~140px) */
+  .brand h1 { flex: 1 0 100%; white-space: nowrap; font-size: clamp(14px, calc((100vw - 140px) / 14.5), 22px); }
   .list:not(.grid) .mon > summary { grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; }
   .list.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .list:not(.grid) .mon > summary .sp { width: 48px; height: 48px; }
