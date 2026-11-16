@@ -966,7 +966,7 @@
     if (!isNaN(mod) && Date.now() - mod > 60000)
       $("#updated").textContent = "Last updated: " + mod.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
   } else {
-    $("#updated").textContent = "Offline copy";
+    $("#updated").textContent = "You are using the offline copy";
     $("#offline-btn").hidden = true; $(".brand .links .sep").hidden = true;
   }
 
