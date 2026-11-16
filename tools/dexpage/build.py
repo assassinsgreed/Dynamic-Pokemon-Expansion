@@ -12,6 +12,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
+from .checklist import checklist
 from .docs import DOC_IMAGES, load_docs, render_topic, topic_text
 from .field_items import field_items
 from .items import load_items, load_machine_locations, load_script_items, load_tutors
@@ -611,6 +612,7 @@ def build(paths: Paths, out: Path) -> None:
     page = page_data(data, roster, links)
     maps = place_maps(paths)
     page["maps"] = map_index(maps)
+    page["checklist"] = checklist(page, maps, paths)
     have = {place_key(m["name"]) for m in maps}
     places = {l["location"] for m in page["mons"] for l in m["loc"]} | set(page["townMap"]["places"])
     for place in sorted(places - NO_MAP):
@@ -684,6 +686,7 @@ def _pack_ability(ability: list | None, index: dict[tuple, int]) -> list | int |
 
 def render(data: dict, sheet: bytes, offsets: dict, maps: list[dict] = ()) -> str:
     index = {(a["name"], a["desc"], a["chance"]): n for n, a in enumerate(data["abilities"])}
+    data.setdefault("checklist", {"stages": [], "upTo": ""})
     data = dict(data, mons=[dict(m, sp=offsets[m["key"]], ss=offsets.get(f"shiny:{m['key']}"),
                                  sb=offsets.get(f"back:{m['key']}"), ssb=offsets.get(f"shinyback:{m['key']}"), abilities=[_pack_ability(a, index) for a in m["abilities"]],
                                  hidden=_pack_ability(m["hidden"], index)) for m in data["mons"]],

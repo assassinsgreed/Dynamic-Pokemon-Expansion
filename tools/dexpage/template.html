@@ -343,6 +343,44 @@ tr.on td { background: var(--accent-soft); }
 tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--console-h, 150px) + 12px); }
 .chip.on { border-color: var(--accent); background: var(--accent-soft); }
 
+/* Checklist: playthrough-order sections of tick boxes */
+.ck-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 4px 2px 10px; }
+.ck-prog { flex: 1 1 220px; display: flex; align-items: center; gap: 10px; font: 600 13px/1 var(--font-data); }
+.ck-bar { flex: 1; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.ck-bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+.ck-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.ck-acts button, .ck-map { font: 600 12px/1 var(--font-body); padding: 6px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.ck-acts button:hover, .ck-map:hover { border-color: var(--accent); }
+.ck-acts label { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; margin-right: 6px; cursor: pointer; }
+.ck-help { margin: 0 2px 12px; }
+.ck-stage { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; }
+.ck-stage > summary { display: flex; align-items: center; gap: 8px; padding: 10px 12px; cursor: pointer; list-style: none; font: 600 15px/1.2 var(--font-display); }
+.ck-stage > summary::-webkit-details-marker { display: none; }
+.ck-stage > summary .chev { transition: transform .15s; transform: rotate(-90deg); color: var(--muted); }
+.ck-stage[open] > summary .chev { transform: none; }
+.ck-stage.k-unlock, .ck-stage.k-later, .ck-stage.k-postgame { border-left: 4px solid var(--accent); }
+.ck-title { flex: 1; min-width: 0; }
+.ck-n { font: 600 12.5px/1 var(--font-data); color: var(--muted); white-space: nowrap; }
+.ck-n.all { color: var(--std); }
+.ck-rows { padding: 0 8px 8px; }
+.ck-place { font: 600 12px/1 var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 10px 4px 4px; }
+.ck-place button { font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline dotted; }
+.ck { display: flex; align-items: flex-start; gap: 8px; padding: 2px 4px; border-radius: 6px; }
+.ck:hover { background: var(--sunk); }
+.ck label { flex: 1; min-width: 0; display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; cursor: pointer; }
+.ck input { width: 18px; height: 18px; margin: 1px 0 0; flex: none; accent-color: var(--accent); }
+.ck-kind { flex: none; width: 16px; height: 16px; margin-top: 2px; }
+.ck-kind svg { width: 16px; height: 16px; display: block; }
+.ck-body { flex: 1; min-width: 0; font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; }
+.ck-body .mvname { font-size: inherit; text-align: left; }
+.ck-tags { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-left: 6px; vertical-align: 1px; }
+.ck.done .ck-body { color: var(--muted); text-decoration: line-through; }
+.ck.done .ck-tags { text-decoration: none; }
+.ck-map { flex: none; margin-top: 4px; padding: 4px 8px; }
+.cklist.hide-done .ck.done { display: none; }
+.ck-key { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0 2px 12px; font-size: 12.5px; color: var(--muted); }
+.ck-key span { display: inline-flex; align-items: center; gap: 5px; }
+
 /* Docs: feature-list topics, rendered from the doc */
 .doccard { position: relative; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px 16px; }
 .doccard h2 { margin: 0 44px 8px 0; font: 600 22px/1.15 var(--font-display); }
@@ -705,6 +743,7 @@ body.map-open .sheet { display: none; }  /* the place's pop-up waits behind the 
       <button role="tab" data-viewtab="items" aria-selected="false">Items</button>
       <button role="tab" data-viewtab="trainers" aria-selected="false">Trainers</button>
       <button role="tab" data-viewtab="places" aria-selected="false">Locations</button>
+      <button role="tab" data-viewtab="check" aria-selected="false">Checklist</button>
       <button role="tab" data-viewtab="docs" aria-selected="false">Docs</button>
     </nav>
       <span class="navbtns">

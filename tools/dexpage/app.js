@@ -92,7 +92,7 @@
   // state.view: dex | moves | items | places; move/item/place name the open card; open is the expanded Pokémon
   const state = { view: "dex", q: "", move: null, item: null, place: null, map: null, mark: null, open: null, mode: "", tab: "level", tabFilter: "",
     doc: null, ability: null, trainer: null, diff: "std",
-    layouts: { dex: "list", moves: "list", tutors: "list", abilities: "list", items: "grid", trainers: "list", places: "grid", docs: "list" } };  // list or cards, per view
+    layouts: { dex: "list", moves: "list", tutors: "list", abilities: "list", items: "grid", trainers: "list", places: "grid", check: "list", docs: "list" } };  // list or cards, per view
   try {
     state.mode = localStorage.getItem("dex-mode") || "";
     state.diff = localStorage.getItem("dex-diff") || "std";
@@ -110,7 +110,7 @@
     if (st.doc) return "doc-" + slug(st.doc);
     if (st.ability) return "ability-" + slug(st.ability);
     if (st.trainer !== null) return "trainer-" + trainerSlug(st.trainer);
-    return { dex: "", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", trainers: "trainers", places: "locations", docs: "docs" }[st.view];
+    return { dex: "", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", trainers: "trainers", places: "locations", check: "checklist", docs: "docs" }[st.view];
   }
   const queries = {};  // each tab keeps its own search text
 
@@ -526,7 +526,7 @@
   // Above every view: how many results the same search has in the other tabs, each a chip that goes there
   const ALSO = [["dex", (q) => matchMons(q).length, "Pokémon", "Pokémon"], ["moves", (q) => matchMoves(q).length, "move", "moves"],
     ["tutors", (q) => matchTutors(q).length, "tutor move", "tutor moves"], ["abilities", (q) => matchAbilities(q).length, "ability", "abilities"],
-    ["items", (q) => matchItems(q).length, "item", "items"], ["trainers", (q) => matchTrainers(q).length, "trainer", "trainers"], ["places", (q) => matchPlaces(q).length, "location", "locations"], ["docs", (q) => matchDocs(q).length, "doc topic", "doc topics"]];
+    ["items", (q) => matchItems(q).length, "item", "items"], ["trainers", (q) => matchTrainers(q).length, "trainer", "trainers"], ["places", (q) => matchPlaces(q).length, "location", "locations"], ["check", (q) => matchCheck(q).length, "checklist entry", "checklist entries"], ["docs", (q) => matchDocs(q).length, "doc topic", "doc topics"]];
   function alsoLine(q, here) {
     if (q.length < 3) return "";
     const counts = ALSO.filter(([v]) => v !== here).map(([v, count, one, many]) => [v, count(q), one, many]).filter(([, n]) => n);
@@ -691,6 +691,128 @@
     return [html, `${list.length} topics`];
   }
 
+  // Checklist (proof of concept): what there is to do, in playthrough order (checklist.py). Ticks live in this
+  // browser's storage; the Download link writes them into the saved file, and Export / Import moves them elsewhere.
+  const CK = DEX.checklist;
+  // Kinds keep the interactive maps' colours and shapes; story beats are a ring
+  const CK_KIND = { story: ["Story", "#6b35c4", ""], npc: ["Person or event", "#009e73", "6,2 16,2 21,11 16,20 6,20 1,11"],
+    wild: ["Pokémon encounter", "#cc79a7", "11,1 13.9,7.6 21,8.3 15.7,13.1 17.2,20.1 11,16.5 4.8,20.1 6.3,13.1 1,8.3 8.1,7.6"],
+    item: ["Item ball", "#d55e00", "3,3 19,3 19,19 3,19"], hidden: ["Hidden item", "#f0e442", "11,1 21,11 11,21 1,11"] };
+  const ckShape = (k) => `<span class="ck-kind" title="${CK_KIND[k][0]}"><svg viewBox="0 0 22 22" aria-hidden="true">${k === "story"
+    ? `<circle cx="11" cy="11" r="8" fill="${CK_KIND[k][1]}" stroke="#111" stroke-width="1.6"/><circle cx="11" cy="11" r="3" fill="#fff" stroke="#111" stroke-width="1.2"/>`
+    : `<polygon points="${CK_KIND[k][2]}" fill="${CK_KIND[k][1]}" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/>`}</svg></span>`;
+  const ckAll = [];
+  CK.stages.forEach((st) => st.groups.forEach((g) => g.entries.forEach((e) => {
+    e.s = words(`${e.t} ${g.place} ${st.title} ${e.fl || ""} ${CK_KIND[e.k][0]} ${e.daily ? "daily" : ""} ${e.need || ""}`);
+    ckAll.push(e);
+  })));
+  const ck = { done: {}, hide: false, closed: {} };
+  const ckMerge = (done) => { for (const [id, t] of Object.entries(done || {})) if (!ck.done[id]) ck.done[id] = t || 1; };
+  const ckSave = () => {
+    try {
+      localStorage.setItem("dex-checklist", JSON.stringify({ v: 1, done: ck.done }));
+      localStorage.setItem("dex-check-ui", JSON.stringify({ hide: ck.hide, closed: ck.closed }));
+    } catch (e) {}
+  };
+  try { ckMerge(JSON.parse(localStorage.getItem("dex-checklist") || "{}").done); } catch (e) {}
+  try { const ui = JSON.parse(localStorage.getItem("dex-check-ui") || "{}"); ck.hide = !!ui.hide; ck.closed = ui.closed || {}; } catch (e) {}
+  // A downloaded copy carries the ticks it was saved with; they join this browser's once per saved file
+  const ckBaked = document.getElementById("saved-checklist");
+  if (ckBaked) {
+    try {
+      const b = JSON.parse(ckBaked.textContent);
+      let seen = null;
+      try { seen = localStorage.getItem("dex-checklist-baked"); } catch (e) {}
+      if (String(b.t) !== seen) {
+        ckMerge(b.done);
+        try { localStorage.setItem("dex-checklist-baked", String(b.t)); } catch (e) {}
+        ckSave();
+      }
+    } catch (e) {}
+  }
+  const ckDone = (list) => list.filter((e) => ck.done[e.id]).length;
+  const ckStageEntries = (st) => st.groups.flatMap((g) => g.entries);
+  const matchCheck = (q) => { const fw = words(state.q); return ckAll.filter((e) => !q || e.s.includes(fw)); };
+  const ckTag = (text) => `<span class="mode">${esc(text)}</span>`;
+
+  function ckRow(e, g) {
+    const name = e.item != null && !e.sd ? `<button class="mvname" data-item="${e.item}">${esc(e.t)}</button>` : esc(e.t);
+    const tags = [e.daily && "Daily", e.sd && "Differs by mode", e.need && `Needs ${e.need}`, e.why, e.fl].filter(Boolean).map(ckTag).join("");
+    return `<div class="ck${ck.done[e.id] ? " done" : ""}"><label><input type="checkbox" data-ck="${esc(e.id)}"${ck.done[e.id] ? " checked" : ""}>${ckShape(e.k)}
+      <span class="ck-body">${name}${tags ? `<span class="ck-tags">${tags}</span>` : ""}</span></label>${
+      e.mark ? `<button class="ck-map" data-ckmap="${g.slug}" data-mark="${e.mark}" title="Show on the map">Map</button>` : ""}</div>`;
+  }
+
+  function ckCounts() {
+    const done = ckDone(ckAll), el = $("#ck-total");
+    if (!el) return;
+    el.textContent = `${done} / ${ckAll.length} done`;
+    $("#ck-fill").style.width = `${ckAll.length ? 100 * done / ckAll.length : 0}%`;
+    document.querySelectorAll("[data-ckn]").forEach((n) => {
+      const es = ckStageEntries(CK.stages[+n.dataset.ckn]), d = ckDone(es);
+      n.textContent = `${d} / ${es.length}`;
+      n.classList.toggle("all", d === es.length);
+    });
+    $("#count").textContent = `${done} / ${ckAll.length} done`;
+  }
+
+  function checkView(q) {
+    if (!ckAll.length) return ['<div class="nores">The checklist isn’t in this build.</div>', ""];
+    const fw = words(state.q), hit = (e) => !q || e.s.includes(fw);
+    const kinds = new Set(ckAll.map((e) => e.k));
+    const stages = CK.stages.map((st, n) => {
+      const groups = st.groups.map((g) => [g, g.entries.filter(hit)]).filter(([, es]) => es.length);
+      if (!groups.length) return "";
+      const open = q || (st.title in ck.closed ? !ck.closed[st.title] : st.kind === "place" || st.kind === "unlock");
+      const named = st.kind !== "place";  // a place's own section needs no place heading
+      return `<details class="ck-stage k-${st.kind}" data-ckstage="${esc(st.title)}"${open ? " open" : ""}><summary>${CHEVRON}<span class="ck-title">${esc(st.title)}</span><span class="ck-n" data-ckn="${n}"></span></summary>
+        <div class="ck-rows">${groups.map(([g, es]) => `${named ? `<div class="ck-place"><button data-place="${esc(g.place)}">${esc(g.place)}</button></div>` : ""}${es.map((e) => ckRow(e, g)).join("")}`).join("")}</div></details>`;
+    }).join("");
+    if (!stages) return [`<div class="nores">Nothing on the checklist matches “${esc(state.q)}”.</div>`, "0 entries"];
+    const html = `<div class="cklist${ck.hide ? " hide-done" : ""}">
+      <div class="ck-top"><div class="ck-prog"><span id="ck-total"></span><span class="ck-bar"><i id="ck-fill"></i></span></div>
+        <div class="ck-acts"><label><input type="checkbox" data-ckact="hide"${ck.hide ? " checked" : ""}>Hide finished</label>
+          <button data-ckact="export" title="Save your ticks to a file">Export</button><button data-ckact="import" title="Load ticks from an exported file">Import</button><button data-ckact="reset">Reset</button></div></div>
+      <p class="note ck-help">Preview: covers the game up to ${esc(CK.upTo)}. Your ticks are saved in this browser, and Download for Offline Use keeps them in the saved file. Export and Import move them to another device.</p>
+      <div class="ck-key">${Object.keys(CK_KIND).filter((k) => kinds.has(k)).map((k) => `<span>${ckShape(k)}${CK_KIND[k][0]}</span>`).join("")}</div>
+      ${stages}</div>`;
+    return [html, ""];
+  }
+
+  const ckFile = (name, type, text) => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], { type }));
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  };
+  const ckPayload = () => JSON.stringify({ app: "pokemon-amethyst-companion", v: 1, t: Date.now(), done: ck.done });
+  function ckImport() {
+    const input = document.createElement("input");
+    input.type = "file"; input.accept = ".json,application/json";
+    input.addEventListener("change", () => {
+      const f = input.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (!data || typeof data.done !== "object") throw new Error();
+          ckMerge(data.done); ckSave(); render();
+        } catch (e) { alert("That file isn’t a checklist export."); }
+      };
+      reader.readAsText(f);
+    });
+    input.click();
+  }
+  function ckAct(el) {
+    const act = el.dataset.ckact;
+    if (act === "hide") { ck.hide = el.checked; ckSave(); el.closest(".cklist").classList.toggle("hide-done", ck.hide); }
+    else if (act === "export") ckFile("amethyst-checklist.json", "application/json", ckPayload());
+    else if (act === "import") ckImport();
+    else if (act === "reset" && confirm("Clear every tick on the checklist?")) { ck.done = {}; ckSave(); render(); }
+  }
+
   // Trainers: four teams each, from the Standard, Hard, Divergent and Hard Divergent tables (in that order).
   // A trainer is one entry tagged Both when Divergent mode fights the same teams, else one entry per mode.
   const trainers = DEX.trainers, TEAMS = DEX.teams;
@@ -799,6 +921,7 @@
     items: "Search items — e.g. Fire Stone, Berries",
     trainers: "Search trainers, places or their Pokémon — e.g. Raine, Hiker, Route 8, Rockruff",
     places: "Search places, or what's there — e.g. Route 2, Bidoof, Full Heal, Grass",
+    check: "Search the checklist — e.g. Ferrox Village, trade, TM12, daily",
     docs: "Search the docs — e.g. Frostbite, Battle Frontier, shiny",
   };
 
@@ -807,15 +930,17 @@
     const hadSheet = shownView === state.view && !!$("#out .sheet");
     shownView = state.view;
     const q = norm(state.q);
-    const [html, count] = { dex: dexView, moves: movesView, tutors: tutorsView, abilities: abilitiesView, items: itemsView, trainers: trainersView, places: placesView, docs: docsView }[state.view](q);
+    const [html, count] = { dex: dexView, moves: movesView, tutors: tutorsView, abilities: abilitiesView, items: itemsView, trainers: trainersView, places: placesView, check: checkView, docs: docsView }[state.view](q);
     $("#out").innerHTML = alsoLine(q, state.view) + html;
     $("#count").textContent = count;
+    if (state.view === "check") ckCounts();
     $("#q").value = state.q;
     $("#q").placeholder = PLACEHOLDER[state.view];
     $("#clear").hidden = !$("#q").value;
     $("#back").disabled = depth <= 0;
     $("#fwd").disabled = depth >= top;
-    $("#mode-seg").hidden = state.view === "docs";
+    $("#mode-seg").hidden = state.view === "docs" || state.view === "check";
+    $("#layout-seg").hidden = state.view === "check";
     $("#diff-pick").hidden = state.view !== "trainers";
     document.querySelectorAll(".seg button[data-diff]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.diff === state.diff)));
     document.querySelectorAll("[data-viewtab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.viewtab === state.view)));
@@ -880,6 +1005,16 @@
 
   $("#out").addEventListener("click", (e) => {
     const t = e.target;
+    const act = t.closest("button[data-ckact]");
+    if (act) { ckAct(act); return; }
+    const onMap = t.closest("[data-ckmap]");
+    if (onMap) { navigate({ view: "places", place: placeOfMap(onMap.dataset.ckmap), map: onMap.dataset.ckmap, mark: onMap.dataset.mark }); return; }
+    const stage = t.closest(".ck-stage > summary");
+    if (stage && !state.q) {  // remember which sections are folded (a search opens them all without saving that)
+      const d = stage.parentElement;
+      setTimeout(() => { ck.closed[d.dataset.ckstage] = !d.open; ckSave(); });
+      return;
+    }
     const go = t.closest("[data-goto]");
     if (go) { navigate({ view: go.dataset.goto, q: state.q }); return; }
     const secret = t.closest(".reveal");
@@ -947,6 +1082,15 @@
       box.outerHTML = tabsBlock(+box.dataset.tabs);
     }
   });
+  $("#out").addEventListener("change", (e) => {
+    const box = e.target;
+    if (box.dataset.ckact) { ckAct(box); return; }
+    if (!box.dataset.ck) return;
+    if (box.checked) ck.done[box.dataset.ck] = Date.now(); else delete ck.done[box.dataset.ck];
+    ckSave();
+    box.closest(".ck").classList.toggle("done", box.checked);
+    ckCounts();
+  });
   $("#out").addEventListener("input", (e) => {
     if (!e.target.classList.contains("tabfilter")) return;
     const box = e.target.closest("[data-tabs]");
@@ -980,6 +1124,20 @@
     $("#offline-btn").setAttribute("aria-expanded", String(!help.hidden));
     syncConsoleHeight();
   });
+  // The downloaded file takes the checklist ticks with it: they're written into the copy as #saved-checklist, ahead of
+  // the scripts that read them. Anything going wrong falls back to the plain download.
+  $("#dl").addEventListener("click", (ev) => {
+    const a = ev.currentTarget;
+    if (a.dataset.plain || !Object.keys(ck.done).length || !/^https?:$/.test(location.protocol)) return;
+    ev.preventDefault();
+    const plain = () => { a.dataset.plain = "1"; a.click(); delete a.dataset.plain; };
+    fetch(a.getAttribute("href")).then((r) => (r.ok ? r.text() : Promise.reject())).then((html) => {
+      const at = html.indexOf('<script type="application/json" id="map' + 'data">');
+      if (at < 0) return plain();
+      const saved = '<script type="application/json" id="saved-checklist">' + ckPayload().split("<").join("\\u003c") + "</" + "script>\n";
+      ckFile(a.getAttribute("download"), "text/html", html.slice(0, at) + saved + html.slice(at));
+    }).catch(plain);
+  });
   if (/^https?:$/.test(location.protocol)) {
     document.head.insertAdjacentHTML("beforeend", '<link rel="manifest" href="manifest.webmanifest">');
     if ("serviceWorker" in navigator) { try { navigator.serviceWorker.register("sw.js").catch(() => {}); } catch (e) {} }
@@ -995,7 +1153,7 @@
   // Links: #rockruff, #move-crunch, #item-fire-stone, #place-route-2, #map-daimyn-city/item-2, #items … (older #ceaseless-edge style still works)
   function fromHash() {
     const h = decodeURIComponent(location.hash.slice(1));
-    const views = { "": "dex", pokedex: "dex", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", trainers: "trainers", locations: "places", docs: "docs" };
+    const views = { "": "dex", pokedex: "dex", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", trainers: "trainers", locations: "places", checklist: "check", docs: "docs" };
     Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, map: null, mark: null, doc: null, ability: null, trainer: null, open: null });
     if (h in views) state.view = views[h];
     else if (h.startsWith("trainer-")) { const n = parseInt(h.slice(8), 10); Object.assign(state, { view: "trainers", trainer: n >= 0 && n < entries.length ? n : null }); }
