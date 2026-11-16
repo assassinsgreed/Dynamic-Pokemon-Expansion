@@ -105,14 +105,6 @@ header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 
 .seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
 .seg button svg { vertical-align: -2px; }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-.typepick { position: relative; }
-.typepick > button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); padding: 5px 10px; border-radius: 8px; font-size: 13px; cursor: pointer; color: var(--ink); }
-.typepick > button svg { color: var(--muted); }
-.typepick .menu { position: absolute; z-index: 6; top: calc(100% + 6px); left: 0; width: min(330px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px; box-shadow: 0 10px 30px rgb(20 10 40 / .18); display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-.typepick .menu button { border: 0; padding: 0; background: none; cursor: pointer; border-radius: 6px; }
-.typepick .menu .type { width: 100%; text-align: center; padding: 6px 4px 5px; }
-.typepick .menu .all { grid-column: 1 / -1; border: 1px solid var(--line); background: var(--sunk); padding: 6px; font-size: 13px; color: var(--ink); }
-.typepick .menu [aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: 1px; }
 .count { margin-left: auto; color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
 
 main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
@@ -441,6 +433,7 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
   .trow { gap: 6px; }
   /* Difficulty gets its own full line under Mode / Layout / count */
   .diffpick { order: 10; flex-basis: 100%; margin-left: 0; }
+  .filters .count { order: 11; }  /* the trainer count goes under the difficulty toggles */
   .diffpick .seg { flex: 1; }
   .diffpick .seg button { flex: 1; }
 }
@@ -566,9 +559,11 @@ body.sheet-open { overflow: hidden; }
   :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .who { grid-column: 2; grid-row: 1; align-self: end; }
   :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .chev { grid-column: 3; grid-row: 1 / span 2; }
   .mon > summary .who { padding-right: 0; }
-  .brand .meta { margin-top: 2px; padding-left: 0; }
-  /* no room beside the title: the links and download button get their own row */
-  .brand-top { flex-wrap: wrap; row-gap: 8px; }
+  /* no room beside the title: the subtitle goes under it, then the links and download button get their own row
+     (brand-top's children join the brand grid so the subtitle can sit between them) */
+  .brand-top { display: contents; }
+  .brand .meta { margin: 2px 0 0; }
+  .brand .links { order: 1; margin: 10px 0 6px; }
   /* title on one line: font scales with the screen (icon + version badge take ~140px) */
   .brand h1 { flex: 1 0 100%; white-space: nowrap; font-size: clamp(14px, calc((100vw - 140px) / 14.5), 22px); }
   .list:not(.grid) .mon > summary { grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; }
@@ -723,10 +718,6 @@ body.map-open .sheet { display: none; }  /* the place's pop-up waits behind the 
           <button data-diff="hard" aria-pressed="false">Hard</button>
           <button data-diff="xhard" aria-pressed="false">Extra Hard</button>
         </div>
-      </div>
-      <div class="typepick" id="typepick">
-        <button id="type-btn" aria-expanded="false" aria-haspopup="true"><span id="type-label">All types</span><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-        <div class="menu" id="type-menu" hidden></div>
       </div>
       <div class="seg" role="group" aria-label="Layout" id="layout-seg">
         <button id="v-list" data-view="list" aria-pressed="true" title="List"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 3h12M2 8h12M2 13h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="vh">List</span></button>

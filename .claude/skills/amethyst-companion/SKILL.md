@@ -100,8 +100,9 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
 - Shell heredocs eat regex backslashes (`` → control char): write regex-heavy edits via a file + Edit/Write.
 - Gym Trainee special tutors are grouped per trainee ("one of three chosen each day" is the shared note).
 - List views open an entry in place under its row, with a collapse button. Card (grid) views open it in a pop-up
-  over the page instead (Collin: inline expansion split the card grid), closed with ×, the backdrop, Escape or Back; links from inside a card open the entry in its own view. The type filter is
-  hidden on Items and Locations.
+  over the page instead (Collin: inline expansion split the card grid), closed with ×, the backdrop, Escape or Back; links from inside a card open the entry in its own view.
+- No type filter (Collin removed it): typing a type name ("Fire") in the search lists that type in the Pokédex,
+  Moves and Tutors, as their search hints say.
 - Abilities tab: one entry per ability *as shown* (CFRU per-species renames make Libero/Protean separate), with
   in-game description and who has it (normal/hidden, incl. Mega forms). Ability names in Pokédex profiles and
   doc table cells that are exactly an ability name link to it.

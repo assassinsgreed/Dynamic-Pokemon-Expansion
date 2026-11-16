@@ -90,7 +90,7 @@
 
   // ---------------------------------------------------------------- state & navigation
   // state.view: dex | moves | items | places; move/item/place name the open card; open is the expanded Pokémon
-  const state = { view: "dex", q: "", move: null, item: null, place: null, map: null, mark: null, open: null, mode: "", type: "", tab: "level", tabFilter: "",
+  const state = { view: "dex", q: "", move: null, item: null, place: null, map: null, mark: null, open: null, mode: "", tab: "level", tabFilter: "",
     doc: null, ability: null, trainer: null, diff: "std",
     layouts: { dex: "list", moves: "list", tutors: "list", abilities: "list", items: "grid", trainers: "list", places: "grid", docs: "list" } };  // list or cards, per view
   try {
@@ -172,7 +172,6 @@
   };
   const bst = (m) => m.stats.reduce((a, b) => a + b, 0);
   const inMode = (m) => !state.mode || m.modes.includes(state.mode);
-  const inType = (m) => !state.type || m.types.includes(state.type);
   const rowInMode = (l) => !state.mode || l.mode === "Both" || l.mode === state.mode;
   const tint = (m) => {  // a faint wash of the Pokémon's type colours behind its row
     const a = TYPE_COLOR[m.types[0]], b = TYPE_COLOR[m.types[1] || m.types[0]];
@@ -374,7 +373,7 @@
 
   function moveCard(k, collapsible) {
     const mv = moves[k];
-    const learners = mv.learners.filter(([i]) => inMode(mons[i]) && inType(mons[i]));
+    const learners = mv.learners.filter(([i]) => inMode(mons[i]));
     const groups = GROUPS.map(([title, test]) => [title, learners.filter(([, h]) => test(h))]).filter(([, l]) => l.length);
     const body = groups.length
       ? groups.map(([title, l]) => `<div><h4>${title} · ${l.length}</h4><div class="chips">${l.map(([i, h]) => monChip(i, h.startsWith("Tutor") ? "" : h.replace(/^Special: /, ""))).join("")}</div></div>`).join("")
@@ -466,7 +465,10 @@
   }
 
   // ---------------------------------------------------------------- views
-  const matchMoves = (q) => (q ? moveKeys.filter((k) => moves[k].s.some((x) => x.includes(q))) : moveKeys);
+  // A type name ("fire") also lists every move of that type, as in the Pokédex
+  const typeOf = (q) => TYPES.find((t) => norm(t) === q);
+  const moveHit = (k, q, typeQ) => moves[k].s.some((x) => x.includes(q)) || moves[k].type === typeQ;
+  const matchMoves = (q) => { const typeQ = typeOf(q); return q ? moveKeys.filter((k) => moveHit(k, q, typeQ)) : moveKeys; };
   const matchItems = (q) => items.map((_, k) => k).filter((k) => !q || itemKeys[k].includes(q)
     || (items[k].move && moves[items[k].move].s.includes(q)));
   // A place also matches what's found there (in the chosen mode): a Pokémon ("bidoof"), an encounter method ("grass",
@@ -486,21 +488,20 @@
 
   function matchMons(q) {
     const list = [];
-    const typeQ = TYPES.find((t) => norm(t) === q);  // "fire" lists every Fire type, as well as names containing it
+    const typeQ = typeOf(q);  // "fire" lists every Fire type, as well as names containing it
     // "16" or "#016" is a dex number in the chosen mode (either on All), with the unnumbered forms listed after it
     const num = /^\d+$/.test(q) ? +q : 0;
     const hasNum = (m, i) => (state.mode ? [state.mode] : m.modes).some((mode) => m.modes.includes(mode) && Math.floor(order[mode][i]) === num);
-    mons.forEach((m, i) => { if (inMode(m) && inType(m) && (num ? hasNum(m, i) : !q || m.s.some((s) => s.includes(q)) || (typeQ && m.types.includes(typeQ)))) list.push(i); });
+    mons.forEach((m, i) => { if (inMode(m) && (num ? hasNum(m, i) : !q || m.s.some((s) => s.includes(q)) || (typeQ && m.types.includes(typeQ)))) list.push(i); });
     return list;
   }
-  const matchTutors = (q) => DEX.tutors.filter((t) => (!q || moves[t.move].s.some((x) => x.includes(q)) || norm(t.where).includes(q) || words(t.note).includes(words(state.q)))
-    && (!state.type || moves[t.move].type === state.type));
+  const matchTutors = (q) => { const typeQ = typeOf(q); return DEX.tutors.filter((t) => !q || moveHit(t.move, q, typeQ) || norm(t.where).includes(q) || words(t.note).includes(words(state.q))); };
   const matchAbilities = (q) => abilities.filter((a, n) => (!q || abilityKeys[n].includes(q))
-    && a.mons.some(([i]) => inMode(mons[i]) && inType(mons[i])));
+    && a.mons.some(([i]) => inMode(mons[i])));
   const matchDocs = (q) => docTopics.filter((t) => !q || norm(t.title).includes(q) || t.s.includes(words(state.q)));
 
   // Above every view: how many results the same search has in the other tabs, each a chip that goes there
-  const ALSO = [["dex", (q) => matchMons(q).length, "Pokémon", "Pokémon"], ["moves", (q) => matchMoves(q).filter((k) => !state.type || moves[k].type === state.type).length, "move", "moves"],
+  const ALSO = [["dex", (q) => matchMons(q).length, "Pokémon", "Pokémon"], ["moves", (q) => matchMoves(q).length, "move", "moves"],
     ["tutors", (q) => matchTutors(q).length, "tutor move", "tutor moves"], ["abilities", (q) => matchAbilities(q).length, "ability", "abilities"],
     ["items", (q) => matchItems(q).length, "item", "items"], ["trainers", (q) => matchTrainers(q).length, "trainer", "trainers"], ["places", (q) => matchPlaces(q).length, "location", "locations"], ["docs", (q) => matchDocs(q).length, "doc topic", "doc topics"]];
   function alsoLine(q, here) {
@@ -534,7 +535,7 @@
   const howTaught = (k) => (moves[k].tm ? moves[k].tm.label : moves[k].tutor ? "Tutor" : "");
 
   function movesView(q) {
-    const list = exactFirst(matchMoves(q), (k) => moves[k].s.includes(q)).filter((k) => !state.type || moves[k].type === state.type);
+    const list = exactFirst(matchMoves(q), (k) => moves[k].s.includes(q));
     if (!list.length) return [`<div class="nores">No moves match “${esc(state.q)}”.</div>`, "0 moves"];
     const open = state.move;  // only a click opens an entry; a typed name just sorts first
     let html;
@@ -637,7 +638,7 @@
     if (!list.length) return [`<div class="nores">No abilities match “${esc(state.q)}”.</div>`, "0 abilities"];
     const open = state.ability;
     const isOpen = (a) => a.name === open;
-    const count = (a) => a.mons.filter(([i]) => inMode(mons[i]) && inType(mons[i])).length;
+    const count = (a) => a.mons.filter(([i]) => inMode(mons[i])).length;
     const html = state.layouts.abilities === "grid"
       ? chipsWithOpen(list, (a) => `<button class="chip${isOpen(a) ? " on" : ""}" data-ability="${esc(a.name)}"><span class="ln" style="padding-left:10px">${esc(a.name)}</span><span class="hw">${count(a)}</span></button>`, isOpen, abilityCard)
       : `<div class="listtable"><table class="mv"><thead><tr><th>Ability</th><th class="c-num">Pokémon</th></tr></thead><tbody>${list.map((a) =>
@@ -769,8 +770,8 @@
 
   const PLACEHOLDER = {
     dex: "Search Pokémon or dex # — e.g. Rockruff, 16, Mega, Galarian, Fire",
-    moves: "Search moves or TMs — e.g. Ceaseless Edge, TM02",
-    tutors: "Search tutor moves or towns — e.g. Draco Meteor, Ferrox Village",
+    moves: "Search moves, TMs or types — e.g. Ceaseless Edge, TM02, Fire",
+    tutors: "Search tutor moves, towns or types — e.g. Draco Meteor, Ferrox Village, Fire",
     abilities: "Search abilities or what they do — e.g. Triage, Libero, weather",
     items: "Search items — e.g. Fire Stone, Berries",
     trainers: "Search trainers, places or their Pokémon — e.g. Raine, Hiker, Route 8, Rockruff",
@@ -791,14 +792,12 @@
     $("#clear").hidden = !$("#q").value;
     $("#back").disabled = depth <= 0;
     $("#fwd").disabled = depth >= top;
-    $("#typepick").hidden = ["abilities", "items", "trainers", "places", "docs"].includes(state.view);  // these have no type
     $("#mode-seg").hidden = state.view === "docs";
     $("#diff-pick").hidden = state.view !== "trainers";
     document.querySelectorAll(".seg button[data-diff]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.diff === state.diff)));
     document.querySelectorAll("[data-viewtab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.viewtab === state.view)));
     document.querySelectorAll(".seg button[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
     document.querySelectorAll(".seg button[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.layouts[state.view])));
-    $("#type-label").innerHTML = state.type ? typeBadge(state.type) : "All types";
     syncConsoleHeight();
     document.body.classList.toggle("sheet-open", !!$("#out .sheet"));
     if (state.map && MapView.open(state.map, state.mark)) return;
@@ -850,29 +849,10 @@
     render();
   }));
 
-  // Type picker: a popover of type badges
-  const menu = $("#type-menu");
-  const drawTypeMenu = () => {
-    menu.innerHTML = `<button class="all" data-type="" aria-pressed="${!state.type}">All types</button>` +
-      TYPES.map((t) => `<button data-type="${t}" aria-pressed="${state.type === t}">${typeBadge(t)}</button>`).join("");
-  };
-  const closeMenu = () => { menu.hidden = true; $("#type-btn").setAttribute("aria-expanded", "false"); };
-  $("#type-btn").addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (menu.hidden) { drawTypeMenu(); menu.hidden = false; $("#type-btn").setAttribute("aria-expanded", "true"); } else closeMenu();
-  });
-  menu.addEventListener("click", (e) => {
-    const b = e.target.closest("[data-type]");
-    if (!b) return;
-    state.type = b.dataset.type;
-    closeMenu();
-    render();
-  });
-  document.addEventListener("click", (e) => { if (!menu.hidden && !e.target.closest("#typepick")) closeMenu(); });
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
     if (MapView.isOpen()) { if (!MapView.escape()) closeMap(); return; }
-    if ($("#out .sheet")) navigate({ view: state.view, q: state.q }); else closeMenu();
+    if ($("#out .sheet")) navigate({ view: state.view, q: state.q });
   });
 
   $("#out").addEventListener("click", (e) => {
