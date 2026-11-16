@@ -489,6 +489,8 @@ table.mv .c-lv { text-align: right; white-space: nowrap; }
 .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 6px; }  /* 5 across a full-width card on desktop */
 .chips.wild { grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }  /* 4 across: room for "Lv 3-6 · ☀️ 10% 🌙 15%" */
 .chips.wild.two { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }  /* 3 across when rates come in pairs or a note is long */
+.chip .rt { margin-left: auto; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; padding: 3px 0; }  /* level/rate over the mode tag */
+.chip .rt .hw { margin-left: 0; }
 .chips.wild .hw { flex-shrink: 0; white-space: nowrap; }  /* when and how often it's found stay whole on one line */
 .chips.wild .ln { flex-shrink: 1; max-width: none; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 4px; }  /* the form and sub-area drop to the next line rather than being cut off */
 .chip { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 2px 12px 2px 2px; border: 1px solid var(--line); border-radius: 999px; background: var(--sunk); cursor: pointer; text-align: left; }

@@ -186,8 +186,10 @@
   // A chip's or Pokédex row's left edge shows the modes a Pokémon (or encounter) is found in
   const modeClass = (modes) => (modes.length > 1 ? " m-both" : modes[0] === "Divergent" ? " m-div" : " m-std");
   const modeEdge = (modes) => `${modeClass(modes)}" title="${modes.length > 1 ? "Standard and Divergent" : `${modes[0]} only`}`;
-  const monChip = (i, note, sub, bare, modes = mons[i].modes) => `<button class="chip${modeEdge(modes)}" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${bare ? "" : formLabel(mons[i])}${
-    sub ? ` <span class="sub">${esc(sub)}</span>` : ""}</span>${note ? `<span class="hw">${esc(note)}</span>` : ""}</button>`;
+  const monChip = (i, note, sub, bare, modes = mons[i].modes, tag = false) => `<button class="chip${modeEdge(modes)}" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${bare ? "" : formLabel(mons[i])}${
+    sub ? ` <span class="sub">${esc(sub)}</span>` : ""}</span>${tag  // the mode tag sits under the level and rate, lined up down the list
+    ? `<span class="rt">${note ? `<span class="hw">${esc(note)}</span>` : ""}${modeTag(modes.length > 1 ? "Both" : modes[0])}</span>`
+    : note ? `<span class="hw">${esc(note)}</span>` : ""}</button>`;
   // Escaped text whose place names ("Secret Trail (need Strength)") open that place's card; longest name first
   let anyPlace = null;
   const placeLinks = (text) => {
@@ -442,19 +444,32 @@
     const pct = (rate) => Math.max(-1, ...(String(rate).match(/\d+(\.\d+)?(?=%)/g) || []).map(Number));
     // Trades come at the level sent: "Same Lv as sent" rather than "Lv Same as sent"
     const lvNote = (lv) => (!lv ? "" : /^\d/.test(lv) ? `Lv ${lv}` : lv === "Same as sent" ? "Same Lv as sent" : lv);
+    // Places with floors list them in floor order (the outside, 1F, 2F…, then B1F, B2F…), likeliest first on each;
+    // a chip found on several floors goes with the first it names. Named rooms ("Side Room", "Peak") come after.
+    const floorRank = (sub) => {
+      const s = (sub || "").split(",")[0].trim().replace(/^Cave\s+/i, "");
+      if (!s || /^(outside|overworld|exterior)$/i.test(s)) return 0;
+      let m;
+      if ((m = s.match(/^(?:(\d+)F|F(\d+))$/i))) return +(m[1] || m[2]);
+      if ((m = s.match(/^(?:B(\d+)F|BF(\d+))$/i))) return 100 + +(m[1] || m[2]);
+      if (/^basement$/i.test(s)) return 101;
+      return 1000;
+    };
     const groups = methods.map(([mt, l]) => [mt, l.map(([i, e]) => {
       const rate = e.times ? Object.entries(e.times).map(([t, r]) => `${TIME_ICON[t]} ${r}`).join(" ") : e.rate;
       return [i, e, rate, [lvNote(e.levels), rate].filter(Boolean).join(" · ")];
-    }).sort((a, b) => pct(b[2]) - pct(a[2]))]);
+    }).sort((a, b) => floorRank(a[1].sub) - floorRank(b[1].sub) || pct(b[2]) - pct(a[2]))]);
     const re = placeRe(p.name);
     const found = [];
     // Chip hint is just the spot within the place ("Shady relic seller"); prices and notes are on the item's card
     const spot = (line) => line.replace(/\s*\([^)]*\)/g, "").replace(p.name, "").replace(/^[\s·-]+/, "");
     items.forEach((it, k) => { const line = it.where.find((w) => re.test(w.toLowerCase())); if (line) found.push([k, spot(line)]); });
     // Three parts, each set apart: the map and description, the encounters by method, the items found here
+    // Each chip names its mode (Standard / Divergent / Both), as the Pokédex rows do, unless a mode is chosen
+    const tagged = !state.mode;
     const encounters = groups.length
       ? groups.map(([mt, l]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips wild${
-        l.some(([, e, , note]) => (e.times && Object.keys(e.times).length > 1) || (e.levels && !/^\d/.test(e.levels))) ? " two" : ""}">${l.map(([i, e, , note]) => monChip(i, note, e.sub, false, e.mode === "Both" ? ["Standard", "Divergent"] : [e.mode])).join("")}</div></div>`).join("")
+        l.some(([, e, , note]) => (e.times && Object.keys(e.times).length > 1) || (e.levels && !/^\d/.test(e.levels))) ? " two" : ""}">${l.map(([i, e, , note]) => monChip(i, note, e.sub, false, e.mode === "Both" ? ["Standard", "Divergent"] : [e.mode], tagged)).join("")}</div></div>`).join("")
       : `<p class="empty">No Pokémon match the current filters here.</p>`;
     const itemChips = found.map(([k, line]) =>
       `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line ? `<span class="hw">${esc(line)}</span>` : ""}</button>`).join("");
