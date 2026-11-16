@@ -6,8 +6,12 @@ from tools.dexpage.sprites import CELL, build_sheet
 
 
 def test_every_row_has_a_cell(roster, source_data):
-    sheet, offsets = build_sheet({e.key: source_data.sprites[e.key] for e in roster})
+    sheet, offsets = build_sheet(
+        {e.key: source_data.sprites[e.key] for e in roster},
+        {e.key: (source_data.sprites[e.key], source_data.shiny[e.key]) for e in roster if e.key in source_data.shiny},
+        {e.key: (source_data.backs[e.key], source_data.sprites[e.key]) for e in roster if e.key in source_data.backs})
     assert {e.key for e in roster} <= set(offsets)
+    assert "back:SPECIES_CASTFORM" in offsets and "shinyback:SPECIES_CASTFORM" in offsets
     assert len(sheet) < 3_000_000
 
 
@@ -33,3 +37,12 @@ def test_identical_sprites_share_a_cell(source_data):
     p = source_data.sprites["SPECIES_BULBASAUR"]
     _, offsets = build_sheet({"A": p, "B": p})
     assert offsets["A"] == offsets["B"]
+
+
+def test_back_sprites_regular_and_shiny(source_data):
+    """Back regular is the back picture in the normal palette, back shiny is the PNG as is: they must differ."""
+    key = "SPECIES_FARFETCHD_G"
+    sheet, offsets = build_sheet({}, backs={key: (source_data.backs[key], source_data.sprites[key])})
+    img = Image.open(io.BytesIO(sheet)).convert("RGBA")
+    crop = lambda o: img.crop((*o, o[0] + CELL, o[1] + CELL)).tobytes()
+    assert crop(offsets[f"back:{key}"]) != crop(offsets[f"shinyback:{key}"])

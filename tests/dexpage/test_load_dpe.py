@@ -1,4 +1,5 @@
 from tools.dexpage.load_dpe import (
+    back_pic,
     base_stats,
     dex_lists,
     egg_moves,
@@ -74,3 +75,9 @@ def test_duplicate_egg_entries_first_wins(paths):
 
 def test_accented_names_decoded(paths):
     assert species_names(paths)["SPECIES_FLABEBE"] == "Flabébé"
+
+
+def test_back_pic(paths):
+    backs = back_pic(paths)
+    assert backs["SPECIES_FARFETCHD_G"].name == "gBackShinySprite1217FarfetchdG.png"
+    assert backs["SPECIES_CASTFORM"].exists()

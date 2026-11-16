@@ -30,6 +30,8 @@ KEY_FORM_LABELS = {
 }
 # Forms the Habitat table leaves out but players can get (by form change or as a gift), with how to get them
 EXTRA_FORMS_CSV = Path(__file__).with_name("extra_forms.csv")
+# Habitat-table forms players can't get in game (Collin), left off the page
+UNOBTAINABLE_FORMS = {"SPECIES_ZARUDE_DADA"}
 
 DROPPED_METHODS = {"EVO_TRADE", "EVO_TRADE_ITEM", "EVO_GIGANTAMAX"}  # impossible in game
 AMPED_NATURES = "Hardy, Brave, Adamant, Naughty, Docile, Impish, Lax, Hasty, Jolly, Naive, Rash, Sassy, Quirky"
@@ -50,6 +52,7 @@ class SourceData:
     names: dict
     sprites: dict
     shiny: dict
+    backs: dict
     national: dict
     moves: dict
     items: dict
@@ -84,7 +87,7 @@ def load_source_data(p: Paths) -> SourceData:
         habitat=load_dpe.habitat_forms(p), stats=load_dpe.base_stats(p),
         levelup=load_dpe.levelup(p), egg=load_dpe.egg_moves(p),
         machines=load_dpe.machine_compat(p), evolutions=load_dpe.evolutions(p),
-        names=load_dpe.species_names(p), sprites=load_dpe.front_pic(p), shiny=load_dpe.shiny_pal(p),
+        names=load_dpe.species_names(p), sprites=load_dpe.front_pic(p), shiny=load_dpe.shiny_pal(p), backs=load_dpe.back_pic(p),
         national=_national_dex(p), moves=load_cfru.moves(p),
         items=item_names(p.rom, item_ids), item_ids=item_ids, abilities=load_cfru.ability_names(p),
     )
@@ -277,7 +280,7 @@ def build_roster(data: SourceData) -> list[Entry]:
 
     bases: dict[str, tuple[str, str | None]] = {}
     for key, kinds in data.habitat.items():
-        if key in dex_species:
+        if key in dex_species or key in UNOBTAINABLE_FORMS:
             continue
         base, form = _split_form(key, data.ids, data.names)
         bases[key] = (base, form)

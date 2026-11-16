@@ -232,6 +232,17 @@ def front_pic(p: Paths) -> dict[str, Path]:
 
 
 @cache
+def back_pic(p: Paths) -> dict[str, Path]:
+    """Back sprites. The PNGs are named gBackShinySprite… because their own palette is the shiny one."""
+    result = {}
+    for species, body in parse_designated_array(_source(p, "src/Back_Pic_Table.c"), "gMonBackPicTable").items():
+        m = re.match(r"(gBackShinySprite\w+?)Tiles\b", body.strip())
+        if m:
+            result[species] = _graphic(p, "backspr", m.group(1))
+    return result
+
+
+@cache
 def shiny_pal(p: Paths) -> dict[str, Path]:
     """gMonShinyPaletteTable names each species' shiny palette after a back sprite (gBackShinySprite…Pal); the game
     compiles that PNG's own palette, so the PNG is the source."""

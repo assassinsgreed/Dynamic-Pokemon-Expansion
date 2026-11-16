@@ -606,7 +606,8 @@ def build(paths: Paths, out: Path) -> None:
     roster = build_roster(data)
     links = evolution_links(data, {e.key for e in roster})
     sheet, offsets = build_sheet({e.key: data.sprites[e.key] for e in roster},
-                                 {e.key: (data.sprites[e.key], data.shiny[e.key]) for e in roster if e.key in data.shiny})
+                                 {e.key: (data.sprites[e.key], data.shiny[e.key]) for e in roster if e.key in data.shiny},
+                                 {e.key: (data.backs[e.key], data.sprites[e.key]) for e in roster if e.key in data.backs})
     page = page_data(data, roster, links)
     maps = place_maps(paths)
     page["maps"] = map_index(maps)
@@ -683,7 +684,8 @@ def _pack_ability(ability: list | None, index: dict[tuple, int]) -> list | int |
 
 def render(data: dict, sheet: bytes, offsets: dict, maps: list[dict] = ()) -> str:
     index = {(a["name"], a["desc"], a["chance"]): n for n, a in enumerate(data["abilities"])}
-    data = dict(data, mons=[dict(m, sp=offsets[m["key"]], ss=offsets.get(f"shiny:{m['key']}"), abilities=[_pack_ability(a, index) for a in m["abilities"]],
+    data = dict(data, mons=[dict(m, sp=offsets[m["key"]], ss=offsets.get(f"shiny:{m['key']}"),
+                                 sb=offsets.get(f"back:{m['key']}"), ssb=offsets.get(f"shinyback:{m['key']}"), abilities=[_pack_ability(a, index) for a in m["abilities"]],
                                  hidden=_pack_ability(m["hidden"], index)) for m in data["mons"]],
                 moves={k: dict(m, learners=_pack_learners(m["learners"])) for k, m in data["moves"].items()})
     # Keys keep the move table compact and stable; the page only needs them as ids.
