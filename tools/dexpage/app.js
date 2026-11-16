@@ -966,8 +966,7 @@
     if (!isNaN(mod) && Date.now() - mod > 60000)
       $("#updated").textContent = "Last updated: " + mod.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
   } else {
-    $("#updated").textContent = "You are using the offline copy";
-    $("#offline-btn").hidden = true; $(".brand .links .sep").hidden = true;
+    $("#offline-btn").hidden = true; $("#offline-note").hidden = false;  // the note takes the Download button's place
   }
 
   // Links: #rockruff, #move-crunch, #item-fire-stone, #place-route-2, #map-daimyn-city/item-2, #items … (older #ceaseless-edge style still works)

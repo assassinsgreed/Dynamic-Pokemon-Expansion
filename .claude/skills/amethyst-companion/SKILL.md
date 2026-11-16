@@ -79,9 +79,11 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   since hiding "Used on" dropped the doc's "(male)" / "(Must hold @ night)".
 - Header subtitle (shown on phones too): "Where to find (just about) everything | Last updated: Nov 16, 2026" on the
   website, where the date is `document.lastModified` (GitHub Pages' built-in deploy sets Last-Modified; the companion
-  repo has no workflow of its own), hidden if the header is missing. The downloaded file reads "| You are using the offline copy" (no "go online" hint: a saved file never updates; the home-screen app does, and it shows the date) and
-  hides the Download button. Phones: title, then the subtitle (lined up under the title text) with "Last updated: …" / "You are using the offline copy" on its own line and no pipe (the pipe is a CSS `::before`), then the link
-  buttons spread out for tapping (~40% of the row, centred, when there's no Download button); on the Trainers tab
+  repo has no workflow of its own), hidden if the header is missing. The downloaded file has no date; its Download
+  button is replaced, beside the link buttons, by "You are using the offline copy" (Collin: it belongs with the
+  Download button, not the subtitle; no "go online" hint, since a saved file never updates). Phones: title, then the
+  subtitle (lined up under the title text) with "Last updated: …" on its own line and no pipe (the pipe is a CSS
+  `::before`), then the link buttons spread out for tapping beside the Download button / offline note; on the Trainers tab
   the Difficulty toggles sit above the count. Trainer list rows keep the right-aligned Level column on phones, as on desktop.
 - Look: Amethyst purple palette (game label art: #b27cfa / #320077), Trozei Jirachi header icon
   (`jirachi-trozei.png`, embedded), type-colour tints, equal-width chips, offline help for PC and phone.
