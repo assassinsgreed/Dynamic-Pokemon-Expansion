@@ -691,7 +691,7 @@
     return [html, `${list.length} topics`];
   }
 
-  // Checklist (proof of concept): what there is to do, in playthrough order (checklist.py). Ticks live in this
+  // Checklist: what there is to do, in playthrough order (checklist.py). Ticks live in this
   // browser's storage; the Download link writes them into the saved file, and Export / Import moves them elsewhere.
   const CK = DEX.checklist;
   // Kinds keep the interactive maps' colours and shapes; story beats are a ring
@@ -736,8 +736,9 @@
   const ckTag = (text) => `<span class="mode">${esc(text)}</span>`;
 
   function ckRow(e, g) {
-    const name = e.item != null && !e.sd ? `<button class="mvname" data-item="${e.item}">${esc(e.t)}</button>` : esc(e.t);
-    const tags = [e.daily && "Daily", e.sd && "Differs by mode", e.need && `Needs ${e.need}`, e.why, e.fl].filter(Boolean).map(ckTag).join("");
+    const name = e.tr ? `<button class="mvname" data-cktr="${e.tr.join(",")}" title="See this trainer's team">${esc(e.t)}</button>`
+      : e.item != null ? `<button class="mvname" data-item="${e.item}">${esc(e.t)}</button>` : esc(e.t);
+    const tags = [e.daily && "Daily", e.sd && "Differs by mode", e.need && `Needs ${e.need}`, e.until, e.fl].filter(Boolean).map(ckTag).join("");
     return `<div class="ck${ck.done[e.id] ? " done" : ""}"><label><input type="checkbox" data-ck="${esc(e.id)}"${ck.done[e.id] ? " checked" : ""}>${ckShape(e.k)}
       <span class="ck-body">${name}${tags ? `<span class="ck-tags">${tags}</span>` : ""}</span></label>${
       e.mark ? `<button class="ck-map" data-ckmap="${g.slug}" data-mark="${e.mark}" title="Show on the map">Map</button>` : ""}</div>`;
@@ -764,18 +765,20 @@
       const groups = st.groups.map((g) => [g, g.entries.filter(hit)]).filter(([, es]) => es.length);
       if (!groups.length) return "";
       const open = q || (st.title in ck.closed ? !ck.closed[st.title] : st.kind === "place" || st.kind === "unlock");
-      const named = st.kind !== "place";  // a place's own section needs no place heading
-      return `<details class="ck-stage k-${st.kind}" data-ckstage="${esc(st.title)}"${open ? " open" : ""}><summary>${CHEVRON}<span class="ck-title">${esc(st.title)}</span><span class="ck-n" data-ckn="${n}"></span></summary>
+      const named = st.kind !== "place";  // a place's own section needs no place heading, just a way to its card
+      const card = named ? "" : places.has(norm(st.title)) ? st.title : st.groups[0].place;
+      return `<details class="ck-stage k-${st.kind}" data-ckstage="${esc(st.title)}"${open ? " open" : ""}><summary>${CHEVRON}<span class="ck-title">${esc(st.title)}</span>${
+        card ? `<button class="ck-loc" data-place="${esc(card)}" title="Pokémon, items and map for ${esc(card)}">Location</button>` : ""}<span class="ck-n" data-ckn="${n}"></span></summary>
         <div class="ck-rows">${groups.map(([g, es]) => `${named ? `<div class="ck-place"><button data-place="${esc(g.place)}">${esc(g.place)}</button></div>` : ""}${es.map((e) => ckRow(e, g)).join("")}`).join("")}</div></details>`;
     }).join("");
     if (!stages) return [`<div class="nores">Nothing on the checklist matches “${esc(state.q)}”.</div>`, "0 entries"];
-    const html = `<div class="cklist${ck.hide ? " hide-done" : ""}">
-      <div class="ck-top"><div class="ck-prog"><span id="ck-total"></span><span class="ck-bar"><i id="ck-fill"></i></span></div>
-        <div class="ck-acts"><label><input type="checkbox" data-ckact="hide"${ck.hide ? " checked" : ""}>Hide finished</label>
+    const html = `<div class="cklist${ck.hide ? " hide-done" : ""}${state.layouts.check === "grid" ? " grid" : ""}">
+      <div class="ck-head"><div class="ck-prog"><span id="ck-total"></span><span class="ck-bar"><i id="ck-fill"></i></span></div>
+        <div class="ck-key">${Object.keys(CK_KIND).filter((k) => kinds.has(k)).map((k) => `<span>${ckShape(k)}${CK_KIND[k][0]}</span>`).join("")}</div></div>
+      <div class="ck-top"><div class="ck-acts"><label><input type="checkbox" data-ckact="hide"${ck.hide ? " checked" : ""}>Hide finished</label>
           <button data-ckact="export" title="Save your ticks to a file">Export</button><button data-ckact="import" title="Load ticks from an exported file">Import</button><button data-ckact="reset">Reset</button></div></div>
-      <p class="note ck-help">Preview: covers the game up to ${esc(CK.upTo)}. Your ticks are saved in this browser, and Download for Offline Use keeps them in the saved file. Export and Import move them to another device.</p>
-      <div class="ck-key">${Object.keys(CK_KIND).filter((k) => kinds.has(k)).map((k) => `<span>${ckShape(k)}${CK_KIND[k][0]}</span>`).join("")}</div>
-      ${stages}</div>`;
+      <p class="note ck-help">Your ticks are saved in this browser, and Download for Offline Use keeps them in the saved file. Export and Import move them to another device.</p>
+      <div class="ck-stages">${stages}</div></div>`;
     return [html, ""];
   }
 
@@ -940,7 +943,6 @@
     $("#back").disabled = depth <= 0;
     $("#fwd").disabled = depth >= top;
     $("#mode-seg").hidden = state.view === "docs" || state.view === "check";
-    $("#layout-seg").hidden = state.view === "check";
     $("#diff-pick").hidden = state.view !== "trainers";
     document.querySelectorAll(".seg button[data-diff]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.diff === state.diff)));
     document.querySelectorAll("[data-viewtab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.viewtab === state.view)));
@@ -1009,8 +1011,16 @@
     if (act) { ckAct(act); return; }
     const onMap = t.closest("[data-ckmap]");
     if (onMap) { navigate({ view: "places", place: placeOfMap(onMap.dataset.ckmap), map: onMap.dataset.ckmap, mark: onMap.dataset.mark }); return; }
+    const boss = t.closest("[data-cktr]");
+    if (boss) {  // the trainer's entry for the mode the player has chosen (difficulty is the Trainers tab's own setting)
+      const ns = boss.dataset.cktr.split(",").map(Number);
+      const hit = entries.findIndex((x, n) => ns.includes(x.n) && entryInMode(n));
+      if (hit >= 0) navigate({ view: "trainers", trainer: hit });
+      return;
+    }
     const stage = t.closest(".ck-stage > summary");
-    if (stage && !state.q) {  // remember which sections are folded (a search opens them all without saving that)
+    if (stage && t.closest("[data-place]")) e.preventDefault();  // the Location button opens the place, not the section
+    else if (stage && !state.q) {  // remember which sections are folded (a search opens them all without saving that)
       const d = stage.parentElement;
       setTimeout(() => { ck.closed[d.dataset.ckstage] = !d.open; ckSave(); });
       return;

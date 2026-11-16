@@ -411,6 +411,11 @@ def _item_category(item: dict, fields: dict[str, dict]) -> str:
     return "Held Items" if f["hold"] else "Other items"
 
 
+def game_item_names(data: SourceData) -> dict[str, str]:
+    """The game's own (often shortened) item name → the name the page shows: HvyDutyBoots → Heavy Duty Boots."""
+    return {data.items[const]: _full_item_name(data, const) for const in data.items}
+
+
 def _full_item_name(data: SourceData, const: str) -> str:
     """The ROM caps names at 12 characters ("BlundrPolicy"); the constant spells them out (Blunder Policy)."""
     rom_name = data.items[const]
@@ -612,7 +617,7 @@ def build(paths: Paths, out: Path) -> None:
     page = page_data(data, roster, links)
     maps = place_maps(paths)
     page["maps"] = map_index(maps)
-    page["checklist"] = checklist(page, maps, paths)
+    page["checklist"] = checklist(page, maps, paths, game_item_names(data))
     have = {place_key(m["name"]) for m in maps}
     places = {l["location"] for m in page["mons"] for l in m["loc"]} | set(page["townMap"]["places"])
     for place in sorted(places - NO_MAP):
@@ -686,7 +691,7 @@ def _pack_ability(ability: list | None, index: dict[tuple, int]) -> list | int |
 
 def render(data: dict, sheet: bytes, offsets: dict, maps: list[dict] = ()) -> str:
     index = {(a["name"], a["desc"], a["chance"]): n for n, a in enumerate(data["abilities"])}
-    data.setdefault("checklist", {"stages": [], "upTo": ""})
+    data.setdefault("checklist", {"stages": []})
     data = dict(data, mons=[dict(m, sp=offsets[m["key"]], ss=offsets.get(f"shiny:{m['key']}"),
                                  sb=offsets.get(f"back:{m['key']}"), ssb=offsets.get(f"shinyback:{m['key']}"), abilities=[_pack_ability(a, index) for a in m["abilities"]],
                                  hidden=_pack_ability(m["hidden"], index)) for m in data["mons"]],

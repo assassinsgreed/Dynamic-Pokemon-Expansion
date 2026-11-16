@@ -1,56 +1,175 @@
 """The Checklist tab's hand-kept half: the order a playthrough goes in, story beats, and corrections.
 
-PROOF OF CONCEPT: covers the game up to the second badge. Everything here is a first draft for Collin to correct.
-Entry ids are printed by `python -m tools.dexpage.checklist` (place/kind/floor/x-y in map tiles).
+A first draft written from the dev diary, the trainer tables and the maps, for Collin to correct.
+Entry ids are printed by `python -m tools.dexpage.checklist` (place/kind/floor/x-y in map tiles); ids and place
+patterns here may use * wildcards where noted.
 """
 
-# Places in the order a playthrough first reaches them (the dev diary's milestone order).
+# Badge number → (name, the place it's won in)
+BADGES = {
+    1: ("Terrain", "Rhodanzi City"), 2: ("Patch", "Ferrox Village"), 3: ("Stormcloud", "Heleo City"),
+    4: ("Roundabout", "Daimyn City"), 5: ("Tactician", "Laplaz Town"), 6: ("Talent", "Bruccie Village"),
+    7: ("Support", "Tsarvosa City"), 8: ("Double", "Uteya Village"),
+}
+
+# The stage in which each HM comes into the player's hands. With the badge CFRU asks for, that decides where the
+# "After … (with Cut)" section goes: after whichever of the two comes later.
+HM_FROM = {"Cut": "Ferrox Village", "Rock Smash": "Heleo City", "Fly": "Route 11 South", "Surf": "Pluto HQ",
+           "Strength": "Tsarvosa City", "Rock Climb": "Uteyan Ruins"}
+
+# Stops in the order a playthrough first reaches them (the dev diary's milestone order; where the game opens up,
+# the order things become available). A stop is a place, or (title, place, floor-name prefixes) for the part of a
+# place that opens at another time; the place's own stop keeps the floors no part claims.
 ORDER = [
     "Anthra Town", "Route 17", "Route 1", "Olenic Town", "Route 2", "Varisi Forest", "Rhodanzi City",
     "Route 3", "Rubarr Desert", "Route 4", "Torma Cave", "Route 13", "Ferrox Village",
+    "Route 5", "Heleo Ranch", "Route 6", "Route 7", "Heleo City",
+    "Route 8", "Forgotten Manse", "Daimyn City",
+    "Route 9", ("Daimyn Factory Overworld", "Daimyn Factory", ["Overworld"]), "Route 10", "Route 11 South",
+    "Hesson Pass", "Route 11 North", "Laplaz Town", "Peradon Forest", "Lake Laplaz",
+    "Route 12 East", "Scalding Spa", "Route 12 West", "Bruccie Village", "Calicin Bay", "Pluto HQ",
+    ("Route 17 cave", "Route 17", ["Cave"]), "Route 18", "Orichelle Garden",
+    "Route 14", "Route 15 North", "Route 15 South", "Route 16", "Route 19", "Emraldin Quay", "Route 20",
+    "Treasure Beach", "Route 21", "Mimmett Jungle", "Route 22", "Secret Trail", "Route 23", "Tsarvosa City",
+    "Seppire Cove", "Daimyn Factory", ("Rubarr Desert Caves", "Rubarr Desert", ["Cave", "Caverns"]),
+    ("Route 13 cave", "Route 13", ["Cave"]), "Carnelidge Volcano", "Uteya Village", "Route 24", "Uteyan Ruins",
+    "Victory Road", "Ascension Tower",
 ]
 
-# Where each badge is earned. An "After badge N (with Cut)" section follows that place.
-BADGE_AT = {"Rhodanzi City": 1, "Ferrox Village": 2}
+# Places whose every entry is postgame
+POSTGAME_PLACES = ["Ultra Space", "Battle Frontier"]
 
-# The preview stops here: anything that needs a later badge goes in the closing "Later in the game" section.
-LAST_BADGE = 2
-
-# Story beats per place: (key, text). Keys are part of the saved id, so keep them when rewording.
+# Story beats per stage: (key, text[, options]). Keys are part of the saved id, so keep them when rewording.
+# Options: trainer=(class, name, place in the Trainers tab) links the battle; daily=True; at=place (Postgame only).
 STORY = {
-    "Anthra Town": [("starter", "Choose your starter and battle your rival")],
+    "Anthra Town": [("starter", "Choose your starter")],
+    "Route 17": [("rival", "Battle your rival for the first time", {"trainer": ("Rival", "", "Route 17")})],
     "Olenic Town": [("pokedex", "Meet Professor Hawthorne and receive the Pokédex and Poké Balls")],
-    "Rhodanzi City": [("gym", "Defeat Leader Terrence for the Terrain Badge")],
-    "Route 3": [("pluto", "Get past the Pluto Thugs (after the Terrain Badge)"), ("rival", "Battle your rival")],
-    "Rubarr Desert": [("pluto", "Follow the Team Pluto grunts to the oasis and face Clancy and Ena")],
-    "Torma Cave": [("foreman", "Help the foreman's crew clear the boulders")],
+    "Rhodanzi City": [("gym", "Defeat Leader Terrence for the Terrain Badge", {"trainer": ("Leader", "Terrence", "Rhodanzi City Gym")})],
+    "Route 3": [("pluto", "Get past the Pluto Thugs (after the Terrain Badge)"),
+                ("rival", "Battle your rival", {"trainer": ("Rival", "", "Route 3")})],
+    "Rubarr Desert": [("pluto", "Follow the Team Pluto grunts to the oasis and defeat Admin Irene",
+                       {"trainer": ("Pluto Admin", "Irene", "Rubarr Desert")})],
+    "Torma Cave": [("foreman", "Help the foreman's crew clear the boulders"),
+                   ("casey", "Battle Casey", {"trainer": ("PKMN Trainer", "Casey", "Torma Cave")})],
     "Ferrox Village": [("rival", "Meet your rival outside the gym"),
-                       ("library", "Solve the Ferrox Library password puzzle"),
-                       ("gym", "Defeat Leader Stella for the Patch Badge")],
-}
-
-# Parts of an early place that open much later: (place, floor-name prefix) → why. Guesses, to be corrected.
-LATER_FLOORS = {
-    ("Route 17", "Cave"): "Route 17 revisited",
-    ("Rubarr Desert", "Caverns"): "Rubarr Desert Caves",
-    ("Route 13", "Cave"): "Carnelidge Volcano climb",
-}
-# Single entries that open later: id → why
-LATER = {
-    "rubarr-desert/wild/desert/81-34": "Legendary encounter",
+                       ("library", "Solve the Ferrox Library password puzzle and receive HM01 Cut from Alistair"),
+                       ("gym", "Defeat Leader Stella for the Patch Badge", {"trainer": ("Leader", "Stella", "Ferrox Village Gym")})],
+    "Heleo City": [("gym", "Defeat Leader Raine for the Stormcloud Badge", {"trainer": ("Leader", "Raine", "Heleo City Gym")}),
+                   ("trainer-house", "Trainer House: battle Bianca, Galen and Jet", {"trainer": ("PKMN Trainer", "Bianca", "Heleo City Trainer House")})],
+    "Daimyn City": [("rival", "Battle your rival", {"trainer": ("Rival", "", "Daimyn City")}),
+                    ("gym", "Defeat Leader Chance for the Roundabout Badge", {"trainer": ("Leader", "Chance", "Daimyn City Gym")})],
+    "Route 10": [("casey", "Battle Casey", {"trainer": ("PKMN Trainer", "Casey", "Route 10")})],
+    "Route 11 South": [("ronald", "Defeat Pluto Admin Ronald", {"trainer": ("Pluto Admin", "Ronald", "Route 11 South")}),
+                       ("rival", "Battle your rival and receive HM02 Fly", {"trainer": ("Rival", "", "Route 11 South")})],
+    "Laplaz Town": [("gym", "Defeat Leader Casey for the Tactician Badge", {"trainer": ("Leader", "Casey", "Laplaz Town Gym")}),
+                    ("trainer-house", "Trainer House: battle Toby, Dirk and Vanessa", {"trainer": ("PKMN Trainer", "Toby", "Laplaz Town Trainer House")})],
+    "Bruccie Village": [("gym", "Defeat Leader Abby for the Talent Badge", {"trainer": ("Leader", "Abby", "Bruccie Village Gym")})],
+    "Calicin Bay": [("rival", "Battle your rival", {"trainer": ("Rival", "", "Bruccie Village & Calicin Bay")})],
+    "Pluto HQ": [("irene", "Defeat Pluto Admin Irene", {"trainer": ("Pluto Admin", "Irene", "Pluto HQ")}),
+                 ("ronald", "Defeat Pluto Admin Ronald", {"trainer": ("Pluto Admin", "Ronald", "Pluto HQ")}),
+                 ("kurtis", "Defeat Pluto Leader Kurtis and receive HM03 Surf", {"trainer": ("Pluto Leader", "Kurtis", "Pluto HQ")})],
+    "Emraldin Quay": [("rival", "Battle your rival", {"trainer": ("Rival", "", "Emraldin Quay")}),
+                      ("trainer-house", "Trainer House: battle Marguerite, Julien and Perry",
+                       {"trainer": ("PKMN Trainer", "Marguerite", "Emraldin Quay Trainer House")})],
+    "Tsarvosa City": [("kaito", "Stats Dojo: defeat Sensei Kaito without items to receive HM04 Strength",
+                       {"trainer": ("Sensei", "Kaito", "Tsarvosa City")}),
+                      ("gym", "Defeat Leader Iris for the Support Badge", {"trainer": ("Leader", "Iris", "Tsarvosa City Gym")}),
+                      ("cafe", "Gym Trainee Cafe: challenge the day's 3 to 5 gym trainees", {"daily": True})],
+    "Carnelidge Volcano": [("rival", "Battle your rival", {"trainer": ("Rival", "", "Carnelidge Volcano")}),
+                           ("alistair", "Battle Alistair", {"trainer": ("PKMN Trainer", "Alistair", "Carnelidge Volcano")}),
+                           ("peak", "See the story through at the peak (the Empty World and Ultra Space)")],
+    "Uteya Village": [("gym", "Defeat Leaders Dennis & Dee for the Double Badge", {"trainer": ("Leader", "Dennis&Dee", "Uteya Village Gym")}),
+                      ("trainer-house", "Trainer House: battle Lisa, Tyson and Wilford", {"trainer": ("PKMN Trainer", "Lisa", "Uteya Village Trainer House")})],
+    "Victory Road": [("rival", "Battle your rival", {"trainer": ("Rival", "", "Victory Road")})],
+    "Ascension Tower": [("hannah", "Defeat Elite Four Hannah", {"trainer": ("Elite Four", "Hannah", "Ascension Tower & Post Credits")}),
+                        ("lucas", "Defeat Elite Four Lucas", {"trainer": ("Elite Four", "Lucas", "Ascension Tower & Post Credits")}),
+                        ("jenna", "Defeat Elite Four Jenna", {"trainer": ("Elite Four", "Jenna", "Ascension Tower & Post Credits")}),
+                        ("thomas", "Defeat Elite Four Thomas", {"trainer": ("Elite Four", "Thomas", "Ascension Tower & Post Credits")}),
+                        ("selene", "Defeat Champion Selene and enter the Hall of Fame", {"trainer": ("Champion", "Selene", "Ascension Tower & Post Credits")})],
+    "Postgame": [
+        ("alistair", "Battle Alistair after the credits", {"at": "Ascension Tower", "trainer": ("PKMN Trainer", "Alistair", "Ascension Tower & Post Credits")}),
+        ("title-defense", "Champion Title Defense: defend your title against the 14 possible challengers",
+         {"at": "Ascension Tower", "trainer": ("Challenger", "Joey", "Title Defense")}),
+        ("e4-hannah", "Elite Four rematch: Hannah", {"at": "Ascension Tower", "trainer": ("Elite Four", "Hannah", "Elite Four Rematches")}),
+        ("e4-lucas", "Elite Four rematch: Lucas", {"at": "Ascension Tower", "trainer": ("Elite Four", "Lucas", "Elite Four Rematches")}),
+        ("e4-jenna", "Elite Four rematch: Jenna", {"at": "Ascension Tower", "trainer": ("Elite Four", "Jenna", "Elite Four Rematches")}),
+        ("e4-thomas", "Elite Four rematch: Thomas", {"at": "Ascension Tower", "trainer": ("Elite Four", "Thomas", "Elite Four Rematches")}),
+        ("conservatory", "Professor's Conservatory: catch the starters behind Hawthorne's lab", {"at": "Olenic Town"}),
+        ("shiny-charm", "Receive the Shiny Charm from Hawthorne (75% of the Pokédex caught)", {"at": "Olenic Town"}),
+        ("diploma", "Receive the Diploma from Hawthorne (Pokédex complete)", {"at": "Olenic Town"}),
+        ("rematch-terrence", "Gym Leader rematch: Terrence", {"at": "Rhodanzi City", "daily": True, "trainer": ("Leader", "Terrence", "Gym Leader Rematches")}),
+        ("rematch-stella", "Gym Leader rematch: Stella", {"at": "Ferrox Village", "daily": True, "trainer": ("Leader", "Stella", "Gym Leader Rematches")}),
+        ("rematch-raine", "Gym Leader rematch: Raine", {"at": "Heleo City", "daily": True, "trainer": ("Leader", "Raine", "Gym Leader Rematches")}),
+        ("blissey", "Pokémon Fan Club: battle the Blissey Trainer", {"at": "Heleo City", "daily": True}),
+        ("rematch-chance", "Gym Leader rematch: Chance", {"at": "Daimyn City", "daily": True, "trainer": ("Leader", "Chance", "Gym Leader Rematches")}),
+        ("ultra-episode", "Ultra Episode: start it at the Interdimensional Research Facility", {"at": "Daimyn City"}),
+        ("rematch-casey", "Gym Leader rematch: Casey", {"at": "Laplaz Town", "daily": True, "trainer": ("Leader", "Casey", "Gym Leader Rematches")}),
+        ("rematch-abby", "Gym Leader rematch: Abby", {"at": "Bruccie Village", "daily": True, "trainer": ("Leader", "Abby", "Gym Leader Rematches")}),
+        ("rematch-iris", "Gym Leader rematch: Iris", {"at": "Tsarvosa City", "daily": True, "trainer": ("Leader", "Iris", "Gym Leader Rematches")}),
+        ("rematch-dennis-dee", "Gym Leader rematch: Dennis & Dee", {"at": "Uteya Village", "daily": True, "trainer": ("Leader", "Dennis&Dee", "Gym Leader Rematches")}),
+        ("tower", "Battle Tower", {"at": "Battle Frontier"}), ("quarry", "Battle Quarry", {"at": "Battle Frontier"}),
+        ("sands", "Battle Sands", {"at": "Battle Frontier"}), ("maze", "Battle Maze", {"at": "Battle Frontier"}),
+        ("isle", "Battle Isle", {"at": "Battle Frontier"}), ("sim", "Battle Sim", {"at": "Battle Frontier"}),
+        ("factory", "Battle Factory", {"at": "Battle Frontier"}), ("observatory", "Battle Observatory", {"at": "Battle Frontier"}),
+    ],
 }
 
 # Reworded entries: id → text
 TEXT = {
     "ferrox-village/npc/house-1/1-4": "Daily Berry: a girl gives a random Berry each day",
-    "ferrox-village/npc/library/16-4": "Alistair: gives HM01 Cut (after the library puzzle)",
+    "ferrox-village/npc/house-3/7-5": "Trade your Snom for a Chinchou (Vanillite for an Eelektrik in Divergent)",
+    "anthra-town/npc/player-home-1st-floor/9-5": "Mom: gives Town Map",
+    "daimyn-city/npc/trade-house/8-5": "Trade with the Trade House trader (one trade per save; your Fire starter decides which Pokémon)",
+    "daimyn-city/npc/daimyn-mall/12-6": "Fish Seller: sells one Carvanha (Wishiwashi in Divergent) for ₽2,000",
+    "daimyn-city/npc/gym/4-2": "Pokémon exchange: buy each Pokémon offered for coins",
+    "daimyn-city/npc/gym/5-2": "Item exchange: buy items for coins",
+    "tsarvosa-city/npc/npc-house-9/6-4": "Trade your Slowbro for a Galarian Slowbro (Rapidash for a Galarian Rapidash in Divergent)",
+    "tsarvosa-city/npc/npc-house-7/5-4": "Dev Team Collin: battle him once a day; gives PokéChip",
+    "tsarvosa-city/npc/npc-house-7/8-4": "Dev Team Crystal: battle her once a day; gives PokéChip",
+    "battle-frontier/npc/pokemon-center/3-7": "Trade your Heat Rotom for a Ditto (after a 5-win streak at any facility)",
+    "ultra-space/npc/ultra-space/38-49": "Poipole Researcher: gives Poipole (once you have caught 150+ Pokémon)",
+    "route-19/npc/route-19/67-14": "Selene: gives Victini; switches a max-friendship Greninja to and from Battle Bond",
+    "route-13/npc/cave-kurtis-room/4-4": "Battle Kurtis in his hideout",
 }
 
-# Once-a-day events the text doesn't already call "Daily" (the diary: trap Pokémon are daily)
-DAILY = {
-    "route-1/wild/route-1/*",
-    "varisi-forest/wild/varisi-forest/*",
+# Entries that belong to another stage than their floor's: id → stage title (or "Postgame")
+MOVE: dict[str, str] = {
+    "rubarr-desert/wild/desert/81-34": "Rubarr Desert Caves",
 }
+
+# People the maps mark who are a battle: id → (class, name, place in the Trainers tab)
+LINKS: dict[str, tuple] = {
+    "route-13/npc/cave-kurtis-room/4-4": ("Pluto Leader", "Kurtis", "Route 13 Cave"),
+    "tsarvosa-city/npc/npc-house-7/5-4": ("Developer", "Collin", "Tsarvosa City"),
+    "tsarvosa-city/npc/npc-house-7/8-4": ("Developer", "Crystal", "Tsarvosa City"),
+    "daimyn-city/npc/restaurant/9-3": ("Leader", "Iris", "Daimyn City Restaurant"),
+}
+
+# Entries to leave out (ids, * allowed): HMs handed over as part of a story beat, renewing items, plain services
+DROP = [
+    "ferrox-village/npc/library/*",   # Alistair's HM01 Cut is part of the library story beat
+    "treasure-beach/hidden/*",        # renew as you walk: never finished
+    "olenic-town/npc/area-5/1-7",     # "Hawthorne: trade" (not a trade in trades.csv)
+    # services a player uses as often as they like: nothing to finish
+    "heleo-city/npc/swarm-house/8-4",          # Swarm Swami
+    "forgotten-manse/npc/closet-1f/*",         # Rotom appliance catalog
+    "daimyn-city/npc/restaurant/11-6",         # Restaurant Proprietor
+    "daimyn-city/npc/daimyn-mall/50-26",       # Sweets Seller
+    "bruccie-village/npc/npc-house-1/*",       # Poké Ball Swapper
+    "tsarvosa-city/npc/npc-house-5/*",         # PokéChip Crusher
+    "uteya-village/npc/npc-house-2/*",         # Clancy's Nature changes
+    "olenic-town/npc/area-5/7-3",              # Tools Developer
+    "anthra-town/npc/anthra-town/3-7",         # Champion Fanatic
+    "battle-frontier/npc/pokemon-center/13-2",  # PokéChip exchange
+    "ultra-space/npc/ultra-space/29-50",       # the researcher who takes you home
+]
+
+# Once-a-day events the text doesn't already call daily (the diary: trap Pokémon are daily). Ids, * allowed.
+DAILY = [
+    "route-1/wild/*", "varisi-forest/wild/*", "route-8/wild/*", "peradon-forest/wild/*", "route-19/wild/*",
+    "route-23/wild/*", "heleo-city/npc/heleo-city/55-26",  # Shady Dealer
+]
 
 # Item names to list although marts sell them, and to leave out although they don't
 INCLUDE: set[str] = set()

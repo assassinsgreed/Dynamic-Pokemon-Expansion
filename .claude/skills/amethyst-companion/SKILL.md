@@ -217,6 +217,30 @@ when measuring scroll positions. `--force-device-scale-factor=1.25` reproduces a
 no `</body>` inside `#mapdata`, so append probes before the final `</body>`.
 Pillow's `getbbox()` on an RGBA difference only looks at alpha: convert to RGB before comparing map pictures.
 
+## Checklist tab (`checklist.py` + `checklist_data.py`)
+
+A playthrough-order list of tick boxes for 100% completion, before Docs. Design:
+`docs/superpowers/specs/2026-11-16-companion-checklist-design.md` (the reachability tool in it was not built).
+
+- Entries are the maps' markers (items, hidden items, people/events, wild) plus hand-written story beats. Iterate the
+  same way as the maps: `python -m tools.dexpage.checklist` prints every entry with its id
+  (`place/kind/floor/x-y` in tiles; ticks are saved under it, so never renumber), then edit **only**
+  `checklist_data.py`: `ORDER` (stops; a `(title, place, floor prefixes)` stop is the part of a place that opens at
+  another time), `STORY`, `TEXT`, `MOVE`, `LINKS` (marker → trainer), `DROP`, `DAILY`, `INCLUDE`/`EXCLUDE`. A wrong id
+  or trainer fails the build. It reads the cached map export, so edits don't redraw maps.
+- HM gating: the item data's "(need Cut)" notes and a TM's Requires column, with CFRU's
+  `gFieldMoveBadgeRequirements`. An "After … (with HM)" section follows whichever comes later, the badge or the stage
+  the HM is received in (`HM_FROM`; Surf's is "After Pluto HQ"). Items in places reached after that stay put, tagged.
+- Collin's rules: common items (general Poké Mart stock) get no entry; shops, healers, tutors and other repeatable
+  services get none; trades read "Trade your X for Y (A for B in Divergent)"; Cut, Fly and Surf arrive inside a story
+  beat (no "gives HM" entry), while Rock Smash, Strength and Rock Climb are errands of their own; rival side events
+  say "Until the <next> Badge is obtained"; named bosses link to their trainer entry in the mode the player has chosen;
+  each place section has a Location button to its card; progress bar and legend stay stuck under the header;
+  list and cards layouts (cards: 4 across on desktop).
+- Ticks: `localStorage["dex-checklist"]`; the Download link writes them into the saved copy as `#saved-checklist`
+  (merged once per saved file); Export/Import is a small JSON file. Don't write `/</g` in app.js: the build turns
+  every `</` into `<\/`, which breaks a regex literal.
+
 ## Known gaps / ideas not done yet
 
 - Maps: the rival's story appearances (e.g. the HM02 hand-over on Route 11 South) are hidden, so those gifts aren't
