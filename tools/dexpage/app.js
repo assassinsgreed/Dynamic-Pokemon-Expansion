@@ -487,7 +487,7 @@
   function matchMons(q) {
     const list = [];
     const typeQ = TYPES.find((t) => norm(t) === q);  // "fire" lists every Fire type, as well as names containing it
-    // "16" or "#016" is a dex number in the chosen mode (either on All), with the unnumbered forms listed after it
+    // "16" or "#016" is a dex number in the chosen mode (either on Both), with the unnumbered forms listed after it
     const num = /^\d+$/.test(q) ? +q : 0;
     const hasNum = (m, i) => (state.mode ? [state.mode] : m.modes).some((mode) => m.modes.includes(mode) && Math.floor(order[mode][i]) === num);
     mons.forEach((m, i) => { if (inMode(m) && inType(m) && (num ? hasNum(m, i) : !q || m.s.some((s) => s.includes(q)) || (typeQ && m.types.includes(typeQ)))) list.push(i); });
