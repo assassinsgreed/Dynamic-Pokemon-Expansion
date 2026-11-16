@@ -135,3 +135,9 @@ def test_extra_forms_with_how_to_get(roster):
     by = {e.key: e for e in roster}
     assert by["SPECIES_ROTOM_WASH"].form == "Wash" and by["SPECIES_PIKACHU_CAP_ORIGINAL"].form == "Original Cap"
     assert {"SPECIES_PIKACHU_ROCK_STAR", "SPECIES_PIKACHU_POP_STAR", "SPECIES_ROTOM_MOW"} <= set(by)
+
+
+def test_unobtainable_forms_are_left_out(roster):
+    keys = {e.key for e in roster}
+    assert "SPECIES_ZARUDE" in keys
+    assert "SPECIES_ZARUDE_DADA" not in keys
