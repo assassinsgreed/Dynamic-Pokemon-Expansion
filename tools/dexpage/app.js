@@ -735,9 +735,16 @@
   const matchCheck = (q) => { const fw = words(state.q); return ckAll.filter((e) => !q || e.s.includes(fw)); };
   const ckTag = (text) => `<span class="mode">${esc(text)}</span>`;
 
+  // Pokémon named in an entry link to their Pokédex entries (e.p: [start, end, Pokémon] from checklist.py)
+  const ckText = (e) => {
+    if (!e.p) return esc(e.t);
+    let html = "", at = 0;
+    for (const [a, b, i] of e.p) { html += esc(e.t.slice(at, a)) + `<button class="mvname" data-open="${i}">${esc(e.t.slice(a, b))}</button>`; at = b; }
+    return html + esc(e.t.slice(at));
+  };
   function ckRow(e, g) {
     const name = e.tr ? `<button class="mvname" data-cktr="${e.tr.join(",")}" title="See this trainer's team">${esc(e.t)}</button>`
-      : e.item != null ? `<button class="mvname" data-item="${e.item}">${esc(e.t)}</button>` : esc(e.t);
+      : e.item != null ? `<button class="mvname" data-item="${e.item}">${esc(e.t)}</button>` : ckText(e);
     const tags = [e.daily && "Daily", e.sd && "Differs by mode", e.need && `Needs ${e.need}`, e.until, e.fl].filter(Boolean).map(ckTag).join("");
     return `<div class="ck${ck.done[e.id] ? " done" : ""}"><label><input type="checkbox" data-ck="${esc(e.id)}"${ck.done[e.id] ? " checked" : ""}>${ckShape(e.k)}
       <span class="ck-body">${name}${tags ? `<span class="ck-tags">${tags}</span>` : ""}</span></label>${
@@ -772,12 +779,12 @@
         <div class="ck-rows">${groups.map(([g, es]) => `${named ? `<div class="ck-place"><button data-place="${esc(g.place)}">${esc(g.place)}</button></div>` : ""}${es.map((e) => ckRow(e, g)).join("")}`).join("")}</div></details>`;
     }).join("");
     if (!stages) return [`<div class="nores">Nothing on the checklist matches “${esc(state.q)}”.</div>`, "0 entries"];
-    const html = `<div class="cklist${ck.hide ? " hide-done" : ""}${state.layouts.check === "grid" ? " grid" : ""}">
+    const html = `<div class="cklist${ck.hide ? " hide-done" : ""}">
       <div class="ck-head"><div class="ck-prog"><span id="ck-total"></span><span class="ck-bar"><i id="ck-fill"></i></span></div>
-        <div class="ck-key">${Object.keys(CK_KIND).filter((k) => kinds.has(k)).map((k) => `<span>${ckShape(k)}${CK_KIND[k][0]}</span>`).join("")}</div></div>
-      <div class="ck-top"><div class="ck-acts"><label><input type="checkbox" data-ckact="hide"${ck.hide ? " checked" : ""}>Hide finished</label>
-          <button data-ckact="export" title="Save your ticks to a file">Export</button><button data-ckact="import" title="Load ticks from an exported file">Import</button><button data-ckact="reset">Reset</button></div></div>
-      <p class="note ck-help">Your ticks are saved in this browser, and Download for Offline Use keeps them in the saved file. Export and Import move them to another device.</p>
+        <div class="ck-key">${Object.keys(CK_KIND).filter((k) => kinds.has(k)).map((k) => `<span>${ckShape(k)}${CK_KIND[k][0]}</span>`).join("")}</div>
+        <div class="ck-acts"><label><input type="checkbox" data-ckact="hide"${ck.hide ? " checked" : ""}>Hide finished</label>
+          <button data-ckact="export" title="Save your ticks to a file">Export</button><button data-ckact="import" title="Load ticks from an exported file">Import</button><button data-ckact="reset">Reset</button></div>
+        <p class="note ck-help"><b>Beta:</b> this list is still being checked against the game, so entries may be missing or out of order. Your ticks are saved in this browser, and Download for Offline Use keeps them in the saved file. Export and Import move them to another device.</p></div>
       <div class="ck-stages">${stages}</div></div>`;
     return [html, ""];
   }
@@ -943,6 +950,7 @@
     $("#back").disabled = depth <= 0;
     $("#fwd").disabled = depth >= top;
     $("#mode-seg").hidden = state.view === "docs" || state.view === "check";
+    $("#layout-seg").hidden = state.view === "check";  // one layout: cards of uneven length read as chaos (Collin)
     $("#diff-pick").hidden = state.view !== "trainers";
     document.querySelectorAll(".seg button[data-diff]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.diff === state.diff)));
     document.querySelectorAll("[data-viewtab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.viewtab === state.view)));

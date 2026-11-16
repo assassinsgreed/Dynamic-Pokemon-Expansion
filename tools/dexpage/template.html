@@ -346,7 +346,6 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 /* Checklist: playthrough-order sections of tick boxes */
 .ck-head { position: sticky; top: var(--console-h, 0px); z-index: 3; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px;
   margin: 0 -4px 8px; padding: 8px 6px; background: var(--bg); border-bottom: 1px solid var(--line); }
-.ck-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 4px 2px 10px; }
 .ck-prog { flex: 1 1 220px; display: flex; align-items: center; gap: 10px; font: 600 13px/1 var(--font-data); }
 .ck-bar { flex: 1; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
 .ck-bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
@@ -354,7 +353,8 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .ck-acts button, .ck-map { font: 600 12px/1 var(--font-body); padding: 6px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
 .ck-acts button:hover, .ck-map:hover { border-color: var(--accent); }
 .ck-acts label { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; margin-right: 6px; cursor: pointer; }
-.ck-help { margin: 0 2px 12px; }
+.ck-help { flex-basis: 100%; margin: 0; font-size: 12px; }
+.beta { font: 600 9.5px/1 var(--font-data); text-transform: uppercase; letter-spacing: .06em; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 2px 5px; margin-left: 6px; vertical-align: 2px; }
 .ck-stage { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; }
 .ck-stage > summary { display: flex; align-items: center; gap: 8px; padding: 10px 12px; cursor: pointer; list-style: none; font: 600 15px/1.2 var(--font-display); }
 .ck-stage > summary::-webkit-details-marker { display: none; }
@@ -380,13 +380,6 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .ck.done .ck-tags { text-decoration: none; }
 .ck-map { flex: none; margin-top: 4px; padding: 4px 8px; }
 .cklist.hide-done .ck.done { display: none; }
-/* Cards: sections side by side (4 across on a desktop), each as tall as its own list */
-.cklist.grid .ck-stages { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 10px; align-items: start; }
-.cklist.grid .ck-stage { margin-bottom: 0; min-width: 0; }
-.cklist.grid .ck-stage > summary { font-size: 14px; padding: 9px 10px; }
-.cklist.grid .ck-rows { padding: 0 4px 6px; }
-.cklist.grid .ck-body { font-size: 13px; }
-.cklist.grid .ck-map { padding: 3px 6px; font-size: 11px; }
 .ck-key { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--muted); }
 .ck-loc { font: 600 12px/1 var(--font-body); padding: 5px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--sunk); color: var(--ink); cursor: pointer; }
 .ck-loc:hover { border-color: var(--accent); }
@@ -754,7 +747,7 @@ body.map-open .sheet { display: none; }  /* the place's pop-up waits behind the 
       <button role="tab" data-viewtab="items" aria-selected="false">Items</button>
       <button role="tab" data-viewtab="trainers" aria-selected="false">Trainers</button>
       <button role="tab" data-viewtab="places" aria-selected="false">Locations</button>
-      <button role="tab" data-viewtab="check" aria-selected="false">Checklist</button>
+      <button role="tab" data-viewtab="check" aria-selected="false">Checklist<span class="beta">Beta</span></button>
       <button role="tab" data-viewtab="docs" aria-selected="false">Docs</button>
     </nav>
       <span class="navbtns">

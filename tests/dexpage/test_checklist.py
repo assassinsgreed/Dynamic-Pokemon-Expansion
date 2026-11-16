@@ -81,6 +81,21 @@ def test_shortened_item_names_link_to_their_item(result, page):
     assert page["items"][by_text["NeverMeltIce"]["item"]]["name"] == "Never Melt Ice"
 
 
+def test_pokemon_link_to_their_entries(result, page):
+    sandygast = next(e for e in entries(stage(result, "Route 1")) if e["k"] == "wild")
+    linked = [(sandygast["t"][a:b], page["mons"][i]["name"]) for a, b, i in sandygast["p"]]
+    assert linked == [("Sandygast", "Sandygast"), ("Diglett", "Diglett")]
+    trade = next(e for e in entries(stage(result, "Tsarvosa City")) if e["t"].startswith("Trade your Slowbro"))
+    named = [(trade["t"][a:b], page["mons"][i]["form"]) for a, b, i in trade["p"]]
+    assert ("Galarian Slowbro", "Galarian") in named and ("Slowbro", None) in named
+
+
+def test_gift_lists_are_written_out(result):
+    assert not any(" +" in e["t"] for e in everything(result) if e["k"] == "npc")
+    assert "Receive the Town Map and Running Shoes from Mom" in texts(stage(result, "Anthra Town"))
+    assert not any(e["t"].startswith("Mom") for e in everything(result))
+
+
 def test_rival_events_say_when_they_end(result):
     rival = next(e for e in entries(stage(result, "Route 2")) if e["t"].startswith("Rival:"))
     assert rival["until"] == "Until the Terrain Badge is obtained"

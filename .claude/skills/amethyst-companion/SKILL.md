@@ -235,8 +235,11 @@ A playthrough-order list of tick boxes for 100% completion, before Docs. Design:
   services get none; trades read "Trade your X for Y (A for B in Divergent)"; Cut, Fly and Surf arrive inside a story
   beat (no "gives HM" entry), while Rock Smash, Strength and Rock Climb are errands of their own; rival side events
   say "Until the <next> Badge is obtained"; named bosses link to their trainer entry in the mode the player has chosen;
-  each place section has a Location button to its card; progress bar and legend stay stuck under the header;
-  list and cards layouts (cards: 4 across on desktop).
+  each place section has a Location button to its card; the progress bar, legend, controls and the Beta note stay
+  stuck under the header; Pokémon named in an entry link to their Pokédex entries; the tab is tagged Beta; one
+  layout only (he tried cards and dropped them: sections of uneven length looked chaotic); gift lists are written
+  out in full (the maps' "A, B +1" is `tf` on the marker), and story hand-outs (Town Map and Running Shoes) are one
+  story tick, not an NPC entry.
 - Ticks: `localStorage["dex-checklist"]`; the Download link writes them into the saved copy as `#saved-checklist`
   (merged once per saved file); Export/Import is a small JSON file. Don't write `/</g` in app.js: the build turns
   every `</` into `<\/`, which breaks a regex literal.

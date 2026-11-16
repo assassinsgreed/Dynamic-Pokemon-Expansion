@@ -42,7 +42,8 @@ POSTGAME_PLACES = ["Ultra Space", "Battle Frontier"]
 # Story beats per stage: (key, text[, options]). Keys are part of the saved id, so keep them when rewording.
 # Options: trainer=(class, name, place in the Trainers tab) links the battle; daily=True; at=place (Postgame only).
 STORY = {
-    "Anthra Town": [("starter", "Choose your starter")],
+    "Anthra Town": [("starter", "Follow the story to choose your starter"),
+                    ("gifts", "Receive the Town Map and Running Shoes from Mom")],
     "Route 17": [("rival", "Battle your rival for the first time", {"trainer": ("Rival", "", "Route 17")})],
     "Olenic Town": [("pokedex", "Meet Professor Hawthorne and receive the Pokédex and Poké Balls")],
     "Rhodanzi City": [("gym", "Defeat Leader Terrence for the Terrain Badge", {"trainer": ("Leader", "Terrence", "Rhodanzi City Gym")})],
@@ -50,7 +51,7 @@ STORY = {
                 ("rival", "Battle your rival", {"trainer": ("Rival", "", "Route 3")})],
     "Rubarr Desert": [("pluto", "Follow the Team Pluto grunts to the oasis and defeat Admin Irene",
                        {"trainer": ("Pluto Admin", "Irene", "Rubarr Desert")})],
-    "Torma Cave": [("foreman", "Help the foreman's crew clear the boulders"),
+    "Torma Cave": [("landslide", "Bypass the landslide via Torma Cave"),
                    ("casey", "Battle Casey", {"trainer": ("PKMN Trainer", "Casey", "Torma Cave")})],
     "Ferrox Village": [("rival", "Meet your rival outside the gym"),
                        ("library", "Solve the Ferrox Library password puzzle and receive HM01 Cut from Alistair"),
@@ -119,7 +120,8 @@ STORY = {
 TEXT = {
     "ferrox-village/npc/house-1/1-4": "Daily Berry: a girl gives a random Berry each day",
     "ferrox-village/npc/house-3/7-5": "Trade your Snom for a Chinchou (Vanillite for an Eelektrik in Divergent)",
-    "anthra-town/npc/player-home-1st-floor/9-5": "Mom: gives Town Map",
+    "rhodanzi-city/npc/trainer-school-basic-class/11-6":
+        "Type Student: pass the type quiz to receive a Miracle Seed, Charcoal or Mystic Water (1 of the 3, based on your starter)",
     "daimyn-city/npc/trade-house/8-5": "Trade with the Trade House trader (one trade per save; your Fire starter decides which Pokémon)",
     "daimyn-city/npc/daimyn-mall/12-6": "Fish Seller: sells one Carvanha (Wishiwashi in Divergent) for ₽2,000",
     "daimyn-city/npc/gym/4-2": "Pokémon exchange: buy each Pokémon offered for coins",
@@ -148,6 +150,7 @@ LINKS: dict[str, tuple] = {
 
 # Entries to leave out (ids, * allowed): HMs handed over as part of a story beat, renewing items, plain services
 DROP = [
+    "anthra-town/npc/player-home-1st-floor/*",  # Mom's Town Map is part of the opening story beat
     "ferrox-village/npc/library/*",   # Alistair's HM01 Cut is part of the library story beat
     "treasure-beach/hidden/*",        # renew as you walk: never finished
     "olenic-town/npc/area-5/1-7",     # "Hawthorne: trade" (not a trade in trades.csv)

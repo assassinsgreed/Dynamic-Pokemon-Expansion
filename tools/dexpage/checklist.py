@@ -115,6 +115,29 @@ class Items:
         return all(k is not None and any(MART_STOCK.fullmatch(w) for w in self.list[k]["where"]) for k in found)
 
 
+class Mons:
+    """Pokémon named in an entry's text, as [start, end, index in the page's Pokémon] so the page can link them."""
+
+    def __init__(self, page: dict):
+        self.by_name: dict[str, list] = {}
+        for i, m in enumerate(page["mons"]):
+            self.by_name.setdefault(m["name"], []).append((m["form"] or "", i))
+        names = sorted(self.by_name, key=len, reverse=True)
+        self.re = re.compile(r"(?<![A-Za-z])(" + "|".join(map(re.escape, names)) + r")(?![A-Za-z])")
+
+    def spans(self, text: str) -> list[list[int]]:
+        out = []
+        for m in self.re.finditer(text):
+            forms, start = self.by_name[m.group(1)], m.start()
+            # "Galarian Slowbro", "Heat Rotom": the form named just before it, else the plain one
+            named = next(((f, i) for f, i in forms if f and text[:start].endswith(f + " ")), None)
+            if named:
+                start -= len(named[0]) + 1
+            pick = named[1] if named else next((i for f, i in forms if not f), forms[0][1])
+            out.append([start, m.end(), pick])
+        return out
+
+
 def _matches(ident: str, patterns) -> bool:
     return any(fnmatch.fnmatchcase(ident, p) for p in patterns)
 
@@ -135,6 +158,7 @@ def _trainers(page: dict, spec: tuple, where: str) -> list[int]:
 def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, str], dropped: list | None = None) -> dict:
     badges = hm_badges(paths)
     items = Items(page, badges, game_names)
+    mons = Mons(page)
     by_name = {m["name"]: m for m in maps}
 
     # ---- stages: each stop in H.ORDER, with an "After … (with HM)" section once an HM can be used in the field
@@ -199,6 +223,8 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
             entry = {"id": new_id(f"{slug(title)}/story/{key}"), "k": "story", "t": text}
             if "trainer" in opts:
                 entry["tr"] = _trainers(page, opts["trainer"], f"STORY {title}/{key}")
+            elif mons.spans(text):
+                entry["p"] = mons.spans(text)
             if opts.get("daily"):
                 entry["daily"] = 1
             put(stage, place, entry)
@@ -210,7 +236,7 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
                 continue
             floor = mp["floors"][mk["f"]]["name"]
             ident = new_id(f"{mp['slug']}/{mk['k']}/{slug(floor)}/{int(mk['x']) // 16}-{int(mk['y']) // 16}")
-            text = H.TEXT.get(ident, mk["t"])
+            text = H.TEXT.get(ident, mk.get("tf", mk["t"]))  # tf: the gift list in full, where the map shortens it
             if _matches(ident, H.DROP) or (mk["k"] == "npc" and _service(text)):
                 continue
             if mk["k"] in ("item", "hidden") and items.common(mk["t"]):
@@ -228,6 +254,8 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
                     entry["item"] = idx
             if ident in H.LINKS:
                 entry["tr"] = _trainers(page, H.LINKS[ident], f"LINKS {ident}")
+            elif mk["k"] in ("npc", "wild") and mons.spans(text):
+                entry["p"] = mons.spans(text)
 
             # where it goes: postgame, a hand-placed stage, the part of the place its floor belongs to, or the place
             moved = H.MOVE.get(ident)

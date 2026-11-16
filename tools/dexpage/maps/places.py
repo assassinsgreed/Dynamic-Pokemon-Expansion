@@ -360,7 +360,7 @@ class Objects:
                   (r"PlayerHeal|Nurse", "heals your team"), (r"HandleTrade|Trade", "trade"),
                   (r"givepokemon", "gives a Pokémon"), (r"giveegg", "gives an Egg")]
 
-    def npc_role(self, label):
+    def npc_role(self, label, full=False):
         """What a person does beyond talking, read from their script and the labels it jumps to."""
         seen, todo, text, items = set(), [(label, 0)], [label.split("_")[-1]], []
         while todo:
@@ -379,7 +379,8 @@ class Objects:
         roles = []
         if items:
             uniq = list(dict.fromkeys(items))
-            roles.append("gives " + ", ".join(uniq[:2]) + (f" +{len(uniq) - 2}" if len(uniq) > 2 else ""))
+            roles.append("gives " + (", ".join(uniq) if full else
+                                     ", ".join(uniq[:2]) + (f" +{len(uniq) - 2}" if len(uniq) > 2 else "")))
         roles += [r for pat, r in self.ROLE_WORDS if re.search(pat, blob)]
         return ", ".join(dict.fromkeys(roles)) or None
 
@@ -465,6 +466,8 @@ class Objects:
                 ob["kind"] = "scenery"  # trainers: sprite only (Collin: players look for warps, items and special NPCs)
             elif label and ((role := self.npc_role(label)) or ob["postgame"]):
                 ob["kind"], ob["text"] = "npc", f"{words(tail)}: {role}" if role else words(tail)
+                if role and re.search(r" \+\d+", role):  # the map key shortens long gift lists; keep the full one too
+                    ob["full"] = f"{words(tail)}: {self.npc_role(label, full=True)}"
                 gift, ob["modes"] = self.by_mode(label, r"(?:giveitem|obtainitem)\s+(ITEM_\w+)", self.item_name)
                 if ob["modes"]:
                     ob["text"] = f"{words(tail)}: gives {gift}"
