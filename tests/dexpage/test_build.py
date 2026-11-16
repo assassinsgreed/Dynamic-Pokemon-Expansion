@@ -50,7 +50,12 @@ def test_evolution_links_use_indices(data):
 
 
 def test_page_is_self_contained(html):
-    assert not re.search(r'(src|href)=["\']https?://', html)
+    # nothing the page loads comes from the network; plain <a> links out (Hackdex, Discord, GitHub) are fine
+    assert not re.search(r'src=["\']https?://', html)
+    assert not re.search(r'<link[^>]*href=["\']https?://', html)
+    outbound = re.findall(r'<a [^>]*href=["\'](https?://[^"\']+)', html)
+    assert outbound == ["https://www.hackdex.app/hack/pokemon-amethyst", "https://discord.gg/PAKps59djr",
+                        "https://github.com/assassinsgreed/pokemon-amethyst-companion"]
     assert "@import" not in html and "fonts.googleapis" not in html
 
 
