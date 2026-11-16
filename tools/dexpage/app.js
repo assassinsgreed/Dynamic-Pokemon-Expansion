@@ -353,7 +353,7 @@
           <dt>Catch rate</dt><dd>${m.catchRate}</dd>
           <dt>Growth</dt><dd>${esc(m.growth)}</dd>
           <dt>EV yield</dt><dd>${evs}</dd>
-          ${m.held.length ? `<dt>Wild held items</dt><dd class="held">${m.held.map(([h, k]) => (k === null ? `<span>${esc(h)}</span>` : itemButton(k, h))).join("")}</dd>` : ""}
+          ${m.held.length ? `<dt class="held-dt">Wild held items</dt><dd class="held">${m.held.map(([h, k]) => (k === null ? `<span>${esc(h)}</span>` : itemButton(k, h))).join("")}</dd>` : ""}
         </dl></section>
       </div>
       <section><h3>Evolution</h3>${evoTree(i)}</section>

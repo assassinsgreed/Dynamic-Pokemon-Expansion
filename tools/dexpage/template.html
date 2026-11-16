@@ -191,7 +191,13 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .toprow > .sec-prof { flex: 1 1 140px; max-width: 320px; }
 .toprow .facts { grid-template-columns: max-content minmax(min-content, 1fr); }  /* its minimum is the gender line */
 .facts dd.gender { white-space: nowrap; }
-@media (max-width: 520px) { .toprow { gap: 16px 14px; } }
+/* Phones: held items get the profile's full width, one per line under their label, so two items don't push the
+   profile under the abilities */
+@media (max-width: 520px) {
+  .toprow { gap: 16px 14px; }
+  .toprow .facts .held-dt, .toprow .facts .held { grid-column: 1 / -1; }
+  .toprow .facts .held { flex-direction: column; align-items: flex-start; gap: 2px; margin-top: -2px; }
+}
 .sprites { flex: none; }
 .spgrid { display: grid; grid-template-columns: auto repeat(2, auto); gap: 6px; align-items: center; justify-items: center; justify-content: start; }
 .spgrid.one { grid-template-columns: auto auto; }
