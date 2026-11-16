@@ -492,8 +492,21 @@
   const typeOf = (q) => TYPES.find((t) => norm(t) === q);
   const moveHit = (k, q, typeQ) => moves[k].s.some((x) => x.includes(q)) || moves[k].type === typeQ;
   const matchMoves = (q) => { const typeQ = typeOf(q); return q ? moveKeys.filter((k) => moveHit(k, q, typeQ)) : moveKeys; };
+  // An item also matches its category from the start of any word, singular or plural: "mega" / "megastone" →
+  // Mega Stones, "berry" → Berries, "ball" → Poké Balls
+  const catKeys = new Map();
+  const catHit = (c, q) => {
+    if (!catKeys.has(c)) {
+      const ws = words(c).split(" ");
+      catKeys.set(c, ws.flatMap((_, i) => {
+        const tail = ws.slice(i).join("");
+        return [tail, tail.replace(/ies$/, "y").replace(/s$/, "")];
+      }));
+    }
+    return catKeys.get(c).some((t) => t.startsWith(q));
+  };
   const matchItems = (q) => items.map((_, k) => k).filter((k) => !q || itemKeys[k].includes(q)
-    || (items[k].move && moves[items[k].move].s.includes(q)));
+    || catHit(items[k].category, q) || (items[k].move && moves[items[k].move].s.includes(q)));
   // A place also matches what's found there (in the chosen mode): a Pokémon ("bidoof"), an encounter method ("grass",
   // "wormhole") or an item ("full heal"); the item lists are worked out once, on the first search
   let placeItems = null;
@@ -784,7 +797,7 @@
         <div class="ck-key">${Object.keys(CK_KIND).filter((k) => kinds.has(k)).map((k) => `<span>${ckShape(k)}${CK_KIND[k][0]}</span>`).join("")}</div>
         <div class="ck-acts"><label><input type="checkbox" data-ckact="hide"${ck.hide ? " checked" : ""}>Hide finished</label>
           <button data-ckact="export" title="Save your ticks to a file">Export</button><button data-ckact="import" title="Load ticks from an exported file">Import</button><button data-ckact="reset">Reset</button></div>
-        <p class="note ck-help"><b>Beta:</b> this list is still being checked against the game, so entries may be missing or out of order. Your ticks are saved in this browser, and Download for Offline Use keeps them in the saved file. Export and Import move them to another device.</p></div>
+        <p class="note ck-help">Track your progress in Pokemon Amethyst. Progress is tracked in your browser; Export and Import allow you to move data to/from local copies.</p></div>
       <div class="ck-stages">${stages}</div></div>`;
     return [html, ""];
   }
@@ -928,7 +941,7 @@
     moves: "Search moves, TMs or types — e.g. Ceaseless Edge, TM02, Fire",
     tutors: "Search tutor moves, towns or types — e.g. Draco Meteor, Ferrox Village, Fire",
     abilities: "Search abilities or what they do — e.g. Triage, Libero, weather",
-    items: "Search items — e.g. Fire Stone, Berries",
+    items: "Search items or kinds — e.g. Fire Stone, Berries, Mega",
     trainers: "Search trainers, places or their Pokémon — e.g. Raine, Hiker, Route 8, Rockruff",
     places: "Search places, or what's there — e.g. Route 2, Bidoof, Full Heal, Grass",
     check: "Search the checklist — e.g. Ferrox Village, trade, TM12, daily",
