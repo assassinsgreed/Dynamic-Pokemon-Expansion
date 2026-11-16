@@ -289,10 +289,14 @@
 
   function locTable(rows) {
     return `<div class="moves"><table class="mv loc"><thead><tr><th>Location</th><th>Method</th><th class="c-num">Lv</th><th class="c-num">Rate</th><th class="hide-sm">Mode</th></tr></thead><tbody>${
-      rows.map((l) => `<tr><td><button class="mvname" data-place="${esc(l.location)}">${esc(l.location)}</button>${l.sub ? `<div class="note">${esc(l.sub)}</div>` : ""}${
-        l.variant ? `<div class="note">${esc(l.variant)}</div>` : ""}${l.notes ? `<div class="note">${esc(l.notes)}</div>` : ""}</td>
+      rows.map((l) => {
+        // The first detail line (sub-area, else variant, else notes) sits beside the name; the rest stay below
+        const [first, ...rest] = [l.sub, l.variant, l.notes].filter(Boolean);
+        return `<tr><td><button class="mvname" data-place="${esc(l.location)}">${esc(l.location)}</button>${first ? ` <span class="note">${esc(first)}</span>` : ""}${
+        rest.map((s) => `<div class="note">${esc(s)}</div>`).join("")}</td>
         <td class="meth">${esc(l.method)}</td><td class="n">${esc(l.levels || "—")}</td><td class="n">${esc(l.rate || "—")}</td>
-        <td class="hide-sm">${modeTag(l.mode)}</td></tr>`).join("")}</tbody></table></div>`;
+        <td class="hide-sm">${modeTag(l.mode)}</td></tr>`;
+      }).join("")}</tbody></table></div>`;
   }
 
   // Where to find it: its own section of the profile, apart from the move tabs
