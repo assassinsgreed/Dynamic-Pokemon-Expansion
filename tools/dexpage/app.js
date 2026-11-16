@@ -286,14 +286,22 @@
   const tabCount = (i, tab, lists) => (tab === "tutor" ? lists.tutor.length + lists.special.length : lists[tab].length);
   const moveMatches = (f) => ([k, how]) => !f || [moves[k].name, moves[k].official || "", moves[k].type, CAT_NAME[moves[k].split], how].some((s) => norm(s).includes(f));
 
+  // An encounter found only by day or only by night says so in a Time column (shown only when some row needs it),
+  // not in its notes; paired rates ("☀️ 10% 🌙 15%") are all day and stay in Rate
+  // (phones show only the icon, to leave the place name room)
+  const ONLY_TIME = { day: ["☀️", "Morning/Day"], night: ["🌙", "Evening/Night"] };
+  const onlyTime = (l) => (l.times && Object.keys(l.times).length === 1 ? ONLY_TIME[Object.keys(l.times)[0]] : null);
+  const timeCell = (l) => { const t = onlyTime(l); return t ? `<span title="${t[1]} only">${t[0]}</span><span class="hide-sm"> ${t[1]}</span>` : ""; };
   function locTable(rows) {
-    return `<div class="moves"><table class="mv loc"><thead><tr><th>Location</th><th>Method</th><th class="c-num">Lv</th><th class="c-num">Rate</th><th class="hide-sm">Mode</th></tr></thead><tbody>${
+    const timed = rows.some(onlyTime);
+    return `<div class="moves"><table class="mv loc"><thead><tr><th>Location</th><th>Method</th>${timed ? "<th>Time</th>" : ""}<th class="c-num">Lv</th><th class="c-num">Rate</th><th class="hide-sm">Mode</th></tr></thead><tbody>${
       rows.map((l) => {
         // The first detail line (sub-area, else variant, else notes) sits beside the name; the rest stay below
-        const [first, ...rest] = [l.sub, l.variant, l.notes].filter(Boolean);
+        const notes = onlyTime(l) ? (l.notes || "").replace(/(☀️|🌙) (Morning\/Day|Evening\/Night) only\.?\s*/, "").trim() : l.notes;
+        const [first, ...rest] = [l.sub, l.variant, notes].filter(Boolean);
         return `<tr><td><button class="mvname" data-place="${esc(l.location)}">${esc(l.location)}</button>${first ? `<span class="note locsub">${esc(first)}</span>` : ""}${
         rest.map((s) => `<div class="note">${esc(s)}</div>`).join("")}</td>
-        <td class="meth">${esc(l.method)}</td><td class="n">${esc(l.levels || "—")}</td><td class="n">${esc(l.rate || "—")}</td>
+        <td class="meth">${esc(l.method)}</td>${timed ? `<td class="meth">${timeCell(l)}</td>` : ""}<td class="n">${esc(l.levels || "—")}</td><td class="n">${esc(l.rate || "—")}</td>
         <td class="hide-sm">${modeTag(l.mode)}</td></tr>`;
       }).join("")}</tbody></table></div>`;
   }

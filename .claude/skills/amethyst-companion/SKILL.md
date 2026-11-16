@@ -71,6 +71,9 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
 - Mode label per Pokémon (Standard / Divergent with that dex's number); mode filters sort by that mode's dex number.
 - Forms get rows when meaningfully different; supported forms come from `src/Habitat_Table.c`.
 - Battle-only forms (Megas) aren't listed as move learners; their entry says they know what the base knows.
+- Pokédex Locations table: an encounter found only by day or only by night shows "☀️ Morning/Day" / "🌙 Evening/Night"
+  in a Time column between Method and Lv (only when some row needs it; just the icon on phones), and the "… only"
+  note is dropped; paired rates stay in Rate.
 - Wild held items belong in the profile, not the location rows. "Used on" is hidden for evolution items that
   already show under Evolves, but kept for form-changing items (Gracidea, Drives, Nectars).
 - Evolutions with special conditions (male Kirlia → Gallade, Sneasel → Weavile at night) **must** show that
