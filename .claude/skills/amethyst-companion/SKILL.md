@@ -126,9 +126,10 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   methods ("Grass", "Wormhole") and items ("Full Heal"). The search box waits 120 ms after typing before it runs,
   so a headless probe that types into `#q` must wait longer than that.
 - Place cards: one list per method, sorted by floor (sub-area's first floor: outside/exterior, 1F/F1, 2F…, then
-  B1F/BF1/Basement…, then named rooms; `floorRank`), then rate (highest first). On All each method is split into a Standard
-  and a Divergent list with the mode tag beside the method name ("Grass [Standard]"); Both encounters go in each,
-  and a method with only Both encounters is one list tagged Both (Collin preferred this to a tag on every chip).
+  B1F/BF1/Basement…, then named rooms; `floorRank`), then rate (highest first). On All each method is split into Standard,
+  Divergent and Both lists with the mode tag beside the method name ("Grass [Standard]"); each encounter is listed
+  once, under the tag its row has (Collin: Jirachi in both the Standard and Divergent lists was wrong; it's Both, as in
+  the Pokédex). He preferred this to a tag on every chip.
   The Locations list's Found by column gets the width (Location 28%). A time-of-day encounter's chip says when
   ("☀️ 20%", "🌙 20%", "☀️ 10% 🌙 15%"; `times` on encounter rows, from locations.py `_by_time`); a bare rate means
   all day (Collin: Varisi Forest read as 120% when day/night rows looked like all-day ones). Wild chips are 4 across

@@ -453,10 +453,10 @@
       if (/^basement$/i.test(s)) return 101;
       return 1000;
     };
-    // On All, each method is split by mode ("Grass [Standard]", then "Grass [Divergent]"), so a player reads only their
-    // mode's list; an encounter in both modes is in both lists, and a method with only those is one list tagged Both
-    const byMode = methods.flatMap(([mt, l]) => (state.mode ? [[mt, null, l]] : l.every(([, e]) => e.mode === "Both") ? [[mt, "Both", l]]
-      : ["Standard", "Divergent"].map((md) => [mt, md, l.filter(([, e]) => e.mode === md || e.mode === "Both")]).filter(([, , g]) => g.length)));
+    // On All, each method is split by mode ("Grass [Standard]", "Grass [Divergent]", "Grass [Both]"), each encounter
+    // listed once under the tag the Pokédex gives it
+    const byMode = methods.flatMap(([mt, l]) => (state.mode ? [[mt, null, l]]
+      : ["Standard", "Divergent", "Both"].map((md) => [mt, md, l.filter(([, e]) => e.mode === md)]).filter(([, , g]) => g.length)));
     const groups = byMode.map(([mt, md, l]) => [mt, md, l.map(([i, e]) => {
       const rate = e.times ? Object.entries(e.times).map(([t, r]) => `${TIME_ICON[t]} ${r}`).join(" ") : e.rate;
       return [i, e, rate, [lvNote(e.levels), rate].filter(Boolean).join(" · ")];
