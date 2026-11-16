@@ -292,7 +292,7 @@
       rows.map((l) => {
         // The first detail line (sub-area, else variant, else notes) sits beside the name; the rest stay below
         const [first, ...rest] = [l.sub, l.variant, l.notes].filter(Boolean);
-        return `<tr><td><button class="mvname" data-place="${esc(l.location)}">${esc(l.location)}</button>${first ? ` <span class="note">${esc(first)}</span>` : ""}${
+        return `<tr><td><button class="mvname" data-place="${esc(l.location)}">${esc(l.location)}</button>${first ? `<span class="note locsub">${esc(first)}</span>` : ""}${
         rest.map((s) => `<div class="note">${esc(s)}</div>`).join("")}</td>
         <td class="meth">${esc(l.method)}</td><td class="n">${esc(l.levels || "—")}</td><td class="n">${esc(l.rate || "—")}</td>
         <td class="hide-sm">${modeTag(l.mode)}</td></tr>`;
