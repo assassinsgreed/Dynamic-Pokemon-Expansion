@@ -142,9 +142,18 @@
 
   // ---------------------------------------------------------------- small pieces
   const typeBadge = (t) => `<span class="type t-${t}">${t === "MYSTERY" ? "???" : t[0] + t.slice(1).toLowerCase()}</span>`;
-  const sprite = (m, small) => `<span class="sp${small ? " sm" : ""}" aria-hidden="true"><i style="background-position:-${m.sp[0]}px -${m.sp[1]}px"></i></span>`;
-  // Pokédex rows only: the shiny colours beside the normal sprite, so the two can be told apart
-  const pics = (m) => `<span class="pics">${sprite(m)}${m.ss ? `<span class="shiny" title="Shiny"><span class="sp" aria-hidden="true"><i style="background-position:-${m.ss[0]}px -${m.ss[1]}px"></i></span></span>` : ""}</span>`;
+  const pic = (xy, cls = "") => `<span class="sp${cls}" aria-hidden="true"><i style="background-position:-${xy[0]}px -${xy[1]}px"></i></span>`;
+  const sprite = (m, small) => pic(m.sp, small ? " sm" : "");
+  // Details only: front/back × regular/shiny, labelled, large enough to tell near-identical shinies apart
+  // (Farfetch'd-G). A missing back drops the Back row, a missing shiny the Shiny column.
+  function spriteGrid(m) {
+    const rows = [["Front", m.sp, m.ss], ["Back", m.sb, m.ssb]].filter(([, r]) => r);
+    const shiny = rows.some(([, , s]) => s);
+    if (rows.length < 2 && !shiny) return "";
+    const cell = (xy, label) => (xy ? `<figure title="${label}">${pic(xy, " lg")}</figure>` : "<span></span>");
+    return `<section class="sprites"><h3>Sprites</h3><div class="spgrid${shiny ? "" : " one"}"><span></span><b>Regular</b>${shiny ? '<b>Shiny <span class="star">✦</span></b>' : ""}${
+      rows.map(([name, r, s]) => `<b class="rowh">${name}</b>${cell(r, `${name}, regular`)}${shiny ? cell(s, `${name}, shiny`) : ""}`).join("")}</div></section>`;
+  }
   const formLabel = (m) => (m.form ? ` <small>${esc(m.form)}</small>` : "");
   const pad = (n) => String(n).padStart(3, "0");
   // One tag for the dex it's in ("Both" for the two), and its number on its own: a Pokémon in both dexes has the same
@@ -205,7 +214,7 @@
   function row(m, i, inSheet = false) {
     const cards = state.layouts.dex === "grid" && !inSheet, open = state.open === i && !cards;
     return `<details class="mon${modeClass(m.modes)}${cards && state.open === i ? " on" : ""}" data-i="${i}" style="${tint(m)}"${open ? " open" : ""}>
-      <summary title="Show details"><span class="dexline">${dexNo(m)}${modeBadge(m)}</span>${pics(m)}
+      <summary title="Show details"><span class="dexline">${dexNo(m)}${modeBadge(m)}</span>${sprite(m)}
         <span class="who"><span class="nm">${esc(m.name)}${formLabel(m)}</span>
           <span class="tags">${m.types.map(typeBadge).join("")}</span></span>
         ${CHEVRON}
@@ -334,7 +343,7 @@
     const ab = ([name, desc, chance], hidden) => `<div class="ab"><button class="mvname" data-ability="${esc(name)}">${esc(name)}</button>${hidden ? '<span class="hid">Hidden</span>' : ""}${desc ? `<span class="desc">${esc(desc)}${chance ? ` (${chance}% chance)` : ""}</span>` : ""}</div>`;
     const evs = m.evs.map((v, n) => (v ? `${v} ${STAT_LABELS[n]}` : "")).filter(Boolean).join(", ") || "—";
     return `<div class="detail">
-      <div class="cols">
+      <div class="toprow">${spriteGrid(m)}<div class="cols">
         <section><h3>Base stats · ${bst(m)}</h3><div class="stats">${m.stats.map((v, n) =>
           `<span class="lab">${STAT_LABELS[n]}</span><span class="val">${v}</span><span class="bar"><span style="width:${Math.min(100, v / 2)}%;background:${statColor(v)}"></span></span>`).join("")}</div></section>
         <section><h3>Abilities</h3><div class="abilities">${m.abilities.map((a) => ab(a, false)).join("")}${m.hidden ? ab(m.hidden, true) : ""}</div></section>
@@ -346,7 +355,7 @@
           <dt>EV yield</dt><dd>${evs}</dd>
           ${m.held.length ? `<dt>Wild held items</dt><dd class="held">${m.held.map(([h, k]) => (k === null ? `<span>${esc(h)}</span>` : itemButton(k, h))).join("")}</dd>` : ""}
         </dl></section>
-      </div>
+      </div></div>
       <section><h3>Evolution</h3>${evoTree(i)}</section>
       <section><h3>Locations · ${locRows(i).length}</h3>${locations(i)}</section>
       <section><h3>Moves</h3>${tabsBlock(i)}</section>

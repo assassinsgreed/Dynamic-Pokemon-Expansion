@@ -158,9 +158,6 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .list.grid .mon[open] .who .nm small { display: inline; margin-left: 6px; }
 .list.grid .mon[open] .chev { position: static; width: 28px; height: 28px; }
 .mon > summary::-webkit-details-marker { display: none; }
-.pics { display: flex; gap: 2px; }
-.shiny { position: relative; }
-.shiny::after { content: "\2726"; position: absolute; top: 0; right: 0; font-size: 12px; line-height: 1; color: #f2c14e; text-shadow: 0 0 2px rgb(0 0 0 / .6); }
 .sp { width: 56px; height: 56px; overflow: hidden; flex: none; }
 .sp i { display: block; width: 64px; height: 64px; transform: scale(.875); transform-origin: 0 0; background-repeat: no-repeat; image-rendering: pixelated; }
 .sp.sm { width: 36px; height: 36px; }
@@ -191,6 +188,19 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
    maximum, so the 1010px card-view pop-up got two, pushing Profile under them.) */
 .cols { display: grid; gap: 18px 32px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); max-width: calc(3 * 320px + 2 * 32px); }
 .cols > * { min-width: 0; }
+/* Sprites grid beside the three info columns when there's room, above them when not */
+.toprow { display: flex; flex-wrap: wrap; gap: 18px 32px; }
+.toprow > .cols { flex: 1 1 560px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); }
+.sprites { flex: none; }
+.spgrid { display: grid; grid-template-columns: auto repeat(2, auto); gap: 6px; align-items: center; justify-items: center; justify-content: start; }
+.spgrid.one { grid-template-columns: auto auto; }
+.spgrid b { font: 600 12px/1 var(--font-display); color: var(--muted); }
+.spgrid .rowh { justify-self: end; padding-right: 2px; }
+.spgrid .star { color: #f2c14e; }
+.spgrid figure { margin: 0; padding: 4px; border: 1px solid var(--line); border-radius: 12px; background: var(--sunk); }
+.sp.lg { display: block; width: 112px; height: 112px; }
+.sp.lg i { transform: scale(1.75); }
+@media (max-width: 360px) { .sp.lg { width: 96px; height: 96px; } .sp.lg i { transform: scale(1.5); } }
 .stats { display: grid; grid-template-columns: 34px 32px minmax(0, 1fr); gap: 3px 8px; align-items: center; font: 12.5px var(--font-data); font-variant-numeric: tabular-nums; }
 .stats .lab { color: var(--muted); }
 .stats .val { text-align: right; font-weight: 600; }
@@ -545,7 +555,7 @@ body.sheet-open { overflow: hidden; }
   /* the dex number and mode tag get their own line under the types: beside them they ran into the type badges */
   :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary { row-gap: 4px; }
   :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .dexline { position: static; transform: none; grid-column: 2; grid-row: 2; }
-  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .pics { grid-column: 1; grid-row: 1 / span 2; }
+  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .sp { grid-column: 1; grid-row: 1 / span 2; }
   :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .who { grid-column: 2; grid-row: 1; align-self: end; }
   :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .chev { grid-column: 3; grid-row: 1 / span 2; }
   .mon > summary .who { padding-right: 0; }
