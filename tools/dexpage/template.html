@@ -563,9 +563,9 @@ body.sheet-open { overflow: hidden; }
   .brand-top { display: contents; }
   .brand .meta { margin: 2px 0 0; }  /* stays under the title text; on a narrow phone "| Last updated: …" wraps to its own line */
   .brand .links { order: 1; margin: 10px 0 6px; }
-  /* spread out, so they're easier to tap: beside the Download button on the website, ~70% of the row (centred) in the downloaded copy */
+  /* spread out, so they're easier to tap: beside the Download button on the website, ~40% of the row (centred) in the downloaded copy */
   .brand .links { justify-content: space-between; }
-  .brand .links:has(.offline-btn[hidden]) { width: 70%; justify-self: center; }
+  .brand .links:has(.offline-btn[hidden]) { width: 40%; justify-self: center; }
   /* title on one line: font scales with the screen (icon + version badge take ~140px) */
   .brand h1 { flex: 1 0 100%; white-space: nowrap; font-size: clamp(14px, calc((100vw - 140px) / 14.5), 22px); }
   .list:not(.grid) .mon > summary { grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; }
