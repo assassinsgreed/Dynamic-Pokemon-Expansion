@@ -182,15 +182,16 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 /* Detail */
 .detail { border-top: 1px solid var(--line); padding: 14px; display: grid; gap: 18px; }
 .detail h3 { margin: 0 0 8px; font: 600 12px/1 var(--font-display); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
-/* Base stats, Abilities and Profile in equal columns of up to 320px, evenly spaced; any spare width goes to the right,
-   not between them; they wrap on narrow screens */
-/* Equal 1fr columns capped at three × 320px. (A fixed 320px track maximum would make auto-fit count columns by that
-   maximum, so the 1010px card-view pop-up got two, pushing Profile under them.) */
-.cols { display: grid; gap: 18px 32px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); max-width: calc(3 * 320px + 2 * 32px); }
-.cols > * { min-width: 0; }
-/* Sprites grid beside the three info columns when there's room, above them when not */
+/* Sprites, Base stats, Abilities and Profile in one row that wraps: all four side by side on wide screens; on phones
+   two rows, sprites beside the stats and abilities beside the profile. Stats and abilities share the spare width (up to
+   320px each, the rest stays on the right). The profile is at least as wide as the gender line, which never wraps;
+   longer values (egg groups, held items) wrap instead of pushing the profile onto its own row. */
 .toprow { display: flex; flex-wrap: wrap; gap: 18px 32px; }
-.toprow > .cols { flex: 1 1 560px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); }
+.toprow > .sec-stats, .toprow > .sec-abil { flex: 1 1 140px; min-width: 0; max-width: 320px; }
+.toprow > .sec-prof { flex: 1 1 140px; max-width: 320px; }
+.toprow .facts { grid-template-columns: max-content minmax(min-content, 1fr); }  /* its minimum is the gender line */
+.facts dd.gender { white-space: nowrap; }
+@media (max-width: 520px) { .toprow { gap: 16px 14px; } }
 .sprites { flex: none; }
 .spgrid { display: grid; grid-template-columns: auto repeat(2, auto); gap: 6px; align-items: center; justify-items: center; justify-content: start; }
 .spgrid.one { grid-template-columns: auto auto; }

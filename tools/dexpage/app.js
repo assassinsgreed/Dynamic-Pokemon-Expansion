@@ -343,19 +343,19 @@
     const ab = ([name, desc, chance], hidden) => `<div class="ab"><button class="mvname" data-ability="${esc(name)}">${esc(name)}</button>${hidden ? '<span class="hid">Hidden</span>' : ""}${desc ? `<span class="desc">${esc(desc)}${chance ? ` (${chance}% chance)` : ""}</span>` : ""}</div>`;
     const evs = m.evs.map((v, n) => (v ? `${v} ${STAT_LABELS[n]}` : "")).filter(Boolean).join(", ") || "—";
     return `<div class="detail">
-      <div class="toprow">${spriteGrid(m)}<div class="cols">
-        <section><h3>Base stats · ${bst(m)}</h3><div class="stats">${m.stats.map((v, n) =>
+      <div class="toprow">${spriteGrid(m)}
+        <section class="sec-stats"><h3>Base stats · ${bst(m)}</h3><div class="stats">${m.stats.map((v, n) =>
           `<span class="lab">${STAT_LABELS[n]}</span><span class="val">${v}</span><span class="bar"><span style="width:${Math.min(100, v / 2)}%;background:${statColor(v)}"></span></span>`).join("")}</div></section>
-        <section><h3>Abilities</h3><div class="abilities">${m.abilities.map((a) => ab(a, false)).join("")}${m.hidden ? ab(m.hidden, true) : ""}</div></section>
-        <section><h3>Profile</h3><dl class="facts">
-          <dt>Gender</dt><dd>${genderText(m.gender)}</dd>
+        <section class="sec-abil"><h3>Abilities</h3><div class="abilities">${m.abilities.map((a) => ab(a, false)).join("")}${m.hidden ? ab(m.hidden, true) : ""}</div></section>
+        <section class="sec-prof"><h3>Profile</h3><dl class="facts">
+          <dt>Gender</dt><dd class="gender">${genderText(m.gender)}</dd>
           <dt>Egg groups</dt><dd>${m.eggGroups.join(", ") || "—"}</dd>
           <dt>Catch rate</dt><dd>${m.catchRate}</dd>
           <dt>Growth</dt><dd>${esc(m.growth)}</dd>
           <dt>EV yield</dt><dd>${evs}</dd>
           ${m.held.length ? `<dt>Wild held items</dt><dd class="held">${m.held.map(([h, k]) => (k === null ? `<span>${esc(h)}</span>` : itemButton(k, h))).join("")}</dd>` : ""}
         </dl></section>
-      </div></div>
+      </div>
       <section><h3>Evolution</h3>${evoTree(i)}</section>
       <section><h3>Locations · ${locRows(i).length}</h3>${locations(i)}</section>
       <section><h3>Moves</h3>${tabsBlock(i)}</section>
