@@ -16,6 +16,8 @@ WILD_METHODS = ("Grass", "Cave", "Indoors", "Surfing", "Rod", "Rock Smash", "Swa
 # "Daimyn City Factory"), but it has its own encounter table, so the page lists it as its own place (Collin)
 FACTORY_OVERWORLD = "Daimyn Factory Overworld"
 OWN_PLACES = {("Route 9", "Daimyn City Factory"): FACTORY_OVERWORLD}  # (location, sub-area) → place
+# Sub-area names the page shows differently from the sheet (the sheet stays as Collin keeps it)
+SUB_AREA_NAMES = {"Volcanion Room": "Hidden Chamber"}
 
 
 def _norm(s: str) -> str:
@@ -81,7 +83,7 @@ def load_encounters(path: Path = ENCOUNTERS_CSV) -> list[dict]:
             "mode": r["Mode"],
             "method": r["Method"],
             "location": own or r["Location"],
-            "sub": "" if own else r["Sub-area"],
+            "sub": "" if own else ", ".join(SUB_AREA_NAMES.get(s, s) for s in r["Sub-area"].split(", ")) if r["Sub-area"] else "",
             "rate": rate,
             "levels": r["Levels"],
             "times": times,

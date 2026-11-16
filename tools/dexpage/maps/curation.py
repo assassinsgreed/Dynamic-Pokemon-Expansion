@@ -10,7 +10,8 @@ PLACE_OF = {
     (20, 0): "Route 11 South",  # its file is named just "Route 11"
     (3, 29): "Route 11 South",  # its image is named just "Route 11"
 }
-FLOOR_NAMES = {(22, 0): "Rest House", (20, 0): "Mega Refiner House", (3, 29): "Route 11 South"}
+FLOOR_NAMES = {(22, 0): "Rest House", (20, 0): "Mega Refiner House", (3, 29): "Route 11 South",
+               (1, 44): "Hidden Chamber"}  # Carnelidge Volcano's "Volcanion Room"
 
 CATEGORY = {"Secret Trail": "Routes", "Calicin Bay": "Routes", "Treasure Beach": "Routes",
             "Heleo Ranch": "Dungeons & landmarks", "Lake Laplaz": "Dungeons & landmarks",
