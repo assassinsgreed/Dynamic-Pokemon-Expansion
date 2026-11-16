@@ -80,9 +80,9 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
 - Header subtitle (shown on phones too): "Where to find (just about) everything | Last updated: Nov 16, 2026" on the
   website, where the date is `document.lastModified` (GitHub Pages' built-in deploy sets Last-Modified; the companion
   repo has no workflow of its own), hidden if the header is missing. The downloaded file reads "| Offline copy" and
-  hides the Download button. Phones: title, then the subtitle (full width, one line at 390 px), then the link
+  hides the Download button. Phones: title, then the subtitle (lined up under the title text; "| Last updated: …" wraps whole onto its own line when narrow), then the link
   buttons spread out for tapping (~70% of the row, centred, when there's no Download button); on the Trainers tab
-  the Difficulty toggles sit above the count.
+  the Difficulty toggles sit above the count. Trainer list rows keep the right-aligned Level column on phones, as on desktop.
 - Look: Amethyst purple palette (game label art: #b27cfa / #320077), Trozei Jirachi header icon
   (`jirachi-trozei.png`, embedded), type-colour tints, equal-width chips, offline help for PC and phone.
 - Everything must work from the single downloaded file: no network, no CDNs, no fonts.
