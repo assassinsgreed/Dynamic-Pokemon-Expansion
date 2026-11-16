@@ -186,10 +186,8 @@
   // A chip's or Pokédex row's left edge shows the modes a Pokémon (or encounter) is found in
   const modeClass = (modes) => (modes.length > 1 ? " m-both" : modes[0] === "Divergent" ? " m-div" : " m-std");
   const modeEdge = (modes) => `${modeClass(modes)}" title="${modes.length > 1 ? "Standard and Divergent" : `${modes[0]} only`}`;
-  const monChip = (i, note, sub, bare, modes = mons[i].modes, tag = false) => `<button class="chip${modeEdge(modes)}" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${bare ? "" : formLabel(mons[i])}${
-    sub ? ` <span class="sub">${esc(sub)}</span>` : ""}</span>${tag  // the mode tag sits under the level and rate, lined up down the list
-    ? `<span class="rt">${note ? `<span class="hw">${esc(note)}</span>` : ""}${modeTag(modes.length > 1 ? "Both" : modes[0])}</span>`
-    : note ? `<span class="hw">${esc(note)}</span>` : ""}</button>`;
+  const monChip = (i, note, sub, bare, modes = mons[i].modes) => `<button class="chip${modeEdge(modes)}" data-open="${i}">${sprite(mons[i], true)}<span class="ln">${esc(mons[i].name)}${bare ? "" : formLabel(mons[i])}${
+    sub ? ` <span class="sub">${esc(sub)}</span>` : ""}</span>${note ? `<span class="hw">${esc(note)}</span>` : ""}</button>`;
   // Escaped text whose place names ("Secret Trail (need Strength)") open that place's card; longest name first
   let anyPlace = null;
   const placeLinks = (text) => {
@@ -455,7 +453,11 @@
       if (/^basement$/i.test(s)) return 101;
       return 1000;
     };
-    const groups = methods.map(([mt, l]) => [mt, l.map(([i, e]) => {
+    // On All, each method is split by mode ("Grass [Standard]", then "Grass [Divergent]"), so a player reads only their
+    // mode's list; an encounter in both modes is in both lists, and a method with only those is one list tagged Both
+    const byMode = methods.flatMap(([mt, l]) => (state.mode ? [[mt, null, l]] : l.every(([, e]) => e.mode === "Both") ? [[mt, "Both", l]]
+      : ["Standard", "Divergent"].map((md) => [mt, md, l.filter(([, e]) => e.mode === md || e.mode === "Both")]).filter(([, , g]) => g.length)));
+    const groups = byMode.map(([mt, md, l]) => [mt, md, l.map(([i, e]) => {
       const rate = e.times ? Object.entries(e.times).map(([t, r]) => `${TIME_ICON[t]} ${r}`).join(" ") : e.rate;
       return [i, e, rate, [lvNote(e.levels), rate].filter(Boolean).join(" · ")];
     }).sort((a, b) => floorRank(a[1].sub) - floorRank(b[1].sub) || pct(b[2]) - pct(a[2]))]);
@@ -465,11 +467,9 @@
     const spot = (line) => line.replace(/\s*\([^)]*\)/g, "").replace(p.name, "").replace(/^[\s·-]+/, "");
     items.forEach((it, k) => { const line = it.where.find((w) => re.test(w.toLowerCase())); if (line) found.push([k, spot(line)]); });
     // Three parts, each set apart: the map and description, the encounters by method, the items found here
-    // Each chip names its mode (Standard / Divergent / Both), as the Pokédex rows do, unless a mode is chosen
-    const tagged = !state.mode;
     const encounters = groups.length
-      ? groups.map(([mt, l]) => `<div><h4>${esc(mt)} · ${l.length}</h4><div class="chips wild${
-        l.some(([, e, , note]) => (e.times && Object.keys(e.times).length > 1) || (e.levels && !/^\d/.test(e.levels))) ? " two" : ""}">${l.map(([i, e, , note]) => monChip(i, note, e.sub, false, e.mode === "Both" ? ["Standard", "Divergent"] : [e.mode], tagged)).join("")}</div></div>`).join("")
+      ? groups.map(([mt, md, l]) => `<div><h4>${esc(mt)}${md ? ` ${modeTag(md)}` : ""} · ${l.length}</h4><div class="chips wild${
+        l.some(([, e, , note]) => (e.times && Object.keys(e.times).length > 1) || (e.levels && !/^\d/.test(e.levels))) ? " two" : ""}">${l.map(([i, e, , note]) => monChip(i, note, e.sub, false, e.mode === "Both" ? ["Standard", "Divergent"] : [e.mode])).join("")}</div></div>`).join("")
       : `<p class="empty">No Pokémon match the current filters here.</p>`;
     const itemChips = found.map(([k, line]) =>
       `<button class="chip" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span>${line ? `<span class="hw">${esc(line)}</span>` : ""}</button>`).join("");
@@ -592,7 +592,7 @@
     const methods = (p) => (p.rows.length ? [...new Set(p.rows.filter(([, l]) => rowInMode(l)).map(([, l]) => l.method))].join(" · ") : "Items only");
     const html = state.layouts.places === "grid"
       ? chipsWithOpen(list, (p) => `<button class="chip${isOpen(p) ? " on" : ""}" data-place="${esc(p.name)}"><span class="ln" style="padding-left:10px">${esc(p.name)}</span><span class="hw">${p.rows.length ? encounters(p) : ""}</span></button>`, isOpen, (p) => placeCard(p, true))
-      : `<div class="listtable"><table class="mv"><thead><tr><th>Location</th><th class="hide-sm">Found by</th><th class="c-num">Pokémon</th></tr></thead><tbody>${list.map((p) =>
+      : `<div class="listtable"><table class="mv"><thead><tr><th class="c-place">Location</th><th class="hide-sm">Found by</th><th class="c-mons">Pokémon</th></tr></thead><tbody>${list.map((p) =>
           `<tr data-place="${esc(p.name)}"${isOpen(p) ? ' class="on"' : ""}><td><span class="mvname">${esc(p.name)}</span></td><td class="note hide-sm">${esc(methods(p))}</td><td class="n">${encounters(p)}</td></tr>${
             isOpen(p) ? expandRow(3, placeCard(p, true)) : ""}`).join("")}</tbody></table></div>`;
     return [html, `${list.length} locations`];

@@ -266,7 +266,8 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .more-l.more-r { -webkit-mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent); }
 table.mv { border-collapse: collapse; width: 100%; font-size: 13.5px; table-layout: fixed; }
 table.mv .c-how { width: 128px; } table.mv .c-type { width: 92px; } table.mv .c-cat { width: 56px; }
-table.mv .c-num { width: 56px; text-align: right; } table.mv .c-tm { width: 64px; text-align: right; }
+table.mv .c-num { width: 56px; text-align: right; }
+table.mv .c-place { width: 28%; } table.mv .c-mons { width: 84px; text-align: right; }  /* Locations list: "Found by" gets the room */ table.mv .c-tm { width: 64px; text-align: right; }
 table.loc { table-layout: auto; }
 table.mv td { overflow: hidden; text-overflow: ellipsis; }
 table.mv th { text-align: left; font: 600 11px var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 4px 6px; border-bottom: 1px solid var(--line); }
@@ -469,6 +470,7 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .trow .tn { display: grid; min-width: 0; }
 .tname { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .chip .mode { flex: none; }
+h4 .mode { text-transform: none; letter-spacing: 0; margin: 0 2px; vertical-align: 1px; }  /* place cards: "Grass [Standard]", as on Pokédex rows */
 table.mv .c-lv { text-align: right; white-space: nowrap; }
 .lvcell { white-space: nowrap; }
 .tmnote { margin: 0 0 0 4px; }
@@ -489,8 +491,6 @@ table.mv .c-lv { text-align: right; white-space: nowrap; }
 .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 6px; }  /* 5 across a full-width card on desktop */
 .chips.wild { grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }  /* 4 across: room for "Lv 3-6 · ☀️ 10% 🌙 15%" */
 .chips.wild.two { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }  /* 3 across when rates come in pairs or a note is long */
-.chip .rt { margin-left: auto; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; padding: 3px 0; }  /* level/rate over the mode tag */
-.chip .rt .hw { margin-left: 0; }
 .chips.wild .hw { flex-shrink: 0; white-space: nowrap; }  /* when and how often it's found stay whole on one line */
 .chips.wild .ln { flex-shrink: 1; max-width: none; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 4px; }  /* the form and sub-area drop to the next line rather than being cut off */
 .chip { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 2px 12px 2px 2px; border: 1px solid var(--line); border-radius: 999px; background: var(--sunk); cursor: pointer; text-align: left; }
@@ -580,6 +580,7 @@ body.sheet-open { overflow: hidden; }
   .who .nm { font-size: 16.5px; }
   .detail { padding: 12px 10px; }
   table.mv .hide-sm { display: none; }
+  table.mv .c-place { width: auto; }
   table.mv .c-how { width: 72px; } table.mv .c-type { width: 80px; }
   .evcard .how { padding-left: 4px; }
 }
