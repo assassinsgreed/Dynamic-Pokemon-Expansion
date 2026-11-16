@@ -980,8 +980,14 @@
   if (/^https?:$/.test(location.protocol)) {
     document.head.insertAdjacentHTML("beforeend", '<link rel="manifest" href="manifest.webmanifest">');
     if ("serviceWorker" in navigator) { try { navigator.serviceWorker.register("sw.js").catch(() => {}); } catch (e) {} }
+    // GitHub Pages' deploy sets Last-Modified, which the browser exposes as document.lastModified (the service worker's
+    // cached copy keeps the header). With no header it reads as "now": show nothing rather than a made-up date.
+    const mod = new Date(document.lastModified);
+    if (!isNaN(mod) && Date.now() - mod > 60000)
+      $("#updated").textContent = " | Last updated: " + mod.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
   } else {
-    $("#offline-web").hidden = true; $("#offline-web2").hidden = true; $("#offline-file").hidden = false;
+    $("#updated").textContent = " | Offline copy";
+    $("#offline-btn").hidden = true; $(".brand .links .sep").hidden = true;
   }
 
   // Links: #rockruff, #move-crunch, #item-fire-stone, #place-route-2, #map-daimyn-city/item-2, #items … (older #ceaseless-edge style still works)

@@ -77,6 +77,10 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   condition wherever the evolution appears. The text comes from `evolution_text` (roster.py) over
   `src/Evolution Table.c`; item cards list every evolution that is more than "Use <item>" under the Evolves chips,
   since hiding "Used on" dropped the doc's "(male)" / "(Must hold @ night)".
+- Header subtitle (shown on phones too): "Where to find (just about) everything | Last updated: Nov 16, 2026" on the
+  website, where the date is `document.lastModified` (GitHub Pages' built-in deploy sets Last-Modified; the companion
+  repo has no workflow of its own), hidden if the header is missing. The downloaded file reads "| Offline copy" and
+  hides the Download button.
 - Look: Amethyst purple palette (game label art: #b27cfa / #320077), Trozei Jirachi header icon
   (`jirachi-trozei.png`, embedded), type-colour tints, equal-width chips, offline help for PC and phone.
 - Everything must work from the single downloaded file: no network, no CDNs, no fonts.
