@@ -71,7 +71,8 @@ header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 
 .brand h1 .brand-icon { width: 34px; height: 34px; flex: none; margin: -6px 0 -6px -2px; }
 /* tagline lines up with the title text: icon 34px − 2px margin + 8px gap */
 .brand .meta { margin: -4px 0 0; padding-left: 40px; color: var(--muted); font-size: 12.5px; font-style: italic; }
-.brand .meta #updated { white-space: nowrap; }  /* "| Last updated: Nov 10, 2026" wraps as a whole; the space before it (in the markup) is where the line breaks */
+.brand .meta #updated { white-space: nowrap; }  /* "| Last updated: Nov 10, 2026" wraps as a whole; the pipe is CSS so phones can drop it */
+.brand .meta #updated:not(:empty)::before { content: "| "; }
 .brand a { color: var(--accent); font-weight: 600; text-decoration: none; }
 .brand a:hover { text-decoration: underline; }
 /* View tabs: underlined tabs on a baseline, so they don't read as one more pill button like the filters below */
@@ -561,7 +562,9 @@ body.sheet-open { overflow: hidden; }
   /* no room beside the title: the subtitle goes under it, then the links and download button get their own row
      (brand-top's children join the brand grid so the subtitle can sit between them) */
   .brand-top { display: contents; }
-  .brand .meta { margin: 2px 0 0; }  /* stays under the title text; on a narrow phone "| Last updated: …" wraps to its own line */
+  .brand .meta { margin: 2px 0 0; }  /* stays under the title text */
+  .brand .meta #updated { display: block; }  /* "Last updated: …" gets its own line, without the pipe */
+  .brand .meta #updated:not(:empty)::before { content: none; }
   .brand .links { order: 1; margin: 10px 0 6px; }
   /* spread out, so they're easier to tap: beside the Download button on the website, ~40% of the row (centred) in the downloaded copy */
   .brand .links { justify-content: space-between; }

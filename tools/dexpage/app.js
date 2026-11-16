@@ -964,9 +964,9 @@
     // cached copy keeps the header). With no header it reads as "now": show nothing rather than a made-up date.
     const mod = new Date(document.lastModified);
     if (!isNaN(mod) && Date.now() - mod > 60000)
-      $("#updated").textContent = "| Last updated: " + mod.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+      $("#updated").textContent = "Last updated: " + mod.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
   } else {
-    $("#updated").textContent = "| Offline copy";
+    $("#updated").textContent = "Offline copy";
     $("#offline-btn").hidden = true; $(".brand .links .sep").hidden = true;
   }
 
