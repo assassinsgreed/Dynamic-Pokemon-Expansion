@@ -248,6 +248,20 @@ A playthrough-order list of tick boxes for 100% completion, before Docs. Design:
   encounter text ("Alolan Diglett": `wild_name` in places.py). When he says the feature list changed, re-download
   it and run `python -m tools.dexpage.items doc.docx` (skip the docs import unless Docs text changed: it only
   renumbers images).
+- Daily things get no entry (Collin: they aren't completion): `daily=True` story beats, `DAILY` ids, text that says
+  "daily", and any person whose script flag is in the game's daily range (0xE00-0xEFF). Postgame markers stay.
+  `python -m tools.dexpage.checklist` lists what was left out as daily.
+- **Load Save File** ticks the list from a `.sav` / `.srm` (the raw 128 KiB flash; save states don't work) and
+  replaces the current ticks after a confirm. Each entry's `sv` lists what in the save means done (`save_flags.py`):
+  item balls and one-off Pokémon by the flag that hides them, hidden items by 1000 + their id byte (both on the
+  map markers as `fg`, with the script label `lb`; checklist.py pops them so the page's map data is unchanged),
+  battles by trainer flag (0x500 + id), people by the flag their script checks and sets, and the rest by hand in
+  `checklist_data.SAVE` (flags, `var()`, `item()` in the bag, `both()`, or another entry's id). A flag that starts
+  set because the object is hidden until an event (Ultra Wormholes, Cosmog, Necrozma, Jirachi) needs a second
+  condition. The reader is in app.js (`ckReadSave`) and mirrored in Python (`save_flags.read_save`);
+  `python -m tools.dexpage.save_flags <save or folder>` prints what a save ticks ("?" = can't be read). Collin's
+  test saves are in `../PokemonShootingStars/saves`. After changing either reader, run both over every save and
+  compare (inject `window.__ck = { ckReadSave, ckFromSave }` before `function ckAct` in a copy of the page).
 - Ticks: `localStorage["dex-checklist"]`; the Download link writes them into the saved copy as `#saved-checklist`
   (merged once per saved file); Export/Import is a small JSON file. Don't write `/</g` in app.js: the build turns
   every `</` into `<\/`, which breaks a regex literal.

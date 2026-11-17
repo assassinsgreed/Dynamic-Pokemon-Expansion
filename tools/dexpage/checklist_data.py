@@ -193,10 +193,61 @@ DROP = [
     "ultra-space/npc/ultra-space/29-50",       # the researcher who takes you home
 ]
 
-# What in a save file says an entry is done, where save_flags.py can't tell on its own: id → flags (done when any
-# is set; [] = nothing in the save says so). Battles with a trainer link, item balls, hidden items and one-off
-# Pokémon need no line here.
+# What in a save file says an entry is done, where save_flags.py can't tell on its own: id → conditions, done when
+# any holds; [] = nothing in the save says so. A condition is a flag number, var(n, at_least), item("ITEM_X") (in the
+# bag) or both(...); another entry's id instead of the list means "done when that one is". Battles with a trainer link, item balls, hidden items, one-off Pokémon and people whose script
+# checks and sets one flag need no line here. Flags and their meanings are from CFRU's overworld scripts.
+def var(number: int, at_least: int) -> list:
+    return ["v", number, at_least]
+
+
+def item(const: str) -> list:
+    return ["i", const]
+
+
+def both(*conditions) -> list:
+    return ["&", *conditions]
+
+
+ULTRA_EPISODE = 0x4073  # 2: started; 5: the Ultra Wormholes are open; 11: Ultra Necrozma beaten; 12: over
+_wormhole = lambda flag: [both(flag, var(ULTRA_EPISODE, 5))]  # its flag starts set (hidden) until the wormholes open
 SAVE: dict[str, list] = {
+    "anthra-town/story/starter": [0x828],                   # FLAG_SYS_POKEMON_GET
+    "anthra-town/story/gifts": [item("ITEM_TOWN_MAP")],
+    "olenic-town/story/pokedex": [0x829],                   # FLAG_SYS_POKEDEX_GET
+    # (saves from old versions lack these two flags: the Patch Badge, 0x821, can't be won without either)
+    "route-3/story/pluto": [0x232, 0x821],                  # the Route 3 DexNav event with the rival and Pluto
+    "torma-cave/story/landslide": [0x255, 0x821],           # battled Casey at the far end of Torma Cave
+    "ferrox-village/story/rival": [item("ITEM_HM01_CUT")],  # no flag of its own: it comes before the library
+    "ferrox-village/story/library": [item("ITEM_HM01_CUT")],
+    "route-9/story/pluto": "route-11-south/story/ronald",   # beating Ronald is what moves Team Pluto on
+    "heleo-city/story/trainer-house": [0x24F],              # got the bike
+    "laplaz-town/story/trainer-house": [0x26C],             # got the Lucky Egg
+    "emraldin-quay/story/trainer-house": [0x252],           # got the Item Finder
+    "uteya-village/story/trainer-house": [0x277],           # got the PokéChip Charm
+    "heleo-city/npc/pokemon-center/13-2": [item("ITEM_CATCHING_CHARM")],
+    "laplaz-town/npc/laplaz-pokemon-center/10-4": [item("ITEM_DECODER")],
+    "laplaz-town/npc/laplaz-psychics-house/9-4": [0x92B],   # IV ratings shown (she can switch them off again)
+    "lake-laplaz/npc/lake-laplaz/29-31": [0x43],            # the birds have flown off to roam
+    "daimyn-city/npc/lana-s-house/11-13": [0x935],          # received the PortaPC (0x834 is only "met Lana")
+    "carnelidge-volcano/story/peak": [0x273],               # completed the Carnelidge Volcano events
+    "ultra-space/wild/hoenn/29-8": [0x273],                 # the Jirachi of the same story
+    "carnelidge-volcano/wild/peak/11-6": [both(0x270, 0x5A)],  # Jirachi awakened, then gone (0x5A alone: not yet shown)
+    "carnelidge-volcano/wild/hidden-chamber/10-3": [0x73],  # Volcanion caught, defeated or fled from (0x3C is reused)
+    "route-12-west/wild/glastrier-event/7-8": [0x46],       # Glastrier caught, defeated or fled from
+    "laplaz-town/wild/laplaz-casey-s-house/1-4": [0x298],   # Darkrai caught
+    "postgame/story/shiny-charm": [item("ITEM_SHINY_CHARM")],
+    "postgame/story/ultra-episode": [var(ULTRA_EPISODE, 2)],
+    "postgame/story/title-defense": [],                     # its trainer flags are cleared for the next defense
+    "ultra-space/wild/ultra-space/101-19": [both(0x6E, var(ULTRA_EPISODE, 5))],  # Cosmog caught and reported
+    "ultra-space/wild/dias-of-light/15-7": [both(0x6F, 0x289)],  # Ultra Necrozma defeated, then Necrozma caught
+    "varisi-forest/wild/varisi-forest/45-30": _wormhole(0x68), "rubarr-desert/wild/desert/66-58": _wormhole(0x65),
+    "forgotten-manse/wild/bf/19-2": _wormhole(0x6D), "daimyn-factory/wild/daimyn-factory/45-2": _wormhole(0x66),
+    "pluto-hq/wild/b1f/14-1": _wormhole(0x69), "mimmett-jungle/wild/mimmett-jungle/62-49": _wormhole(0x64),
+    "seppire-cove/wild/side-room/8-8": _wormhole(0x63), "carnelidge-volcano/wild/exterior/41-21": _wormhole(0x67),
+    "uteyan-ruins/wild/overworld/22-17": _wormhole(0x6A),
+    # the ROM gives this hidden item the same flag (174) as a Treasure Beach one that renews, so the flag says nothing
+    "route-15-south/hidden/route-15-south/18-123": [],
 }
 
 # Once-a-day events the text doesn't already call daily (the diary: trap Pokémon are daily). Ids, * allowed.

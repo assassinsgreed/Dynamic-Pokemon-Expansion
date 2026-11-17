@@ -828,13 +828,15 @@
     });
     input.click();
   }
-  // A save file ticks the list: each entry's e.sv lists the game flags that mean it's done (save_flags.py).
+  // A save file ticks the list: each entry's e.sv lists what in the game's save means it's done (save_flags.py).
   // The layout is CFRU's (save.c): 2 slots of 14 sectors of 0x1000 bytes, each ending in its id, checksum, signature
   // and save counter; the newer complete slot is the game's save. SaveBlock1 is sectors 1-4 (0xFF0 bytes each) with
-  // flags 0-0x8FF at 0xEE0, and flags 0x900+ start CFRU's extra block in the unused tail of sector 0 (0xF24 on).
-  function ckSaveFlags(bytes) {
+  // flags 0-0x8FF at 0xEE0 and variables 0x4000 on at 0x1000. CFRU's own block (flags 0x900 on, then much later the
+  // bag) fills the unused tails of sectors 0, 4 and 13, then sectors 30 and 31.
+  function ckReadSave(bytes) {
     if (bytes.length < 0x20000) return null;  // .sav and .srm are both the raw 128 KiB flash (some add a clock footer)
     const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const TAIL = { 0: 0xF24, 4: 0xD98, 13: 0x450 };  // where the vanilla game's part of a sector ends
     let best = null;
     for (let slot = 0; slot < 2; slot++) {
       const at = {};
@@ -842,8 +844,8 @@
       for (let i = 0; i < 14; i++) {
         const o = (slot * 14 + i) * 0x1000;
         if (view.getUint32(o + 0xFF8, true) !== 0x08012025) continue;
-        const id = view.getUint16(o + 0xFF4, true), size = { 0: 0xF24, 4: 0xD98, 13: 0x450 }[id] || 0xFF0;
-        let sum = 0;  // the game's checksum, over the part of the sector the vanilla game uses: a half-written one fails
+        const id = view.getUint16(o + 0xFF4, true), size = TAIL[id] || 0xFF0;
+        let sum = 0;  // the game's checksum, over the vanilla part: a half-written sector fails it
         for (let w = 0; w < size; w += 4) sum = (sum + view.getUint32(o + w, true)) >>> 0;
         if ((((sum >>> 16) + sum) & 0xFFFF) !== view.getUint16(o + 0xFF6, true)) continue;
         at[id] = o;
@@ -852,13 +854,28 @@
       if (Object.keys(at).length === 14 && (!best || counter > best.counter)) best = { at, counter };
     }
     if (!best) return null;
-    const flags = new Uint8Array(0x320), part = (id, from, to) => bytes.subarray(best.at[id] + from, best.at[id] + to);
-    flags.set(part(1, 0xEE0, 0xFF0), 0);
-    flags.set(part(2, 0, 0x10), 0x110);
-    flags.set(part(0, 0xF24, 0xFF0), 0x120);          // flags 0x900 on: 0xCC bytes here,
-    flags.set(part(4, 0xD98, 0xD98 + 0x134), 0x1EC);  // the rest in sector 4's tail
-    return flags;
+    const join = (parts) => {
+      const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
+      let n = 0;
+      parts.forEach((p) => { out.set(p, n); n += p.length; });
+      return out;
+    };
+    const part = (id, from) => bytes.subarray(best.at[id] + from, best.at[id] + 0xFF0);
+    const block1 = join([1, 2, 3, 4].map((id) => part(id, 0)));
+    const block = join([part(0, TAIL[0]), part(4, TAIL[4]), part(13, TAIL[13]), bytes.subarray(0x1E000, 0x1EFF0), bytes.subarray(0x1F000, 0x1FFF0)]);
+    const u16 = (b, o) => b[o] | (b[o + 1] << 8);
+    const items = new Set();
+    for (let o = 0x9AC; o < 0x15D4; o += 4) items.add(u16(block, o));  // the bag: RAM 0x203BB20-0x203C748 in the block at 0x203B174
+    return { flags: join([block1.subarray(0xEE0, 0x1000), block.subarray(0, 0x200)]), items, v: (n) => u16(block1, 0x1000 + 2 * (n - 0x4000)) };
   }
+  // A condition is a flag number, ["v", variable, at least], ["i", item in the bag] or ["&", all of these...]
+  const ckHolds = (c, save) => typeof c === "number" ? !!((save.flags[c >> 3] >> (c & 7)) & 1)
+    : c[0] === "v" ? save.v(c[1]) >= c[2] : c[0] === "i" ? save.items.has(c[1]) : c.slice(1).every((x) => ckHolds(x, save));
+  const ckFromSave = (save) => {
+    const done = {};
+    ckAll.forEach((e) => { if (e.sv && e.sv.some((c) => ckHolds(c, save))) done[e.id] = 1; });
+    return done;
+  };
   function ckLoadSave() {
     const input = document.createElement("input");
     input.type = "file";  // no accept filter: phones hide .sav / .srm files behind one
@@ -867,12 +884,9 @@
       if (!f) return;
       const reader = new FileReader();
       reader.onload = () => {
-        const flags = ckSaveFlags(new Uint8Array(reader.result));
-        if (!flags) { alert("That isn’t a Pokémon Amethyst save file. Choose the .sav or .srm file your emulator saves (not a save state)."); return; }
-        const has = (n) => (flags[n >> 3] >> (n & 7)) & 1;
-        const done = {}, known = ckAll.filter((e) => e.sv);
-        known.forEach((e) => { if (e.sv.some(has)) done[e.id] = 1; });
-        const n = Object.keys(done).length, blind = ckAll.length - known.length;
+        const save = ckReadSave(new Uint8Array(reader.result));
+        if (!save) { alert("That isn’t a Pokémon Amethyst save file. Choose the .sav or .srm file your emulator saves (not a save state)."); return; }
+        const done = ckFromSave(save), n = Object.keys(done).length, blind = ckAll.filter((e) => !e.sv).length;
         if (!confirm(`This save has ${n} of ${ckAll.length} entries done.${blind ? ` ${blind} entries can’t be read from a save file and will be left unticked.` : ""}
 
 Replace your ${ckDone(ckAll)} current ticks with it?`)) return;

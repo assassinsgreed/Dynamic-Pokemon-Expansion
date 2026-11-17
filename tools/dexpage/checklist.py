@@ -245,7 +245,8 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
                 entry["tr"] = _trainers(page, opts["trainer"], f"STORY {title}/{key}")
             elif mons.spans(text):
                 entry["p"] = mons.spans(text)
-            sv = H.SAVE.get(entry["id"], save_flags.trainer_flags(page, entry.get("tr", [])))
+            sv = save_flags.resolve(paths, H.SAVE[entry["id"]]) if entry["id"] in H.SAVE else \
+                save_flags.trainer_flags(page, entry.get("tr", []))
             if sv:
                 entry["sv"] = sv
             put(stage, place, entry)
@@ -253,10 +254,10 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
     # ---- everything the maps mark
     for place, mp in by_name.items():
         for mk in mp["markers"]:
+            hide_flag, label = mk.pop("fg", 0), mk.pop("lb", "")  # only the save reader wants these, not the map viewer
             if mk["k"] not in ("item", "hidden", "npc", "wild"):
                 continue
             floor = mp["floors"][mk["f"]]["name"]
-            hide_flag, label = mk.pop("fg", 0), mk.pop("lb", "")  # only the save reader wants these, not the map viewer
             ident = new_id(f"{mp['slug']}/{mk['k']}/{slug(floor)}/{int(mk['x']) // 16}-{int(mk['y']) // 16}")
             text = H.TEXT.get(ident, mk.get("tf", mk["t"]))  # tf: the gift list in full, where the map shortens it
             # HMs it takes to reach: the item data's notes plus Collin's own; the map viewer shows them too (rq)
@@ -272,8 +273,19 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
                 if dropped is not None:
                     dropped.append((place, mk["t"]))
                 continue
+            # what in a save file says it's done (save_flags.py)
+            if ident in H.SAVE:
+                sv = save_flags.resolve(paths, H.SAVE[ident])
+            elif ident in H.LINKS:
+                sv = save_flags.trainer_flags(page, _trainers(page, H.LINKS[ident], f"LINKS {ident}"))
+            elif mk["k"] == "npc":
+                sv = save_flags.script_flags(paths, label)[:1]
+            else:
+                sv = [hide_flag] if hide_flag else []
             late = H.MOVE.get(ident) == "Postgame" or (ident not in H.MOVE and (place in H.POSTGAME_PLACES or mk["pg"]))
-            if not late and (DAILY_TEXT.search(text) or _matches(ident, H.DAILY)):
+            # daily: the text says so, Collin says so, or (a person) the flag their script sets is one the game clears each day
+            if (not late and (DAILY_TEXT.search(text) or _matches(ident, H.DAILY))) or \
+                    (mk["k"] == "npc" and ident not in H.SAVE and sv and save_flags.is_daily(sv[0])):
                 if daily is not None:
                     daily.append((place, text))
                 continue
@@ -292,13 +304,6 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
                 entry["tr"] = _trainers(page, H.LINKS[ident], f"LINKS {ident}")
             elif mk["k"] in ("npc", "wild") and mons.spans(text):
                 entry["p"] = mons.spans(text)
-            # what in a save file says it's done (save_flags.py)
-            if ident in H.SAVE:
-                sv = H.SAVE[ident]
-            elif mk["k"] == "npc":
-                sv = save_flags.trainer_flags(page, entry["tr"]) if "tr" in entry else save_flags.script_flags(paths, label)[:1]
-            else:
-                sv = [hide_flag] if hide_flag else []
             if sv:
                 entry["sv"] = sv
 
@@ -337,6 +342,13 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
             if ident not in seen:
                 raise ValueError(f"checklist_data.{name}: no entry has the id {ident!r}")
 
+    by_id = {e["id"]: e for st in [*stages, *unlocks.values(), postgame] for es in st["groups"].values() for e in es}
+    for e in by_id.values():  # SAVE: "done when that other entry is"
+        if isinstance(e.get("sv"), str):
+            if not isinstance(by_id.get(e["sv"], {}).get("sv"), list):
+                raise ValueError(f"checklist_data.SAVE {e['id']}: {e['sv']!r} is not an entry a save can tick")
+            e["sv"] = by_id[e["sv"]]["sv"]
+
     place_rank = {}
     for n, st in enumerate(stages):
         place_rank.setdefault(st["place"], n)
@@ -373,7 +385,7 @@ def main() -> None:
             for e in g["entries"]:
                 total += 1
                 notes = [e.get("need") and f"needs {e['need']}", e.get("until"), "sv" not in e and "NOT IN SAVE",
-                         e.get("sv") and "save " + "/".join(f"{n:#x}" for n in e["sv"][:4]) + ("…" if len(e["sv"]) > 4 else ""),
+                         e.get("sv") and "save " + save_flags.describe(e["sv"]),
                          e.get("tr") and "trainer link", e["k"] in ("item", "hidden") and "item" not in e and "NO ITEM LINK"]
                 print(f"   {e['id']:<52} {e['k']:<6} {g['place']}: {e['t']}" + "".join(f"  [{n}]" for n in notes if n))
     print(f"\n{total} entries")

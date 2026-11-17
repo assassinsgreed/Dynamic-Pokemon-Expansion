@@ -1,6 +1,7 @@
 """What in a save file says a Checklist entry is done, so the page can tick entries from a player's .sav / .srm.
 
-Each entry gets `sv`: a list of flag numbers, done when any is set.
+Each entry gets `sv`: a list of conditions, done when any holds. A condition is a flag number (set), ["v", var,
+n] (the game variable is at least n), ["i", item id] (the item is in the bag) or ["&", condition, ...] (all of them).
   item balls / one-off Pokémon   the flag that hides the object once it's taken or dealt with (ROM map data)
   hidden items                   FLAG_HIDDEN_ITEMS_START + the item's id byte (ROM map data)
   battles (story beats, LINKS)   the trainer flag of any of the linked trainers (0x500 + trainer id)
@@ -8,9 +9,10 @@ Each entry gets `sv`: a list of flag numbers, done when any is set.
                                  checklist_data.SAVE names it
   other story beats              checklist_data.SAVE
 
-The page's reader (app.js ckSave*) mirrors CFRU's save.c: two slots of 14 sectors, 0xFF0 data bytes each; flags
-0-0x8FF sit in SaveBlock1 at 0xEE0 and CFRU's flags 0x900-0x18FF open its "parasite" block, which starts in the
-unused tail of sector 0 (0xF24 on).
+The page's reader (app.js ckReadSave) mirrors CFRU's save.c: two slots of 14 sectors, 0xFF0 data bytes each; flags
+0-0x8FF sit in SaveBlock1 at 0xEE0 with variables 0x4000-0x40FF after them. CFRU's own block (RAM 0x203B174 on) is
+saved in the unused tails of sectors 0, 4 and 13 and then in sectors 30 and 31: it opens with flags 0x900-0x18FF,
+and holds the bag (every pocket, back to back, from RAM 0x203BB20).
 """
 
 import re
@@ -21,7 +23,49 @@ from .paths import Paths
 
 TRAINER_FLAGS = 0x500
 MODE_FLAG = 0x945          # Divergent mode: never what marks an entry done
-FLAG_COUNT = 0x1900
+DAILY_FLAGS = range(0xE00, 0xF00)  # FLAG_DAILY_EVENTS_START: cleared each new day
+
+
+def is_daily(condition) -> bool:
+    return isinstance(condition, int) and condition in DAILY_FLAGS
+
+
+@cache
+def _item_ids(p: Paths) -> dict[str, int]:
+    out = {}
+    for k, v in collect_defines(p.cfru / "include/constants/items.h").items():
+        if k.startswith("ITEM_") and re.fullmatch(r"0x[0-9A-Fa-f]+|\d+", (v or "").split()[0] if v else ""):
+            out[k] = int(v.split()[0], 0)
+    text = (p.cfru / "include/constants/items.h").read_text(encoding="utf-8", errors="replace")
+    for m in re.finditer(r"^\s*(ITEM_\w+)\s*=\s*(0x[0-9A-Fa-f]+|\d+)\s*,", text, re.M):  # the TM/HM enum
+        out.setdefault(m.group(1), int(m.group(2), 0))
+    return out
+
+
+def resolve(p: Paths, conditions: list) -> list:
+    """checklist_data.SAVE as the page reads it: item constants become their numbers. (A string instead of a list
+    is another entry's id, "done when that one is": checklist() swaps it for that entry's conditions.)"""
+    if isinstance(conditions, str):
+        return conditions
+    def one(c):
+        if isinstance(c, int):
+            return c
+        if c[0] == "i":
+            if c[1] not in _item_ids(p):
+                raise ValueError(f"checklist_data.SAVE: no item {c[1]!r} in CFRU's items.h")
+            return ["i", _item_ids(p)[c[1]]]
+        return ["&", *map(one, c[1:])] if c[0] == "&" else list(c)
+    return [one(c) for c in conditions]
+
+
+def describe(conditions: list) -> str:
+    def one(c):
+        if isinstance(c, int):
+            return f"{c:#x}"
+        if c[0] == "&":
+            return "(" + " & ".join(map(one, c[1:])) + ")"
+        return f"var {c[1]:#x}>={c[2]}" if c[0] == "v" else f"item {c[1]}"
+    return "/".join(map(one, conditions[:4])) + ("…" if len(conditions) > 4 else "")
 _FLAG = r"(0x[0-9A-Fa-f]+|\d+|FLAG_\w+)"
 
 
@@ -61,12 +105,12 @@ def _scripts(p: Paths) -> tuple[dict, dict]:
 
 
 def script_flags(p: Paths, label: str, depth: int = 4) -> list[int]:
-    """Flags a script (and what it jumps to) both checks and sets, in the order it sets them: "have I given this
-    already?" flags. The mode flag and flags it also clears (toggles, daily resets) don't count."""
+    """Flags a script (and what it jumps to) both checks and sets, in the order it checks them: "have I given this
+    already?" flags. The mode flag and flags it also clears (toggles) don't count."""
     files, home = _scripts(p)
     if label not in home:
         return []
-    checked, set_, cleared = set(), [], set()
+    checked, set_, cleared = [], set(), set()
     todo, seen = [(home[label], label, 0)], set()
     while todo:
         path, lab, d = todo.pop(0)
@@ -79,9 +123,9 @@ def script_flags(p: Paths, label: str, depth: int = 4) -> list[int]:
                 if n is None:
                     continue
                 if m.group(1).lower() == "checkflag":
-                    checked.add(n)
+                    checked.append(n)
                 elif m.group(1).lower() == "setflag":
-                    set_.append(n)
+                    set_.add(n)
                 else:
                     cleared.add(n)
             elif d < depth and (m := re.search(r"(?:goto|call)\s+(\w+)\s*$", line)):
@@ -89,7 +133,7 @@ def script_flags(p: Paths, label: str, depth: int = 4) -> list[int]:
                 at = path if target in files[path] else home.get(target)
                 if at:
                     todo.append((at, target, d + 1))
-    return [n for n in dict.fromkeys(set_) if n in checked and n not in cleared and n != MODE_FLAG and n >= 0x20]
+    return [n for n in dict.fromkeys(checked) if n in set_ and n not in cleared and n != MODE_FLAG and n >= 0x20]
 
 
 def trainer_flags(page: dict, indexes: list[int]) -> list[int]:
@@ -103,8 +147,14 @@ CHUNK = {0: 0xF24, 4: 0xD98, 13: 0x450}  # the vanilla part of a sector (what it
 SECTOR_DATA = 0xFF0
 
 
-def read_flags(data: bytes) -> bytes | None:
-    """Flags 0-0x18FF of the newer complete save slot, or None when the file isn't a save of this game."""
+BLOCK = 0x203B174           # CFRU's block in RAM
+BAG = (0x203BB20, 0x203C748)  # every bag pocket: 4-byte slots, item id then (scrambled) quantity
+VARS = 0x4000
+
+
+def read_save(data: bytes) -> dict | None:
+    """{"flags": bytes for flags 0-0x18FF, "vars": [0x4000-0x40FF], "items": ids in the bag} from the newer complete
+    save slot, or None when the file isn't a save of this game."""
     import struct
     if len(data) < 0x20000:
         return None
@@ -123,14 +173,30 @@ def read_flags(data: bytes) -> bytes | None:
     if best is None:
         return None
     part = lambda ident, a, b: data[best[0][ident] + a:best[0][ident] + b]
-    extra = part(0, CHUNK[0], SECTOR_DATA) + part(4, CHUNK[4], SECTOR_DATA)  # CFRU's block starts with flags 0x900+
-    return part(1, 0xEE0, SECTOR_DATA) + part(2, 0, 0x10) + extra[:0x200]
+    block = b"".join(part(i, CHUNK[i], SECTOR_DATA) for i in (0, 4, 13)) + \
+        data[30 * 0x1000:30 * 0x1000 + SECTOR_DATA] + data[31 * 0x1000:31 * 0x1000 + SECTOR_DATA]
+    block1 = b"".join(part(i, 0, SECTOR_DATA) for i in (1, 2, 3, 4))
+    bag = block[BAG[0] - BLOCK:BAG[1] - BLOCK]
+    return {"flags": block1[0xEE0:0x1000] + block[:0x200],
+            "vars": list(struct.unpack_from("<256H", block1, 0x1000)),
+            "items": {n for n in struct.unpack_from(f"<{len(bag) // 2}H", bag)[::2] if n}}
 
 
-def ticked(result: dict, flags: bytes) -> set[str]:
-    """Ids of the checklist entries a save's flags say are done."""
-    has = lambda n: flags[n >> 3] >> (n & 7) & 1
-    return {e["id"] for st in result["stages"] for g in st["groups"] for e in g["entries"] if any(map(has, e.get("sv", ())))}
+def holds(condition, save: dict) -> bool:
+    if isinstance(condition, int):
+        return bool(save["flags"][condition >> 3] >> (condition & 7) & 1)
+    kind = condition[0]
+    if kind == "v":
+        return save["vars"][condition[1] - VARS] >= condition[2]
+    if kind == "i":
+        return condition[1] in save["items"]
+    return all(holds(c, save) for c in condition[1:])
+
+
+def ticked(result: dict, save: dict) -> set[str]:
+    """Ids of the checklist entries a save says are done."""
+    return {e["id"] for st in result["stages"] for g in st["groups"] for e in g["entries"]
+            if any(holds(c, save) for c in e.get("sv", ()))}
 
 
 def main() -> None:
@@ -149,11 +215,11 @@ def main() -> None:
     for arg in sys.argv[1:]:
         files = sorted(Path(arg).glob("*.s[ar][vm]")) if Path(arg).is_dir() else [Path(arg)]
         for f in files:
-            flags = read_flags(f.read_bytes())
-            if flags is None:
+            save = read_save(f.read_bytes())
+            if save is None:
                 print(f"{f.name}: not a save of this game")
                 continue
-            done = ticked(result, flags)
+            done = ticked(result, save)
             print(f"{f.name}: {len(done)} of {len(every)} done")
             if len(files) == 1:
                 for st, g, e in every:
