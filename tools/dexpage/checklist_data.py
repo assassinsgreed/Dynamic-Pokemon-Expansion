@@ -267,8 +267,6 @@ SAVE: dict[str, list] = {
     "pluto-hq/wild/b1f/14-1": _wormhole(0x69), "mimmett-jungle/wild/mimmett-jungle/62-49": _wormhole(0x64),
     "seppire-cove/wild/side-room/8-8": _wormhole(0x63), "carnelidge-volcano/wild/exterior/41-21": _wormhole(0x67),
     "uteyan-ruins/wild/overworld/22-17": _wormhole(0x6A),
-    # the ROM gives this hidden item the same flag (174) as a Treasure Beach one that renews, so the flag says nothing
-    "route-15-south/hidden/route-15-south/18-123": [],
 }
 
 # Once-a-day events the text doesn't already call daily (the diary: trap Pokémon are daily). Ids, * allowed.

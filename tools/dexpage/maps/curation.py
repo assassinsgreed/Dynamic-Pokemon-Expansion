@@ -86,7 +86,7 @@ WILD_NOTES = {
 }
 
 # Hidden items the player can't reach (leftover data): (map, x, y)
-NO_HIDDEN = {((3, 38), 3, 0), ((3, 41), 1, 0), ((3, 40), 15, 4)}  # Route 20, Route 22, Secret Trail
+NO_HIDDEN = {((3, 38), 3, 0), ((3, 38), 2, 0), ((3, 41), 1, 0), ((3, 40), 15, 4)}  # Route 20 (2: the Nest Ball, retired), Route 22, Secret Trail
 
 # Ways out that only show the next map, which the player can't walk into: (place, destination)
 NO_EXIT = {("Route 6", "Daimyn City")}
