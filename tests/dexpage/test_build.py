@@ -138,9 +138,9 @@ def test_sw_cache_name_tracks_content(site):
 
 
 def test_site_files(site):
-    for f in ["index.html", "dex.html", "manifest.webmanifest", "sw.js", "icon-192.png", "icon-512.png"]:
+    for f in ["index.html", "manifest.webmanifest", "sw.js", "icon-192.png", "icon-512.png"]:
         assert (site / f).exists()
-    assert (site / "dex.html").read_bytes() == (site / "index.html").read_bytes()
+    assert not (site / "dex.html").exists()  # the Download link saves index.html itself
     import json
     manifest = json.loads((site / "manifest.webmanifest").read_text())
     assert manifest["display"] == "standalone" and manifest["start_url"] == "./"

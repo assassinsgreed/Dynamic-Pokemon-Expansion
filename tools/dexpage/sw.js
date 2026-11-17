@@ -18,14 +18,15 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
-  if (req.mode === "navigate") {
-    // Network first so players see new data when online; fall back to the cached page offline.
+  const url = new URL(req.url);
+  const isPage = url.origin === self.location.origin && (url.pathname.endsWith("/") || url.pathname.endsWith("/index.html"));
+  // The page itself (opened, or fetched by the Download link) is network first, so players get new data when online;
+  // offline it falls back to the cached copy.
+  if (req.mode === "navigate" || isPage) {
     event.respondWith(
       fetch(req)
         .then((res) => {
           // Only a real copy of the page may replace the offline one (never a 404 page or redirect)
-          const url = new URL(req.url);
-          const isPage = url.pathname.endsWith("/") || url.pathname.endsWith("/index.html");
           if (res.ok && res.type === "basic" && isPage) {
             const copy = res.clone();
             caches.open(CACHE).then((cache) => cache.put("index.html", copy));

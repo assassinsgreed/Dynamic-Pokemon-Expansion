@@ -19,7 +19,7 @@ home screen or download one `.html` file, and both work offline.
    `<cfru>/test.gba`). The command exits with an error, and writes nothing, if a name can't be found or a source
    file has a shape it doesn't understand.
 
-`site/` then contains `index.html`, `dex.html` (the same page, used by the download link), `sw.js`,
+`site/` then contains `index.html` (also what the Download link saves), `sw.js`,
 `manifest.webmanifest` and two icons. `site/` is git-ignored.
 
 ## Publish on GitHub Pages

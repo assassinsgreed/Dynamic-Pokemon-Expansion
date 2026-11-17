@@ -651,7 +651,6 @@ def build(paths: Paths, out: Path) -> None:
 
     out.mkdir(parents=True, exist_ok=True)
     (out / "index.html").write_bytes(html)
-    (out / "dex.html").write_bytes(html)  # "Download for offline use" target
     (out / "manifest.webmanifest").write_text(json.dumps(MANIFEST, indent=2), encoding="utf-8")
     (out / "icon-192.png").write_bytes(_icon(192))
     (out / "icon-512.png").write_bytes(_icon(512))
