@@ -96,11 +96,7 @@ STORY = {
                         ("thomas", "Defeat Elite Four Thomas", {"trainer": ("Elite Four", "Thomas", "Ascension Tower & Post Credits")}),
                         ("selene", "Defeat Champion Selene and enter the Hall of Fame", {"trainer": ("Champion", "Selene", "Ascension Tower & Post Credits")})],
     "Postgame": [
-        ("title-defense", "Champion Title Defense: defend your title against the 14 possible challengers",
-         {"at": "Ascension Tower", "trainer": ("Challenger", "Joey", "Title Defense")}),
-        ("conservatory", "Professor's Conservatory: catch the starters behind Hawthorne's lab", {"at": "Olenic Town"}),
         ("shiny-charm", "Receive the Shiny Charm from Hawthorne (75% of the Pokédex caught)", {"at": "Olenic Town"}),
-        ("diploma", "Receive the Diploma from Hawthorne (Pokédex complete)", {"at": "Olenic Town"}),
         # Collin: the rematches themselves are daily, so the goal is all eight in one day (it unlocks a game modifier)
         ("gym-rematches", "Rematch every Gym Leader in the same day", {"at": "Rhodanzi City"}),
         ("rematch-terrence", "Gym Leader rematch: Terrence", {"at": "Rhodanzi City", "daily": True, "trainer": ("Leader", "Terrence", "Gym Leader Rematches")}),
@@ -125,8 +121,6 @@ TEXT = {
         "Type Student: pass the type quiz to receive a Miracle Seed, Charcoal or Mystic Water (1 of the 3, based on your starter)",
     "daimyn-city/npc/trade-house/8-5": "Trade with the Trade House trader (one trade per save; your Fire starter decides which Pokémon)",
     "daimyn-city/npc/daimyn-mall/12-6": "Fish Seller: sells one Carvanha (Wishiwashi in Divergent) for ₽2,000",
-    "daimyn-city/npc/gym/4-2": "Pokémon exchange: buy each Pokémon offered for coins",
-    "daimyn-city/npc/gym/5-2": "Item exchange: buy items for coins",
     "tsarvosa-city/npc/npc-house-9/6-4": "Trade your Slowbro for a Galarian Slowbro (Rapidash for a Galarian Rapidash in Divergent)",
     "tsarvosa-city/npc/npc-house-7/5-4": "Dev Team Collin: battle him once a day; gives PokéChip",
     "tsarvosa-city/npc/npc-house-7/8-4": "Dev Team Crystal: battle her once a day; gives PokéChip",
@@ -203,6 +197,7 @@ DROP = [
     "treasure-beach/hidden/*",        # renew as you walk: never finished
     "olenic-town/npc/area-5/1-7",     # "Hawthorne: trade" (not a trade in trades.csv)
     "pluto-hq/npc/ronald-s-office/*", "pluto-hq/npc/irene-s-office/*",  # their keys are part of the story beats
+    "ultra-space/wild/hoenn/29-8",    # Jirachi in Ultra Space: part of the Carnelidge Volcano story, not an encounter
     # services a player uses as often as they like: nothing to finish
     "heleo-city/npc/swarm-house/8-4",          # Swarm Swami
     "forgotten-manse/npc/closet-1f/*",         # Rotom appliance catalog
@@ -216,6 +211,11 @@ DROP = [
     "battle-frontier/npc/pokemon-center/13-2",  # PokéChip exchange
     "ultra-space/npc/ultra-space/29-50",       # the researcher who takes you home
     "route-11-south/npc/mega-refiner-house/7-4",  # Mega Stone Refiner (a shop; its map text no longer says so)
+    # Collin: things a player can do, not completion (and nothing in a save says they're done)
+    "ferrox-village/npc/ferrox-village/27-19",   # Digging Minigame
+    "heleo-city/npc/swarm-house/11-4",           # Swarm Researcher: a Bottlecap per swarming species shown
+    "daimyn-city/npc/gym/4-2", "daimyn-city/npc/gym/5-2",  # Game Corner Pokémon and item exchanges
+    "tsarvosa-city/npc/tsarvosa-city/22-14",     # Pokémon Donator
 ]
 
 # What in a save file says an entry is done, where save_flags.py can't tell on its own: id → conditions, done when
@@ -240,9 +240,11 @@ SAVE: dict[str, list] = {
     "anthra-town/story/starter": [0x828],                   # FLAG_SYS_POKEMON_GET
     "anthra-town/story/gifts": [item("ITEM_TOWN_MAP")],
     "olenic-town/story/pokedex": [0x829],                   # FLAG_SYS_POKEDEX_GET
-    # (saves from old versions lack these two flags: the Patch Badge, 0x821, can't be won without either)
+    # (saves from old versions lack 0x232: the Patch Badge, 0x821, can't be won without it)
     "route-3/story/pluto": [0x232, 0x821],                  # the Route 3 DexNav event with the rival and Pluto
-    "torma-cave/story/landslide": [0x255, 0x821],           # battled Casey at the far end of Torma Cave
+    # 0x35 "Torma Cave cleared" (Collin) also hides the Route 4 NPCs from the start of the game until the assistant
+    # takes the DexNavs back (0x32 set, 0x35 cleared); the end of the cave sets it again
+    "torma-cave/story/landslide": [both(0x32, 0x35)],
     "ferrox-village/story/rival": [item("ITEM_HM01_CUT")],  # no flag of its own: it comes before the library
     "ferrox-village/story/library": [item("ITEM_HM01_CUT")],
     "route-9/story/pluto": "route-11-south/story/ronald",   # beating Ronald is what moves Team Pluto on
@@ -256,18 +258,16 @@ SAVE: dict[str, list] = {
     "lake-laplaz/npc/lake-laplaz/29-31": [0x43],            # the birds have flown off to roam
     "daimyn-city/npc/lana-s-house/11-13": [0x935],          # received the PortaPC (0x834 is only "met Lana")
     "carnelidge-volcano/story/peak": [0x273],               # completed the Carnelidge Volcano events
-    "ultra-space/wild/hoenn/29-8": [0x273],                 # the Jirachi of the same story
     "carnelidge-volcano/wild/peak/11-6": [both(0x270, 0x5A)],  # Jirachi awakened, then gone (0x5A alone: not yet shown)
     "carnelidge-volcano/wild/hidden-chamber/10-3": [0x73],  # Volcanion caught, defeated or fled from (0x3C is reused)
     "route-12-west/wild/glastrier-event/7-8": [0x46],       # Glastrier caught, defeated or fled from
     "laplaz-town/wild/laplaz-casey-s-house/1-4": [0x298],   # Darkrai caught
     "postgame/story/shiny-charm": [item("ITEM_SHINY_CHARM")],
     "postgame/story/ultra-episode": [var(ULTRA_EPISODE, 2)],
-    "postgame/story/title-defense": [],                     # its trainer flags are cleared for the next defense
-    "ultra-space/wild/ultra-space/101-19": [both(0x6E, var(ULTRA_EPISODE, 5))],  # Cosmog caught and reported
     # the Hidden Abilities game modifier, set once all 8 rematch flags are set the same day; a code unlocking it counts too
     "postgame/story/gym-rematches": [0xB7],
     "postgame/story/frontier": [0x8B3],                     # the Battle Frontier's world map flag
+    "ultra-space/wild/ultra-space/101-19": [both(0x6E, var(ULTRA_EPISODE, 5))],  # Cosmog caught and reported
     "ultra-space/wild/dias-of-light/15-7": [both(0x6F, 0x289)],  # Ultra Necrozma defeated, then Necrozma caught
     "varisi-forest/wild/varisi-forest/45-30": _wormhole(0x68), "rubarr-desert/wild/desert/66-58": _wormhole(0x65),
     "forgotten-manse/wild/bf/19-2": _wormhole(0x6D), "daimyn-factory/wild/daimyn-factory/45-2": _wormhole(0x66),
