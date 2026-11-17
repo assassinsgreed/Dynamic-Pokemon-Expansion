@@ -24,15 +24,17 @@
   const cueSoon = () => { if (!cueFrame) cueFrame = requestAnimationFrame(() => { cueFrame = 0; cueAll(); }); };
 
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const norm = (s) => s.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const fold = (s) => s.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase();  // "Poké" → "poke"
+  const norm = (s) => fold(s).replace(/[^a-z0-9]/g, "");
   // Prose (descriptions, notes, docs) is searched word by word: "terra" finds "terrain" but not "encounter rate"
-  const words = (s) => (s || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-  const slug = (s) => s.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const words = (s) => fold(s || "").replace(/[^a-z0-9]+/g, " ").trim();
+  const slug = (s) => fold(s).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const TYPES = ["NORMAL", "FIRE", "WATER", "GRASS", "ELECTRIC", "ICE", "FIGHTING", "POISON", "GROUND", "FLYING", "PSYCHIC", "BUG", "ROCK", "GHOST", "DRAGON", "DARK", "STEEL", "FAIRY"];
   const STAT_LABELS = ["HP", "Atk", "Def", "SpA", "SpD", "Spe"];
   // The games' own Physical / Special / Status labels (cat_icons/, embedded by build.py)
   const CAT = Object.fromEntries(Object.entries(CAT_ICONS).map(([k, src]) => [k, `<img src="${src}" alt="" draggable="false">`]));
   const CAT_NAME = { physical: "Physical", special: "Special", status: "Status" };
+  const catIcon = (split) => `<span class="cat" title="${CAT_NAME[split]}">${CAT[split]}</span>`;
   const TYPE_COLOR = { NORMAL: "#9a9d9a", FIRE: "#e2562a", WATER: "#2f7fe6", GRASS: "#3c9a2d", ELECTRIC: "#f2bd16", ICE: "#3fc4e8",
     FIGHTING: "#e07510", POISON: "#8f45c6", GROUND: "#946033", FLYING: "#6f9fdc", PSYCHIC: "#e8487d", BUG: "#8b9b1c", ROCK: "#a49a6c",
     GHOST: "#6c4a74", DRAGON: "#5463d8", DARK: "#5b4b4c", STEEL: "#5f99ad", FAIRY: "#e06fe0", MYSTERY: "#5e8f86" };
@@ -268,7 +270,7 @@
     return `<tr>${showHow ? `<td class="h">${esc(how)}</td>` : ""}
       <td><button class="mvname" data-move="${k}" title="${esc(mv.desc)}">${esc(mv.name)}</button></td>
       <td>${typeBadge(mv.type)}</td>
-      <td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td>
+      <td>${catIcon(mv.split)}</td>
       <td class="n">${mv.power || "—"}</td><td class="n hide-sm">${mv.acc || "—"}</td><td class="n hide-sm">${mv.pp}</td></tr>`;
   }
 
@@ -397,7 +399,7 @@
       ? groups.map(([title, l]) => `<div><h4>${title} · ${l.length}</h4><div class="chips">${l.map(([i, h]) => monChip(i, h.startsWith("Tutor") ? "" : h.replace(/^Special: /, ""))).join("")}</div></div>`).join("")
       : `<p class="empty">${mv.learners.length ? "No Pokémon match the current filters." : "No Pokémon learn this move."}</p>`;
     return `<article class="movecard">${collapsible ? COLLAPSE : ""}
-      <div class="top">${typeBadge(mv.type)}<span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span>
+      <div class="top">${typeBadge(mv.type)}${catIcon(mv.split)}
         <h2>${esc(mv.name)}${mv.official ? `<small>${esc(mv.official)}</small>` : ""}</h2></div>
       ${mv.desc ? `<div class="gamedesc">${esc(mv.desc)}</div>` : ""}
       <div class="specs"><span>${CAT_NAME[mv.split]}</span><span>Pow <b>${mv.power || "—"}</b></span><span>Acc <b>${mv.acc || "—"}</b></span><span>PP <b>${mv.pp}</b></span>${mv.chance ? `<span>Effect chance <b>${mv.chance}%</b></span>` : ""}</div>
@@ -407,9 +409,8 @@
   }
 
   function itemCard(k, collapsible) {
-    const it = items[k];
-    const holders = [];
-    mons.forEach((m, i) => m.held.forEach(([h, hk]) => { if (hk === k && inMode(m)) holders.push([i, (h.match(/\(([^)]*)\)/) || [])[1] || ""]); }));
+    const it = items[k], where = whereIn(k);
+    const holders = heldBy[k].filter(([i]) => inMode(mons[i]));
     const evolves = [];
     // The name match catches a second item in the text (Hisui Rock, Shedinja's Poké Ball), but not one that's only
     // part of the evolution's own item's name (Gengarite inside "Gengarite-G")
@@ -426,7 +427,7 @@
       ${showUse ? `<div><h4>${it.move ? "Note" : useTitle}</h4><div class="use">${esc(it.use)}</div></div>` : ""}
       ${evolves.length ? `<div><h4>${it.category === "Mega Stones" ? "Mega Evolves" : "Evolves"} · ${evolves.length}</h4><div class="chips">${evolves.map(([i, to]) => monChip(to, "", "", it.category === "Mega Stones")).join("")}</div>${
         conditions.length ? `<ul class="evocond">${conditions.map(([i, to, how]) => `<li><b>${esc(mons[i].name)}${formLabel(mons[i])}</b> → <b>${esc(mons[to].name)}${formLabel(mons[to])}</b>: ${esc(how)}</li>`).join("")}</ul>` : ""}</div>` : ""}
-      ${whereIn(k).length ? `<div><h4>Where to find</h4><ul class="where">${whereIn(k).map((w) => `<li>${placeLinks(w)}</li>`).join("")}</ul></div>` : '<p class="note">No known location.</p>'}
+      ${where.length ? `<div><h4>Where to find</h4><ul class="where">${where.map((w) => `<li>${placeLinks(w)}</li>`).join("")}</ul></div>` : '<p class="note">No known location.</p>'}
       ${holders.length ? `<div><h4>Held by wild Pokémon · ${holders.length}</h4><div class="chips">${holders.map(([i, pct]) => monChip(i, pct)).join("")}</div></div>` : ""}
     </article>`;
   }
@@ -452,8 +453,7 @@
 
   function placeCard(p, collapsible) {
     const rows = p.rows.filter(([, l]) => rowInMode(l));
-    const methods = [];
-    rows.forEach((r) => { const g = methods.find(([mt]) => mt === r[1].method); g ? g[1].push(r) : methods.push([r[1].method, [r]]); });
+    const methods = groupBy(rows, (r) => r[1].method);
     // An encounter that depends on the time of day says when on its chip ("☀️ 20%" Pikipek by day, "🌙 20%" Hoothoot
     // by night, "☀️ 10% 🌙 15%"); a bare rate is all day. Each list runs from the likeliest encounter down.
     const TIME_ICON = { day: "☀️", night: "🌙" };
@@ -518,10 +518,11 @@
   // Where-to-find lines name the one mode they're true in: "(Standard)", "(Divergent mode)", "(Requires Surf; Standard mode)"
   const lineMode = (w) => (w.match(/[(;]\s*(Standard|Divergent)(?: mode)?(?: only)?\s*[;)]/i) || [])[1] || null;
   const lineInMode = (w) => { const m = lineMode(w); return !state.mode || !m || m.toLowerCase() === state.mode.toLowerCase(); };
+  // Per item, the wild Pokémon that hold it: [Pokémon, chance ("5%")]
   const heldBy = items.map(() => []);
-  mons.forEach((m) => m.held.forEach(([, hk]) => { if (hk != null && heldBy[hk]) heldBy[hk].push(m); }));
+  mons.forEach((m, i) => m.held.forEach(([h, hk]) => { if (hk != null && heldBy[hk]) heldBy[hk].push([i, (h.match(/\(([^)]*)\)/) || [])[1] || ""]); }));
   // An item is in the chosen mode when it's found there, or held by a wild Pokémon there (or the data says nothing)
-  const itemInMode = (k) => !state.mode || items[k].where.some(lineInMode) || heldBy[k].some(inMode)
+  const itemInMode = (k) => !state.mode || items[k].where.some(lineInMode) || heldBy[k].some(([i]) => inMode(mons[i]))
     || (!items[k].where.length && !heldBy[k].length);
   const whereIn = (k) => items[k].where.filter(lineInMode);
   const matchItems = (q) => items.map((_, k) => k).filter(itemInMode).filter((k) => !q || itemKeys[k].includes(q)
@@ -540,6 +541,12 @@
     || p.rows.some(([i, l]) => rowInMode(l) && (mons[i].s.some((s) => s.includes(q)) || norm(l.method).includes(q)))
     || itemsAt(p).some((k) => itemKeys[k].includes(q)));
   const exactFirst = (list, isExact) => list.filter(isExact).concat(list.filter((x) => !isExact(x)));
+  // [key, entries] per key, in the order the keys first appear
+  const groupBy = (list, key) => {
+    const groups = new Map();
+    for (const x of list) { const k = key(x); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(x); }
+    return [...groups];
+  };
 
   function matchMons(q) {
     const list = [];
@@ -585,86 +592,91 @@
     const open = keys.find(isOpen);
     return `<div class="chips">${keys.map(chip).join("")}</div>${open !== undefined ? sheet(card(open)) : ""}`;
   };
+  // A view's entries as chips (cards layout: the open one in a pop-up) or as table rows (list layout: the open one
+  // expanded under its row)
+  const listOrCards = (cards, keys, { chip, row, isOpen, card, cols, head, wrap = "listtable" }) => (cards
+    ? chipsWithOpen(keys, chip, isOpen, card)
+    : `<div class="${wrap}"><table class="mv">${head ? `<thead><tr>${head}</tr></thead>` : ""}<tbody>${keys.map((k) => row(k) + (isOpen(k) ? expandRow(cols, card(k)) : "")).join("")}</tbody></table></div>`);
+  const noResults = (text, count) => [`<div class="nores">${text}</div>`, count];
 
   // A move card's corner says how to teach it: its TM/HM number, or "Tutor" (tutor numbers mean nothing to players)
   const howTaught = (k) => (moves[k].tm ? moves[k].tm.label : moves[k].tutor ? "Tutor" : "");
 
   function movesView(q) {
     const list = exactFirst(matchMoves(q), (k) => moves[k].s.includes(q));
-    if (!list.length) return [`<div class="nores">No moves match “${esc(state.q)}”.</div>`, "0 moves"];
+    if (!list.length) return noResults(`No moves match “${esc(state.q)}”.`, "0 moves");
     const open = state.move;  // only a click opens an entry; a typed name just sorts first
-    let html;
-    if (state.layouts.moves === "grid") {
-      html = chipsWithOpen(list, (k) => `<button class="chip${k === open ? " on" : ""}" data-move="${k}">${typeBadge(moves[k].type)}<span class="ln">${esc(moves[k].name)}</span><span class="hw">${howTaught(k)}</span></button>`,
-        (k) => k === open, (k) => moveCard(k, true));
-    } else {
-      const rows = list.map((k) => {
+    const html = listOrCards(state.layouts.moves === "grid", list, {
+      chip: (k) => `<button class="chip${k === open ? " on" : ""}" data-move="${k}">${typeBadge(moves[k].type)}<span class="ln">${esc(moves[k].name)}</span><span class="hw">${howTaught(k)}</span></button>`,
+      row: (k) => {
         const mv = moves[k];
         return `<tr data-move="${k}"${k === open ? ' class="on"' : ""}><td><span class="mvname">${esc(mv.name)}</span>${mv.official ? ` <span class="note">${esc(mv.official)}</span>` : ""}<span class="mvdesc">${esc(mv.desc)}</span></td><td>${typeBadge(mv.type)}</td>
-          <td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td><td class="n">${mv.power || "—"}</td>
-          <td class="n hide-sm">${mv.acc || "—"}</td><td class="n hide-sm">${mv.pp}</td><td class="n hide-sm">${mv.tm ? mv.tm.label : ""}</td></tr>${k === open ? expandRow(7, moveCard(k, true)) : ""}`;
-      }).join("");
-      html = `<div class="movelist"><table class="mv"><thead><tr><th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num">Pow</th><th class="c-num hide-sm">Acc</th><th class="c-num hide-sm">PP</th><th class="c-tm hide-sm">TM</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-    }
+          <td>${catIcon(mv.split)}</td><td class="n">${mv.power || "—"}</td>
+          <td class="n hide-sm">${mv.acc || "—"}</td><td class="n hide-sm">${mv.pp}</td><td class="n hide-sm">${mv.tm ? mv.tm.label : ""}</td></tr>`;
+      },
+      isOpen: (k) => k === open, card: (k) => moveCard(k, true), cols: 7, wrap: "movelist",
+      head: '<th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num">Pow</th><th class="c-num hide-sm">Acc</th><th class="c-num hide-sm">PP</th><th class="c-tm hide-sm">TM</th>',
+    });
     return [html, `${list.length} moves`];
   }
 
   function itemsView(q) {
     const list = exactFirst(matchItems(q), (k) => itemKeys[k] === q);
-    if (!list.length) return [`<div class="nores">No items match “${esc(state.q)}”.</div>`, "0 items"];
+    if (!list.length) return noResults(`No items match “${esc(state.q)}”.`, "0 items");
     const open = state.item;
-    const cats = [];
-    list.forEach((k) => { const c = items[k].category; const g = cats.find(([n]) => n === c); g ? g[1].push(k) : cats.push([c, [k]]); });
-    const html = cats.map(([c, ks]) => `<div class="cat-head">${esc(c)} · ${ks.length}</div>${state.layouts.items === "grid"
-      ? chipsWithOpen(ks, (k) => `<button class="chip${k === open ? " on" : ""}" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span></button>`, (k) => k === open, (k) => itemCard(k, true))
-      : `<div class="listtable"><table class="mv"><thead><tr><th>Item</th><th>Where to find</th></tr></thead><tbody>${ks.map((k) =>
-          `<tr data-item="${k}"${k === open ? ' class="on"' : ""}><td>${itemIcon(k)}<span class="mvname">${esc(items[k].name)}</span></td><td class="note">${esc(whereIn(k).slice(0, 2).join("; ") || "—")}${
-            whereIn(k).length > 2 ? ` +${whereIn(k).length - 2} more` : ""}</td></tr>${k === open ? expandRow(2, itemCard(k, true)) : ""}`).join("")}</tbody></table></div>`}`).join("");
+    const html = groupBy(list, (k) => items[k].category).map(([c, ks]) => `<div class="cat-head">${esc(c)} · ${ks.length}</div>${listOrCards(state.layouts.items === "grid", ks, {
+      chip: (k) => `<button class="chip${k === open ? " on" : ""}" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span></button>`,
+      row: (k) => {
+        const where = whereIn(k);
+        return `<tr data-item="${k}"${k === open ? ' class="on"' : ""}><td>${itemIcon(k)}<span class="mvname">${esc(items[k].name)}</span></td><td class="note">${esc(where.slice(0, 2).join("; ") || "—")}${
+          where.length > 2 ? ` +${where.length - 2} more` : ""}</td></tr>`;
+      },
+      isOpen: (k) => k === open, card: (k) => itemCard(k, true), cols: 2, head: "<th>Item</th><th>Where to find</th>",
+    })}`).join("");
     return [html, `${list.length} items`];
   }
 
   function placesView(q) {
     const list = exactFirst(matchPlaces(q), (p) => norm(p.name) === q);
-    if (!list.length) return [`<div class="nores">No locations match “${esc(state.q)}”.</div>`, "0 locations"];
+    if (!list.length) return noResults(`No locations match “${esc(state.q)}”.`, "0 locations");
     const open = state.place ? norm(state.place) : null;
     const isOpen = (p) => norm(p.name) === open;
     const encounters = (p) => p.rows.filter(([, l]) => rowInMode(l)).length;
     const methods = (p) => (p.rows.length ? [...new Set(p.rows.filter(([, l]) => rowInMode(l)).map(([, l]) => l.method))].join(" · ") : "Items only");
-    const html = state.layouts.places === "grid"
-      ? chipsWithOpen(list, (p) => `<button class="chip${isOpen(p) ? " on" : ""}" data-place="${esc(p.name)}"><span class="ln" style="padding-left:10px">${esc(p.name)}</span><span class="hw">${p.rows.length ? encounters(p) : ""}</span></button>`, isOpen, (p) => placeCard(p, true))
-      : `<div class="listtable"><table class="mv"><thead><tr><th class="c-place">Location</th><th class="hide-sm">Found by</th><th class="c-mons">Pokémon</th></tr></thead><tbody>${list.map((p) =>
-          `<tr data-place="${esc(p.name)}"${isOpen(p) ? ' class="on"' : ""}><td><span class="mvname">${esc(p.name)}</span></td><td class="note hide-sm">${esc(methods(p))}</td><td class="n">${encounters(p)}</td></tr>${
-            isOpen(p) ? expandRow(3, placeCard(p, true)) : ""}`).join("")}</tbody></table></div>`;
+    const html = listOrCards(state.layouts.places === "grid", list, {
+      chip: (p) => `<button class="chip${isOpen(p) ? " on" : ""}" data-place="${esc(p.name)}"><span class="ln" style="padding-left:10px">${esc(p.name)}</span><span class="hw">${p.rows.length ? encounters(p) : ""}</span></button>`,
+      row: (p) => `<tr data-place="${esc(p.name)}"${isOpen(p) ? ' class="on"' : ""}><td><span class="mvname">${esc(p.name)}</span></td><td class="note hide-sm">${esc(methods(p))}</td><td class="n">${encounters(p)}</td></tr>`,
+      isOpen, card: (p) => placeCard(p, true), cols: 3,
+      head: '<th class="c-place">Location</th><th class="hide-sm">Found by</th><th class="c-mons">Pokémon</th>',
+    });
     return [html, `${list.length} locations`];
   }
 
   function tutorsView(q) {
     const rows = matchTutors(q);
-    if (!rows.length) return [`<div class="nores">No tutors match “${esc(state.q)}”.</div>`, "0 tutor moves"];
+    if (!rows.length) return noResults(`No tutors match “${esc(state.q)}”.`, "0 tutor moves");
     const open = state.move || (q && rows.find((t) => moves[t.move].s.includes(q)) || {}).move || null;
     let opened = false;  // a move taught in two places opens under the first
     const isOpen = (t) => { if (t.move !== open || opened) return false; opened = true; return true; };
-    const groups = [];
-    rows.forEach((t) => { const key = t.kind + "|" + t.where; const g = groups.find(([k]) => k === key); g ? g[1].push(t) : groups.push([key, [t]]); });
     const learners = (t) => moves[t.move].learners.filter(([i, h]) => inMode(mons[i]) && h.startsWith(t.kind === "Special" ? "Special:" : "Tutor")).length;
-    const asCards = state.layouts.tutors === "grid";
-    const html = groups.map(([key, ts]) => {
+    const html = groupBy(rows, (t) => t.kind + "|" + t.where).map(([key, ts]) => {
       const [kind, where] = key.split("|");
       const sameNote = ts.every((t) => t.note === ts[0].note) ? ts[0].note : "";
       const head = `<div class="cat-head tutorhead">${esc(where)}${kind === "Special" ? " · special tutor" : ""}${sameNote ? `<small>${esc(sameNote)}</small>` : ""}</div>`;
-      if (asCards) {
-        const flags = ts.map(isOpen);
-        return head + chipsWithOpen(ts.map((_, n) => n), (n) => {
+      const flags = ts.map(isOpen);
+      return head + listOrCards(state.layouts.tutors === "grid", ts.map((_, n) => n), {
+        chip: (n) => {
           const t = ts[n];
           return `<button class="chip${flags[n] ? " on" : ""}" data-move="${t.move}">${typeBadge(moves[t.move].type)}<span class="ln">${esc(moves[t.move].name)}</span><span class="hw" title="${sameNote ? "Pokémon that can learn it" : esc(t.note)}">${learners(t)}</span></button>`;
-        }, (n) => flags[n], (n) => moveCard(ts[n].move, true));
-      }
-      const cols = sameNote ? 5 : 6;
-      return head + `<div class="listtable"><table class="mv"><thead><tr><th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num hide-sm">Pow</th>${sameNote ? "" : "<th>Requirement</th>"}<th class="c-num">Learn</th></tr></thead><tbody>${ts.map((t) => {
-        const mv = moves[t.move], on = isOpen(t);
-        return `<tr data-move="${t.move}"${on ? ' class="on"' : ""}><td><span class="mvname">${esc(mv.name)}</span></td><td>${typeBadge(mv.type)}</td><td><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span></td><td class="n hide-sm">${mv.power || "—"}</td>${
-          sameNote ? "" : `<td class="note">${esc(t.note)}</td>`}<td class="n">${learners(t)}</td></tr>${on ? expandRow(cols, moveCard(t.move, true)) : ""}`;
-      }).join("")}</tbody></table></div>`;
+        },
+        row: (n) => {
+          const t = ts[n], mv = moves[t.move];
+          return `<tr data-move="${t.move}"${flags[n] ? ' class="on"' : ""}><td><span class="mvname">${esc(mv.name)}</span></td><td>${typeBadge(mv.type)}</td><td>${catIcon(mv.split)}</td><td class="n hide-sm">${mv.power || "—"}</td>${
+            sameNote ? "" : `<td class="note">${esc(t.note)}</td>`}<td class="n">${learners(t)}</td></tr>`;
+        },
+        isOpen: (n) => flags[n], card: (n) => moveCard(ts[n].move, true), cols: sameNote ? 5 : 6,
+        head: `<th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num hide-sm">Pow</th>${sameNote ? "" : "<th>Requirement</th>"}<th class="c-num">Learn</th>`,
+      });
     }).join("");
     return [html, `${rows.length} tutor moves`];
   }
@@ -690,15 +702,15 @@
 
   function abilitiesView(q) {
     const list = exactFirst(matchAbilities(q), (a) => norm(a.name) === q || (a.official && norm(a.official) === q));
-    if (!list.length) return [`<div class="nores">No abilities match “${esc(state.q)}”.</div>`, "0 abilities"];
+    if (!list.length) return noResults(`No abilities match “${esc(state.q)}”.`, "0 abilities");
     const open = state.ability;
     const isOpen = (a) => a.name === open;
     const count = (a) => a.mons.filter(([i]) => inMode(mons[i])).length;
-    const html = state.layouts.abilities === "grid"
-      ? chipsWithOpen(list, (a) => `<button class="chip${isOpen(a) ? " on" : ""}" data-ability="${esc(a.name)}"><span class="ln" style="padding-left:10px">${esc(a.name)}</span><span class="hw">${count(a)}</span></button>`, isOpen, abilityCard)
-      : `<div class="listtable"><table class="mv"><thead><tr><th>Ability</th><th class="c-num">Pokémon</th></tr></thead><tbody>${list.map((a) =>
-          `<tr data-ability="${esc(a.name)}"${isOpen(a) ? ' class="on"' : ""}><td><span class="mvname">${esc(a.name)}</span>${a.official ? ` <span class="note">${esc(a.official)}</span>` : ""}<span class="mvdesc">${esc(a.desc)}</span></td><td class="n">${count(a)}</td></tr>${
-            isOpen(a) ? expandRow(2, abilityCard(a)) : ""}`).join("")}</tbody></table></div>`;
+    const html = listOrCards(state.layouts.abilities === "grid", list, {
+      chip: (a) => `<button class="chip${isOpen(a) ? " on" : ""}" data-ability="${esc(a.name)}"><span class="ln" style="padding-left:10px">${esc(a.name)}</span><span class="hw">${count(a)}</span></button>`,
+      row: (a) => `<tr data-ability="${esc(a.name)}"${isOpen(a) ? ' class="on"' : ""}><td><span class="mvname">${esc(a.name)}</span>${a.official ? ` <span class="note">${esc(a.official)}</span>` : ""}<span class="mvdesc">${esc(a.desc)}</span></td><td class="n">${count(a)}</td></tr>`,
+      isOpen, card: abilityCard, cols: 2, head: '<th>Ability</th><th class="c-num">Pokémon</th>',
+    });
     return [html, `${list.length} abilities`];
   }
 
@@ -711,15 +723,18 @@
 
   function docsView(q) {
     const list = matchDocs(q);
-    if (!list.length) return [`<div class="nores">No topics mention “${esc(state.q)}”.</div>`, "0 topics"];
+    if (!list.length) return noResults(`No topics mention “${esc(state.q)}”.`, "0 topics");
     const open = state.doc;
     const isOpen = (t) => t.title === open;
-    const groups = [];
-    list.forEach((t) => { const g = groups.find(([n]) => n === t.group); g ? g[1].push(t) : groups.push([t.group, [t]]); });
-    const html = groups.map(([g, ts]) => `<div class="cat-head">${esc(g)} · ${ts.length}</div>${state.layouts.docs === "grid"
-      ? '<div class="dchips">' + chipsWithOpen(ts, (t) => `<button class="chip${isOpen(t) ? " on" : ""}" data-doc="${esc(t.title)}"><span class="ln" style="padding-left:10px">${esc(t.title)}</span></button>`, isOpen, docCard) + "</div>"
-      : `<div class="listtable"><table class="mv"><tbody>${ts.map((t) => `<tr data-doc="${esc(t.title)}"${isOpen(t) ? ' class="on"' : ""}><td><span class="mvname">${esc(t.title)}</span></td></tr>${
-          isOpen(t) ? expandRow(1, docCard(t)) : ""}`).join("")}</tbody></table></div>`}`).join("");
+    const cards = state.layouts.docs === "grid";
+    const html = groupBy(list, (t) => t.group).map(([g, ts]) => {
+      const body = listOrCards(cards, ts, {
+        chip: (t) => `<button class="chip${isOpen(t) ? " on" : ""}" data-doc="${esc(t.title)}"><span class="ln" style="padding-left:10px">${esc(t.title)}</span></button>`,
+        row: (t) => `<tr data-doc="${esc(t.title)}"${isOpen(t) ? ' class="on"' : ""}><td><span class="mvname">${esc(t.title)}</span></td></tr>`,
+        isOpen, card: docCard, cols: 1,
+      });
+      return `<div class="cat-head">${esc(g)} · ${ts.length}</div>${cards ? `<div class="dchips">${body}</div>` : body}`;
+    }).join("");
     // The dev diary is a separate Google Doc, linked above the Overview
     const diary = `<p class="diary"><a href="https://docs.google.com/document/d/15neA-vw1VMiw20mT-OlcRAXjx283DN87cZLS6phBKgk/edit?usp=sharing" target="_blank" rel="noopener">Read the Pokemon Amethyst Dev Diary ↗</a></p>`;
     return [(q ? "" : diary) + html, `${list.length} topics`];
@@ -983,7 +998,7 @@ Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
     ].filter(Boolean);
     const moveBtn = (n) => {
       const k = TEAMS.moves[n], mv = moves[k];
-      return `<button class="tmv" data-move="${k}" style="--c:${TYPE_COLOR[mv.type]}" title="${esc(mv.desc)}"><span class="cat" title="${CAT_NAME[mv.split]}">${CAT[mv.split]}</span><span class="tmvname">${esc(mv.name)}</span>${typeBadge(mv.type)}</button>`;
+      return `<button class="tmv" data-move="${k}" style="--c:${TYPE_COLOR[mv.type]}" title="${esc(mv.desc)}">${catIcon(mv.split)}<span class="tmvname">${esc(mv.name)}</span>${typeBadge(mv.type)}</button>`;
     };
     // Gender the game gives it (trainers.py _gender: the trainer's, unless the species can't be or is 75%+ female)
     const sex = gender === "F" ? FEMALE : gender === "M" ? MALE : "";
@@ -1011,25 +1026,30 @@ Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
 
   function trainersView(q) {
     const list = matchTrainers(q);
-    if (!list.length) return [`<div class="nores">No trainers match “${esc(state.q)}”${state.mode ? ` in ${state.mode} mode` : ""}.</div>`, "0 trainers"];
+    if (!list.length) return noResults(`No trainers match “${esc(state.q)}”${state.mode ? ` in ${state.mode} mode` : ""}.`, "0 trainers");
     const open = state.trainer;
-    const groups = [];
-    list.forEach((e) => { const p = trainers[entries[e].n].place || "Other"; const g = groups.find(([x]) => x === p); g ? g[1].push(e) : groups.push([p, [e]]); });
     const maxLv = (e) => Math.max(...teamOf(e).map(([, lv]) => lv));
     // Scaled battles (Trainer Houses, Gym Trainees…) come out at your party's highest level
     const SCALE_TIP = "Levels scale to your party's highest";
     const minLv = (e) => Math.min(...teamOf(e).map(([, lv]) => lv));
     const lvRange = (e) => (minLv(e) === maxLv(e) ? `${minLv(e)}` : `${minLv(e)}–${maxLv(e)}`);
     const lvText = (e) => (trainers[entries[e].n].scaled ? `Scaling, min ${minLv(e)}` : `Lv ${lvRange(e)}`);
-    const html = groups.map(([p, es]) => `<div class="cat-head">${esc(p)} · ${es.length}</div>${state.layouts.trainers === "grid"
-      ? '<div class="tchips">' + chipsWithOpen(es, (e) => `<button class="chip${e === open ? " on" : ""}" data-trainer="${e}">${trainerPic(trainers[entries[e].n], "sm")}<span class="ln">${esc(trainerTitle(trainers[entries[e].n]))}</span>${
-          state.mode ? "" : entryMode(e)}<span class="hw" title="${trainers[entries[e].n].scaled ? SCALE_TIP : "Levels on the team"}">${lvText(e)}</span></button>`, (e) => e === open, trainerCard) + '</div>'
-      : `<div class="listtable"><table class="mv"><thead><tr><th>Trainer</th><th class="tteam">Team</th><th class="c-lv tlvcol">Level</th></tr></thead><tbody>${es.map((e) => {
+    const cards = state.layouts.trainers === "grid";
+    const html = groupBy(list, (e) => trainers[entries[e].n].place || "Other").map(([p, es]) => {
+      const body = listOrCards(cards, es, {
+        chip: (e) => `<button class="chip${e === open ? " on" : ""}" data-trainer="${e}">${trainerPic(trainers[entries[e].n], "sm")}<span class="ln">${esc(trainerTitle(trainers[entries[e].n]))}</span>${
+          state.mode ? "" : entryMode(e)}<span class="hw" title="${trainers[entries[e].n].scaled ? SCALE_TIP : "Levels on the team"}">${lvText(e)}</span></button>`,
+        row: (e) => {
           const t = trainers[entries[e].n], sprites = teamOf(e).map(([i]) => sprite(mons[i], true)).join("");
           return `<tr data-trainer="${e}"${e === open ? ' class="on"' : ""}><td><div class="trow">${trainerPic(t)}<span class="tn"><span class="tname"><span class="mvname">${esc(trainerTitle(t))}</span>${entryMode(e)}</span>${
             t.note ? `<span class="note">${esc(t.note)}</span>` : ""}<span class="teamline tt-inline">${sprites}</span></span></div></td><td class="tteam"><span class="teamline">${sprites}</span></td>
-            <td class="n lvcell tlvcol" title="${t.scaled ? SCALE_TIP : "Levels on the team"}">${t.scaled ? `<span class="note">Scaling, min</span> ${minLv(e)}` : lvRange(e)}</td></tr>${e === open ? expandRow(3, trainerCard(e)) : ""}`;
-        }).join("")}</tbody></table></div>`}`).join("");
+            <td class="n lvcell tlvcol" title="${t.scaled ? SCALE_TIP : "Levels on the team"}">${t.scaled ? `<span class="note">Scaling, min</span> ${minLv(e)}` : lvRange(e)}</td></tr>`;
+        },
+        isOpen: (e) => e === open, card: trainerCard, cols: 3,
+        head: '<th>Trainer</th><th class="tteam">Team</th><th class="c-lv tlvcol">Level</th>',
+      });
+      return `<div class="cat-head">${esc(p)} · ${es.length}</div>${cards ? `<div class="tchips">${body}</div>` : body}`;
+    }).join("");
     return [html, `${list.length} trainers`];
   }
 
