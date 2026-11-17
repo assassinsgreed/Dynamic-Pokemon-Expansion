@@ -10,6 +10,37 @@
   const consoleEl = $("header.console");
   const syncConsoleHeight = () => root.style.setProperty("--console-h", `${consoleEl.offsetHeight}px`);
   window.addEventListener("resize", syncConsoleHeight);
+  // Phones and short screens: scrolling down tucks the header away and scrolling up slides it back, like a drawer; on
+  // the checklist its pinned panel folds to the progress bar at the same time (CSS: body.tucked)
+  const compact = matchMedia("(max-width: 600px), (max-height: 500px)");
+  const mainEl = $("main");
+  let lastY = 0, settleUntil = 0;
+  function tuck(on) {
+    on = on && compact.matches;
+    if (document.body.classList.contains("tucked") === on) return;
+    // (the checklist's pinned panel changes height too; the list moves with its edge, so the row under it stays put)
+    document.body.classList.toggle("tucked", on);
+    if (!on) ckSepSync();
+    settleUntil = performance.now() + 350;  // tucking resizes <main>, which can move scrollTop without the player scrolling
+  }
+  const untuck = () => { document.body.classList.remove("tucked"); lastY = 0; };
+  mainEl.addEventListener("scroll", () => {
+    const y = mainEl.scrollTop;
+    if (performance.now() < settleUntil) { lastY = y; return; }
+    if (Math.abs(y - lastY) < 6) return;  // ignore jitter
+    tuck(y > lastY && y > consoleEl.offsetHeight);
+    lastY = y;
+  }, { passive: true });
+  try { compact.addEventListener("change", untuck); } catch (e) { compact.addListener(untuck); }  // older Safari
+  // The "|" between the checklist's folding and data buttons only belongs between them on one line: once the data
+  // buttons wrap onto a line of their own, it would dangle at the end of the first
+  function ckSepSync() {
+    const sep = document.querySelector(".ck-sep"), data = document.querySelector(".ck-data");
+    if (!sep || !data) return;
+    sep.hidden = false;
+    sep.hidden = data.offsetTop > sep.offsetTop + 2;
+  }
+  window.addEventListener("resize", ckSepSync);
   // Strips and tables that scroll sideways fade out on the side with more to see (phones hide scrollbars)
   const SCROLLERS = ".views, .tablist, .moves, .movelist, .listtable, .doctable";
   const cue = (el) => {
@@ -826,14 +857,14 @@
         card ? `<button class="ck-loc" data-place="${esc(card)}" title="Pokémon, items and map for ${esc(card)}">See Location</button>` : ""}<span class="ck-n" data-ckn="${n}"></span></summary>
         <div class="ck-rows">${groups.map(([g, es]) => `<div class="ck-grp">${named || g.place !== st.place ? `<div class="ck-place">${g.slug ? `<button data-place="${esc(g.place)}">${esc(g.place)}</button>` : esc(g.place)}</div>` : ""}${es.map((e) => ckRow(e, g)).join("")}</div>`).join("")}</div></details>`;
     }).join("");
-    if (!stages) return [`<div class="nores">Nothing on the checklist matches “${esc(state.q)}”.</div>`, "0 entries"];
+    if (!stages) return [`${alsoLine(q, "check")}<div class="nores">Nothing on the checklist matches “${esc(state.q)}”.</div>`, "0 entries"];
     const html = `<div class="cklist${ck.hide ? " hide-done" : ""}">
       <div class="ck-head"><div class="ck-prog"><span id="ck-total"></span><span class="ck-bar"><i id="ck-fill"></i></span></div>
         <div class="ck-acts"><label><input type="checkbox" data-ckact="hide"${ck.hide ? " checked" : ""}>Hide finished</label>
           <span class="ck-fold">Sections <button data-ckact="open-all" title="Expand every section">Expand</button><button data-ckact="close-all" title="Collapse every section">Collapse</button><button data-ckact="close-done" title="Collapse the sections you have finished">Collapse finished</button></span><span class="ck-sep" aria-hidden="true">|</span>
           <span class="ck-data"><button data-ckact="save" title="Tick what your save file says you've done (.sav or .srm); replaces your current ticks">Import from Save</button><button data-ckact="export" title="Save your ticks to a backup file">Export Backup</button><button data-ckact="import" title="Load ticks from a backup file">Import Backup</button><button data-ckact="reset">Reset</button></span></div>
         <p class="note ck-help">Track your progress in Pokemon Amethyst, in order of when things can first be obtained.</p></div>
-      <div class="ck-stages">${stages}</div></div>`;
+      ${alsoLine(q, "check")}<div class="ck-stages">${stages}</div></div>`;
     return [html, ""];
   }
 
@@ -1072,9 +1103,11 @@ Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
     shownView = state.view;
     const q = norm(state.q);
     const [html, count] = { dex: dexView, moves: movesView, tutors: tutorsView, abilities: abilitiesView, items: itemsView, trainers: trainersView, places: placesView, check: checkView, docs: docsView }[state.view](q);
-    $("#out").innerHTML = alsoLine(q, state.view) + html;
+    if (scroll) untuck();  // a new view or entry starts with the header showing
+    // (the checklist puts its "Also matching" line under its pinned panel, so the panel never moves)
+    $("#out").innerHTML = (state.view === "check" ? "" : alsoLine(q, state.view)) + html;
     $("#count").textContent = count;
-    if (state.view === "check") ckCounts();
+    if (state.view === "check") { ckCounts(); ckSepSync(); }
     $("#q").value = state.q;
     $("#q").placeholder = PLACEHOLDER[state.view];
     $("#clear").hidden = !$("#q").value;
