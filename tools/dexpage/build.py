@@ -240,6 +240,7 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
     index: dict[str, int] = {}
 
     def add(name: str, category: str, where: list[str], use: str) -> None:
+        where = [WHERE_REWORDS.get(w, w) for w in where]  # before the ROM's places are matched against them
         const = const_for.get(_norm(name))
         if const is None and not category:
             return  # prize-table rows that aren't items (the Game Corner also trades Pokémon)
@@ -324,7 +325,7 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
         if len(stock) > 1:
             first = min(stock, key=lambda w: int(re.sub(r"\D", "", w) or 0))
             item["where"] = [w for w in item["where"] if w not in stock or w == first]
-        item["where"] = _tidy_where([WHERE_REWORDS.get(w, w) for w in item["where"]])
+        item["where"] = _tidy_where(item["where"])
         item["use"] = _drop_versions(item["use"])
         # "PokeChip Crusher" is redundant next to "PokeChip Crusher (5 chips)"
         item["where"] = [w for w in item["where"] if not any(o.startswith(w + " (") for o in item["where"])]
@@ -421,6 +422,7 @@ def _item_category(item: dict, fields: dict[str, dict]) -> str:
 WHERE_REWORDS = {
     "Jumping Kid in Heleo City": "Heleo City Jumping Kid",
     "Heleo City NPC after performing 10 critical captures": "Heleo City NPC (10 critical captures)",
+    "Route 8 Cave (needs Surf)": "Forgotten Manse Underground (needs Surf)",  # the tunnel (map 1.8) is Forgotten Manse
 }
 
 
@@ -432,7 +434,7 @@ def game_item_names(data: SourceData) -> dict[str, str]:
 def _full_item_name(data: SourceData, const: str) -> str:
     """The ROM caps names at 12 characters ("BlundrPolicy"); the constant spells them out (Blunder Policy)."""
     rom_name = data.items[const]
-    spelled = const.removeprefix("ITEM_").replace("_", " ").title()
+    spelled = re.sub(r"_OLD$", "", const.removeprefix("ITEM_")).replace("_", " ").title()  # ITEM_ENIGMA_BERRY_OLD
     short, full = _norm(rom_name), _norm(spelled)
     letters = iter(full)
     abbreviated = len(rom_name) >= 11 and short != full and all(c in letters for c in short)

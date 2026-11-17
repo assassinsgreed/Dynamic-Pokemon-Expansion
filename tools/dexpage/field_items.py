@@ -22,9 +22,11 @@ HIDDEN_ITEM = 7
 # FireRed's Sevii Islands are still in the ROM but no warp leads there in Amethyst
 UNUSED_MAPS = {"Water Path", "Memorial Pillar", "Outcast Island", "Trainer Tower", "Green Path", "Tanoby Ruins",
                "Canyon Entrance", "Sevault Canyon"}
-MAP_PLACES = {(1, 30): FACTORY_OVERWORLD}  # maps listed apart from their map section's place (group, number)
+# maps listed apart from their map section's place (group, number); 1.8, the Forgotten Manse tunnel, is in Route 8's
+MAP_PLACES = {(1, 30): FACTORY_OVERWORLD, (1, 8): "Forgotten Manse"}
 RENEWING_HIDDEN = {"Treasure Beach"}  # its hidden items come back (feature list: Treasure Beach)
-SKIPPED_ITEMS = {"ITEM_NONE", "ITEM_ENIGMA_BERRY_OLD"}
+# ITEM_ENIGMA_BERRY_OLD (175) is not skipped: it's the game's working Enigma Berry (0x76, ITEM_ENIGMA_BERRY, is unused)
+SKIPPED_ITEMS = {"ITEM_NONE"}
 
 
 def _script_items(p: Paths) -> dict[int, str]:

@@ -468,7 +468,7 @@
       let m;
       if ((m = s.match(/^(?:(\d+)F|F(\d+))$/i))) return +(m[1] || m[2]);
       if ((m = s.match(/^(?:B(\d+)F|BF(\d+))$/i))) return 100 + +(m[1] || m[2]);
-      if (/^basement$/i.test(s)) return 101;
+      if (/^(basement|underground)$/i.test(s)) return 101;
       return 1000;
     };
     // On All, each method is split by mode ("Grass [Standard]", "Grass [Divergent]", "Grass [Both]"), each encounter
@@ -780,11 +780,12 @@
   const matchCheck = (q) => { const fw = words(state.q); return ckAll.filter((e) => !q || e.s.includes(fw)); };
   const ckTag = (text) => `<span class="mode">${esc(text)}</span>`;
 
-  // Pokémon named in an entry link to their Pokédex entries (e.p: [start, end, Pokémon] from checklist.py)
+  // Pokémon named in an entry link to their Pokédex entries, and items to their cards (e.p / e.ip: [start, end, Pokémon
+  // or item] from checklist.py; an item pickup that differs by mode names both, "A (B in Divergent)")
   const ckText = (e) => {
-    if (!e.p) return esc(e.t);
+    const links = [...(e.p || []).map(([a, b, i]) => [a, b, `data-open="${i}"`]), ...(e.ip || []).map(([a, b, k]) => [a, b, `data-item="${k}"`])];
     let html = "", at = 0;
-    for (const [a, b, i] of e.p) { html += esc(e.t.slice(at, a)) + `<button class="mvname" data-open="${i}">${esc(e.t.slice(a, b))}</button>`; at = b; }
+    for (const [a, b, attr] of links.sort((x, y) => x[0] - y[0])) { html += esc(e.t.slice(at, a)) + `<button class="mvname" ${attr}>${esc(e.t.slice(a, b))}</button>`; at = b; }
     return html + esc(e.t.slice(at));
   };
   function ckRow(e, g) {

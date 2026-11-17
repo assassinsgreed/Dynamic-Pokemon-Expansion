@@ -15,7 +15,10 @@ WILD_METHODS = ("Grass", "Cave", "Indoors", "Surfing", "Rod", "Rock Smash", "Swa
 # Map 1.30, outside Daimyn Factory, is Route 9 to the game (its map section) and to the sheet (sub-area
 # "Daimyn City Factory"), but it has its own encounter table, so the page lists it as its own place (Collin)
 FACTORY_OVERWORLD = "Daimyn Factory Overworld"
-OWN_PLACES = {("Route 9", "Daimyn City Factory"): FACTORY_OVERWORLD}  # (location, sub-area) → place
+# (location, sub-area) → the (place, sub-area) the page files it under. The tunnel is map 1.8, the Forgotten Manse map's
+# Underground floor; the sheet lists it under Route 8, whose map section it shares (Collin: it's Forgotten Manse)
+OWN_PLACES = {("Route 9", "Daimyn City Factory"): (FACTORY_OVERWORLD, ""),
+              ("Route 8", "Forgotten Manse Tunnel"): ("Forgotten Manse", "Underground")}
 # Sub-area names the page shows differently from the sheet (the sheet stays as Collin keeps it)
 SUB_AREA_NAMES = {"Volcanion Room": "Hidden Chamber"}
 
@@ -87,8 +90,8 @@ def load_encounters(path: Path = ENCOUNTERS_CSV) -> list[dict]:
             "form": m.group(2) if m else None,
             "mode": r["Mode"],
             "method": r["Method"],
-            "location": own or r["Location"],
-            "sub": "" if own else ", ".join(SUB_AREA_NAMES.get(s, s) for s in r["Sub-area"].split(", ")) if r["Sub-area"] else "",
+            "location": own[0] if own else r["Location"],
+            "sub": own[1] if own else ", ".join(SUB_AREA_NAMES.get(s, s) for s in r["Sub-area"].split(", ")) if r["Sub-area"] else "",
             "rate": rate,
             "levels": r["Levels"],
             "times": times,

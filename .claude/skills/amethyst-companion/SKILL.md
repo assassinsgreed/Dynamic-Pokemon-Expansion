@@ -44,7 +44,7 @@ He also tests `site/index.html` directly.
 | `load_cfru.py` | moves (Z/Max dropped), ability names + per-species renames (`GetAbilityNameOverride`), ability descriptions (positional table: ROM addresses + CFRU strings), shop stock (`pokemart` lists in `assembly/overworld_scripts`) |
 | `rom.py` | item names and item icons (icon table found via literal pool near `AddItemIconSprite` 0x8098758), text at ROM addresses |
 | `roster.py` | which Pokémon/forms get rows, Mode labels, special tutors (parsed from `item.c`), egg-move rules (parsed from `daycare.c`), evolution text |
-| `locations.py` + `encounters.csv`, `trades.csv` | wild/gift/trade encounters from Collin's Google Sheet (Encounters tab, hand-exported CSV; `trades.csv` is the Trades tab, used only for its "You give" column so trade notes say what to send); only wild methods (`WILD_METHODS`) feed profile held items; `OWN_PLACES` lists sheet rows shown as their own place (Route 9 / "Daimyn City Factory" → Daimyn Factory Overworld, map 1.30; its item balls follow via `field_items.MAP_PLACES`) |
+| `locations.py` + `encounters.csv`, `trades.csv` | wild/gift/trade encounters from Collin's Google Sheet (Encounters tab, hand-exported CSV; `trades.csv` is the Trades tab, used only for its "You give" column so trade notes say what to send); only wild methods (`WILD_METHODS`) feed profile held items; `OWN_PLACES` re-files sheet rows as (place, sub-area) (Route 9 / "Daimyn City Factory" → Daimyn Factory Overworld, map 1.30; Route 8 / "Forgotten Manse Tunnel" → Forgotten Manse / Underground, map 1.8, which is in Route 8's map section — Collin: the tunnel is Forgotten Manse everywhere); their item balls follow via `field_items.MAP_PLACES`, and the feature list's "Route 8 Cave" line via `build.WHERE_REWORDS` |
 | `items.py` + `items.csv`, `machines.csv`, `tutors.csv` | item, TM and tutor locations imported from the feature-list Google Doc (`python -m tools.dexpage.items doc.docx`, needs python-docx) |
 | `docs.py` + `docs.json`, `doc_images/` | Docs tab: feature-list topics (H1 group / H2 topic), imported with `python -m tools.dexpage.docs doc.docx`; overlapping topics skipped via `SKIP_GROUPS`/`SKIP_TOPICS` |
 | `ability_details.json` | Abilities tab's longer explanation per ability (keyed by the name shown) + `moves`: CFRU move-table names (`gPunchingMoves`…) whose moves show as chips. Hand-written from CFRU's code, not Bulbapedia; the build fails if it's out of step with the page's abilities |
@@ -254,7 +254,7 @@ A playthrough-order list of tick boxes for 100% completion, before Docs. Design:
   beat (no "gives HM" entry), while Rock Smash, Strength and Rock Climb are errands of their own; rival side events
   say "Until the <next> Badge is obtained"; named bosses link to their trainer entry in the mode the player has chosen;
   each place section has a Location button to its card; the progress bar and controls stay
-  stuck under the header; Pokémon named in an entry link to their Pokédex entries; no Beta tag and no legend: each entry starts with a
+  stuck under the header; Pokémon named in an entry link to their Pokédex entries (`p` spans), and an item pickup that differs by mode links each item it names ("Rusted Data (Burn Drive, Shock Drive… in Divergent)": `ip` spans, else `item` for the whole text); no Beta tag and no legend: each entry starts with a
   kind tag (Story / Event / Item / Pokémon / Hidden Item, in the maps' marker colours); a section's count turns bold
   green when full, and Hide finished hides a place heading or a whole section once it's all ticked; the search row
   shows no "x / y done" (the panel does); one
@@ -303,5 +303,6 @@ A playthrough-order list of tick boxes for 100% completion, before Docs. Design:
   still appear as separate move learners.
 - Service worker install not verified on a real phone (headless Chrome CacheStorage error).
 - Items with no icon: Running Shoes, Pokedex (no bag icon in game).
+- The working Enigma Berry is item 175 (`ITEM_ENIGMA_BERRY_OLD`; 0x76 is "????????"): never skip it in `field_items`.
 - Item-only places get a card only if they're a Town Map place (`DEX.townMap.places`) named in some item's where
   line (Treasure Beach, towns with shops); other item-only spots are reachable through item cards.

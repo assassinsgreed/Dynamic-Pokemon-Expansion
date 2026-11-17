@@ -73,9 +73,20 @@ class Items:
         self.found: dict[str, int | None] = {}
 
     def names(self, text: str) -> list[str]:
-        """'Garchompite (Aerodactite in Divergent)' → both names; 'TM12 Taunt' → itself."""
+        """'Garchompite (Aerodactite in Divergent)' → both names; 'Rusted Data (Burn Drive, Shock Drive in Divergent)'
+        → all three; 'TM12 Taunt' → itself."""
         m = re.fullmatch(r"(.+?) \((.+?) in Divergent\)", text)
-        return [m.group(1), m.group(2)] if m else [text]
+        return [m.group(1), *m.group(2).split(", ")] if m else [text]
+
+    def spans(self, text: str) -> list[list[int]]:
+        """[start, end, page item] for each item the text names, so each links to its own card."""
+        out, at = [], 0
+        for name in self.names(text):
+            start, k = text.find(name, at), self.find(name)
+            if start >= 0 and k is not None:
+                out.append([start, start + len(name), k])
+                at = start + len(name)
+        return out
 
     def find(self, name: str) -> int | None:
         """Index of the page item a marker names: 'HvyDutyBoots' is the game's spelling of Heavy Duty Boots."""
@@ -298,8 +309,10 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
             if only:
                 entry["only"] = only
             if mk["k"] in ("item", "hidden"):
-                idx = items.find(items.names(mk["t"])[0])
-                if idx is not None:
+                idx, spans = items.find(items.names(mk["t"])[0]), items.spans(text)
+                if len(spans) > 1:  # "A (B in Divergent)": each name links to its own item
+                    entry["ip"] = spans
+                elif idx is not None:
                     entry["item"] = idx
             if ident in H.LINKS:
                 entry["tr"] = _trainers(page, H.LINKS[ident], f"LINKS {ident}")
@@ -401,7 +414,7 @@ def main() -> None:
                 total += 1
                 notes = [e.get("need") and f"needs {e['need']}", e.get("until"), "sv" not in e and "NOT IN SAVE",
                          e.get("sv") and "save " + save_flags.describe(e["sv"]),
-                         e.get("tr") and "trainer link", e["k"] in ("item", "hidden") and "item" not in e and "NO ITEM LINK"]
+                         e.get("tr") and "trainer link", e["k"] in ("item", "hidden") and "item" not in e and "ip" not in e and "NO ITEM LINK"]
                 print(f"   {e['id']:<52} {e['k']:<6} {e.get('at', g['place'])}: {e['t']}" + "".join(f"  [{n}]" for n in notes if n))
     print(f"\n{total} entries")
     print("\nLeft out as daily:")
