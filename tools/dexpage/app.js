@@ -90,7 +90,7 @@
 
   // ---------------------------------------------------------------- state & navigation
   // state.view: dex | moves | items | places; move/item/place name the open card; open is the expanded Pokémon
-  const state = { view: "dex", q: "", move: null, item: null, place: null, map: null, mark: null, open: null, mode: "", tab: "level", tabFilter: "",
+  const state = { from: null, view: "dex", q: "", move: null, item: null, place: null, map: null, mark: null, open: null, mode: "", tab: "level", tabFilter: "",
     doc: null, ability: null, trainer: null, diff: "std",
     layouts: { dex: "list", moves: "list", tutors: "list", abilities: "list", items: "grid", trainers: "list", places: "grid", check: "list", docs: "list" } };  // list or cards, per view
   try {
@@ -100,7 +100,7 @@
   } catch (e) {}
   let depth = 0, top = 0;  // position in this page's history, and how far Forward can go
 
-  const snapshot = () => ({ view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, map: state.map, mark: state.mark, doc: state.doc, ability: state.ability, trainer: state.trainer, open: state.open });
+  const snapshot = () => ({ from: state.from, view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, map: state.map, mark: state.mark, doc: state.doc, ability: state.ability, trainer: state.trainer, open: state.open });
   function hashFor(st) {
     if (st.view === "dex" && st.open !== null) return monSlug(st.open);
     if (st.move) return "move-" + slug(moves[st.move].name);
@@ -115,7 +115,9 @@
   const queries = {};  // each tab keeps its own search text
 
   function navigate(change) {
-    const next = Object.assign({ view: state.view, q: "", move: null, item: null, place: null, map: null, mark: null, doc: null, ability: null, trainer: null, open: null }, change);
+    const next = Object.assign({ from: null, view: state.view, q: "", move: null, item: null, place: null, map: null, mark: null, doc: null, ability: null, trainer: null, open: null }, change);
+    // the step being left keeps its scroll position, so Back returns to the same spot (the checklist after a map)
+    try { history.replaceState(Object.assign({}, history.state, { scroll: $("main").scrollTop }), ""); } catch (e) {}
     Object.assign(state, next, { tabFilter: "" });
     queries[state.view] = state.q;
     depth++;
@@ -127,7 +129,10 @@
     try { history.replaceState({ dex: snapshot(), depth }, "", "#" + hashFor(state)); } catch (e) {}
   }
   window.addEventListener("popstate", (e) => {
-    if (e.state && e.state.dex) { Object.assign(state, e.state.dex, { tabFilter: "" }); depth = e.state.depth || 0; top = Math.max(top, depth); render(true); }
+    if (e.state && e.state.dex) {
+      Object.assign(state, { from: null }, e.state.dex, { tabFilter: "" }); depth = e.state.depth || 0; top = Math.max(top, depth); render(true);
+      if (e.state.scroll != null && !state.map) $("main").scrollTop = e.state.scroll;
+    }
     else fromHash();
   });
 
@@ -135,9 +140,14 @@
   const openMove = (k) => navigate({ view: "moves", move: k });
   const openItem = (k) => navigate({ view: "items", item: k });
   const openPlace = (name) => navigate({ view: "places", place: name });
-  // Back from a map returns to its place's details; a way out on the map opens the next place's map
-  const closeMap = () => navigate({ view: "places", q: state.q, place: state.place });
-  MapView.init({ onClose: closeMap, onLink: (slug) => navigate({ view: "places", place: placeOfMap(slug) || null, map: slug }),
+  // Back from a map returns to where it was opened from: the checklist (a history step back, like the header's Back,
+  // so the list is where it was) or its place's details; a way out on the map opens the next place's map
+  const closeMap = () => {
+    if (state.from !== "check") navigate({ view: "places", q: state.q, place: state.place });
+    else if (depth > 0) history.back();
+    else navigate({ view: "check" });
+  };
+  MapView.init({ onClose: closeMap, backLabel: () => (state.from === "check" ? "Back to checklist" : "Back to place details"), onLink: (slug) => navigate({ view: "places", place: placeOfMap(slug) || null, map: slug }),
     onMark: (mark) => { if (state.map) { state.mark = mark; remember(); } } });  // #map-<place>/<marker> links to one marker
 
   // ---------------------------------------------------------------- small pieces
@@ -1118,7 +1128,7 @@ Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
     const act = t.closest("button[data-ckact]");
     if (act) { ckAct(act); return; }
     const onMap = t.closest("[data-ckmap]");
-    if (onMap) { navigate({ view: "places", place: placeOfMap(onMap.dataset.ckmap), map: onMap.dataset.ckmap, mark: onMap.dataset.mark }); return; }
+    if (onMap) { navigate({ view: "places", place: placeOfMap(onMap.dataset.ckmap), map: onMap.dataset.ckmap, mark: onMap.dataset.mark, from: "check" }); return; }
     const boss = t.closest("[data-cktr]");
     if (boss) {  // the trainer's entry for the mode the player has chosen (difficulty is the Trainers tab's own setting)
       const ns = boss.dataset.cktr.split(",").map(Number);

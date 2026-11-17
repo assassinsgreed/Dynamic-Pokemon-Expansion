@@ -301,7 +301,7 @@ const MapView = (() => {
   }
 
   return {
-    // onLink(slug): a way out was clicked; onClose(): the Back button. The companion turns both into history steps.
+    // onLink(slug): a way out was clicked; onClose(): the Back button (labelled by backLabel()). The companion turns both into history steps.
     // onMark(id | null): a marker was selected or let go, so the companion can put its link in the address bar.
     init(o) { opts = o; },
     open(slug, mark) {
@@ -310,6 +310,7 @@ const MapView = (() => {
       if (!p) return false;
       if (!root) build();
       if (p !== place) { render(p); root.scrollTop = 0; }
+      $("close").lastChild.textContent = " " + (opts.backLabel ? opts.backLabel() : "Back to place details");
       root.hidden = false;
       document.body.classList.add("map-open");
       goMark(mark || null);

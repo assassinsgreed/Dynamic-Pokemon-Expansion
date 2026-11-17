@@ -203,7 +203,9 @@ Each place card has a **View Interactive Map** button that opens `#map-<slug>`: 
 - On-page help is exactly: "Click or tap a warp to see where it leads." / "Click or tap a marker in the map to see
   what it is." / "Click or tap a marker in the key to highlight it in the map." (+ a 2× hint on touch screens).
 - The map layer sits under the console (`--console-h`), so tabs and Back/Forward stay usable; its own
-  "← Back to place details" button, Escape and the header's Back return to the card. A place pop-up behind it is
+  "← Back to place details" button, Escape and the header's Back return to the card. Opened from the checklist's
+  Find in Map (`from: "check"` on that history step), the button reads "← Back to checklist" and steps back in history;
+  every history step keeps `main`'s scroll position, so Back lands where the list was. A place pop-up behind it is
   hidden (`body.map-open .sheet`). Typing a search or switching tabs closes the map.
 - Fit scales floors to the frame and must never scroll inside the maps area (fractional widths at 125% display
   scaling made stray scrollbars); 2× scrolls sideways with `flex-shrink: 0` floors.
