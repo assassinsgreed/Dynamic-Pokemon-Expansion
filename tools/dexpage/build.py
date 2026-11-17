@@ -196,7 +196,7 @@ def _trainers(data: SourceData, index: dict, item_by_const: dict) -> tuple[list[
     trainers = []
     for t in raw:
         trainers.append({
-            "cls": t["cls"], "name": t["name"], "rival": t["rival"], "pic": offsets.get(t["pic"]),
+            "id": t["id"], "cls": t["cls"], "name": t["name"], "rival": t["rival"], "pic": offsets.get(t["pic"]),
             "place": t["place"], "note": t["note"], "double": t["double"], "scaled": t["scaled"],
             "items": [item(i) for i in t["items"]], "ball": item(t["ball"]), "iv": t["iv"], "teams": [t["teams"][k] for k in TEAM_KEYS],
         })
@@ -323,7 +323,7 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
         if len(stock) > 1:
             first = min(stock, key=lambda w: int(re.sub(r"\D", "", w) or 0))
             item["where"] = [w for w in item["where"] if w not in stock or w == first]
-        item["where"] = _tidy_where(item["where"])
+        item["where"] = _tidy_where([WHERE_REWORDS.get(w, w) for w in item["where"]])
         item["use"] = _drop_versions(item["use"])
         # "PokeChip Crusher" is redundant next to "PokeChip Crusher (5 chips)"
         item["where"] = [w for w in item["where"] if not any(o.startswith(w + " (") for o in item["where"])]
@@ -409,6 +409,13 @@ def _item_category(item: dict, fields: dict[str, dict]) -> str:
     if f["battle_use"] or f["field_use"] not in (0, unusable):
         return "Consumables"
     return "Held Items" if f["hold"] else "Other items"
+
+
+# Feature-list sources reworded so a place card's chip hint stays short (Collin: "Jumping Kid", not a sentence)
+WHERE_REWORDS = {
+    "Jumping Kid in Heleo City": "Heleo City Jumping Kid",
+    "Heleo City NPC after performing 10 critical captures": "Heleo City NPC (10 critical captures)",
+}
 
 
 def game_item_names(data: SourceData) -> dict[str, str]:

@@ -21,6 +21,7 @@ DUNGEONS = ["Rubarr Desert", "Varisi Forest", "Torma Cave", "Forgotten Manse", "
             "Pluto HQ", "Mimmett Jungle", "Carnelidge Volcano", "Uteyan Ruins", "Victory Road"]
 PREFIX_PLACES = ["Pluto HQ", "Daimyn Factory"]  # map files named "<place> <room>"
 HIDDEN_ITEM = 7
+HIDDEN_FLAGS = 1000  # FLAG_HIDDEN_ITEMS_START: a hidden item's found flag is this + its id byte
 CUTSCENE_COPIES = ("Empty ", "Credits ")  # image names of cutscene copies of real maps
 BLACK = (20, 20, 20)
 
@@ -321,6 +322,13 @@ class Objects:
             if line in ("end", "return") or line.startswith("goto "):
                 break
 
+    REGIONAL = (("_A", "Alolan"), ("_G", "Galarian"), ("_H", "Hisuian"))
+
+    def wild_name(self, const):
+        """SPECIES_DIGLETT_A is an Alolan Diglett: the game's name table calls every form just 'Diglett'."""
+        name = self.species_name.get(const, const)
+        return next((f"{word} {name}" for suffix, word in self.REGIONAL if const.endswith(suffix)), name)
+
     def by_mode(self, label, pattern, name):
         """What a pattern finds in Standard and in Divergent mode, as 'X' or 'X (Y in Divergent)'."""
         found = {False: [], True: []}
@@ -422,8 +430,8 @@ class Objects:
             gfx = u8(o + 1) | u8(o + 3) << 8
             if gfx >> 8 == 0xFF and (gfx & 0xFF) in swaps:  # a runtime-changeable sprite: the map sets which one
                 gfx = swaps[gfx & 0xFF]
-            ob = {"x": x, "y": y, "label": label, "gfx": gfx, "move": u8(o + 9), "modes": False}
-            flag = u16(o + 20)
+            flag = u16(o + 20)  # the flag that hides it: set once an item ball is taken or a one-off Pokémon is dealt with
+            ob = {"x": x, "y": y, "label": label, "gfx": gfx, "move": u8(o + 9), "modes": False, "flag": flag}
             ob["postgame"] = flag in POSTGAME_HIDE_FLAGS or flag in late or "UltraWormhole_" in label
             if label in C.NO_SPRITE:
                 continue
@@ -448,7 +456,7 @@ class Objects:
                 out.append(ob)
                 continue  # numbered by the Rubarr puzzle
             wild, wild_modes = self.by_mode(label, r"(?:setwildbattle|wildbattle)\s+(SPECIES_\w+)",
-                                            lambda s: self.species_name.get(s, s)) if label else (None, False)
+                                            self.wild_name) if label else (None, False)
             if script in self.items or "ItemScript" in label:
                 ob["kind"] = "item"
                 given, ob["modes"] = self.by_mode(label, r"(?:finditem|setvar CHOSEN_ITEM)\s+(ITEM_\w+)", self.item_name)
@@ -489,16 +497,18 @@ class Objects:
             label = self.labels.get(u32(c + 12), "")
             if label in C.NOTES:
                 text, modes, pg = C.NOTES[label]
-                out.append({"x": s16(c), "y": s16(c + 2), "kind": "npc", "text": text, "modes": modes, "postgame": pg})
+                out.append({"x": s16(c), "y": s16(c + 2), "kind": "npc", "text": text, "modes": modes, "postgame": pg,
+                            "label": label})
         for i in range(u8(e + 3)):
             bg = off(u32(e + 16)) + 12 * i
             x, y = s16(bg), s16(bg + 2)
             if u8(bg + 5) == HIDDEN_ITEM and (key, x, y) not in C.NO_HIDDEN:
                 const = self.by_id.get(u16(bg + 8), "?")
-                out.append({"x": x, "y": y, "kind": "hidden", "text": self.item_name(const)})
+                out.append({"x": x, "y": y, "kind": "hidden", "text": self.item_name(const),
+                            "flag": HIDDEN_FLAGS + u8(bg + 10)})
             elif u8(bg + 5) < 5 and (label := self.labels.get(u32(bg + 8), "")) in C.NOTES:  # signs (Rotom's catalog)
                 text, modes, pg = C.NOTES[label]
-                out.append({"x": x, "y": y, "kind": "npc", "text": text, "modes": modes, "postgame": pg})
+                out.append({"x": x, "y": y, "kind": "npc", "text": text, "modes": modes, "postgame": pg, "label": label})
         return out
 
 

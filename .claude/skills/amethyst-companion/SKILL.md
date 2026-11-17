@@ -240,6 +240,14 @@ A playthrough-order list of tick boxes for 100% completion, before Docs. Design:
   layout only (he tried cards and dropped them: sections of uneven length looked chaotic); gift lists are written
   out in full (the maps' "A, B +1" is `tf` on the marker), and story hand-outs (Town Map and Running Shoes) are one
   story tick, not an NPC entry.
+- More of Collin's rules: buttons read "See Location" / "See Interactive Map"; no coloured border on sections
+  (purple reads as Divergent); Trainer Houses list their grand prize, not the trainers; an item the data says is in
+  one mode only is tagged "Divergent only" (`only`; the map shows it as `mo`); what an item needs also shows on the
+  interactive map (`rq`, set on the marker by checklist.py; `NEEDS` adds what the feature list lacks); `KEEP` lists a
+  common item anyway; `MOVE` to "with Strength" puts an entry in that HM's section. Regional forms are named in
+  encounter text ("Alolan Diglett": `wild_name` in places.py). When he says the feature list changed, re-download
+  it and run `python -m tools.dexpage.items doc.docx` (skip the docs import unless Docs text changed: it only
+  renumbers images).
 - Ticks: `localStorage["dex-checklist"]`; the Download link writes them into the saved copy as `#saved-checklist`
   (merged once per saved file); Export/Import is a small JSON file. Don't write `/</g` in app.js: the build turns
   every `</` into `<\/`, which breaks a regex literal.

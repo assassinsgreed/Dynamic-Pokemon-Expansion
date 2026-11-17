@@ -415,6 +415,7 @@ def load_trainers(p: Paths, stats: dict, learnsets: dict, move_data: dict, abili
             pics[pic] = trainer_pic(p, pic)
         trainers.append({
             "const": const,
+            "id": ids[const],
             "cls": names[class_ids[cls]] if cls in class_ids else cls,
             "name": _name(p, std.get("trainerName", "")),
             "rival": cls in ("CLASS_RIVAL", "CLASS_RIVAL_2"),

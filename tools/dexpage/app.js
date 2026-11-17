@@ -716,7 +716,7 @@
     : `<polygon points="${CK_KIND[k][2]}" fill="${CK_KIND[k][1]}" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/>`}</svg></span>`;
   const ckAll = [];
   CK.stages.forEach((st) => st.groups.forEach((g) => g.entries.forEach((e) => {
-    e.s = words(`${e.t} ${g.place} ${st.title} ${e.fl || ""} ${CK_KIND[e.k][0]} ${e.daily ? "daily" : ""} ${e.need || ""}`);
+    e.s = words(`${e.t} ${g.place} ${st.title} ${e.fl || ""} ${CK_KIND[e.k][0]} ${e.need || ""}`);
     ckAll.push(e);
   })));
   const ck = { done: {}, hide: false, closed: {} };
@@ -758,10 +758,10 @@
   function ckRow(e, g) {
     const name = e.tr ? `<button class="mvname" data-cktr="${e.tr.join(",")}" title="See this trainer's team">${esc(e.t)}</button>`
       : e.item != null ? `<button class="mvname" data-item="${e.item}">${esc(e.t)}</button>` : ckText(e);
-    const tags = [e.daily && "Daily", e.sd && "Differs by mode", e.need && `Needs ${e.need}`, e.until, e.fl].filter(Boolean).map(ckTag).join("");
+    const tags = [e.sd && "Differs by mode", e.only && `${e.only} only`, e.need && `Needs ${e.need}`, e.until, e.fl].filter(Boolean).map(ckTag).join("");
     return `<div class="ck${ck.done[e.id] ? " done" : ""}"><label><input type="checkbox" data-ck="${esc(e.id)}"${ck.done[e.id] ? " checked" : ""}>${ckShape(e.k)}
       <span class="ck-body">${name}${tags ? `<span class="ck-tags">${tags}</span>` : ""}</span></label>${
-      e.mark ? `<button class="ck-map" data-ckmap="${g.slug}" data-mark="${e.mark}" title="Show on the map">Map</button>` : ""}</div>`;
+      e.mark ? `<button class="ck-map" data-ckmap="${g.slug}" data-mark="${e.mark}" >See Interactive Map</button>` : ""}</div>`;
   }
 
   function ckCounts() {
@@ -788,15 +788,15 @@
       const named = st.kind !== "place";  // a place's own section needs no place heading, just a way to its card
       const card = named ? "" : places.has(norm(st.title)) ? st.title : st.groups[0].place;
       return `<details class="ck-stage k-${st.kind}" data-ckstage="${esc(st.title)}"${open ? " open" : ""}><summary>${CHEVRON}<span class="ck-title">${esc(st.title)}</span>${
-        card ? `<button class="ck-loc" data-place="${esc(card)}" title="Pokémon, items and map for ${esc(card)}">Location</button>` : ""}<span class="ck-n" data-ckn="${n}"></span></summary>
-        <div class="ck-rows">${groups.map(([g, es]) => `${named ? `<div class="ck-place"><button data-place="${esc(g.place)}">${esc(g.place)}</button></div>` : ""}${es.map((e) => ckRow(e, g)).join("")}`).join("")}</div></details>`;
+        card ? `<button class="ck-loc" data-place="${esc(card)}" title="Pokémon, items and map for ${esc(card)}">See Location</button>` : ""}<span class="ck-n" data-ckn="${n}"></span></summary>
+        <div class="ck-rows">${groups.map(([g, es]) => `${named || g.place !== st.place ? `<div class="ck-place"><button data-place="${esc(g.place)}">${esc(g.place)}</button></div>` : ""}${es.map((e) => ckRow(e, g)).join("")}`).join("")}</div></details>`;
     }).join("");
     if (!stages) return [`<div class="nores">Nothing on the checklist matches “${esc(state.q)}”.</div>`, "0 entries"];
     const html = `<div class="cklist${ck.hide ? " hide-done" : ""}">
       <div class="ck-head"><div class="ck-prog"><span id="ck-total"></span><span class="ck-bar"><i id="ck-fill"></i></span></div>
         <div class="ck-key">${Object.keys(CK_KIND).filter((k) => kinds.has(k)).map((k) => `<span>${ckShape(k)}${CK_KIND[k][0]}</span>`).join("")}</div>
         <div class="ck-acts"><label><input type="checkbox" data-ckact="hide"${ck.hide ? " checked" : ""}>Hide finished</label>
-          <button data-ckact="export" title="Save your ticks to a file">Export</button><button data-ckact="import" title="Load ticks from an exported file">Import</button><button data-ckact="reset">Reset</button></div>
+          <button data-ckact="save" title="Tick what your save file says you've done (.sav or .srm); replaces your current ticks">Load Save File</button><button data-ckact="export" title="Save your ticks to a file">Export</button><button data-ckact="import" title="Load ticks from an exported file">Import</button><button data-ckact="reset">Reset</button></div>
         <p class="note ck-help">Track your progress in Pokemon Amethyst. Progress is tracked in your browser; Export and Import allow you to move data to/from local copies.</p></div>
       <div class="ck-stages">${stages}</div></div>`;
     return [html, ""];
@@ -828,11 +828,66 @@
     });
     input.click();
   }
+  // A save file ticks the list: each entry's e.sv lists the game flags that mean it's done (save_flags.py).
+  // The layout is CFRU's (save.c): 2 slots of 14 sectors of 0x1000 bytes, each ending in its id, checksum, signature
+  // and save counter; the newer complete slot is the game's save. SaveBlock1 is sectors 1-4 (0xFF0 bytes each) with
+  // flags 0-0x8FF at 0xEE0, and flags 0x900+ start CFRU's extra block in the unused tail of sector 0 (0xF24 on).
+  function ckSaveFlags(bytes) {
+    if (bytes.length < 0x20000) return null;  // .sav and .srm are both the raw 128 KiB flash (some add a clock footer)
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    let best = null;
+    for (let slot = 0; slot < 2; slot++) {
+      const at = {};
+      let counter = 0;
+      for (let i = 0; i < 14; i++) {
+        const o = (slot * 14 + i) * 0x1000;
+        if (view.getUint32(o + 0xFF8, true) !== 0x08012025) continue;
+        const id = view.getUint16(o + 0xFF4, true), size = { 0: 0xF24, 4: 0xD98, 13: 0x450 }[id] || 0xFF0;
+        let sum = 0;  // the game's checksum, over the part of the sector the vanilla game uses: a half-written one fails
+        for (let w = 0; w < size; w += 4) sum = (sum + view.getUint32(o + w, true)) >>> 0;
+        if ((((sum >>> 16) + sum) & 0xFFFF) !== view.getUint16(o + 0xFF6, true)) continue;
+        at[id] = o;
+        counter = view.getUint32(o + 0xFFC, true);
+      }
+      if (Object.keys(at).length === 14 && (!best || counter > best.counter)) best = { at, counter };
+    }
+    if (!best) return null;
+    const flags = new Uint8Array(0x320), part = (id, from, to) => bytes.subarray(best.at[id] + from, best.at[id] + to);
+    flags.set(part(1, 0xEE0, 0xFF0), 0);
+    flags.set(part(2, 0, 0x10), 0x110);
+    flags.set(part(0, 0xF24, 0xFF0), 0x120);          // flags 0x900 on: 0xCC bytes here,
+    flags.set(part(4, 0xD98, 0xD98 + 0x134), 0x1EC);  // the rest in sector 4's tail
+    return flags;
+  }
+  function ckLoadSave() {
+    const input = document.createElement("input");
+    input.type = "file";  // no accept filter: phones hide .sav / .srm files behind one
+    input.addEventListener("change", () => {
+      const f = input.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const flags = ckSaveFlags(new Uint8Array(reader.result));
+        if (!flags) { alert("That isn’t a Pokémon Amethyst save file. Choose the .sav or .srm file your emulator saves (not a save state)."); return; }
+        const has = (n) => (flags[n >> 3] >> (n & 7)) & 1;
+        const done = {}, known = ckAll.filter((e) => e.sv);
+        known.forEach((e) => { if (e.sv.some(has)) done[e.id] = 1; });
+        const n = Object.keys(done).length, blind = ckAll.length - known.length;
+        if (!confirm(`This save has ${n} of ${ckAll.length} entries done.${blind ? ` ${blind} entries can’t be read from a save file and will be left unticked.` : ""}
+
+Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
+        ck.done = done; ckSave(); render();
+      };
+      reader.readAsArrayBuffer(f);
+    });
+    input.click();
+  }
   function ckAct(el) {
     const act = el.dataset.ckact;
     if (act === "hide") { ck.hide = el.checked; ckSave(); el.closest(".cklist").classList.toggle("hide-done", ck.hide); }
     else if (act === "export") ckFile("amethyst-checklist.json", "application/json", ckPayload());
     else if (act === "import") ckImport();
+    else if (act === "save") ckLoadSave();
     else if (act === "reset" && confirm("Clear every tick on the checklist?")) { ck.done = {}; ckSave(); render(); }
   }
 
@@ -944,7 +999,7 @@
     items: "Search items or kinds — e.g. Fire Stone, Berries, Mega",
     trainers: "Search trainers, places or their Pokémon — e.g. Raine, Hiker, Route 8, Rockruff",
     places: "Search places, or what's there — e.g. Route 2, Bidoof, Full Heal, Grass",
-    check: "Search the checklist — e.g. Ferrox Village, trade, TM12, daily",
+    check: "Search the checklist — e.g. Ferrox Village, trade, TM12",
     docs: "Search the docs — e.g. Frostbite, Battle Frontier, shiny",
   };
 

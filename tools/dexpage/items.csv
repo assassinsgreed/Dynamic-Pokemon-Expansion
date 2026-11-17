@@ -129,15 +129,19 @@ Daimyn City Mall",Give 10 HP EVs
 Protein,Consumables,"Tsarvosa City Stats Dojo
 Daimyn City Mall",Give 10 attack EVs
 Iron,Consumables,"Tsarvosa City Stats Dojo
-Daimyn City Mall",Give 10 defense EVs
+Daimyn City Mall
+Route 6 (needs Surf)",Give 10 defense EVs
 Calcium,Consumables,"Tsarvosa City Stats Dojo
 Daimyn City Mall",Give 10 special attack EVs
 Zinc,Consumables,"Tsarvosa City Stats Dojo
 Daimyn City Mall",Give 10 special defense EVs
 Carbos,Consumables,"Tsarvosa City Stats Dojo
 Daimyn City Mall",Give 10 speed EVs
-Rare Candy,Consumables,PokeChip Crusher,Raises a Pokemon’s level by 1
-PP Up,Consumables,Heleo City Shady Dealer,Raises PP for a move
+Rare Candy,Consumables,"PokeChip Crusher
+Route 6 (needs Surf)
+Route 8 Cave (needs Surf)",Raises a Pokemon’s level by 1
+PP Up,Consumables,"Heleo City Shady Dealer
+Route 6 (needs Strength)",Raises PP for a move
 PP Max,Consumables,PokeChip Crusher,Raises PP to the max for a move
 Honey,Consumables,"Wild Combee and Vespiquen
 Pokemarts",Triggers a wild encounter with boosted PokeChip odds
@@ -215,7 +219,7 @@ Torma Cave B2F
 Route 12 West","Eevee
 Darumaka-G
 Crabrawler"
-Linking Cord,Evolution,"Route 6
+Linking Cord,Evolution,"Route 6 (need Rock Smash & Strength)
 Route 12 East (hidden)
 Daimyn City Mall","Boldore
 Gurdurr
@@ -388,7 +392,7 @@ Black Belt,Held Items,Route 7,Raises the power of fighting moves
 Magnet,Held Items,Daimyn Factory Overworld,Raises the power of electric moves
 Mystic Water,Held Items,Rubarr Desert Oasis,Raises the power of water moves
 Sharp Beak,Held Items,Route 9,Raises the power of flying moves
-Poison Barb,Held Items,Route 8,Raises the power of poison moves
+Poison Barb,Held Items,Route 8 (needs Cut),Raises the power of poison moves
 Never Melt Ice,Held Items,Torma Cave B2F,Raises the power of ice moves
 Spell Tag,Held Items,Forgotten Manse 2F,Raises the power of ghost moves
 Twisted Spoon,Held Items,Route 22,Raises the power of psychic moves

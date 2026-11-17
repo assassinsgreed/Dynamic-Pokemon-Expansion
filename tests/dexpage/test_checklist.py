@@ -84,7 +84,7 @@ def test_shortened_item_names_link_to_their_item(result, page):
 def test_pokemon_link_to_their_entries(result, page):
     sandygast = next(e for e in entries(stage(result, "Route 1")) if e["k"] == "wild")
     linked = [(sandygast["t"][a:b], page["mons"][i]["name"]) for a, b, i in sandygast["p"]]
-    assert linked == [("Sandygast", "Sandygast"), ("Diglett", "Diglett")]
+    assert linked == [("Sandygast", "Sandygast"), ("Alolan Diglett", "Diglett")]
     trade = next(e for e in entries(stage(result, "Tsarvosa City")) if e["t"].startswith("Trade your Slowbro"))
     named = [(trade["t"][a:b], page["mons"][i]["form"]) for a, b, i in trade["p"]]
     assert ("Galarian Slowbro", "Galarian") in named and ("Slowbro", None) in named
@@ -107,6 +107,35 @@ def test_bosses_link_to_their_trainers(result, page):
     gym = next(e for e in entries(stage(result, "Heleo City")) if "Leader Raine" in e["t"])
     assert len(gym["tr"]) == 3  # one team per badge count
     assert all(page["trainers"][n]["name"] == "Raine" for n in gym["tr"])
+
+
+def test_regional_forms_are_named(result, page):
+    sandygast = next(e for e in entries(stage(result, "Route 1")) if e["k"] == "wild")
+    assert sandygast["t"] == "Sandygast (Alolan Diglett in Divergent)"
+    assert [page["mons"][i]["form"] for _, _, i in sandygast["p"]] == [None, "Alolan"]
+    assert "Ampharos (Pidgeot in Divergent)" in texts(stage(result, "Heleo Ranch"))
+
+
+def test_one_mode_items_are_tagged(result):
+    by_text = {e["t"]: e for e in everything(result)}
+    assert by_text["Beedrillite"]["only"] == "Divergent"
+    assert by_text["Cameruptite"]["only"] == "Divergent"
+    assert "only" not in by_text["TM12 Taunt"]
+
+
+def test_hand_placed_entries(result):
+    f2 = texts(stage(result, "Hesson Pass F2"))
+    assert "Charizite X" in f2 and "Light Clay" in f2 and "TM67 Smart Strike" in f2
+    assert "Star Piece" in texts(stage(result, "Hesson Pass"))
+    titles = [st["title"] for st in result[0]["stages"]]
+    assert titles.index("Hesson Pass F2") > titles.index("Carnelidge Volcano")
+    assert any(t.startswith("Gentleman: gives Decoder") for t in texts(stage(result, "Uteyan Ruins"), "Laplaz Town"))
+    assert any(t.startswith("Stella and Iris") for t in texts(stage(result, "After badge 7 (with Strength)"), "Daimyn City"))
+    assert "Psychic Sister: IV Grading Unlock" in texts(stage(result, "Laplaz Town"))
+    revive = next(e for e in entries(stage(result, "Route 12 West")) if e["t"] == "Revive")
+    assert revive["need"] == "Rock Smash"  # mart stock, but listed: it sits behind a rock
+    assert not any(e["k"] == "npc" for e in entries(stage(result, "Pluto HQ")))  # the keys come with the story beats
+    assert "Trainer House: win the grand prize, the Mach Bike" in texts(stage(result, "Heleo City"))
 
 
 def test_every_map_place_has_a_stage(result, paths):

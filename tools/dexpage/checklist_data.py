@@ -32,7 +32,7 @@ ORDER = [
     "Route 14", "Route 15 North", "Route 15 South", "Route 16", "Route 19", "Emraldin Quay", "Route 20",
     "Treasure Beach", "Route 21", "Mimmett Jungle", "Route 22", "Secret Trail", "Route 23", "Tsarvosa City",
     "Seppire Cove", "Daimyn Factory", ("Rubarr Desert Caves", "Rubarr Desert", ["Cave", "Caverns"]),
-    ("Route 13 cave", "Route 13", ["Cave"]), "Carnelidge Volcano", "Uteya Village", "Route 24", "Uteyan Ruins",
+    ("Route 13 cave", "Route 13", ["Cave"]), "Carnelidge Volcano", ("Hesson Pass F2", "Hesson Pass", ["F2"]), "Uteya Village", "Route 24", "Uteyan Ruins",
     "Victory Road", "Ascension Tower",
 ]
 
@@ -40,7 +40,8 @@ ORDER = [
 POSTGAME_PLACES = ["Ultra Space", "Battle Frontier"]
 
 # Story beats per stage: (key, text[, options]). Keys are part of the saved id, so keep them when rewording.
-# Options: trainer=(class, name, place in the Trainers tab) links the battle; daily=True; at=place (Postgame only).
+# Options: trainer=(class, name, place in the Trainers tab) links the battle; item=name links the reward's item;
+# daily=True (left off the list: never finished); at=place (Postgame only).
 STORY = {
     "Anthra Town": [("starter", "Follow the story to choose your starter"),
                     ("gifts", "Receive the Town Map and Running Shoes from Mom")],
@@ -57,22 +58,24 @@ STORY = {
                        ("library", "Solve the Ferrox Library password puzzle and receive HM01 Cut from Alistair"),
                        ("gym", "Defeat Leader Stella for the Patch Badge", {"trainer": ("Leader", "Stella", "Ferrox Village Gym")})],
     "Heleo City": [("gym", "Defeat Leader Raine for the Stormcloud Badge", {"trainer": ("Leader", "Raine", "Heleo City Gym")}),
-                   ("trainer-house", "Trainer House: battle Bianca, Galen and Jet", {"trainer": ("PKMN Trainer", "Bianca", "Heleo City Trainer House")})],
+                   ("trainer-house", "Trainer House: win the grand prize, the Mach Bike", {"item": "Mach Bike"})],
     "Daimyn City": [("rival", "Battle your rival", {"trainer": ("Rival", "", "Daimyn City")}),
                     ("gym", "Defeat Leader Chance for the Roundabout Badge", {"trainer": ("Leader", "Chance", "Daimyn City Gym")})],
+    "Route 9": [("pluto", "Stop Team Pluto at Route 11 South to move Slowbro")],
     "Route 10": [("casey", "Battle Casey", {"trainer": ("PKMN Trainer", "Casey", "Route 10")})],
     "Route 11 South": [("ronald", "Defeat Pluto Admin Ronald", {"trainer": ("Pluto Admin", "Ronald", "Route 11 South")}),
                        ("rival", "Battle your rival and receive HM02 Fly", {"trainer": ("Rival", "", "Route 11 South")})],
     "Laplaz Town": [("gym", "Defeat Leader Casey for the Tactician Badge", {"trainer": ("Leader", "Casey", "Laplaz Town Gym")}),
-                    ("trainer-house", "Trainer House: battle Toby, Dirk and Vanessa", {"trainer": ("PKMN Trainer", "Toby", "Laplaz Town Trainer House")})],
-    "Bruccie Village": [("gym", "Defeat Leader Abby for the Talent Badge", {"trainer": ("Leader", "Abby", "Bruccie Village Gym")})],
-    "Calicin Bay": [("rival", "Battle your rival", {"trainer": ("Rival", "", "Bruccie Village & Calicin Bay")})],
-    "Pluto HQ": [("irene", "Defeat Pluto Admin Irene", {"trainer": ("Pluto Admin", "Irene", "Pluto HQ")}),
-                 ("ronald", "Defeat Pluto Admin Ronald", {"trainer": ("Pluto Admin", "Ronald", "Pluto HQ")}),
+                    ("trainer-house", "Trainer House: win the grand prize, the Lucky Egg", {"item": "Lucky Egg"})],
+    "Scalding Spa": [("yolena", "Defeat Team Pluto Yolena", {"trainer": ("Team Pluto", "Yolena", "Route 12 & Scalding Spa")})],
+    "Bruccie Village": [("rival", "Battle your rival to access the gym", {"trainer": ("Rival", "", "Bruccie Village & Calicin Bay")}),
+                        ("gym", "Defeat Leader Abby for the Talent Badge", {"trainer": ("Leader", "Abby", "Bruccie Village Gym")})],
+    "Calicin Bay": [("pluto", "Battle Team Pluto Clancy and Ena", {"trainer": ("Team Pluto", "Clancy", "Bruccie Village & Calicin Bay")})],
+    "Pluto HQ": [("irene", "Defeat Pluto Admin Irene and receive the Serpent Key", {"trainer": ("Pluto Admin", "Irene", "Pluto HQ")}),
+                 ("ronald", "Defeat Pluto Admin Ronald and receive the Cerberus Key", {"trainer": ("Pluto Admin", "Ronald", "Pluto HQ")}),
                  ("kurtis", "Defeat Pluto Leader Kurtis and receive HM03 Surf", {"trainer": ("Pluto Leader", "Kurtis", "Pluto HQ")})],
     "Emraldin Quay": [("rival", "Battle your rival", {"trainer": ("Rival", "", "Emraldin Quay")}),
-                      ("trainer-house", "Trainer House: battle Marguerite, Julien and Perry",
-                       {"trainer": ("PKMN Trainer", "Marguerite", "Emraldin Quay Trainer House")})],
+                      ("trainer-house", "Trainer House: win the grand prize, the Item Finder", {"item": "Item Finder"})],
     "Tsarvosa City": [("kaito", "Stats Dojo: defeat Sensei Kaito without items to receive HM04 Strength",
                        {"trainer": ("Sensei", "Kaito", "Tsarvosa City")}),
                       ("gym", "Defeat Leader Iris for the Support Badge", {"trainer": ("Leader", "Iris", "Tsarvosa City Gym")}),
@@ -81,7 +84,7 @@ STORY = {
                            ("alistair", "Battle Alistair", {"trainer": ("PKMN Trainer", "Alistair", "Carnelidge Volcano")}),
                            ("peak", "See the story through at the peak (the Empty World and Ultra Space)")],
     "Uteya Village": [("gym", "Defeat Leaders Dennis & Dee for the Double Badge", {"trainer": ("Leader", "Dennis&Dee", "Uteya Village Gym")}),
-                      ("trainer-house", "Trainer House: battle Lisa, Tyson and Wilford", {"trainer": ("PKMN Trainer", "Lisa", "Uteya Village Trainer House")})],
+                      ("trainer-house", "Trainer House: win the grand prize, the PokéChip Charm", {"item": "PokeChip Charm"})],
     "Victory Road": [("rival", "Battle your rival", {"trainer": ("Rival", "", "Victory Road")})],
     "Ascension Tower": [("hannah", "Defeat Elite Four Hannah", {"trainer": ("Elite Four", "Hannah", "Ascension Tower & Post Credits")}),
                         ("lucas", "Defeat Elite Four Lucas", {"trainer": ("Elite Four", "Lucas", "Ascension Tower & Post Credits")}),
@@ -133,12 +136,33 @@ TEXT = {
     "ultra-space/npc/ultra-space/38-49": "Poipole Researcher: gives Poipole (once you have caught 150+ Pokémon)",
     "route-19/npc/route-19/67-14": "Selene: gives Victini; switches a max-friendship Greninja to and from Battle Bond",
     "route-13/npc/cave-kurtis-room/4-4": "Battle Kurtis in his hideout",
+    "daimyn-city/wild/ash-s-house/7-5": "Pikachu Gift",
+    "laplaz-town/npc/laplaz-pokemon-center/10-4": "Gentleman: gives Decoder (after you talk to an NPC at Uteyan Ruins)",
 }
 
-# Entries that belong to another stage than their floor's: id → stage title (or "Postgame")
+# Entries that belong to another stage than their floor's: id → stage title, "Postgame", or "with Strength" for
+# that HM's "After … (with Strength)" section
 MOVE: dict[str, str] = {
+    "daimyn-city/npc/restaurant/9-3": "with Strength",   # Stella and Iris: only once the 7th badge is won
+    "daimyn-city/npc/lana-s-house/11-13": "Postgame",    # Lana's PortaPC
+    "laplaz-town/npc/laplaz-pokemon-center/10-4": "Uteyan Ruins",  # the Decoder needs a talk at Uteyan Ruins first
+    # Hesson Pass: F1 and most of BF1 are open from the start; these two wait for F2 (Strength + Carnelidge Volcano)
+    "hesson-pass/item/bf1/29-18": "Hesson Pass F2",      # Charizite X
+    "hesson-pass/hidden/bf1/21-13": "Hesson Pass F2",    # Light Clay
     "rubarr-desert/wild/desert/81-34": "Rubarr Desert Caves",
 }
+
+# HMs an entry needs that the feature list doesn't say: id → HMs
+NEEDS: dict[str, list] = {
+    "route-8/hidden/route-8/1-5": ["Rock Smash"],  # Everstone
+    "route-12-west/item/route-12-west/92-36": ["Rock Smash"],  # Zinc
+    "route-12-west/item/route-12-west/34-35": ["Rock Smash"],  # Revive
+}
+
+# Common items listed anyway (ids, * allowed): Collin missed them on the list
+KEEP = [
+    "route-12-west/item/route-12-west/34-35",  # Revive behind Rock Smash
+]
 
 # People the maps mark who are a battle: id → (class, name, place in the Trainers tab)
 LINKS: dict[str, tuple] = {
@@ -154,6 +178,7 @@ DROP = [
     "ferrox-village/npc/library/*",   # Alistair's HM01 Cut is part of the library story beat
     "treasure-beach/hidden/*",        # renew as you walk: never finished
     "olenic-town/npc/area-5/1-7",     # "Hawthorne: trade" (not a trade in trades.csv)
+    "pluto-hq/npc/ronald-s-office/*", "pluto-hq/npc/irene-s-office/*",  # their keys are part of the story beats
     # services a player uses as often as they like: nothing to finish
     "heleo-city/npc/swarm-house/8-4",          # Swarm Swami
     "forgotten-manse/npc/closet-1f/*",         # Rotom appliance catalog
@@ -168,7 +193,14 @@ DROP = [
     "ultra-space/npc/ultra-space/29-50",       # the researcher who takes you home
 ]
 
+# What in a save file says an entry is done, where save_flags.py can't tell on its own: id → flags (done when any
+# is set; [] = nothing in the save says so). Battles with a trainer link, item balls, hidden items and one-off
+# Pokémon need no line here.
+SAVE: dict[str, list] = {
+}
+
 # Once-a-day events the text doesn't already call daily (the diary: trap Pokémon are daily). Ids, * allowed.
+# Daily things get no entry (Collin: they aren't completion).
 DAILY = [
     "route-1/wild/*", "varisi-forest/wild/*", "route-8/wild/*", "peradon-forest/wild/*", "route-19/wild/*",
     "route-23/wild/*", "heleo-city/npc/heleo-city/55-26",  # Shady Dealer

@@ -76,6 +76,8 @@ FINAL_SPOT = {
 
 # Legendary encounters whose script picks the Pokémon by mode: label → (text, postgame)
 WILD_NOTES = {
+    "EvenScript_HeleoRanch_Ampharos": ("Ampharos (Pidgeot in Divergent)", False),  # the label's typo is CFRU's
+    "EventScript_MimmettJungle_Zeraora": ("Zeraora (Zarude in Divergent)", False),
     "EventScript_LaplazNPCHouses_Monty": ("Darkrai (Divergent only)", True),
     "EventScript_CarnelidgeVolcano_Volcanion": ("Volcanion (Heatran in Divergent)", True),
     "EventScript_GlastrierRoom_Glastrier": ("Glastrier (Spectrier in Divergent)", True),
@@ -92,6 +94,11 @@ NO_EXIT = {("Route 6", "Daimyn City")}
 # What a person or event does, where their script doesn't say it plainly: label → (text, differs by mode, postgame).
 # Objects, signs and step triggers alike.
 NOTES = {
+    "EventScript_LaplazNPCHouses_PsychicSister": ("Psychic Sister: IV Grading Unlock", False, False),
+    "EventScript_HeleoFacilities_PokemonCenter_CriticalCapture":
+        ("Critical Capture: gives Catch Charm after 10 critical captures", False, False),
+    "EventScript_HeleoCity_SwamiResearcher":
+        ("Swami Researcher: Bottlecap per unique swarming species shown.", False, False),
     "EventScript_AnthraTown_ChampionFanatic": ("Champion Fanatic: shows your game stats", False, False),
     "EventScript_BruccieVillageNPCHouses_PokeballSwapper":
         ("Poké Ball Swapper: moves a Pokémon into another Poké Ball for 2 PokéChips", False, False),

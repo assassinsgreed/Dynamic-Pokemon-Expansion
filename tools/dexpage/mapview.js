@@ -166,7 +166,7 @@ const MapView = (() => {
         if (!ms.length) return;
         if (p.floors.length > 1) h += `<div class="mv-floorhead">${esc(f.name)}</div>`;
         h += "<ul class='mv-list'>" + ms.map(([m, i]) => `<li><button type="button" data-m="${i}">${shape(m.k)}<span class="num">${m.n}</span><span>${
-          m.pg ? '<span class="pg">Postgame:</span> ' : ""}${esc(m.t)}${m.sd ? '<span class="tag">S/D</span>' : ""}</span></button></li>`).join("") + "</ul>";
+          m.pg ? '<span class="pg">Postgame:</span> ' : ""}${esc(m.t)}${m.mo ? ` (${m.mo} only)` : ""}${m.rq ? ` (needs ${esc(m.rq)})` : ""}${m.sd ? '<span class="tag">S/D</span>' : ""}</span></button></li>`).join("") + "</ul>";
       });
     } else h += `<h3>On this map</h3><p class="mv-none">No items or special people here.</p>`;
     $("side").innerHTML = h;
@@ -192,7 +192,7 @@ const MapView = (() => {
     }
     const m = p.markers[d.m];
     return { what: `${m.n} · ${KINDS[m.k].label}${p.floors.length > 1 ? " · " + p.floors[m.f].name : ""}`,
-      text: (m.pg ? "Postgame: " : "") + m.t, mark: d.m };
+      text: (m.pg ? "Postgame: " : "") + m.t + (m.mo ? ` (${m.mo} only)` : "") + (m.rq ? ` (needs ${m.rq})` : ""), mark: d.m };
   }
 
   function show(t, pinned) {
@@ -230,7 +230,9 @@ const MapView = (() => {
 
   function ping(el, long) {
     el.scrollIntoView({ block: "center", inline: "center", behavior: smooth() });
-    el.classList.remove("ping", "long"); void el.offsetWidth; el.classList.add("ping");
+    // only the newest target pulses: a marker left with the class would pulse again each time the map is shown
+    root.querySelectorAll(".ping").forEach((x) => x.classList.remove("ping", "long"));
+    void el.offsetWidth; el.classList.add("ping");
     el.classList.toggle("long", !!long);  // a shared link pulses longer, so whoever opened it spots it
   }
 
