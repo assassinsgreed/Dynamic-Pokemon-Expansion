@@ -484,7 +484,7 @@
 
   function placeCard(p, collapsible) {
     const rows = p.rows.filter(([, l]) => rowInMode(l));
-    const methods = groupBy(rows, (r) => r[1].method);
+    const methods = rodsInOrder(groupBy(rows, (r) => r[1].method), ([mt]) => mt);
     // An encounter that depends on the time of day says when on its chip ("☀️ 20%" Pikipek by day, "🌙 20%" Hoothoot
     // by night, "☀️ 10% 🌙 15%"); a bare rate is all day. Each list runs from the likeliest encounter down.
     const TIME_ICON = { day: "☀️", night: "🌙" };
@@ -577,6 +577,17 @@
     const groups = new Map();
     for (const x of list) { const k = key(x); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(x); }
     return [...groups];
+  };
+  // Encounter methods in the order they're listed, except fishing, which always reads Old → Good → Super Rod (together,
+  // where the first rod comes)
+  const RODS = ["Old Rod", "Good Rod", "Super Rod"];
+  const rodsInOrder = (list, methodOf) => {
+    const rod = (x) => RODS.findIndex((r) => methodOf(x).includes(r));
+    const first = list.findIndex((x) => rod(x) >= 0);
+    if (first < 0) return list;
+    const rest = list.filter((x) => rod(x) < 0);
+    rest.splice(first, 0, ...list.filter((x) => rod(x) >= 0).sort((a, b) => rod(a) - rod(b)));
+    return rest;
   };
 
   function matchMons(q) {
@@ -673,7 +684,7 @@
     const open = state.place ? norm(state.place) : null;
     const isOpen = (p) => norm(p.name) === open;
     const encounters = (p) => p.rows.filter(([, l]) => rowInMode(l)).length;
-    const methods = (p) => (p.rows.length ? [...new Set(p.rows.filter(([, l]) => rowInMode(l)).map(([, l]) => l.method))].join(" · ") : "Items only");
+    const methods = (p) => (p.rows.length ? rodsInOrder([...new Set(p.rows.filter(([, l]) => rowInMode(l)).map(([, l]) => l.method))], (mt) => mt).join(" · ") : "Items only");
     const html = listOrCards(state.layouts.places === "grid", list, {
       chip: (p) => `<button class="chip${isOpen(p) ? " on" : ""}" data-place="${esc(p.name)}"><span class="ln" style="padding-left:10px">${esc(p.name)}</span><span class="hw">${p.rows.length ? encounters(p) : ""}</span></button>`,
       row: (p) => `<tr data-place="${esc(p.name)}"${isOpen(p) ? ' class="on"' : ""}><td><span class="mvname">${esc(p.name)}</span></td><td class="note hide-sm">${esc(methods(p))}</td><td class="n">${encounters(p)}</td></tr>`,
