@@ -22,7 +22,7 @@ TM,20,Safeguard,Daimyn City Mall,
 TM,21,Knock Off,Tsarvosa City Gym Reward,
 TM,22,Solar Beam,Mimmett Jungle,
 TM,23,Smack Down,Route 10 Cave,
-TM,24,Thunderbolt,Route 23,
+TM,24,Thunderbolt,Route 23,Surf
 TM,25,Thunder,Daimyn Factory,Strength
 TM,26,Earthquake,Uteya Village Gym Reward,
 TM,27,Return,Route 14,
@@ -86,14 +86,14 @@ TM,84,Poison Jab,Route 19,Strength
 TM,85,Dream Eater,Route 24,Surf
 TM,86,Grass Knot,Peradon Forest,
 TM,87,Swagger,Olenic Town,Cut
-TM,88,Stealth Rock,Route 6,Strength
+TM,88,Stealth Rock,Route 6,Rock Climb
 TM,89,U-Turn,Daimyn City Gym Reward,
 TM,90,Substitute,Route 22,
 TM,91,Flash Cannon,Rubarr Desert Caves,"Strength, Rock Smash"
 TM,92,Trick Room,Route 18,
 TM,93,Wild Charge,Daimyn Factory Overworld,Rock Climb
 TM,94,Flip Turn,Daimyn City Gym Reward,
-TM,95,Snarl,Route 12 East (need Cut),
+TM,95,Snarl,Route 12 East,Cut
 TM,96,Nature Power,Route 2,Surf
 TM,97,Dark Pulse,Forgotten Manse (needs Rock Smash and Strength),"Strength, Rock Smash"
 TM,98,Waterfall,Seppire Cove B1F,Surf

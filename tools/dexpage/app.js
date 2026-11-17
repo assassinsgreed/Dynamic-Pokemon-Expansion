@@ -796,8 +796,9 @@
       <div class="ck-head"><div class="ck-prog"><span id="ck-total"></span><span class="ck-bar"><i id="ck-fill"></i></span></div>
         <div class="ck-key">${Object.keys(CK_KIND).filter((k) => kinds.has(k)).map((k) => `<span>${ckShape(k)}${CK_KIND[k][0]}</span>`).join("")}</div>
         <div class="ck-acts"><label><input type="checkbox" data-ckact="hide"${ck.hide ? " checked" : ""}>Hide finished</label>
+          <button data-ckact="open-all">Expand All</button><button data-ckact="close-all">Collapse All</button><button data-ckact="open-done" title="Expand the sections you have finished">Expand Completed</button><button data-ckact="close-done" title="Collapse the sections you have finished">Collapse Completed</button>
           <button data-ckact="save" title="Tick what your save file says you've done (.sav or .srm); replaces your current ticks">Load Save File</button><button data-ckact="export" title="Save your ticks to a file">Export</button><button data-ckact="import" title="Load ticks from an exported file">Import</button><button data-ckact="reset">Reset</button></div>
-        <p class="note ck-help">Track your progress in Pokemon Amethyst. Progress is tracked in your browser; Export and Import allow you to move data to/from local copies.</p></div>
+        <p class="note ck-help">Track your progress in Pokemon Amethyst. Progress is tracked in your browser; Export and Import allow you to move data to/from local copies. Entries are ordered by what you can reach as you play: things that need an HM (Surf, for example) are only listed after the point where you get it.</p></div>
       <div class="ck-stages">${stages}</div></div>`;
     return [html, ""];
   }
@@ -899,6 +900,15 @@ Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
   function ckAct(el) {
     const act = el.dataset.ckact;
     if (act === "hide") { ck.hide = el.checked; ckSave(); el.closest(".cklist").classList.toggle("hide-done", ck.hide); }
+    else if (/^(open|close)-(all|done)$/.test(act)) {  // fold or unfold every section, or only the finished ones
+      const open = act.startsWith("open"), onlyDone = act.endsWith("done");
+      document.querySelectorAll("details.ck-stage").forEach((d) => {
+        if (onlyDone && !d.querySelector(".ck-n.all")) return;
+        d.open = open;
+        if (!state.q) ck.closed[d.dataset.ckstage] = !open;  // a search opens everything without saving that
+      });
+      ckSave();
+    }
     else if (act === "export") ckFile("amethyst-checklist.json", "application/json", ckPayload());
     else if (act === "import") ckImport();
     else if (act === "save") ckLoadSave();

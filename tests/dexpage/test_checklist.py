@@ -13,9 +13,7 @@ def page(source_data, roster, evo_links):
 
 @pytest.fixture(scope="module")
 def result(page, source_data, paths):
-    dropped = []
-    out = checklist(page, place_maps(paths), paths, game_item_names(source_data), dropped)
-    return out, dropped
+    return (checklist(page, place_maps(paths), paths, game_item_names(source_data)),)
 
 
 def stage(result, title):
@@ -45,7 +43,9 @@ def test_stages_follow_the_playthrough(result):
     assert titles.index("After badge 2 (with Cut)") == titles.index("Ferrox Village") + 1
     # Surf's badge is Bruccie Village's, but the HM comes at Pluto HQ
     assert titles.index("After Pluto HQ (with Surf)") == titles.index("Pluto HQ") + 1
-    assert titles[-1] == "Postgame"
+    assert titles[-2:] == ["Postgame", "Ultra Episode"]
+    # Secret Trail can't be explored before Strength
+    assert titles.index("Secret Trail") > titles.index("After badge 7 (with Strength)")
 
 
 def test_ferrox_village(result):
@@ -67,11 +67,43 @@ def test_cut_items_wait_for_badge_two(result):
     assert endure["need"] == "Cut"
 
 
-def test_common_items_left_out(result):
-    names = [e["t"] for e in everything(result)]
-    assert "Potion" not in names and "Repel" not in names and "Poké Ball" not in names
-    assert ("Route 3", "Potion") in result[1]
-    assert "Star Piece" in names
+def test_every_pickup_is_listed(result):
+    # Collin: a map's item is on the list even when marts sell it
+    assert "Honey" in texts(stage(result, "Orichelle Garden"))
+    assert "Potion" in texts(stage(result, "Route 3")) and "Max Potion" in texts(stage(result, "Secret Trail"))
+    assert "TM77 Psych Up" in texts(stage(result, "Secret Trail"))
+
+
+def test_collins_hm_corrections(result):
+    surf = stage(result, "After Pluto HQ (with Surf)")
+    assert "Nugget" in texts(surf, "Route 2") and "Calcium" in texts(surf, "Torma Cave")
+    assert "Max Elixir" in texts(surf, "Peradon Forest") and "Rare Candy" in texts(surf, "Forgotten Manse")
+    assert "Rare Candy" not in texts(surf, "Route 8")
+    zinc = next(e for e in entries(stage(result, "Route 19")) if e["t"] == "Zinc")
+    assert zinc["need"] == "Cut"
+    # Routes 14-16 are only reached by Surf, so nothing there is tagged with it
+    for place in ("Route 14", "Route 15 North", "Route 15 South", "Route 16"):
+        assert not any("Surf" in e.get("need", "") for e in entries(stage(result, place)))
+    volcano = entries(stage(result, "Carnelidge Volcano"))
+    assert next(e for e in volcano if e["t"] == "Charizite Y")["need"] == "Lava Surf"
+    assert not any(e.get("need") == "Surf" for e in volcano)
+
+
+def test_ultra_episode_has_its_own_section(result):
+    ultra = texts(stage(result, "Ultra Episode"))
+    assert "Ultra Wormhole (Kartana)" in ultra and "Necrozma" in ultra and "Cosmog" in ultra
+    assert any(t.startswith("Ultra Episode: start it") for t in ultra)
+    assert not any("Ultra Wormhole" in t for t in texts(stage(result, "Postgame")))
+    assert not any("Alistair after the credits" in t for t in texts(stage(result, "Postgame")))
+
+
+def test_collins_review_round(result):
+    shaymin = next(e for e in entries(stage(result, "Route 18")) if e["t"].startswith("Shaymin Form Change Girl"))
+    assert shaymin["only"] == "Standard"
+    assert not any(e["k"] == "story" and "rival" in e["t"] for e in entries(stage(result, "Emraldin Quay")))
+    assert not any("shop" in e["t"].lower().split(": ")[-1] for e in everything(result) if e["k"] == "npc")
+    zeraora = next(e for e in entries(stage(result, "Mimmett Jungle")) if e["t"].startswith("Zeraora"))
+    assert zeraora["fl"] == "Marsh Cave" and zeraora["id"] == "mimmett-jungle/wild/zeraora-room/4-2"
 
 
 def test_shortened_item_names_link_to_their_item(result, page):
@@ -154,7 +186,7 @@ def test_tab_sits_before_docs():
 
 def test_daily_things_are_left_out(result, page, source_data, paths):
     daily = []
-    checklist(page, place_maps(paths), paths, game_item_names(source_data), None, daily)
+    checklist(page, place_maps(paths), paths, game_item_names(source_data), daily)
     left_out = [t for _, t in daily]
     assert "Gym Leader rematch: Stella" in left_out and "Sandygast (Alolan Diglett in Divergent)" in left_out
     # people whose script sets a flag the game clears each day count too, whatever their text says

@@ -95,7 +95,7 @@ def export(M, place, keys, maps, base, objs, groups):
             markers.append({"f": k, "x": ob.get("mx", ob["x"]) * 16 + 8, "y": ob.get("my", ob["y"]) * 16 + 8,
                             "k": ob["kind"], "t": ob["text"], "pg": bool(ob.get("postgame")), "sd": bool(ob.get("modes")), **({"tf": ob["full"]} if ob.get("full") else {}),
                             # for the Checklist's save-file reader (dropped before the page is written)
-                            "fg": ob.get("flag", 0), "lb": ob.get("label", "")})
+                            "fg": ob.get("flag", 0), "lb": ob.get("label", ""), "rl": ob.get("roles", "")})
         if place == "Rubarr Desert" and k == (1, 123):
             for s in M.rubarr()["statues"]:
                 what = ("adds one level to the big pit on Caverns B2F (3 needed)" if s["addsLevel"]

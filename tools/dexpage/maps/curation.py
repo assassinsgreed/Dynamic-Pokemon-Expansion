@@ -11,7 +11,8 @@ PLACE_OF = {
     (3, 29): "Route 11 South",  # its image is named just "Route 11"
 }
 FLOOR_NAMES = {(22, 0): "Rest House", (20, 0): "Mega Refiner House", (3, 29): "Route 11 South",
-               (1, 44): "Hidden Chamber"}  # Carnelidge Volcano's "Volcanion Room"
+               (1, 44): "Hidden Chamber",  # Carnelidge Volcano's "Volcanion Room"
+               (1, 71): "Marsh Cave"}  # Mimmett Jungle's "Zeraora Room"
 
 CATEGORY = {"Secret Trail": "Routes", "Calicin Bay": "Routes", "Treasure Beach": "Routes",
             "Heleo Ranch": "Dungeons & landmarks", "Lake Laplaz": "Dungeons & landmarks",
@@ -54,7 +55,6 @@ NO_MARKER = {
     "EventScript_UltraSpace_EclipseVillage_Shopkeeper", "EventScript_BruccieVillage_Wingull",
     "EventScript_CalicinBay_StoryEvents", "EventScript_DaimynCityMall_WaitingGirl", "EventScript_HeleoGym_Slowbro",
     "EventScript_RhodanziNPCHouses_Nidoran",
-    "EventScript_SecretTrail_TM77_PsychUp",  # out of the player's reach
     "EventScript_BattleFrontier_PokemonCenterOldMan", "EventScript_DaimynCityGym_LeaderChance",  # gym leaders: no marker
 }
 NO_MARKER_MAPS = {(2, 0)}  # Tsarvosa's Type Trainer House: the Gym Trainee tutors
@@ -133,7 +133,7 @@ NOTES = {
         ("Travelling Man: sells one random Safari, Sport, Park or Dream Ball a day for ₽1,500", False, False),
     "EventScript_FerroxNPCHouses_ChinchouTrade": ("Trade: gives you a Chinchou (Eelektrik in Divergent)", True, False),
     "EventScript_FerroxVillage_UndergroundMiner": ("Digging Minigame", False, False),
-    "EventScript_Route11SouthRefiner_RefinerShop": ("Mega Stone Refiner: shop", False, False),
+    "EventScript_Route11SouthRefiner_RefinerShop": ("Mega Stone Refiner", False, False),
     # a magazine seller who only chats in Standard mode
     "EventScript_DaimynCityMall_MagazineSeller":
         ("Sweets Seller (Divergent only): sells Tart Apple, Sweet Apple, Cracked Pot and the seven Sweets", True, False),

@@ -392,6 +392,11 @@ class Objects:
         roles += [r for pat, r in self.ROLE_WORDS if re.search(pat, blob)]
         return ", ".join(dict.fromkeys(roles)) or None
 
+    @staticmethod
+    def shown_role(role):
+        """A role as the maps show it: without "shop" ("Nurse: shop, heals your team" → "Nurse: heals your team")."""
+        return re.sub(r"(^|, )shop(?=, |$)", "", role or "").strip(", ")
+
     def postgame_flags(self, key):
         """Flags this map's own scripts clear only once the game is cleared (Kurtis in the Route 13 cave)."""
         flags = set()
@@ -473,9 +478,11 @@ class Objects:
             elif ttype:
                 ob["kind"] = "scenery"  # trainers: sprite only (Collin: players look for warps, items and special NPCs)
             elif label and ((role := self.npc_role(label)) or ob["postgame"]):
-                ob["kind"], ob["text"] = "npc", f"{words(tail)}: {role}" if role else words(tail)
+                # Collin: "shop" says nothing a player can't see; it stays in roles so the Checklist can skip shopkeepers
+                ob["roles"], shown = role or "", self.shown_role(role)
+                ob["kind"], ob["text"] = "npc", f"{words(tail)}: {shown}" if shown else words(tail)
                 if role and re.search(r" \+\d+", role):  # the map key shortens long gift lists; keep the full one too
-                    ob["full"] = f"{words(tail)}: {self.npc_role(label, full=True)}"
+                    ob["full"] = f"{words(tail)}: {self.shown_role(self.npc_role(label, full=True))}"
                 gift, ob["modes"] = self.by_mode(label, r"(?:giveitem|obtainitem)\s+(ITEM_\w+)", self.item_name)
                 if ob["modes"]:
                     ob["text"] = f"{words(tail)}: gives {gift}"

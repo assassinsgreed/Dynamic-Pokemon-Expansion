@@ -226,12 +226,17 @@ A playthrough-order list of tick boxes for 100% completion, before Docs. Design:
   same way as the maps: `python -m tools.dexpage.checklist` prints every entry with its id
   (`place/kind/floor/x-y` in tiles; ticks are saved under it, so never renumber), then edit **only**
   `checklist_data.py`: `ORDER` (stops; a `(title, place, floor prefixes)` stop is the part of a place that opens at
-  another time), `STORY`, `TEXT`, `MOVE`, `LINKS` (marker → trainer), `DROP`, `DAILY`, `INCLUDE`/`EXCLUDE`. A wrong id
+  another time), `STORY`, `TEXT`, `MOVE`, `LINKS` (marker → trainer), `DROP`, `DAILY`, `NEEDS` (replaces the item
+  data's HMs for that id; `[]` = none), `REACHED_WITH` (HMs a whole place needs, never tagged: Surf for Routes 14-16),
+  `HM_NAMES` (Surf is "Lava Surf" in Carnelidge Volcano; "Requires Lava Surfing" counts as Surf), `ONLY` (one-mode
+  people), `ULTRA_EPISODE_ENTRIES` (+ every Ultra Wormhole and `ultra=True` story beats → the "Ultra Episode" section
+  after Postgame), `FLOOR_IDS` (a renamed floor keeps its old id slug: Mimmett's Marsh Cave was "Zeraora Room"). A wrong id
   or trainer fails the build. It reads the cached map export, so edits don't redraw maps.
 - HM gating: the item data's "(need Cut)" notes and a TM's Requires column, with CFRU's
   `gFieldMoveBadgeRequirements`. An "After … (with HM)" section follows whichever comes later, the badge or the stage
   the HM is received in (`HM_FROM`; Surf's is "After Pluto HQ"). Items in places reached after that stay put, tagged.
-- Collin's rules: common items (general Poké Mart stock) get no entry; shops, healers, tutors and other repeatable
+- Collin's rules: every item ball and hidden item on a map gets an entry, mart stock included (he reversed the
+  earlier "common items get no entry" rule on 2026-11-17); shops, healers, tutors and other repeatable
   services get none; trades read "Trade your X for Y (A for B in Divergent)"; Cut, Fly and Surf arrive inside a story
   beat (no "gives HM" entry), while Rock Smash, Strength and Rock Climb are errands of their own; rival side events
   say "Until the <next> Badge is obtained"; named bosses link to their trainer entry in the mode the player has chosen;
@@ -243,14 +248,18 @@ A playthrough-order list of tick boxes for 100% completion, before Docs. Design:
 - More of Collin's rules: buttons read "See Location" / "See Interactive Map"; no coloured border on sections
   (purple reads as Divergent); Trainer Houses list their grand prize, not the trainers; an item the data says is in
   one mode only is tagged "Divergent only" (`only`; the map shows it as `mo`); what an item needs also shows on the
-  interactive map (`rq`, set on the marker by checklist.py; `NEEDS` adds what the feature list lacks); `KEEP` lists a
-  common item anyway; `MOVE` to "with Strength" puts an entry in that HM's section. Regional forms are named in
+  interactive map (`rq`, set on the marker by checklist.py; `NEEDS` corrects the feature list); `MOVE` to "with Strength" puts an entry in that HM's section. Regional forms are named in
   encounter text ("Alolan Diglett": `wild_name` in places.py). When he says the feature list changed, re-download
   it and run `python -m tools.dexpage.items doc.docx` (skip the docs import unless Docs text changed: it only
   renumbers images).
 - Daily things get no entry (Collin: they aren't completion): `daily=True` story beats, `DAILY` ids, text that says
   "daily", and any person whose script flag is in the game's daily range (0xE00-0xEFF). Postgame markers stay.
   `python -m tools.dexpage.checklist` lists what was left out as daily.
+- Map people's text never says "shop" (Collin: "Mega Stone Refiner", "Nurse: heals your team"); places.py keeps the
+  full role list on the marker as `rl` so the checklist still skips shop-only people, and checklist.py pops it.
+- Controls: Hide finished, Expand/Collapse All, Expand/Collapse Completed (sections whose count is full), then the
+  save/export buttons; folding is remembered in `dex-check-ui`. The help note says entries follow what a player can
+  reach (HM-gated things after the HM).
 - **Load Save File** ticks the list from a `.sav` / `.srm` (the raw 128 KiB flash; save states don't work) and
   replaces the current ticks after a confirm. Each entry's `sv` lists what in the save means done (`save_flags.py`):
   item balls and one-off Pokémon by the flag that hides them, hidden items by 1000 + their id byte (both on the

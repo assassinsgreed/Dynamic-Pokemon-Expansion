@@ -30,7 +30,8 @@ ORDER = [
     "Route 12 East", "Scalding Spa", "Route 12 West", "Bruccie Village", "Calicin Bay", "Pluto HQ",
     ("Route 17 cave", "Route 17", ["Cave"]), "Route 18", "Orichelle Garden",
     "Route 14", "Route 15 North", "Route 15 South", "Route 16", "Route 19", "Emraldin Quay", "Route 20",
-    "Treasure Beach", "Route 21", "Mimmett Jungle", "Route 22", "Secret Trail", "Route 23", "Tsarvosa City",
+    "Treasure Beach", "Route 21", "Mimmett Jungle", "Route 22", "Route 23", "Tsarvosa City",
+    "Secret Trail",  # Collin: it can't be explored before Strength, which comes at Tsarvosa City
     "Seppire Cove", "Daimyn Factory", ("Rubarr Desert Caves", "Rubarr Desert", ["Cave", "Caverns"]),
     ("Route 13 cave", "Route 13", ["Cave"]), "Carnelidge Volcano", ("Hesson Pass F2", "Hesson Pass", ["F2"]), "Uteya Village", "Route 24", "Uteyan Ruins",
     "Victory Road", "Ascension Tower",
@@ -41,7 +42,8 @@ POSTGAME_PLACES = ["Ultra Space", "Battle Frontier"]
 
 # Story beats per stage: (key, text[, options]). Keys are part of the saved id, so keep them when rewording.
 # Options: trainer=(class, name, place in the Trainers tab) links the battle; item=name links the reward's item;
-# daily=True (left off the list: never finished); at=place (Postgame only).
+# daily=True (left off the list: never finished); at=place (Postgame only); ultra=True (Postgame: in the Ultra Episode
+# section).
 STORY = {
     "Anthra Town": [("starter", "Follow the story to choose your starter"),
                     ("gifts", "Receive the Town Map and Running Shoes from Mom")],
@@ -74,8 +76,8 @@ STORY = {
     "Pluto HQ": [("irene", "Defeat Pluto Admin Irene and receive the Serpent Key", {"trainer": ("Pluto Admin", "Irene", "Pluto HQ")}),
                  ("ronald", "Defeat Pluto Admin Ronald and receive the Cerberus Key", {"trainer": ("Pluto Admin", "Ronald", "Pluto HQ")}),
                  ("kurtis", "Defeat Pluto Leader Kurtis and receive HM03 Surf", {"trainer": ("Pluto Leader", "Kurtis", "Pluto HQ")})],
-    "Emraldin Quay": [("rival", "Battle your rival", {"trainer": ("Rival", "", "Emraldin Quay")}),
-                      ("trainer-house", "Trainer House: win the grand prize, the Item Finder", {"item": "Item Finder"})],
+    # (the rival battle here is optional: the rival's side event covers it)
+    "Emraldin Quay": [("trainer-house", "Trainer House: win the grand prize, the Item Finder", {"item": "Item Finder"})],
     "Tsarvosa City": [("kaito", "Stats Dojo: defeat Sensei Kaito without items to receive HM04 Strength",
                        {"trainer": ("Sensei", "Kaito", "Tsarvosa City")}),
                       ("gym", "Defeat Leader Iris for the Support Badge", {"trainer": ("Leader", "Iris", "Tsarvosa City Gym")}),
@@ -92,7 +94,6 @@ STORY = {
                         ("thomas", "Defeat Elite Four Thomas", {"trainer": ("Elite Four", "Thomas", "Ascension Tower & Post Credits")}),
                         ("selene", "Defeat Champion Selene and enter the Hall of Fame", {"trainer": ("Champion", "Selene", "Ascension Tower & Post Credits")})],
     "Postgame": [
-        ("alistair", "Battle Alistair after the credits", {"at": "Ascension Tower", "trainer": ("PKMN Trainer", "Alistair", "Ascension Tower & Post Credits")}),
         ("title-defense", "Champion Title Defense: defend your title against the 14 possible challengers",
          {"at": "Ascension Tower", "trainer": ("Challenger", "Joey", "Title Defense")}),
         ("e4-hannah", "Elite Four rematch: Hannah", {"at": "Ascension Tower", "trainer": ("Elite Four", "Hannah", "Elite Four Rematches")}),
@@ -107,7 +108,7 @@ STORY = {
         ("rematch-raine", "Gym Leader rematch: Raine", {"at": "Heleo City", "daily": True, "trainer": ("Leader", "Raine", "Gym Leader Rematches")}),
         ("blissey", "Pokémon Fan Club: battle the Blissey Trainer", {"at": "Heleo City", "daily": True}),
         ("rematch-chance", "Gym Leader rematch: Chance", {"at": "Daimyn City", "daily": True, "trainer": ("Leader", "Chance", "Gym Leader Rematches")}),
-        ("ultra-episode", "Ultra Episode: start it at the Interdimensional Research Facility", {"at": "Daimyn City"}),
+        ("ultra-episode", "Ultra Episode: start it at the Interdimensional Research Facility", {"at": "Daimyn City", "ultra": True}),
         ("rematch-casey", "Gym Leader rematch: Casey", {"at": "Laplaz Town", "daily": True, "trainer": ("Leader", "Casey", "Gym Leader Rematches")}),
         ("rematch-abby", "Gym Leader rematch: Abby", {"at": "Bruccie Village", "daily": True, "trainer": ("Leader", "Abby", "Gym Leader Rematches")}),
         ("rematch-iris", "Gym Leader rematch: Iris", {"at": "Tsarvosa City", "daily": True, "trainer": ("Leader", "Iris", "Gym Leader Rematches")}),
@@ -152,17 +153,36 @@ MOVE: dict[str, str] = {
     "rubarr-desert/wild/desert/81-34": "Rubarr Desert Caves",
 }
 
-# HMs an entry needs that the feature list doesn't say: id → HMs
+# HMs an entry needs, where the feature list says nothing or the wrong thing: id → every HM it needs ([] = none)
 NEEDS: dict[str, list] = {
     "route-8/hidden/route-8/1-5": ["Rock Smash"],  # Everstone
     "route-12-west/item/route-12-west/92-36": ["Rock Smash"],  # Zinc
     "route-12-west/item/route-12-west/34-35": ["Rock Smash"],  # Revive
+    "route-2/item/area-1/3-74": ["Surf"],          # Nugget
+    "torma-cave/item/bf2/5-32": ["Surf"],          # Calcium
+    "peradon-forest/item/area-2/42-53": ["Surf"],  # Max Elixir
+    "route-19/item/route-19/30-4": ["Cut"],        # Zinc
+    # the feature list's "Rare Candy, Route 8 (needs Surf)" is the one in the cave under the Forgotten Manse
+    "route-8/hidden/route-8/11-88": [],
+    "forgotten-manse/item/underground/2-22": ["Surf"],
 }
 
-# Common items listed anyway (ids, * allowed): Collin missed them on the list
-KEEP = [
-    "route-12-west/item/route-12-west/34-35",  # Revive behind Rock Smash
-]
+# HMs a whole place is reached with, so its entries aren't tagged with them (Collin: Routes 14-16 need Surf to explore)
+REACHED_WITH = {"Route 14": ["Surf"], "Route 15 North": ["Surf"], "Route 15 South": ["Surf"], "Route 16": ["Surf"]}
+
+# What an HM is called at a place: Surf on Carnelidge Volcano's lava
+HM_NAMES = {"Carnelidge Volcano": {"Surf": "Lava Surf"}}
+
+# Entries that exist in one mode only, where the item data doesn't say: id → "Standard" / "Divergent"
+ONLY = {
+    "route-18/npc/caretaker-house/4-4": "Standard",  # the Shaymin form-change girl (Divergent has Xerneas)
+}
+
+# Postgame entries in the Ultra Episode section (ids, * allowed); every Ultra Wormhole goes there too
+ULTRA_EPISODE_ENTRIES = ["ultra-space/npc/*", "ultra-space/wild/ultra-space/*", "ultra-space/wild/dias-of-light/*"]
+
+# Floors renamed after their entries were first ticked: (place, floor) → the slug their ids keep
+FLOOR_IDS = {("Mimmett Jungle", "Marsh Cave"): "zeraora-room"}
 
 # People the maps mark who are a battle: id → (class, name, place in the Trainers tab)
 LINKS: dict[str, tuple] = {
@@ -191,6 +211,7 @@ DROP = [
     "anthra-town/npc/anthra-town/3-7",         # Champion Fanatic
     "battle-frontier/npc/pokemon-center/13-2",  # PokéChip exchange
     "ultra-space/npc/ultra-space/29-50",       # the researcher who takes you home
+    "route-11-south/npc/mega-refiner-house/7-4",  # Mega Stone Refiner (a shop; its map text no longer says so)
 ]
 
 # What in a save file says an entry is done, where save_flags.py can't tell on its own: id → conditions, done when
@@ -256,7 +277,3 @@ DAILY = [
     "route-1/wild/*", "varisi-forest/wild/*", "route-8/wild/*", "peradon-forest/wild/*", "route-19/wild/*",
     "route-23/wild/*", "heleo-city/npc/heleo-city/55-26",  # Shady Dealer
 ]
-
-# Item names to list although marts sell them, and to leave out although they don't
-INCLUDE: set[str] = set()
-EXCLUDE: set[str] = set()

@@ -5,7 +5,7 @@ hand-written story beats; checklist_data.py says the order and corrects the rest
 page's own item data ("Route 9 (Requires Cut)", a TM's Requires column), and the badge each HM needs outside battle
 from CFRU's gFieldMoveBadgeRequirements.
 
-    python -m tools.dexpage.checklist      # prints every entry with its id, and the common items left out
+    python -m tools.dexpage.checklist      # prints every entry with its id, and the daily things left out
 """
 
 import difflib
@@ -19,7 +19,6 @@ from .paths import Paths
 
 FIELD_MOVES = {"CUT": "Cut", "ROCK_SMASH": "Rock Smash", "FLY": "Fly", "SURF": "Surf", "STRENGTH": "Strength",
                "ROCK_CLIMB": "Rock Climb"}
-MART_STOCK = re.compile(r"Poké Marts( \(after \d+ badges?\))?")
 # What the maps say a person does that is a service, not something to finish
 SERVICES = {"shop", "heals your team", "move tutor", "move reminder", "move deleter"}
 DAILY_TEXT = re.compile(r"^Daily|\b(a|each|per|every) day\b|\bdaily\b")
@@ -50,7 +49,14 @@ def _place_re(place: str) -> re.Pattern:
 
 
 def _hms_in(text: str, badges: dict[str, int]) -> set[str]:
-    return {hm for hm in badges if re.search(r"\b" + hm.lower() + r"\b", text.lower())}
+    """HMs a note names; "Requires Lava Surfing" is Surf (on lava: Carnelidge Volcano shows it as Lava Surf)."""
+    return {hm for hm in badges if re.search(r"\b" + hm.lower() + r"(ing)?\b", text.lower())}
+
+
+def _hm_label(hms, place: str, badges: dict[str, int]) -> str:
+    """'Cut, Surf' in badge order, with the place's own names for them (Surf in Carnelidge Volcano is Lava Surf)."""
+    names = H.HM_NAMES.get(place, {})
+    return ", ".join(names.get(h, h) for h in sorted(hms, key=lambda h: badges[h]))
 
 
 class Items:
@@ -115,16 +121,6 @@ class Items:
                 return m.group(1)
         return None
 
-    def common(self, text: str) -> bool:
-        """Sold in ordinary Poké Marts, so a ball of it on the ground isn't worth a tick box."""
-        names = self.names(text)
-        if any(n in H.INCLUDE for n in names):
-            return False
-        if any(n in H.EXCLUDE for n in names):
-            return True
-        found = [self.find(n) for n in names]
-        return all(k is not None and any(MART_STOCK.fullmatch(w) for w in self.list[k]["where"]) for k in found)
-
 
 class Mons:
     """Pokémon named in an entry's text, as [start, end, index in the page's Pokémon] so the page can link them."""
@@ -153,9 +149,10 @@ def _matches(ident: str, patterns) -> bool:
     return any(fnmatch.fnmatchcase(ident, p) for p in patterns)
 
 
-def _service(text: str) -> bool:
-    who, sep, does = text.partition(": ")
-    return bool(sep) and all(part in SERVICES for part in does.split(", "))
+def _service(text: str, roles: str) -> bool:
+    """Only a service: what the script does (roles, which still says "shop" where the map's text no longer does)."""
+    does = roles or text.partition(": ")[2]
+    return bool(does) and all(part in SERVICES for part in does.split(", "))
 
 
 def _trainers(page: dict, spec: tuple, where: str) -> list[int]:
@@ -166,8 +163,7 @@ def _trainers(page: dict, spec: tuple, where: str) -> list[int]:
     return found
 
 
-def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, str], dropped: list | None = None,
-              daily: list | None = None) -> dict:
+def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, str], daily: list | None = None) -> dict:
     badges = hm_badges(paths)
     items = Items(page, badges, game_names)
     mons = Mons(page)
@@ -202,6 +198,7 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
         where = f"badge {b}" if at == badge_stage[b] else stages[at]["title"]
         unlocks[hm] = {"title": f"After {where} (with {hm})", "kind": "unlock", "groups": {}}
     postgame = {"title": "Postgame", "kind": "postgame", "groups": {}}
+    ultra = {"title": "Ultra Episode", "kind": "postgame", "groups": {}}  # Collin: its own section after Postgame
 
     def next_badge(index: int) -> str | None:
         """The badge a player is working toward at this stage (rival side events last until it's won)."""
@@ -225,7 +222,7 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
             key, text = beat[0], beat[1]
             opts = beat[2] if len(beat) > 2 else {}
             if title == "Postgame":
-                stage, place = postgame, opts["at"]
+                stage, place = ultra if opts.get("ultra") else postgame, opts["at"]
                 if place not in by_name:
                     raise ValueError(f"checklist_data.STORY Postgame/{key}: {place!r} has no interactive map")
             elif title in stage_of:
@@ -254,25 +251,29 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
     # ---- everything the maps mark
     for place, mp in by_name.items():
         for mk in mp["markers"]:
-            hide_flag, label = mk.pop("fg", 0), mk.pop("lb", "")  # only the save reader wants these, not the map viewer
+            # only the save reader (fg, lb) and the service check (rl) want these, not the map viewer
+            hide_flag, label, roles = mk.pop("fg", 0), mk.pop("lb", ""), mk.pop("rl", "")
             if mk["k"] not in ("item", "hidden", "npc", "wild"):
                 continue
             floor = mp["floors"][mk["f"]]["name"]
-            ident = new_id(f"{mp['slug']}/{mk['k']}/{slug(floor)}/{int(mk['x']) // 16}-{int(mk['y']) // 16}")
+            floor_id = H.FLOOR_IDS.get((place, floor), slug(floor))  # a renamed floor keeps the ids ticks are saved under
+            ident = new_id(f"{mp['slug']}/{mk['k']}/{floor_id}/{int(mk['x']) // 16}-{int(mk['y']) // 16}")
             text = H.TEXT.get(ident, mk.get("tf", mk["t"]))  # tf: the gift list in full, where the map shortens it
             # HMs it takes to reach: the item data's notes plus Collin's own; the map viewer shows them too (rq)
-            hms = (items.needs(mk["t"], place) if mk["k"] in ("item", "hidden") else set()) | set(H.NEEDS.get(ident, ()))
+            # HMs it takes to reach: the item data's notes, or Collin's own (NEEDS); the map viewer shows them too (rq).
+            # The HM a whole place is reached with (Surf for Routes 14-16) goes without saying.
+            if ident in H.NEEDS:
+                hms = set(H.NEEDS[ident])
+            else:
+                hms = items.needs(mk["t"], place) if mk["k"] in ("item", "hidden") else set()
+            hms -= set(H.REACHED_WITH.get(place, ()))
             if hms:
-                mk["rq"] = ", ".join(sorted(hms, key=lambda h: badges[h]))
-            if _matches(ident, H.DROP) or (mk["k"] == "npc" and _service(text)):
+                mk["rq"] = _hm_label(hms, place, badges)
+            if _matches(ident, H.DROP) or (mk["k"] == "npc" and _service(text, roles)):
                 continue
-            only = items.only(mk["t"], place) if mk["k"] in ("item", "hidden") else None
+            only = H.ONLY.get(ident) or (items.only(mk["t"], place) if mk["k"] in ("item", "hidden") else None)
             if only:
                 mk["mo"] = only
-            if mk["k"] in ("item", "hidden") and items.common(mk["t"]) and not _matches(ident, H.KEEP):
-                if dropped is not None:
-                    dropped.append((place, mk["t"]))
-                continue
             # what in a save file says it's done (save_flags.py)
             if ident in H.SAVE:
                 sv = save_flags.resolve(paths, H.SAVE[ident])
@@ -327,9 +328,10 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
                 entry["until"] = f"Until the {next_badge(home)} Badge is obtained"
 
             if hms:
-                entry["need"] = ", ".join(sorted(hms, key=lambda h: badges[h]))
+                entry["need"] = _hm_label(hms, place, badges)
             if home is None:
-                put(postgame, place, entry)
+                ultra_part = _matches(ident, H.ULTRA_EPISODE_ENTRIES) or text.startswith("Ultra Wormhole")
+                put(ultra if ultra_part else postgame, place, entry)
                 continue
             last = max(hms, key=lambda h: unlock_after[h], default=None)  # the HM that arrives last
             if last and unlock_after[last] >= home:
@@ -337,12 +339,13 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
             else:
                 put(stages[home], place, entry)
 
-    for table, name in ((H.TEXT, "TEXT"), (H.MOVE, "MOVE"), (H.LINKS, "LINKS"), (H.NEEDS, "NEEDS"), (H.SAVE, "SAVE")):
+    for table, name in ((H.TEXT, "TEXT"), (H.MOVE, "MOVE"), (H.LINKS, "LINKS"), (H.NEEDS, "NEEDS"), (H.SAVE, "SAVE"),
+                        (H.ONLY, "ONLY")):
         for ident in table:
             if ident not in seen:
                 raise ValueError(f"checklist_data.{name}: no entry has the id {ident!r}")
 
-    by_id = {e["id"]: e for st in [*stages, *unlocks.values(), postgame] for es in st["groups"].values() for e in es}
+    by_id = {e["id"]: e for st in [*stages, *unlocks.values(), postgame, ultra] for es in st["groups"].values() for e in es}
     for e in by_id.values():  # SAVE: "done when that other entry is"
         if isinstance(e.get("sv"), str):
             if not isinstance(by_id.get(e["sv"], {}).get("sv"), list):
@@ -357,7 +360,7 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
         order.append(st)
         order += [unlocks[hm] for hm, at in unlock_after.items() if at == n]
     out = []
-    for st in order + [postgame]:
+    for st in order + [postgame, ultra]:
         groups = [{"place": p, "slug": by_name[p]["slug"], "entries": es} for p, es in st["groups"].items()]
         if st["kind"] != "place":  # places in the order the playthrough reaches them
             groups.sort(key=lambda g: place_rank.get(g["place"], len(stages)))
@@ -375,9 +378,8 @@ def main() -> None:
     data = load_source_data(paths)
     roster = build_roster(data)
     page = page_data(data, roster, evolution_links(data, {e.key for e in roster}))
-    dropped: list = []
     daily: list = []
-    result = checklist(page, place_maps(paths), paths, game_item_names(data), dropped, daily)
+    result = checklist(page, place_maps(paths), paths, game_item_names(data), daily)
     total = 0
     for st in result["stages"]:
         print(f"== {st['title']}")
@@ -392,9 +394,6 @@ def main() -> None:
     print("\nLeft out as daily:")
     for place, text in daily:
         print(f"   {place}: {text}")
-    print("\nLeft out as common (sold in Poké Marts):")
-    for name in sorted({t for _, t in dropped}):
-        print(f"   {name}: {', '.join(sorted({p for p, t in dropped if t == name}))}")
     print("\nItems with no page entry:", ", ".join(result["unmatchedItems"]))
 
 
