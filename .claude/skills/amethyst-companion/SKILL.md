@@ -97,6 +97,9 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   `performance.now()` deltas (run without `--virtual-time-budget`, which freezes the clock).
 - Views: Pokédex, Moves, Tutors, Abilities, Items, Trainers, Locations, Docs; each has its own list/cards layout (remembered per browser).
   Back/Forward buttons sit right of the tabs, always visible, disabled when there's nowhere to go.
+  The header never scrolls: `<main>` is the scroll container, so the scrollbar starts below the header (scroll
+  `main`, not `window`; sticky things inside it use `top: 0`). Docs has a Dev Diary link (a Google Doc) above Overview.
+  Phone Pokédex list rows put the dex # and mode tag at the right, beside the name and types.
 - Tutor rows like "Fire Fang, or Flame Burst (v1.4+)" resolve to the move the game teaches for that tutor kind
   (move-tutor files for Regular, CFRU special tutors for Special); doc typos fuzzy-match (Breaking Strike → Breaking Swipe).
 - Content describes the **latest release** (version tag from `../PokemonShootingStars/Changelog.txt` beside the
@@ -136,7 +139,8 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   The Locations list's Found by column gets the width (Location 28%). A time-of-day encounter's chip says when
   ("☀️ 20%", "🌙 20%", "☀️ 10% 🌙 15%"; `times` on encounter rows, from locations.py `_by_time`); a bare rate means
   all day (Collin: Varisi Forest read as 120% when day/night rows looked like all-day ones). Wild chips are 4 across
-  (`.chips.wild`), 3 when a list has paired rates or a non-numeric level ("Same Lv as sent").
+  (`.chips.wild`), 3 when a list has paired rates or a non-numeric level. Trades say what to send where the level
+  would be ("Give Snom", "Give any Egg"; `give` on the row, from trades.csv's "You give").
 - Chips never truncate with "…" (Collin: players couldn't tell what "Galari… H." meant): a chip grows taller and
   wraps instead, grid rows stretch so chips stay uniform. Names keep priority (never split mid-word); the right-hand
   detail wraps first; on wild chips the level/rate stays on one line and the form/sub-area drop to a second line.
@@ -145,7 +149,12 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   Divergent / Both" column is *where-to-find* info: it becomes "(Standard mode)" on the where lines, not the effect.
   Doc "*" footnotes the item import misses go in `ITEM_FOOTNOTES` (build.py; Ability Capsule/Patch → Battle Bond).
 - Every TM/HM is an item ("TM02 Dragon Claw", category TMs/HMs) linking to its move; typing a type name in the
-  Pokédex lists that type.
+  Pokédex lists that type. Their icons are the disc in the move's type colour (`rom.tm_icons`: the ROM's per-item TM
+  palettes are FireRed's, stale or generic, since the game colours them at runtime; Fairy comes from CFRU's
+  `Fairy_TM_DiskPal`).
+- Items follow the mode filter: a where line's "(Standard)" / "(Divergent mode)" / "; Standard mode)" names its mode
+  (`lineMode` in app.js); an item shows in a mode if a line (or a wild holder) is in it. A CFRU shop list with a Divergent
+  twin (`EvolutionItemsShop` / `…Divergent`) is tagged "(Standard)" in `marts()`; a line both lists share is untagged.
 - Shinies live only in the details (Collin: a shiny beside every row was information overload; players open a
   Pokémon to compare near-identical shinies like Farfetch'd-G). Rows and collapsed cards show the normal front sprite.
   The details open with a **Sprites** grid: columns Regular / Shiny ✦, rows Front / Back, at 56 px (112 px was too big).
@@ -209,6 +218,8 @@ address moves every CFRU build), and stitches edge-joined maps into one picture 
 Runtime-changeable sprites (0xFF0n) take the value the map's own load script sets; read those scripts from the
 map's own file, because files reuse local labels (four dungeons each have `MapLoadScript_SetLegendarySprite`).
 Rubarr's sand-statue pits come from `MapEntryScript_RubarrDesertBF2_SetSand` (`rubarr()`).
+Floors start at the entrance the warps reach first, except numbered "Area N" floors, which go in number order
+(`sort_floors`; Peradon Forest's Area 1 before Area 2).
 
 **Checking a map:** open `site/index.html#map-rubarr-desert` headless (same recipe as above); inject a load-event
 script that clicks `.mapbtn`, `.warp`, `.door`, `.mk` or `.mv-list button` and writes results to `document.title`,
@@ -240,12 +251,15 @@ A playthrough-order list of tick boxes for 100% completion, before Docs. Design:
   services get none; trades read "Trade your X for Y (A for B in Divergent)"; Cut, Fly and Surf arrive inside a story
   beat (no "gives HM" entry), while Rock Smash, Strength and Rock Climb are errands of their own; rival side events
   say "Until the <next> Badge is obtained"; named bosses link to their trainer entry in the mode the player has chosen;
-  each place section has a Location button to its card; the progress bar, legend, controls and the Beta note stay
-  stuck under the header; Pokémon named in an entry link to their Pokédex entries; the tab is tagged Beta; one
+  each place section has a Location button to its card; the progress bar and controls stay
+  stuck under the header; Pokémon named in an entry link to their Pokédex entries; no Beta tag and no legend: each entry starts with a
+  kind tag (Story / Event / Item / Pokémon / Hidden Item, in the maps' marker colours); a section's count turns bold
+  green when full, and Hide finished hides a place heading or a whole section once it's all ticked; the search row
+  shows no "x / y done" (the panel does); one
   layout only (he tried cards and dropped them: sections of uneven length looked chaotic); gift lists are written
   out in full (the maps' "A, B +1" is `tf` on the marker), and story hand-outs (Town Map and Running Shoes) are one
   story tick, not an NPC entry.
-- More of Collin's rules: buttons read "See Location" / "See Interactive Map"; no coloured border on sections
+- More of Collin's rules: buttons read "See Location" / "Find in Map"; no coloured border on sections
   (purple reads as Divergent); Trainer Houses list their grand prize, not the trainers; an item the data says is in
   one mode only is tagged "Divergent only" (`only`; the map shows it as `mo`); what an item needs also shows on the
   interactive map (`rq`, set on the marker by checklist.py; `NEEDS` corrects the feature list); `MOVE` to "with Strength" puts an entry in that HM's section. Regional forms are named in
@@ -257,10 +271,12 @@ A playthrough-order list of tick boxes for 100% completion, before Docs. Design:
   `python -m tools.dexpage.checklist` lists what was left out as daily.
 - Map people's text never says "shop" (Collin: "Mega Stone Refiner", "Nurse: heals your team"); places.py keeps the
   full role list on the marker as `rl` so the checklist still skips shop-only people, and checklist.py pops it.
-- Controls: Hide finished, Expand/Collapse All, Expand/Collapse Completed (sections whose count is full), then the
-  save/export buttons; folding is remembered in `dex-check-ui`. The help note says entries follow what a player can
-  reach (HM-gated things after the HM).
-- **Load Save File** ticks the list from a `.sav` / `.srm` (the raw 128 KiB flash; save states don't work) and
+- Controls: Hide finished, "Sections" Expand / Collapse / Collapse finished, then Import from Save, Export Backup,
+  Import Backup, Reset, with a "|" between the folding and the data buttons (`.ck-sep`). On phones (≤600 px) the "|"
+  goes and the controls stack: Hide finished, the three section buttons in one even row, the data buttons 2×2; folding is remembered in
+  `dex-check-ui`. The help note is exactly (Collin): "Track your progress in Pokemon Amethyst, in order of when things
+  can first be obtained."
+- **Import from Save** ticks the list from a `.sav` / `.srm` (the raw 128 KiB flash; save states don't work) and
   replaces the current ticks after a confirm. Each entry's `sv` lists what in the save means done (`save_flags.py`):
   item balls and one-off Pokémon by the flag that hides them, hidden items by 1000 + their id byte (both on the
   map markers as `fg`, with the script label `lb`; checklist.py pops them so the page's map data is unchanged),
@@ -272,7 +288,7 @@ A playthrough-order list of tick boxes for 100% completion, before Docs. Design:
   test saves are in `../PokemonShootingStars/saves`. After changing either reader, run both over every save and
   compare (inject `window.__ck = { ckReadSave, ckFromSave }` before `function ckAct` in a copy of the page).
 - Ticks: `localStorage["dex-checklist"]`; the Download link writes them into the saved copy as `#saved-checklist`
-  (merged once per saved file); Export/Import is a small JSON file. Don't write `/</g` in app.js: the build turns
+  (merged once per saved file); Export Backup / Import Backup is a small JSON file. Don't write `/</g` in app.js: the build turns
   every `</` into `<\/`, which breaks a regex literal.
 
 ## Known gaps / ideas not done yet

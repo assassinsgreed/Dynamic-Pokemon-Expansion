@@ -71,8 +71,13 @@ def load_encounters(path: Path = ENCOUNTERS_CSV) -> list[dict]:
     result = []
     for r in rows:
         notes = r["Notes"].strip()
+        give = ""
         if "trade" in r["Method"] or "Egg" in r["Method"]:
-            notes = _with_ask(notes, asks.get((r["Pokémon"], r["Mode"], r["Location"])))
+            ask = asks.get((r["Pokémon"], r["Mode"], r["Location"]))
+            notes = _with_ask(notes, ask)
+            if ask and "trade" in r["Method"]:  # place cards say what to send ("Give Lillipup", "Give any Egg")
+                ask = re.sub(r"(.+?) \((.+)\)", r"\2 \1", ask)  # "Rotom (Heat)" → "Heat Rotom"
+                give = f"any {ask[4:]}" if ask.lower().startswith("any ") else ask
         rate, notes, times = _by_time(_rate(r["Rate"]) if r["Rate"] else "", notes)
         name = r["Pokémon"].replace("\\e", "é")  # the sheet keeps the game's \e escape for é
         m = re.fullmatch(r"(.*?)\s*\((.+)\)", name)
@@ -88,6 +93,7 @@ def load_encounters(path: Path = ENCOUNTERS_CSV) -> list[dict]:
             "levels": r["Levels"],
             "times": times,
             "item": r["Held item"],
+            "give": give,
             # The sheet's other tabs don't exist on the page
             "notes": re.sub(r"\s*Details on the \w+ tab\.", "", notes).strip().replace("Swarm days only", "When swarming"),
         })

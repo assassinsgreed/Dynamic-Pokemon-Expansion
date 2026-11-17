@@ -55,7 +55,8 @@ def test_page_is_self_contained(html):
     assert not re.search(r'<link[^>]*href=["\']https?://', html)
     outbound = re.findall(r'<a [^>]*href=["\'](https?://[^"\']+)', html)
     assert outbound == ["https://www.hackdex.app/hack/pokemon-amethyst", "https://discord.gg/PAKps59djr",
-                        "https://github.com/assassinsgreed/pokemon-amethyst-companion/issues"]
+                        "https://github.com/assassinsgreed/pokemon-amethyst-companion/issues",
+                        "https://docs.google.com/document/d/15neA-vw1VMiw20mT-OlcRAXjx283DN87cZLS6phBKgk/edit?usp=sharing"]  # Docs' dev diary
     assert "@import" not in html and "fonts.googleapis" not in html
 
 

@@ -56,7 +56,11 @@ button { font: inherit; color: inherit; }
 .wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 
 /* Console */
-header.console { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--console); border-bottom: 1px solid var(--line); }
+/* The header stays put and only the view under it scrolls, so the scrollbar starts below the header */
+html, body { height: 100%; }
+body { display: flex; flex-direction: column; overflow: hidden; }
+main { flex: 1; min-height: 0; overflow: auto; }
+header.console { position: relative; flex: none; z-index: 5; background: var(--console); border-bottom: 1px solid var(--line); }
 .console .wrap { padding-block: 12px; display: grid; gap: 10px; }
 .console .wrap > * { min-width: 0; }  /* let the tab strip scroll instead of widening the header */
 .brand { display: grid; gap: 0; }
@@ -124,7 +128,7 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 
 /* Rows */
 .list { display: grid; gap: 6px; }
-.mon { background: var(--edge, none) left / 4px 100% no-repeat, linear-gradient(var(--hl, transparent), var(--hl, transparent)), var(--tint, none), var(--surface); border: 1px solid var(--line); border-radius: 10px; scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--console-h, 150px) + 8px); }
+.mon { background: var(--edge, none) left / 4px 100% no-repeat, linear-gradient(var(--hl, transparent), var(--hl, transparent)), var(--tint, none), var(--surface); border: 1px solid var(--line); border-radius: 10px; scroll-margin-top: 8px; }
 .mon[open] { border-color: var(--muted); }
 .mon > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 12px 6px 6px; border-radius: 10px; }
 .mon:not([open]):hover { --hl: color-mix(in srgb, var(--accent) 8%, transparent); }
@@ -336,15 +340,18 @@ table.mv > tbody > tr:not(.expanded):hover > td,
 .movecard, .itemcard, .loccard { position: relative; }
 .collapse { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--accent); background: var(--surface); color: var(--accent); cursor: pointer; }
 .collapse:hover { background: var(--accent-soft); }
-.expanded { grid-column: 1 / -1; margin: 6px 0; scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--console-h, 150px) + 8px); }
+.expanded { grid-column: 1 / -1; margin: 6px 0; scroll-margin-top: 8px; }
 tr.expanded > td { padding: 6px 0 10px; background: none !important; }
 tr.expanded { cursor: default; }
 tr.on td { background: var(--accent-soft); }
-tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--console-h, 150px) + 12px); }
+tr.on, .chip.on { scroll-margin-top: 12px; }
 .chip.on { border-color: var(--accent); background: var(--accent-soft); }
 
+.diary { margin: 14px 0 0; }
+.diary a { display: inline-block; font-weight: 600; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--accent); }
+.diary a:hover { border-color: var(--accent); text-decoration: none; }
 /* Checklist: playthrough-order sections of tick boxes */
-.ck-head { position: sticky; top: var(--console-h, 0px); z-index: 3; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px;
+.ck-head { position: sticky; top: 0; z-index: 3; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px;
   margin: 0 -4px 8px; padding: 8px 6px; background: var(--bg); border-bottom: 1px solid var(--line); }
 .ck-prog { flex: 1 1 220px; display: flex; align-items: center; gap: 10px; font: 600 13px/1 var(--font-data); }
 .ck-bar { flex: 1; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
@@ -353,8 +360,18 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .ck-acts button, .ck-map { font: 600 12px/1 var(--font-body); padding: 6px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
 .ck-acts button:hover, .ck-map:hover { border-color: var(--accent); }
 .ck-acts label { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; margin-right: 6px; cursor: pointer; }
+.ck-sep { color: var(--muted); margin: 0 4px; user-select: none; }
+.ck-fold, .ck-data { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+/* Phones: Hide finished, then the three section buttons in one even row, then the data buttons two by two */
+@media (max-width: 600px) {
+  .ck-acts { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; width: 100%; }
+  .ck-sep { display: none; }
+  .ck-fold { display: flex; flex-wrap: nowrap; }
+  .ck-fold button { flex: 1 1 auto; padding: 7px 6px; }
+  .ck-data { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ck-data button { padding: 8px 6px; }
+}
 .ck-help { flex-basis: 100%; margin: 0; font-size: 12px; }
-.beta { font: 600 9.5px/1 var(--font-data); text-transform: uppercase; letter-spacing: .06em; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 2px 5px; margin-left: 6px; vertical-align: 2px; }
 .ck-stage { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; }
 .ck-stage > summary { display: flex; align-items: center; gap: 8px; padding: 10px 12px; cursor: pointer; list-style: none; font: 600 15px/1.2 var(--font-display); }
 .ck-stage > summary::-webkit-details-marker { display: none; }
@@ -362,7 +379,9 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .ck-stage[open] > summary .chev { transform: none; }
 .ck-title { flex: 1; min-width: 0; }
 .ck-n { font: 600 12.5px/1 var(--font-data); color: var(--muted); white-space: nowrap; }
-.ck-n.all { color: var(--std); }
+.ck-n.all { color: #0a9a3c; font-weight: 800; font-size: 13.5px; }
+:root[data-theme="dark"] .ck-n.all { color: #3ee07a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ck-n.all { color: #3ee07a; } }
 .ck-rows { padding: 0 8px 8px; }
 .ck-place { font: 600 12px/1 var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 10px 4px 4px; }
 .ck-at { font: inherit; color: var(--muted); background: none; border: 0; padding: 0 0 0 .5em; cursor: pointer; text-decoration: underline dotted; }
@@ -372,8 +391,11 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .ck:hover { background: var(--sunk); }
 .ck label { flex: 1; min-width: 0; display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; cursor: pointer; }
 .ck input { width: 18px; height: 18px; margin: 1px 0 0; flex: none; accent-color: var(--accent); }
-.ck-kind { flex: none; width: 16px; height: 16px; margin-top: 2px; }
-.ck-kind svg { width: 16px; height: 16px; display: block; }
+.ck-kind { flex: none; width: 76px; margin-top: 1px; text-align: center; font: 600 10.5px/1 var(--font-data); text-transform: uppercase; letter-spacing: .03em; padding: 3px 0; border-radius: 4px; white-space: nowrap;
+  color: var(--ink); border: 1px solid var(--k); background: color-mix(in srgb, var(--k) 22%, var(--surface)); }
+/* the interactive maps' marker colours */
+.ck-kind.k-story { --k: #6b35c4; } .ck-kind.k-npc { --k: #009e73; } .ck-kind.k-item { --k: #d55e00; } .ck-kind.k-wild { --k: #cc79a7; } .ck-kind.k-hidden { --k: #d4c400; }
+.ck.done .ck-kind { opacity: .55; }
 .ck-body { flex: 1; min-width: 0; font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; }
 .ck-body .mvname { font-size: inherit; text-align: left; }
 .ck-tags { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-left: 6px; vertical-align: 1px; }
@@ -381,11 +403,10 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .ck.done .ck-tags { text-decoration: none; }
 .ck-tags .mode { white-space: normal; line-height: 1.15; }  /* a long tag ("Until the … Badge is obtained") wraps on phones instead of widening the page */
 .ck-map { flex: none; margin-top: 4px; padding: 4px 8px; white-space: nowrap; }
-.cklist.hide-done .ck.done { display: none; }
-.ck-key { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--muted); }
+.cklist.hide-done .ck.done, .cklist.hide-done .ck-grp.fin, .cklist.hide-done .ck-stage.fin { display: none; }
+.ck-fold { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); margin-right: 6px; }
 .ck-loc { font: 600 12px/1 var(--font-body); padding: 5px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--sunk); color: var(--ink); cursor: pointer; }
 .ck-loc:hover { border-color: var(--accent); }
-.ck-key span { display: inline-flex; align-items: center; gap: 5px; }
 
 /* Docs: feature-list topics, rendered from the doc */
 .doccard { position: relative; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px 16px; }
@@ -563,7 +584,7 @@ table.mv .c-lv { text-align: right; white-space: nowrap; }
 .list.grid .mon:not([open]) { contain-intrinsic-size: auto 205px; }
 .nores { padding: 24px; text-align: center; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; }
 /* Card views open an entry in a pop-up over the page (list views expand in place) */
-body.sheet-open { overflow: hidden; }
+body.sheet-open main { overflow: hidden; }
 .sheet { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) 16px 16px; }
 .sheet-backdrop { position: absolute; inset: 0; background: rgb(8 4 16 / .62); }
 /* The panel keeps its rounded frame; only .sheet-body scrolls, so the scrollbar stays inside it */
@@ -600,12 +621,13 @@ body.sheet-open { overflow: hidden; }
   .sheet-close { top: calc(12px + env(safe-area-inset-top, 0px)); }
 }
 @media (max-width: 520px) {
-  /* the dex number and mode tag get their own line under the types: beside them they ran into the type badges */
-  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary { row-gap: 4px; }
-  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .dexline { position: static; transform: none; grid-column: 2; grid-row: 2; }
-  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .sp { grid-column: 1; grid-row: 1 / span 2; }
-  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .who { grid-column: 2; grid-row: 1; align-self: end; }
-  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .chev { grid-column: 3; grid-row: 1 / span 2; }
+  /* the dex number and mode tag stack at the right, beside the name and the types (# on the name's line, the mode
+     tag on the types' line), left of the arrow */
+  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary { grid-template-columns: auto minmax(0, 1fr) auto auto; row-gap: 4px; }
+  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .dexline { position: static; transform: none; grid-column: 3; grid-row: 1; flex-direction: column; align-items: flex-end; justify-content: center; gap: 6px; }
+  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .sp { grid-column: 1; grid-row: 1; }
+  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .who { grid-column: 2; grid-row: 1; }
+  :is(.list:not(.grid) .mon, .list.grid .mon[open]) > summary .chev { grid-column: 4; grid-row: 1; }
   .mon > summary .who { padding-right: 0; }
   /* no room beside the title: the subtitle goes under it, then the links and download button get their own row
      (brand-top's children join the brand grid so the subtitle can sit between them) */
@@ -618,7 +640,7 @@ body.sheet-open { overflow: hidden; }
   .brand .links { justify-content: space-between; }
   /* title on one line: font scales with the screen (icon + version badge take ~140px) */
   .brand h1 { flex: 1 0 100%; white-space: nowrap; font-size: clamp(14px, calc((100vw - 140px) / 14.5), 22px); }
-  .list:not(.grid) .mon > summary { grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; }
+  .list:not(.grid) .mon > summary { gap: 8px; }
   .list.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .list:not(.grid) .mon > summary .sp { width: 48px; height: 48px; }
   .list:not(.grid) .mon > summary .sp i { transform: scale(.75); }
@@ -641,7 +663,7 @@ body.sheet-open { overflow: hidden; }
 :root[data-theme="dark"] .mapbtn { color: #1a0b33; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mapbtn { color: #1a0b33; } }
 .mapbtn svg { width: 16px; height: 16px; }
-body.map-open { overflow: hidden; }
+body.map-open main { overflow: hidden; }
 body.map-open .sheet { display: none; }  /* the place's pop-up waits behind the map */
 #mapview { position: fixed; inset: calc(env(safe-area-inset-top, 0px) + var(--console-h, 150px)) 0 0; z-index: 4; overflow: auto; overscroll-behavior: contain; background: var(--bg);
   --map-bg: #1b1426; --flash: #ffd400; --k-item: #d55e00; --k-hidden: #f0e442; --k-npc: #009e73; --k-wild: #cc79a7; --k-statue: #56b4e9; }
@@ -749,7 +771,7 @@ body.map-open .sheet { display: none; }  /* the place's pop-up waits behind the 
       <button role="tab" data-viewtab="items" aria-selected="false">Items</button>
       <button role="tab" data-viewtab="trainers" aria-selected="false">Trainers</button>
       <button role="tab" data-viewtab="places" aria-selected="false">Locations</button>
-      <button role="tab" data-viewtab="check" aria-selected="false">Checklist<span class="beta">Beta</span></button>
+      <button role="tab" data-viewtab="check" aria-selected="false">Checklist</button>
       <button role="tab" data-viewtab="docs" aria-selected="false">Docs</button>
     </nav>
       <span class="navbtns">

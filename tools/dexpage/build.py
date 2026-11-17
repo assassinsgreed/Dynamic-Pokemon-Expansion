@@ -13,6 +13,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 from .checklist import checklist
+from .cparse import read
 from .docs import DOC_IMAGES, load_docs, render_topic, topic_text
 from .field_items import field_items
 from .items import load_items, load_machine_locations, load_script_items, load_tutors
@@ -23,7 +24,7 @@ from .locations import attach_encounters, load_encounters
 from .maps.export import place_maps
 from .paths import DPE_ROOT, Paths
 from .roster import Entry, SourceData, build_roster, evolution_links, load_extra_forms, load_source_data
-from .rom import POCKET_BERRIES, POCKET_KEY_ITEMS, POCKET_POKE_BALLS, item_fields, item_icons
+from .rom import POCKET_BERRIES, POCKET_KEY_ITEMS, POCKET_POKE_BALLS, item_fields, item_icons, tm_icons
 from .sprites import build_sheet, pack
 from .town_map import norm as place_key, place_descriptions, town_map_png, town_map_squares
 from .trainers import NATURES, load_trainers
@@ -366,7 +367,12 @@ def _items(data: SourceData, held: dict[str, list[str]], evo_links: dict) -> tup
             by_const[const] = index[_norm(name)]
 
     wanted = {i["key"]: data.item_ids[i["key"]] for i in items if i["key"]}
-    sheet, offsets = pack(item_icons(data.paths.rom, wanted), 24)
+    icons = item_icons(data.paths.rom, wanted)
+    # TMs and HMs: the disc in their move's type colour, as the game colours it
+    machines = {i["key"]: (data.item_ids[i["key"]], data.moves[i["move"]]["type"]) for i in items if i["key"] and i.get("move")}
+    fairy = re.search(r"^Fairy_TM_DiskPal:\s+([0-9A-Fa-f]{8})", read(data.paths.cfru / "offsets.ini"), flags=re.M)
+    icons.update(tm_icons(data.paths.rom, machines, int(fairy.group(1), 16)))
+    sheet, offsets = pack(icons, 24)
     for item in items:
         item["icon"] = offsets.get(item.pop("key"))
     return items, index, by_const, "data:image/webp;base64," + base64.b64encode(sheet).decode()
@@ -479,7 +485,10 @@ def _tidy_where(where: list[str]) -> list[str]:
             kept = ", ".join(piece for piece in re.split(r",\s*(?![^()]*\))", w) if not covered(piece))  # "Route 7, Tsarvosa City Market"
             if kept:
                 out.append(kept)
-    return list(dict.fromkeys(out))
+    # a line in both modes' lists (a shop selling it in both) is said once, untagged
+    bare = lambda o: re.sub(r" \((?:Standard|Divergent)\)$", "", o)
+    both = {bare(o) for o in out if o.endswith(" (Standard)") and bare(o) + " (Divergent)" in out}
+    return list(dict.fromkeys(bare(o) if bare(o) in both else o for o in out))
 
 
 def _abilities(mons: list[dict], officials: dict[str, str]) -> list[dict]:

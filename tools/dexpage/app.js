@@ -416,7 +416,7 @@
       ${showUse ? `<div><h4>${it.move ? "Note" : useTitle}</h4><div class="use">${esc(it.use)}</div></div>` : ""}
       ${evolves.length ? `<div><h4>${it.category === "Mega Stones" ? "Mega Evolves" : "Evolves"} · ${evolves.length}</h4><div class="chips">${evolves.map(([i, to]) => monChip(to, "", "", it.category === "Mega Stones")).join("")}</div>${
         conditions.length ? `<ul class="evocond">${conditions.map(([i, to, how]) => `<li><b>${esc(mons[i].name)}${formLabel(mons[i])}</b> → <b>${esc(mons[to].name)}${formLabel(mons[to])}</b>: ${esc(how)}</li>`).join("")}</ul>` : ""}</div>` : ""}
-      ${it.where.length ? `<div><h4>Where to find</h4><ul class="where">${it.where.map((w) => `<li>${placeLinks(w)}</li>`).join("")}</ul></div>` : '<p class="note">No known location.</p>'}
+      ${whereIn(k).length ? `<div><h4>Where to find</h4><ul class="where">${whereIn(k).map((w) => `<li>${placeLinks(w)}</li>`).join("")}</ul></div>` : '<p class="note">No known location.</p>'}
       ${holders.length ? `<div><h4>Held by wild Pokémon · ${holders.length}</h4><div class="chips">${holders.map(([i, pct]) => monChip(i, pct)).join("")}</div></div>` : ""}
     </article>`;
   }
@@ -448,8 +448,8 @@
     // by night, "☀️ 10% 🌙 15%"); a bare rate is all day. Each list runs from the likeliest encounter down.
     const TIME_ICON = { day: "☀️", night: "🌙" };
     const pct = (rate) => Math.max(-1, ...(String(rate).match(/\d+(\.\d+)?(?=%)/g) || []).map(Number));
-    // Trades come at the level sent: "Same Lv as sent" rather than "Lv Same as sent"
-    const lvNote = (lv) => (!lv ? "" : /^\d/.test(lv) ? `Lv ${lv}` : lv === "Same as sent" ? "Same Lv as sent" : lv);
+    // A trade says what to send ("Give Lillipup") where the level would be (it comes at the level sent)
+    const lvNote = (e) => (e.give && !/^\d/.test(e.levels || "") ? `Give ${e.give}` : !e.levels ? "" : /^\d/.test(e.levels) ? `Lv ${e.levels}` : e.levels === "Same as sent" ? "Same Lv as sent" : e.levels);
     // Places with floors list them in floor order (the outside, 1F, 2F…, then B1F, B2F…), likeliest first on each;
     // a chip found on several floors goes with the first it names. Named rooms ("Side Room", "Peak") come after.
     const floorRank = (sub) => {
@@ -467,13 +467,13 @@
       : ["Standard", "Divergent", "Both"].map((md) => [mt, md, l.filter(([, e]) => e.mode === md)]).filter(([, , g]) => g.length)));
     const groups = byMode.map(([mt, md, l]) => [mt, md, l.map(([i, e]) => {
       const rate = e.times ? Object.entries(e.times).map(([t, r]) => `${TIME_ICON[t]} ${r}`).join(" ") : e.rate;
-      return [i, e, rate, [lvNote(e.levels), rate].filter(Boolean).join(" · ")];
+      return [i, e, rate, [lvNote(e), rate].filter(Boolean).join(" · ")];
     }).sort((a, b) => floorRank(a[1].sub) - floorRank(b[1].sub) || pct(b[2]) - pct(a[2]))]);
     const re = placeRe(p.name);
     const found = [];
     // Chip hint is just the spot within the place ("Shady relic seller"); prices and notes are on the item's card
     const spot = (line) => line.replace(/\s*\([^)]*\)/g, "").replace(p.name, "").replace(/^[\s·-]+/, "");
-    items.forEach((it, k) => { const line = it.where.find((w) => re.test(w.toLowerCase())); if (line) found.push([k, spot(line)]); });
+    items.forEach((it, k) => { const line = it.where.find((w) => re.test(w.toLowerCase()) && lineInMode(w)); if (line) found.push([k, spot(line)]); });
     // Three parts, each set apart: the map and description, the encounters by method, the items found here
     const encounters = groups.length
       ? groups.map(([mt, md, l]) => `<div><h4>${esc(mt)}${md ? ` ${modeTag(md)}` : ""} · ${l.length}</h4><div class="chips wild${
@@ -505,7 +505,16 @@
     }
     return catKeys.get(c).some((t) => t.startsWith(q));
   };
-  const matchItems = (q) => items.map((_, k) => k).filter((k) => !q || itemKeys[k].includes(q)
+  // Where-to-find lines name the one mode they're true in: "(Standard)", "(Divergent mode)", "(Requires Surf; Standard mode)"
+  const lineMode = (w) => (w.match(/[(;]\s*(Standard|Divergent)(?: mode)?(?: only)?\s*[;)]/i) || [])[1] || null;
+  const lineInMode = (w) => { const m = lineMode(w); return !state.mode || !m || m.toLowerCase() === state.mode.toLowerCase(); };
+  const heldBy = items.map(() => []);
+  mons.forEach((m) => m.held.forEach(([, hk]) => { if (hk != null && heldBy[hk]) heldBy[hk].push(m); }));
+  // An item is in the chosen mode when it's found there, or held by a wild Pokémon there (or the data says nothing)
+  const itemInMode = (k) => !state.mode || items[k].where.some(lineInMode) || heldBy[k].some(inMode)
+    || (!items[k].where.length && !heldBy[k].length);
+  const whereIn = (k) => items[k].where.filter(lineInMode);
+  const matchItems = (q) => items.map((_, k) => k).filter(itemInMode).filter((k) => !q || itemKeys[k].includes(q)
     || catHit(items[k].category, q) || (items[k].move && moves[items[k].move].s.includes(q)));
   // A place also matches what's found there (in the chosen mode): a Pokémon ("bidoof"), an encounter method ("grass",
   // "wormhole") or an item ("full heal"); the item lists are worked out once, on the first search
@@ -513,9 +522,9 @@
   const itemsAt = (p) => {
     placeItems ??= new Map(placeList.map((pl) => {
       const re = placeRe(pl.name);
-      return [pl, items.flatMap((it, k) => (it.where.some((w) => re.test(w.toLowerCase())) ? [k] : []))];
+      return [pl, items.flatMap((it, k) => it.where.filter((w) => re.test(w.toLowerCase())).map((w) => [k, w]))];
     }));
-    return placeItems.get(p);
+    return placeItems.get(p).filter(([, w]) => lineInMode(w)).map(([k]) => k);
   };
   const matchPlaces = (q) => placeList.filter((p) => !q || norm(p.name).includes(q)
     || p.rows.some(([i, l]) => rowInMode(l) && (mons[i].s.some((s) => s.includes(q)) || norm(l.method).includes(q)))
@@ -599,8 +608,8 @@
     const html = cats.map(([c, ks]) => `<div class="cat-head">${esc(c)} · ${ks.length}</div>${state.layouts.items === "grid"
       ? chipsWithOpen(ks, (k) => `<button class="chip${k === open ? " on" : ""}" data-item="${k}">${itemIcon(k)}<span class="ln">${esc(items[k].name)}</span></button>`, (k) => k === open, (k) => itemCard(k, true))
       : `<div class="listtable"><table class="mv"><thead><tr><th>Item</th><th>Where to find</th></tr></thead><tbody>${ks.map((k) =>
-          `<tr data-item="${k}"${k === open ? ' class="on"' : ""}><td>${itemIcon(k)}<span class="mvname">${esc(items[k].name)}</span></td><td class="note">${esc(items[k].where.slice(0, 2).join("; ") || "—")}${
-            items[k].where.length > 2 ? ` +${items[k].where.length - 2} more` : ""}</td></tr>${k === open ? expandRow(2, itemCard(k, true)) : ""}`).join("")}</tbody></table></div>`}`).join("");
+          `<tr data-item="${k}"${k === open ? ' class="on"' : ""}><td>${itemIcon(k)}<span class="mvname">${esc(items[k].name)}</span></td><td class="note">${esc(whereIn(k).slice(0, 2).join("; ") || "—")}${
+            whereIn(k).length > 2 ? ` +${whereIn(k).length - 2} more` : ""}</td></tr>${k === open ? expandRow(2, itemCard(k, true)) : ""}`).join("")}</tbody></table></div>`}`).join("");
     return [html, `${list.length} items`];
   }
 
@@ -701,22 +710,20 @@
       ? '<div class="dchips">' + chipsWithOpen(ts, (t) => `<button class="chip${isOpen(t) ? " on" : ""}" data-doc="${esc(t.title)}"><span class="ln" style="padding-left:10px">${esc(t.title)}</span></button>`, isOpen, docCard) + "</div>"
       : `<div class="listtable"><table class="mv"><tbody>${ts.map((t) => `<tr data-doc="${esc(t.title)}"${isOpen(t) ? ' class="on"' : ""}><td><span class="mvname">${esc(t.title)}</span></td></tr>${
           isOpen(t) ? expandRow(1, docCard(t)) : ""}`).join("")}</tbody></table></div>`}`).join("");
-    return [html, `${list.length} topics`];
+    // The dev diary is a separate Google Doc, linked above the Overview
+    const diary = `<p class="diary"><a href="https://docs.google.com/document/d/15neA-vw1VMiw20mT-OlcRAXjx283DN87cZLS6phBKgk/edit?usp=sharing" target="_blank" rel="noopener">Read the Pokemon Amethyst Dev Diary ↗</a></p>`;
+    return [(q ? "" : diary) + html, `${list.length} topics`];
   }
 
   // Checklist: what there is to do, in playthrough order (checklist.py). Ticks live in this
   // browser's storage; the Download link writes them into the saved file, and Export / Import moves them elsewhere.
   const CK = DEX.checklist;
-  // Kinds keep the interactive maps' colours and shapes; story beats are a ring
-  const CK_KIND = { story: ["Story", "#6b35c4", ""], npc: ["Person or event", "#009e73", "6,2 16,2 21,11 16,20 6,20 1,11"],
-    wild: ["Pokémon encounter", "#cc79a7", "11,1 13.9,7.6 21,8.3 15.7,13.1 17.2,20.1 11,16.5 4.8,20.1 6.3,13.1 1,8.3 8.1,7.6"],
-    item: ["Item ball", "#d55e00", "3,3 19,3 19,19 3,19"], hidden: ["Hidden item", "#f0e442", "11,1 21,11 11,21 1,11"] };
-  const ckShape = (k) => `<span class="ck-kind" title="${CK_KIND[k][0]}"><svg viewBox="0 0 22 22" aria-hidden="true">${k === "story"
-    ? `<circle cx="11" cy="11" r="8" fill="${CK_KIND[k][1]}" stroke="#111" stroke-width="1.6"/><circle cx="11" cy="11" r="3" fill="#fff" stroke="#111" stroke-width="1.2"/>`
-    : `<polygon points="${CK_KIND[k][2]}" fill="${CK_KIND[k][1]}" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/>`}</svg></span>`;
+  // Each entry starts with a tag naming what it is
+  const CK_KIND = { story: "Story", npc: "Event", item: "Item", wild: "Pokémon", hidden: "Hidden Item" };
+  const ckKind = (k) => `<span class="ck-kind k-${k}">${CK_KIND[k]}</span>`;
   const ckAll = [];
   CK.stages.forEach((st) => st.groups.forEach((g) => g.entries.forEach((e) => {
-    e.s = words(`${e.t} ${g.place} ${e.at || ""} ${st.title} ${e.fl || ""} ${CK_KIND[e.k][0]} ${e.need || ""}`);
+    e.s = words(`${e.t} ${g.place} ${e.at || ""} ${st.title} ${e.fl || ""} ${CK_KIND[e.k]} ${e.need || ""}`);
     ckAll.push(e);
   })));
   const ck = { done: {}, hide: false, closed: {} };
@@ -761,9 +768,9 @@
     // e.at: the place of an entry in a list that isn't one place (the Ultra Wormhole Search)
     const at = e.at ? `<button class="ck-at" data-place="${esc(e.at)}" title="See ${esc(e.at)}">${esc(e.at)}</button>` : "";
     const tags = [e.sd && "Differs by mode", e.only && `${e.only} only`, e.need && `Needs ${e.need}`, e.until, e.fl].filter(Boolean).map(ckTag).join("");
-    return `<div class="ck${ck.done[e.id] ? " done" : ""}"><label><input type="checkbox" data-ck="${esc(e.id)}"${ck.done[e.id] ? " checked" : ""}>${ckShape(e.k)}
+    return `<div class="ck${ck.done[e.id] ? " done" : ""}"><label><input type="checkbox" data-ck="${esc(e.id)}"${ck.done[e.id] ? " checked" : ""}>${ckKind(e.k)}
       <span class="ck-body">${name}${at}${tags ? `<span class="ck-tags">${tags}</span>` : ""}</span></label>${
-      e.mark ? `<button class="ck-map" data-ckmap="${e.ms || g.slug}" data-mark="${e.mark}" >See Interactive Map</button>` : ""}</div>`;
+      e.mark ? `<button class="ck-map" data-ckmap="${e.ms || g.slug}" data-mark="${e.mark}" >Find in Map</button>` : ""}</div>`;
   }
 
   function ckCounts() {
@@ -776,13 +783,13 @@
       n.textContent = `${d} / ${es.length}`;
       n.classList.toggle("all", d === es.length);
     });
-    $("#count").textContent = `${done} / ${ckAll.length} done`;
+    // Hide finished hides a place heading, or a whole section, once everything under it is ticked
+    document.querySelectorAll(".ck-grp, .ck-stage").forEach((g) => g.classList.toggle("fin", !g.querySelector(".ck:not(.done)")));
   }
 
   function checkView(q) {
     if (!ckAll.length) return ['<div class="nores">The checklist isn’t in this build.</div>', ""];
     const fw = words(state.q), hit = (e) => !q || e.s.includes(fw);
-    const kinds = new Set(ckAll.map((e) => e.k));
     const stages = CK.stages.map((st, n) => {
       const groups = st.groups.map((g) => [g, g.entries.filter(hit)]).filter(([, es]) => es.length);
       if (!groups.length) return "";
@@ -791,16 +798,15 @@
       const card = named ? "" : places.has(norm(st.title)) ? st.title : st.groups[0].place;
       return `<details class="ck-stage k-${st.kind}" data-ckstage="${esc(st.title)}"${open ? " open" : ""}><summary>${CHEVRON}<span class="ck-title">${esc(st.title)}</span>${
         card ? `<button class="ck-loc" data-place="${esc(card)}" title="Pokémon, items and map for ${esc(card)}">See Location</button>` : ""}<span class="ck-n" data-ckn="${n}"></span></summary>
-        <div class="ck-rows">${groups.map(([g, es]) => `${named || g.place !== st.place ? `<div class="ck-place">${g.slug ? `<button data-place="${esc(g.place)}">${esc(g.place)}</button>` : esc(g.place)}</div>` : ""}${es.map((e) => ckRow(e, g)).join("")}`).join("")}</div></details>`;
+        <div class="ck-rows">${groups.map(([g, es]) => `<div class="ck-grp">${named || g.place !== st.place ? `<div class="ck-place">${g.slug ? `<button data-place="${esc(g.place)}">${esc(g.place)}</button>` : esc(g.place)}</div>` : ""}${es.map((e) => ckRow(e, g)).join("")}</div>`).join("")}</div></details>`;
     }).join("");
     if (!stages) return [`<div class="nores">Nothing on the checklist matches “${esc(state.q)}”.</div>`, "0 entries"];
     const html = `<div class="cklist${ck.hide ? " hide-done" : ""}">
       <div class="ck-head"><div class="ck-prog"><span id="ck-total"></span><span class="ck-bar"><i id="ck-fill"></i></span></div>
-        <div class="ck-key">${Object.keys(CK_KIND).filter((k) => kinds.has(k)).map((k) => `<span>${ckShape(k)}${CK_KIND[k][0]}</span>`).join("")}</div>
         <div class="ck-acts"><label><input type="checkbox" data-ckact="hide"${ck.hide ? " checked" : ""}>Hide finished</label>
-          <button data-ckact="open-all">Expand All</button><button data-ckact="close-all">Collapse All</button><button data-ckact="open-done" title="Expand the sections you have finished">Expand Completed</button><button data-ckact="close-done" title="Collapse the sections you have finished">Collapse Completed</button>
-          <button data-ckact="save" title="Tick what your save file says you've done (.sav or .srm); replaces your current ticks">Load Save File</button><button data-ckact="export" title="Save your ticks to a file">Export</button><button data-ckact="import" title="Load ticks from an exported file">Import</button><button data-ckact="reset">Reset</button></div>
-        <p class="note ck-help">Track your progress in Pokemon Amethyst. Progress is tracked in your browser; Export and Import allow you to move data to/from local copies. Entries are ordered by what you can reach as you play: things that need an HM (Surf, for example) are only listed after the point where you get it.</p></div>
+          <span class="ck-fold">Sections <button data-ckact="open-all" title="Expand every section">Expand</button><button data-ckact="close-all" title="Collapse every section">Collapse</button><button data-ckact="close-done" title="Collapse the sections you have finished">Collapse finished</button></span><span class="ck-sep" aria-hidden="true">|</span>
+          <span class="ck-data"><button data-ckact="save" title="Tick what your save file says you've done (.sav or .srm); replaces your current ticks">Import from Save</button><button data-ckact="export" title="Save your ticks to a backup file">Export Backup</button><button data-ckact="import" title="Load ticks from a backup file">Import Backup</button><button data-ckact="reset">Reset</button></span></div>
+        <p class="note ck-help">Track your progress in Pokemon Amethyst, in order of when things can first be obtained.</p></div>
       <div class="ck-stages">${stages}</div></div>`;
     return [html, ""];
   }
@@ -1061,7 +1067,7 @@ Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
       if (on) on.scrollIntoView({ block: "nearest" });
     } else if (scroll) {
       const el = (state.open !== null && document.querySelector(`.mon[data-i="${state.open}"]`)) || ((state.move || state.item !== null || state.place || state.doc || state.ability || state.trainer !== null) && document.querySelector("tr.on, .chip.on"));
-      if (el) el.scrollIntoView({ block: "start" }); else window.scrollTo({ top: 0 });
+      if (el) el.scrollIntoView({ block: "start" }); else $("main").scrollTo({ top: 0 });
     }
   }
 

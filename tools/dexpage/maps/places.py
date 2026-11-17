@@ -553,6 +553,11 @@ def floor_rank(name):
 
 def sort_floors(order, fnames):
     """Keep the entrance first, then numbered floors in order (up from 1F, down from B1F), then the rest."""
+    # Numbered areas read in their own order, whichever one the warps reach first (Peradon Forest: Area 1, then Area 2)
+    area = lambda k: int(m.group(1)) if (m := re.fullmatch(r"Area (\d+)", fnames[k])) else None
+    if area(order[0]) is not None:
+        areas = sorted((k for k in order if area(k) is not None), key=area)
+        order = areas + [k for k in order if area(k) is None]
     first, rest = order[0], order[1:]
     ranked = sorted((k for k in rest if floor_rank(fnames[k]) is not None), key=lambda k: abs(floor_rank(fnames[k])))
     return [first] + ranked + [k for k in rest if floor_rank(fnames[k]) is None]

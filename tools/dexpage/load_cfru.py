@@ -280,6 +280,11 @@ def marts(p: Paths) -> list[dict]:
         for m in re.finditer(r"^(\w+):\s*\n((?:[ \t]*\.hword[ \t]+ITEM_\w+[^\n]*\n)+)", text, flags=re.M):
             lists[m.group(1)] = [i for i in re.findall(r"ITEM_\w+", m.group(2)) if i != "ITEM_NONE"]
 
+    # A shop with a Divergent twin list (EvolutionItemsShop / EvolutionItemsShopDivergent, MegaStoneShop and
+    # ExpandedMegaStoneShop / DivergentMegaStoneShopItems) sells its own lists in Standard mode only
+    twin = lambda label: re.sub(r"Divergent|Expanded|Items$", "", label)
+    opened = {m.group(1) for text in files.values() for m in re.finditer(r"pokemart\s+(\w+)", text)}
+    twinned = {twin(label) for label in opened if "Divergent" in label}
     result, seen = [], set()
     for path, text in files.items():
         for m in re.finditer(r"pokemart\s+(\w+)", text):
@@ -296,7 +301,7 @@ def marts(p: Paths) -> list[dict]:
             else:
                 prefix = script.removeprefix("EventScript_").split("_")[0] if script.startswith("EventScript_") else ""
                 place = PLACE_ALIASES.get(prefix) or (_words(prefix) if prefix else _words(path.stem.replace("_", " ").title().replace(" ", "")))
-                where = f"{place} · {_shop(label)}" + (" (Divergent)" if "Divergent" in label + script else "")
+                where = f"{place} · {_shop(label)}" + (" (Divergent)" if "Divergent" in label + script else " (Standard)" if twin(label) in twinned else "")
             if (where, label) in seen:
                 continue
             seen.add((where, label))

@@ -1,5 +1,6 @@
 """Reads in-game text that only exists in the built ROM (item names were edited there with HexManiac)."""
 
+from collections import Counter, defaultdict
 from functools import cache
 from pathlib import Path
 
@@ -130,21 +131,50 @@ def item_icons(rom_path: Path, item_ids: dict[str, int]) -> dict[str, Image.Imag
         gfx_ptr, pal_ptr = _u32(rom, table + 8 * idx), _u32(rom, table + 8 * idx + 4)
         if _lz77_size(rom, gfx_ptr) != ICON_GFX_SIZE or _lz77_size(rom, pal_ptr) != ICON_PAL_SIZE:
             continue
-        gfx, pal = lz77(rom, gfx_ptr), lz77(rom, pal_ptr)
-        colors = []
-        for k in range(16):
-            c = pal[2 * k] | pal[2 * k + 1] << 8
-            colors.append(((c & 31) * 255 // 31, (c >> 5 & 31) * 255 // 31, (c >> 10 & 31) * 255 // 31, 0 if k == 0 else 255))
-        img = Image.new("RGBA", (24, 24))
-        px = img.load()
-        for tile in range(9):  # 3×3 tiles of 8×8, two pixels per byte (low nibble first)
-            tx, ty = tile % 3 * 8, tile // 3 * 8
-            for y in range(8):
-                for x in range(8):
-                    byte = gfx[tile * 32 + y * 4 + x // 2]
-                    px[tx + x, ty + y] = colors[byte >> 4 if x & 1 else byte & 15]
-        icons[const] = img
+        icons[const] = _icon(lz77(rom, gfx_ptr), lz77(rom, pal_ptr))
     return icons
+
+
+def _icon(gfx: bytes, pal: bytes) -> Image.Image:
+    colors = []
+    for k in range(16):
+        c = pal[2 * k] | pal[2 * k + 1] << 8
+        colors.append(((c & 31) * 255 // 31, (c >> 5 & 31) * 255 // 31, (c >> 10 & 31) * 255 // 31, 0 if k == 0 else 255))
+    img = Image.new("RGBA", (24, 24))
+    px = img.load()
+    for tile in range(9):  # 3×3 tiles of 8×8, two pixels per byte (low nibble first)
+        tx, ty = tile % 3 * 8, tile // 3 * 8
+        for y in range(8):
+            for x in range(8):
+                byte = gfx[tile * 32 + y * 4 + x // 2]
+                px[tx + x, ty + y] = colors[byte >> 4 if x & 1 else byte & 15]
+    return img
+
+
+def tm_icons(rom_path: Path, machines: dict[str, tuple[int, str]], fairy_pal: int) -> dict[str, Image.Image]:
+    """TM/HM bag icons in their move's type colour ({item constant: (item id, move type)} → icon), as the game shows
+    them. The item icon table still has FireRed's palette per TM item (stale where a TM teaches another move, and
+    generic past TM100), so each type takes the palette most of its TMs have, on the disc most TMs use. FireRed has
+    no Fairy disc: CFRU's Fairy_TM_DiskPal (the TM Case's, address from offsets.ini) has the same seven-shade
+    gradient at indices 2-8 and its highlight at 14, where a bag palette has them at 3-9 and 14."""
+    rom = _rom_bytes(rom_path)
+    table = _find_icon_table(rom)
+    discs, by_type = Counter(), defaultdict(Counter)
+    for idx, move_type in machines.values():
+        gfx_ptr, pal_ptr = _u32(rom, table + 8 * idx), _u32(rom, table + 8 * idx + 4)
+        discs[gfx_ptr] += 1
+        if _lz77_size(rom, pal_ptr) == ICON_PAL_SIZE:
+            by_type[move_type][pal_ptr] += 1
+    gfx = lz77(rom, discs.most_common(1)[0][0])
+    pals = {t: lz77(rom, c.most_common(1)[0][0]) for t, c in by_type.items() if t != "FAIRY"}
+    if "FAIRY" in {t for _, t in machines.values()}:
+        fairy, base = rom[fairy_pal - ROM_BASE:fairy_pal - ROM_BASE + 32], bytearray(pals["PSYCHIC"])
+        base[6:20], base[28:30] = fairy[4:18], fairy[28:30]
+        pals["FAIRY"] = bytes(base)
+    missing = {t for _, t in machines.values()} - set(pals)
+    if missing:
+        raise RomError(f"no TM disc palette for {sorted(missing)}")
+    return {const: _icon(gfx, pals[t]) for const, (_, t) in machines.items()}
 
 
 @cache
