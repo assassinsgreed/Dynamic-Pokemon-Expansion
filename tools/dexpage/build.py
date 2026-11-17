@@ -629,10 +629,11 @@ def build(paths: Paths, out: Path) -> None:
     data = load_source_data(paths)
     roster = build_roster(data)
     links = evolution_links(data, {e.key for e in roster})
-    sheet, offsets = build_sheet({e.key: data.sprites[e.key] for e in roster},
-                                 {e.key: (data.sprites[e.key], data.shiny[e.key]) for e in roster if e.key in data.shiny},
-                                 {e.key: (data.backs[e.key], data.sprites[e.key]) for e in roster if e.key in data.backs})
+    sheet, offsets, recolors = build_sheet({e.key: data.sprites[e.key] for e in roster},
+                                           {e.key: (data.sprites[e.key], data.shiny[e.key]) for e in roster if e.key in data.shiny},
+                                           {e.key: (data.backs[e.key], data.sprites[e.key]) for e in roster if e.key in data.backs})
     page = page_data(data, roster, links)
+    page["recolors"] = recolors  # how app.js draws shiny fronts and regular backs from other cells (sprites.py)
     maps = place_maps(paths)
     page["maps"] = map_index(maps)
     page["checklist"] = checklist(page, maps, paths, game_item_names(data))

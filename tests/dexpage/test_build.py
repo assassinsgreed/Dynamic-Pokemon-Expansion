@@ -14,7 +14,7 @@ def data(source_data, roster, evo_links):
 
 @pytest.fixture(scope="module")
 def html(data, source_data, roster):
-    sheet, offsets = build_sheet({e.key: source_data.sprites[e.key] for e in roster})
+    sheet, offsets, _ = build_sheet({e.key: source_data.sprites[e.key] for e in roster})
     return render(data, sheet, offsets)
 
 

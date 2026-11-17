@@ -185,7 +185,36 @@
 
   // ---------------------------------------------------------------- small pieces
   const typeBadge = (t) => `<span class="type t-${t}">${t === "MYSTERY" ? "???" : t[0] + t.slice(1).toLowerCase()}</span>`;
-  const pic = (xy, cls = "") => `<span class="sp${cls}" aria-hidden="true"><i style="background-position:-${xy[0]}px -${xy[1]}px"></i></span>`;
+  // A sprite's cell in the sheet, [x, y]; [x, y, n] is that cell recoloured with DEX.recolors[n] (shiny fronts and
+  // regular backs, which sprites.py checks come out exact), painted by paintRecolors once it's on the page
+  const pic = (xy, cls = "") => `<span class="sp${cls}" aria-hidden="true"><i ${xy.length > 2 ? `data-rc="${xy}"` : `style="background-position:-${xy[0]}px -${xy[1]}px"`}></i></span>`;
+  const recolored = new Map();  // "x,y,n" → PNG data URL
+  let sheetImg = null;
+  function paintRecolors() {
+    const todo = document.querySelectorAll("#out i[data-rc]:not([style])");
+    if (!todo.length) return;
+    if (!sheetImg) { sheetImg = new Image(); sheetImg.src = SHEET; }
+    const paint = () => todo.forEach((el) => {
+      const key = el.dataset.rc;
+      if (!recolored.has(key)) {
+        const [x, y, n] = key.split(",").map(Number), hex = DEX.recolors[n], swap = new Map();
+        for (let k = 0; k < hex.length; k += 12) swap.set(parseInt(hex.slice(k, k + 6), 16), parseInt(hex.slice(k + 6, k + 12), 16));
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = 64;
+        const g = canvas.getContext("2d");
+        g.drawImage(sheetImg, x, y, 64, 64, 0, 0, 64, 64);
+        const img = g.getImageData(0, 0, 64, 64), d = img.data;
+        for (let p = 0; p < d.length; p += 4) {
+          const to = d[p + 3] ? swap.get((d[p] << 16) | (d[p + 1] << 8) | d[p + 2]) : undefined;
+          if (to !== undefined) { d[p] = to >> 16; d[p + 1] = (to >> 8) & 255; d[p + 2] = to & 255; }
+        }
+        g.putImageData(img, 0, 0);
+        recolored.set(key, canvas.toDataURL());
+      }
+      el.style.backgroundImage = `url("${recolored.get(key)}")`;
+    });
+    if (sheetImg.complete) paint(); else sheetImg.addEventListener("load", paint, { once: true });
+  }
   const sprite = (m, small) => pic(m.sp, small ? " sm" : "");
   // Details only: front/back × regular/shiny, labelled, large enough to tell near-identical shinies apart
   // (Farfetch'd-G). A missing back drops the Back row, a missing shiny the Shiny column.
@@ -1290,7 +1319,7 @@ Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
     state.tabFilter = e.target.value;
     box.querySelector(".panel").innerHTML = panel(+box.dataset.tabs);
   });
-  new MutationObserver(cueSoon).observe($("#out"), { childList: true, subtree: true });
+  new MutationObserver(() => { cueSoon(); paintRecolors(); }).observe($("#out"), { childList: true, subtree: true });
   cueSoon();
 
   $("#out").addEventListener("toggle", (e) => {

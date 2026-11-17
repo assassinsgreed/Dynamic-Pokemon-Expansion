@@ -164,6 +164,7 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 .mon > summary::-webkit-details-marker { display: none; }
 .sp { width: 56px; height: 56px; overflow: hidden; flex: none; }
 .sp i { display: block; width: 64px; height: 64px; transform: scale(.875); transform-origin: 0 0; background-repeat: no-repeat; image-rendering: pixelated; }
+.sp i[data-rc]:not([style]) { background-image: none; }  /* a recoloured sprite until app.js paints it */
 .sp.sm { width: 36px; height: 36px; }
 .sp.sm i { transform: scale(.5625); }
 .who { min-width: 0; display: grid; gap: 4px; }

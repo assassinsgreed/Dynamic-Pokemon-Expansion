@@ -31,6 +31,8 @@ CH="/c/Program Files/Google/Chrome/Application/chrome.exe"
 # console errors: grep "Uncaught" in the stderr log
 ```
 
+The Download link saves `index.html` itself (no `dex.html` copy; the service worker serves the page network first).
+
 Collin previews via a private claude.ai artifact (https://claude.ai/artifact/WHK7kT9oh5y4KfizQCjbaN): publish the
 `<head>` contents + `<body>` contents of `site/index.html` (no doctype/html wrappers) to the same artifact URL.
 He also tests `site/index.html` directly.
@@ -54,7 +56,7 @@ He also tests `site/index.html` directly.
 | `script_items.csv` | hand-written sources the feature list misses (Apricorn balls, Traveller balls, Memories, Drives, relics…), checked against CFRU's scripts |
 | `extra_forms.csv` | forms the Habitat table leaves out but players can get (Rotom appliances, Cosplay/Cap Pikachu), with a how-to-get row; never enable them in Habitat_Table.c |
 | `trainers.py` | Trainers tab: CFRU's 4 trainer tables with GetTrainerData's fallback order; teams finished like CreateNPCTrainerParty (class IVs / 31 on Extra Hard, Hard nature via GiveMonBestStatNature, Extra Hard EVs in the 2 best base stats, default moves = last 4 level-up); places from gTrainers `#region` headings; variant notes (rival = water starter gen, badge-count gym teams, rematches) from constants + `NOTES`; sprites and class names from the ROM |
-| `build.py` | page data JSON, item list merge (doc + shops + held + evolution items), sprite/icon sheets, site files. Sprite sheet keys (`sprites.build_sheet`): `<key>` front, `shiny:` front in the shiny palette, `back:` / `shinyback:`; page mons carry them as `sp` / `ss` / `sb` / `ssb`. The `gBackShinySprite*.png` back PNGs are stored in **shiny** colours (their palette is `gMonShinyPaletteTable`'s), so back shiny = the PNG as is, back regular = its pixels in the front PNG's palette |
+| `build.py` | page data JSON, item list merge (doc + shops + held + evolution items), sprite/icon sheets, site files. Sprite sheet keys (`sprites.build_sheet`): `<key>` front, `shiny:` front in the shiny palette, `back:` / `shinyback:`; page mons carry them as `sp` / `ss` / `sb` / `ssb`. Only fronts and shiny backs have cells of their own: a shiny front is its front's cell recoloured, a regular back its shiny back's, so `ss` / `sb` are `[x, y, n]` (the cell at x, y with colour swaps `DEX.recolors[n]`, painted on a canvas by `paintRecolors` in app.js) or `[x, y]`. `build_sheet` derives each swap from the exact images and keeps a cell for any sprite no swap can make (Bidoof's shiny: one front colour becomes two); `test_recoloured_sprites_are_exact` checks every one against the real sheet. Saved ~1 MB. The `gBackShinySprite*.png` back PNGs are stored in **shiny** colours (their palette is `gMonShinyPaletteTable`'s), so back shiny = the PNG as is, back regular = its pixels in the front PNG's palette |
 | `maps/` | interactive place maps drawn from the ROM: `rom_maps.py` (headers, tilesets, metatile renderer, offsets.ini labels; `init(paths)` before importing `places.py`), `places.py` (which PSS map files form each place, objects + sprites + what each NPC does, floor names/order, stitching edge-joined maps, Rubarr's sand-statue pits), `export.py` (per place: floor pictures as lossless WebP data URIs + markers/warps/exits/edges; `place_maps()` caches in `maps/.cache/` keyed on the ROM, CFRU scripts/offsets, PSS map list and this package — a cold build redraws for ~4 min), `curation.py` (**Collin's per-NPC review**, by script label: NO_MARKER, NO_SPRITE, NOTES, WILD_NOTES, FINAL_SPOT, NO_HIDDEN, NO_EXIT, PLACE_OF, CATEGORY, PLACE_NOTES). `python -m tools.dexpage.maps.export "Route 17"` prints a place's markers |
 | `mapview.js` | the map viewer, inlined before app.js; maps live in `<script id="mapdata">` (parsed on first open); app.js links a place to its map by name or `DEX.maps.alias` (`build.MAP_OF`) |
 | `template.html` | CSS + markup; `app.js` is the whole UI, inlined at build (`__APP_SCRIPT__`) |
@@ -162,6 +164,12 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   screens; on phones two rows, sprites + stats, then abilities + profile. The gender line never wraps (the profile
   is at least that wide); egg groups wrap instead, and on phones wild held items stack one per line under their label.
 
+- Phones and short screens (`(max-width: 600px), (max-height: 500px)`): scrolling down slides the header away like a
+  drawer and the checklist's pinned panel folds to its progress bar; scrolling up brings both back (`body.tucked`).
+  Desktop keeps its fixed header. The checklist panel starts where it pins (top of the view), so it never moves as the
+  list scrolls (Collin); its "Also matching" line sits under it, and scroll anchoring is off in the list.
+- Fishing always reads Old Rod → Good Rod → Super Rod on Locations (place cards and the list's Found by), together
+  where the first rod comes (`rodsInOrder`).
 - Interactive maps: see the section below.
 
 ## Interactive maps (`maps/` + `mapview.js`)
