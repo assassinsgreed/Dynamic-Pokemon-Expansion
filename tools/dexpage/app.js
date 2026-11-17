@@ -716,7 +716,7 @@
     : `<polygon points="${CK_KIND[k][2]}" fill="${CK_KIND[k][1]}" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/>`}</svg></span>`;
   const ckAll = [];
   CK.stages.forEach((st) => st.groups.forEach((g) => g.entries.forEach((e) => {
-    e.s = words(`${e.t} ${g.place} ${st.title} ${e.fl || ""} ${CK_KIND[e.k][0]} ${e.need || ""}`);
+    e.s = words(`${e.t} ${g.place} ${e.at || ""} ${st.title} ${e.fl || ""} ${CK_KIND[e.k][0]} ${e.need || ""}`);
     ckAll.push(e);
   })));
   const ck = { done: {}, hide: false, closed: {} };
@@ -758,10 +758,12 @@
   function ckRow(e, g) {
     const name = e.tr ? `<button class="mvname" data-cktr="${e.tr.join(",")}" title="See this trainer's team">${esc(e.t)}</button>`
       : e.item != null ? `<button class="mvname" data-item="${e.item}">${esc(e.t)}</button>` : ckText(e);
+    // e.at: the place of an entry in a list that isn't one place (the Ultra Wormhole Search)
+    const at = e.at ? `<button class="ck-at" data-place="${esc(e.at)}" title="See ${esc(e.at)}">${esc(e.at)}</button>` : "";
     const tags = [e.sd && "Differs by mode", e.only && `${e.only} only`, e.need && `Needs ${e.need}`, e.until, e.fl].filter(Boolean).map(ckTag).join("");
     return `<div class="ck${ck.done[e.id] ? " done" : ""}"><label><input type="checkbox" data-ck="${esc(e.id)}"${ck.done[e.id] ? " checked" : ""}>${ckShape(e.k)}
-      <span class="ck-body">${name}${tags ? `<span class="ck-tags">${tags}</span>` : ""}</span></label>${
-      e.mark ? `<button class="ck-map" data-ckmap="${g.slug}" data-mark="${e.mark}" >See Interactive Map</button>` : ""}</div>`;
+      <span class="ck-body">${name}${at}${tags ? `<span class="ck-tags">${tags}</span>` : ""}</span></label>${
+      e.mark ? `<button class="ck-map" data-ckmap="${e.ms || g.slug}" data-mark="${e.mark}" >See Interactive Map</button>` : ""}</div>`;
   }
 
   function ckCounts() {
@@ -789,7 +791,7 @@
       const card = named ? "" : places.has(norm(st.title)) ? st.title : st.groups[0].place;
       return `<details class="ck-stage k-${st.kind}" data-ckstage="${esc(st.title)}"${open ? " open" : ""}><summary>${CHEVRON}<span class="ck-title">${esc(st.title)}</span>${
         card ? `<button class="ck-loc" data-place="${esc(card)}" title="Pokémon, items and map for ${esc(card)}">See Location</button>` : ""}<span class="ck-n" data-ckn="${n}"></span></summary>
-        <div class="ck-rows">${groups.map(([g, es]) => `${named || g.place !== st.place ? `<div class="ck-place"><button data-place="${esc(g.place)}">${esc(g.place)}</button></div>` : ""}${es.map((e) => ckRow(e, g)).join("")}`).join("")}</div></details>`;
+        <div class="ck-rows">${groups.map(([g, es]) => `${named || g.place !== st.place ? `<div class="ck-place">${g.slug ? `<button data-place="${esc(g.place)}">${esc(g.place)}</button>` : esc(g.place)}</div>` : ""}${es.map((e) => ckRow(e, g)).join("")}`).join("")}</div></details>`;
     }).join("");
     if (!stages) return [`<div class="nores">Nothing on the checklist matches “${esc(state.q)}”.</div>`, "0 entries"];
     const html = `<div class="cklist${ck.hide ? " hide-done" : ""}">

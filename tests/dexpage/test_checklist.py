@@ -28,6 +28,10 @@ def texts(st, place=None):
     return [e["t"] for e in entries(st, place)]
 
 
+def everything_in(st):
+    return [e for g in st["groups"] for e in g["entries"]]
+
+
 def everything(result):
     return [e for st in result[0]["stages"] for e in entries(st)]
 
@@ -91,10 +95,25 @@ def test_collins_hm_corrections(result):
 
 def test_ultra_episode_has_its_own_section(result):
     ultra = texts(stage(result, "Ultra Episode"))
-    assert "Ultra Wormhole (Kartana)" in ultra and "Necrozma" in ultra and "Cosmog" in ultra
-    assert any(t.startswith("Ultra Episode: start it") for t in ultra)
+    assert ultra[0].startswith("Ultra Episode: start it")
+    # Collin: then one Ultra Wormhole Search list (each wormhole saying where it is), then Cosmog and Necrozma
+    st = stage(result, "Ultra Episode")
+    assert [g["place"] for g in st["groups"]] == ["Daimyn City", "Ultra Wormhole Search", "Ultra Space"]
+    holes = st["groups"][1]["entries"]
+    assert len(holes) == 9 and all(e["t"].startswith("Ultra Wormhole") and e["at"] and e["ms"] for e in holes)
+    assert {e["at"]: e["t"] for e in holes}["Varisi Forest"] == "Ultra Wormhole (Kartana)"
+    assert [t.split(":")[0] for t in ultra[-2:]] == ["Cosmog", "Necrozma"]
+    assert all("Ultra Episode story" in t for t in ultra[-2:])
+    assert any(t.startswith("Poipole Researcher") for t in texts(stage(result, "Revisiting Ultra Space")))
+    titles = [s["title"] for s in result[0]["stages"]]
+    assert titles.index("Revisiting Ultra Space") == titles.index("Carnelidge Volcano") + 1
     assert not any("Ultra Wormhole" in t for t in texts(stage(result, "Postgame")))
     assert not any("Alistair after the credits" in t for t in texts(stage(result, "Postgame")))
+    frontier = [e for e in entries(stage(result, "Postgame"), "Battle Frontier") if e["k"] == "story"]
+    assert [e["t"] for e in frontier] == ["Visit the Battle Frontier"] and frontier[0]["sv"] == [0x8B3]
+    post = everything_in(stage(result, "Postgame"))
+    assert not any(e["t"].startswith("Elite Four rematch") for e in post)
+    assert next(e for e in post if e["t"] == "Rematch every Gym Leader in the same day")["sv"] == [0xB7]
 
 
 def test_collins_review_round(result):
@@ -236,7 +255,7 @@ def test_saves_tick_the_list(result, paths):
     assert picked == {"Cypress Key", "Owl Key"}
     assert "Defeat Leaders Dennis & Dee for the Double Badge" in texts_of(bare)
     done = texts_of(read("CompletedSave.sav"))
-    assert len(save_flags.ticked(result[0], read("CompletedSave.sav"))) > 400 and "Defeat Champion Selene and enter the Hall of Fame" in done and "Necrozma" in done
+    assert len(save_flags.ticked(result[0], read("CompletedSave.sav"))) > 400 and "Defeat Champion Selene and enter the Hall of Fame" in done and "Necrozma: encountered as part of the Ultra Episode story" in done
     assert "Necrozma" not in texts_of(read("UltraEpisode_PreNecrozma.sav"))
     assert len(texts_of(read("SteamDeckSave.srm"))) > 200            # RetroArch's .srm is the same file
     assert read("Divergent_AlmostAllPokemonCaught.sav") is not None  # 16 bytes of clock data after the save

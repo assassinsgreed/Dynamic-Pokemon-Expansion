@@ -33,7 +33,9 @@ ORDER = [
     "Treasure Beach", "Route 21", "Mimmett Jungle", "Route 22", "Route 23", "Tsarvosa City",
     "Secret Trail",  # Collin: it can't be explored before Strength, which comes at Tsarvosa City
     "Seppire Cove", "Daimyn Factory", ("Rubarr Desert Caves", "Rubarr Desert", ["Cave", "Caverns"]),
-    ("Route 13 cave", "Route 13", ["Cave"]), "Carnelidge Volcano", ("Hesson Pass F2", "Hesson Pass", ["F2"]), "Uteya Village", "Route 24", "Uteyan Ruins",
+    ("Route 13 cave", "Route 13", ["Cave"]), "Carnelidge Volcano",
+    ("Revisiting Ultra Space", "Ultra Space", []),  # Collin: Poipole waits here, after the story's first visit
+    ("Hesson Pass F2", "Hesson Pass", ["F2"]), "Uteya Village", "Route 24", "Uteyan Ruins",
     "Victory Road", "Ascension Tower",
 ]
 
@@ -96,13 +98,11 @@ STORY = {
     "Postgame": [
         ("title-defense", "Champion Title Defense: defend your title against the 14 possible challengers",
          {"at": "Ascension Tower", "trainer": ("Challenger", "Joey", "Title Defense")}),
-        ("e4-hannah", "Elite Four rematch: Hannah", {"at": "Ascension Tower", "trainer": ("Elite Four", "Hannah", "Elite Four Rematches")}),
-        ("e4-lucas", "Elite Four rematch: Lucas", {"at": "Ascension Tower", "trainer": ("Elite Four", "Lucas", "Elite Four Rematches")}),
-        ("e4-jenna", "Elite Four rematch: Jenna", {"at": "Ascension Tower", "trainer": ("Elite Four", "Jenna", "Elite Four Rematches")}),
-        ("e4-thomas", "Elite Four rematch: Thomas", {"at": "Ascension Tower", "trainer": ("Elite Four", "Thomas", "Elite Four Rematches")}),
         ("conservatory", "Professor's Conservatory: catch the starters behind Hawthorne's lab", {"at": "Olenic Town"}),
         ("shiny-charm", "Receive the Shiny Charm from Hawthorne (75% of the Pokédex caught)", {"at": "Olenic Town"}),
         ("diploma", "Receive the Diploma from Hawthorne (Pokédex complete)", {"at": "Olenic Town"}),
+        # Collin: the rematches themselves are daily, so the goal is all eight in one day (it unlocks a game modifier)
+        ("gym-rematches", "Rematch every Gym Leader in the same day", {"at": "Rhodanzi City"}),
         ("rematch-terrence", "Gym Leader rematch: Terrence", {"at": "Rhodanzi City", "daily": True, "trainer": ("Leader", "Terrence", "Gym Leader Rematches")}),
         ("rematch-stella", "Gym Leader rematch: Stella", {"at": "Ferrox Village", "daily": True, "trainer": ("Leader", "Stella", "Gym Leader Rematches")}),
         ("rematch-raine", "Gym Leader rematch: Raine", {"at": "Heleo City", "daily": True, "trainer": ("Leader", "Raine", "Gym Leader Rematches")}),
@@ -113,10 +113,7 @@ STORY = {
         ("rematch-abby", "Gym Leader rematch: Abby", {"at": "Bruccie Village", "daily": True, "trainer": ("Leader", "Abby", "Gym Leader Rematches")}),
         ("rematch-iris", "Gym Leader rematch: Iris", {"at": "Tsarvosa City", "daily": True, "trainer": ("Leader", "Iris", "Gym Leader Rematches")}),
         ("rematch-dennis-dee", "Gym Leader rematch: Dennis & Dee", {"at": "Uteya Village", "daily": True, "trainer": ("Leader", "Dennis&Dee", "Gym Leader Rematches")}),
-        ("tower", "Battle Tower", {"at": "Battle Frontier"}), ("quarry", "Battle Quarry", {"at": "Battle Frontier"}),
-        ("sands", "Battle Sands", {"at": "Battle Frontier"}), ("maze", "Battle Maze", {"at": "Battle Frontier"}),
-        ("isle", "Battle Isle", {"at": "Battle Frontier"}), ("sim", "Battle Sim", {"at": "Battle Frontier"}),
-        ("factory", "Battle Factory", {"at": "Battle Frontier"}), ("observatory", "Battle Observatory", {"at": "Battle Frontier"}),
+        ("frontier", "Visit the Battle Frontier", {"at": "Battle Frontier"}),  # Collin: one entry, not one per facility
     ],
 }
 
@@ -134,6 +131,8 @@ TEXT = {
     "tsarvosa-city/npc/npc-house-7/5-4": "Dev Team Collin: battle him once a day; gives PokéChip",
     "tsarvosa-city/npc/npc-house-7/8-4": "Dev Team Crystal: battle her once a day; gives PokéChip",
     "battle-frontier/npc/pokemon-center/3-7": "Trade your Heat Rotom for a Ditto (after a 5-win streak at any facility)",
+    "ultra-space/wild/ultra-space/101-19": "Cosmog: encountered as part of the Ultra Episode story",
+    "ultra-space/wild/dias-of-light/15-7": "Necrozma: encountered as part of the Ultra Episode story",
     "ultra-space/npc/ultra-space/38-49": "Poipole Researcher: gives Poipole (once you have caught 150+ Pokémon)",
     "route-19/npc/route-19/67-14": "Selene: gives Victini; switches a max-friendship Greninja to and from Battle Bond",
     "route-13/npc/cave-kurtis-room/4-4": "Battle Kurtis in his hideout",
@@ -151,6 +150,7 @@ MOVE: dict[str, str] = {
     "hesson-pass/item/bf1/29-18": "Hesson Pass F2",      # Charizite X
     "hesson-pass/hidden/bf1/21-13": "Hesson Pass F2",    # Light Clay
     "rubarr-desert/wild/desert/81-34": "Rubarr Desert Caves",
+    "ultra-space/npc/ultra-space/38-49": "Revisiting Ultra Space",  # Poipole
 }
 
 # HMs an entry needs, where the feature list says nothing or the wrong thing: id → every HM it needs ([] = none)
@@ -179,6 +179,10 @@ ONLY = {
 }
 
 # Postgame entries in the Ultra Episode section (ids, * allowed); every Ultra Wormhole goes there too
+# The Ultra Episode section's order (Collin): starting it in Daimyn City, then every Ultra Wormhole as one
+# "Ultra Wormhole Search" list (each with its place), then Ultra Space
+ULTRA_WORMHOLES = "Ultra Wormhole Search"
+ULTRA_ORDER = ["Daimyn City", ULTRA_WORMHOLES, "Ultra Space"]
 ULTRA_EPISODE_ENTRIES = ["ultra-space/npc/*", "ultra-space/wild/ultra-space/*", "ultra-space/wild/dias-of-light/*"]
 
 # Floors renamed after their entries were first ticked: (place, floor) → the slug their ids keep
@@ -261,6 +265,9 @@ SAVE: dict[str, list] = {
     "postgame/story/ultra-episode": [var(ULTRA_EPISODE, 2)],
     "postgame/story/title-defense": [],                     # its trainer flags are cleared for the next defense
     "ultra-space/wild/ultra-space/101-19": [both(0x6E, var(ULTRA_EPISODE, 5))],  # Cosmog caught and reported
+    # the Hidden Abilities game modifier, set once all 8 rematch flags are set the same day; a code unlocking it counts too
+    "postgame/story/gym-rematches": [0xB7],
+    "postgame/story/frontier": [0x8B3],                     # the Battle Frontier's world map flag
     "ultra-space/wild/dias-of-light/15-7": [both(0x6F, 0x289)],  # Ultra Necrozma defeated, then Necrozma caught
     "varisi-forest/wild/varisi-forest/45-30": _wormhole(0x68), "rubarr-desert/wild/desert/66-58": _wormhole(0x65),
     "forgotten-manse/wild/bf/19-2": _wormhole(0x6D), "daimyn-factory/wild/daimyn-factory/45-2": _wormhole(0x66),

@@ -365,6 +365,8 @@ tr.on, .chip.on { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + var(--
 .ck-n.all { color: var(--std); }
 .ck-rows { padding: 0 8px 8px; }
 .ck-place { font: 600 12px/1 var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 10px 4px 4px; }
+.ck-at { font: inherit; color: var(--muted); background: none; border: 0; padding: 0 0 0 .5em; cursor: pointer; text-decoration: underline dotted; }
+.ck-at::before { content: "·"; display: inline-block; margin-right: .3em; }  /* inline-block: the underline skips it */
 .ck-place button { font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline dotted; }
 .ck { display: flex; align-items: flex-start; gap: 8px; padding: 2px 4px; border-radius: 6px; }
 .ck:hover { background: var(--sunk); }

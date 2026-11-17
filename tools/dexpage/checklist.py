@@ -330,8 +330,11 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
             if hms:
                 entry["need"] = _hm_label(hms, place, badges)
             if home is None:
-                ultra_part = _matches(ident, H.ULTRA_EPISODE_ENTRIES) or text.startswith("Ultra Wormhole")
-                put(ultra if ultra_part else postgame, place, entry)
+                if text.startswith("Ultra Wormhole"):  # one list of them all, each saying where it is
+                    entry["at"], entry["ms"] = place, mp["slug"]
+                    put(ultra, H.ULTRA_WORMHOLES, entry)
+                else:
+                    put(ultra if _matches(ident, H.ULTRA_EPISODE_ENTRIES) else postgame, place, entry)
                 continue
             last = max(hms, key=lambda h: unlock_after[h], default=None)  # the HM that arrives last
             if last and unlock_after[last] >= home:
@@ -361,8 +364,18 @@ def checklist(page: dict, maps: list[dict], paths: Paths, game_names: dict[str, 
         order += [unlocks[hm] for hm, at in unlock_after.items() if at == n]
     out = []
     for st in order + [postgame, ultra]:
-        groups = [{"place": p, "slug": by_name[p]["slug"], "entries": es} for p, es in st["groups"].items()]
-        if st["kind"] != "place":  # places in the order the playthrough reaches them
+        groups = [{"place": p, "slug": by_name[p]["slug"] if p in by_name else None, "entries": es}
+                  for p, es in st["groups"].items()]
+        for g in groups:
+            if g["slug"] is None:  # a list, not a place (the Ultra Wormhole Search): its entries in playthrough order
+                del g["slug"]
+                g["entries"].sort(key=lambda e: place_rank.get(e.get("at"), len(stages)))
+        if st is ultra:
+            unknown = [g["place"] for g in groups if g["place"] not in H.ULTRA_ORDER]
+            if unknown:
+                raise ValueError(f"checklist_data.ULTRA_ORDER: no place for {', '.join(unknown)}")
+            groups.sort(key=lambda g: H.ULTRA_ORDER.index(g["place"]))
+        elif st["kind"] != "place":  # places in the order the playthrough reaches them
             groups.sort(key=lambda g: place_rank.get(g["place"], len(stages)))
         if groups:
             out.append({"title": st["title"], "kind": st["kind"], "place": st.get("place"), "groups": groups})
@@ -389,7 +402,7 @@ def main() -> None:
                 notes = [e.get("need") and f"needs {e['need']}", e.get("until"), "sv" not in e and "NOT IN SAVE",
                          e.get("sv") and "save " + save_flags.describe(e["sv"]),
                          e.get("tr") and "trainer link", e["k"] in ("item", "hidden") and "item" not in e and "NO ITEM LINK"]
-                print(f"   {e['id']:<52} {e['k']:<6} {g['place']}: {e['t']}" + "".join(f"  [{n}]" for n in notes if n))
+                print(f"   {e['id']:<52} {e['k']:<6} {e.get('at', g['place'])}: {e['t']}" + "".join(f"  [{n}]" for n in notes if n))
     print(f"\n{total} entries")
     print("\nLeft out as daily:")
     for place, text in daily:
