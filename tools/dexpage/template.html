@@ -61,11 +61,6 @@ html, body { height: 100%; }
 body { display: flex; flex-direction: column; overflow: hidden; }
 main { flex: 1; min-height: 0; overflow: auto; }
 header.console { position: relative; flex: none; z-index: 5; background: var(--console); border-bottom: 1px solid var(--line); }
-/* Phones and short screens: scrolling down slides the header up out of sight and scrolling up brings it back, like a
-   drawer (app.js sets body.tucked); the view under it grows into the space */
-header.console { transition: margin-top .25s ease; }
-body.tucked header.console { margin-top: calc(-1 * var(--console-h, 0px)); }
-@media (prefers-reduced-motion: reduce) { header.console { transition: none; } }
 .console .wrap { padding-block: 12px; display: grid; gap: 10px; }
 .console .wrap > * { min-width: 0; }  /* let the tab strip scroll instead of widening the header */
 .brand { display: grid; gap: 0; }
@@ -378,11 +373,15 @@ tr.on, .chip.on { scroll-margin-top: 12px; }
   .ck-data button { padding: 8px 6px; }
 }
 .ck-help { flex-basis: 100%; margin: 0; font-size: 12px; }
-/* With the header tucked away, the checklist's pinned panel is just the progress bar. The list moves with the panel's
-   edge as it folds, so the row under it stays the row under it; the browser's scroll anchoring would hold the list
-   still instead and slide rows under the panel */
-body.tucked .ck-acts, body.tucked .ck-help { display: none; }
-.cklist { overflow-anchor: none; }
+/* Phones: the controls fold under an Options header beside the progress bar (folded at first, remembered) */
+.ck-more { display: none; }
+@media (max-width: 600px) {
+  .ck-more { display: inline-flex; align-items: center; gap: 4px; flex: none; font: 600 12px/1 var(--font-body); padding: 6px 9px; border-radius: 6px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .ck-more .chev { width: auto; height: auto; border: 0; background: none; color: inherit; transition: transform .15s; }
+  .ck-head.folded .ck-more .chev { transform: rotate(-90deg); }
+  .ck-head.folded .ck-acts, .ck-head.folded .ck-help { display: none; }
+}
 /* The panel starts where it pins (the top of the view, not below its padding), so it never shifts as the list scrolls */
 .cklist { margin-top: -14px; }
 .cklist > .also { margin: 0 0 10px; }

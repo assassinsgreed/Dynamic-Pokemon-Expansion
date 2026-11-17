@@ -164,10 +164,12 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   screens; on phones two rows, sprites + stats, then abilities + profile. The gender line never wraps (the profile
   is at least that wide); egg groups wrap instead, and on phones wild held items stack one per line under their label.
 
-- Phones and short screens (`(max-width: 600px), (max-height: 500px)`): scrolling down slides the header away like a
-  drawer and the checklist's pinned panel folds to its progress bar; scrolling up brings both back (`body.tucked`).
-  Desktop keeps its fixed header. The checklist panel starts where it pins (top of the view), so it never moves as the
-  list scrolls (Collin); its "Also matching" line sits under it, and scroll anchoring is off in the list.
+- No sliding header (Collin tried a scroll-away drawer and found it awkward). On phones (≤600 px) the checklist's
+  controls and help line fold under an "Options" button beside the progress bar (folded at first, remembered as
+  `opts` in `dex-check-ui`). The checklist panel starts where it pins (top of the view), so it never moves as the list
+  scrolls (Collin); its "Also matching" line sits under it.
+- Phones get short search hints (`PLACEHOLDER_SHORT`: what each search covers, no examples; they must fit the box at
+  360 px); wider screens keep the full hints with examples. Pokédex, Moves and Tutors hints still name types.
 - Fishing always reads Old Rod → Good Rod → Super Rod on Locations (place cards and the list's Found by), together
   where the first rod comes (`rodsInOrder`).
 - Interactive maps: see the section below.

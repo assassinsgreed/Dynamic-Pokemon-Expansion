@@ -10,28 +10,6 @@
   const consoleEl = $("header.console");
   const syncConsoleHeight = () => root.style.setProperty("--console-h", `${consoleEl.offsetHeight}px`);
   window.addEventListener("resize", syncConsoleHeight);
-  // Phones and short screens: scrolling down tucks the header away and scrolling up slides it back, like a drawer; on
-  // the checklist its pinned panel folds to the progress bar at the same time (CSS: body.tucked)
-  const compact = matchMedia("(max-width: 600px), (max-height: 500px)");
-  const mainEl = $("main");
-  let lastY = 0, settleUntil = 0;
-  function tuck(on) {
-    on = on && compact.matches;
-    if (document.body.classList.contains("tucked") === on) return;
-    // (the checklist's pinned panel changes height too; the list moves with its edge, so the row under it stays put)
-    document.body.classList.toggle("tucked", on);
-    if (!on) ckSepSync();
-    settleUntil = performance.now() + 350;  // tucking resizes <main>, which can move scrollTop without the player scrolling
-  }
-  const untuck = () => { document.body.classList.remove("tucked"); lastY = 0; };
-  mainEl.addEventListener("scroll", () => {
-    const y = mainEl.scrollTop;
-    if (performance.now() < settleUntil) { lastY = y; return; }
-    if (Math.abs(y - lastY) < 6) return;  // ignore jitter
-    tuck(y > lastY && y > consoleEl.offsetHeight);
-    lastY = y;
-  }, { passive: true });
-  try { compact.addEventListener("change", untuck); } catch (e) { compact.addListener(untuck); }  // older Safari
   // The "|" between the checklist's folding and data buttons only belongs between them on one line: once the data
   // buttons wrap onto a line of their own, it would dangle at the end of the first
   function ckSepSync() {
@@ -822,16 +800,16 @@
     e.s = words(`${e.t} ${g.place} ${e.at || ""} ${st.title} ${e.fl || ""} ${CK_KIND[e.k]} ${e.need || ""}`);
     ckAll.push(e);
   })));
-  const ck = { done: {}, hide: false, closed: {} };
+  const ck = { done: {}, hide: false, closed: {}, opts: false };  // opts: the controls unfolded (phones)
   const ckMerge = (done) => { for (const [id, t] of Object.entries(done || {})) if (!ck.done[id]) ck.done[id] = t || 1; };
   const ckSave = () => {
     try {
       localStorage.setItem("dex-checklist", JSON.stringify({ v: 1, done: ck.done }));
-      localStorage.setItem("dex-check-ui", JSON.stringify({ hide: ck.hide, closed: ck.closed }));
+      localStorage.setItem("dex-check-ui", JSON.stringify({ hide: ck.hide, closed: ck.closed, opts: ck.opts }));
     } catch (e) {}
   };
   try { ckMerge(JSON.parse(localStorage.getItem("dex-checklist") || "{}").done); } catch (e) {}
-  try { const ui = JSON.parse(localStorage.getItem("dex-check-ui") || "{}"); ck.hide = !!ui.hide; ck.closed = ui.closed || {}; } catch (e) {}
+  try { const ui = JSON.parse(localStorage.getItem("dex-check-ui") || "{}"); ck.hide = !!ui.hide; ck.closed = ui.closed || {}; ck.opts = !!ui.opts; } catch (e) {}
   // A downloaded copy carries the ticks it was saved with; they join this browser's once per saved file
   const ckBaked = document.getElementById("saved-checklist");
   if (ckBaked) {
@@ -899,7 +877,7 @@
     }).join("");
     if (!stages) return [`${alsoLine(q, "check")}<div class="nores">Nothing on the checklist matches “${esc(state.q)}”.</div>`, "0 entries"];
     const html = `<div class="cklist${ck.hide ? " hide-done" : ""}">
-      <div class="ck-head"><div class="ck-prog"><span id="ck-total"></span><span class="ck-bar"><i id="ck-fill"></i></span></div>
+      <div class="ck-head${ck.opts ? "" : " folded"}"><div class="ck-prog"><span id="ck-total"></span><span class="ck-bar"><i id="ck-fill"></i></span><button class="ck-more" data-ckact="more" aria-expanded="${ck.opts}" title="Show or hide the checklist's options">Options ${CHEVRON}</button></div>
         <div class="ck-acts"><label><input type="checkbox" data-ckact="hide"${ck.hide ? " checked" : ""}>Hide finished</label>
           <span class="ck-fold">Sections <button data-ckact="open-all" title="Expand every section">Expand</button><button data-ckact="close-all" title="Collapse every section">Collapse</button><button data-ckact="close-done" title="Collapse the sections you have finished">Collapse finished</button></span><span class="ck-sep" aria-hidden="true">|</span>
           <span class="ck-data"><button data-ckact="save" title="Tick what your save file says you've done (.sav or .srm); replaces your current ticks">Import from Save</button><button data-ckact="export" title="Save your ticks to a backup file">Export Backup</button><button data-ckact="import" title="Load ticks from a backup file">Import Backup</button><button data-ckact="reset">Reset</button></span></div>
@@ -1004,7 +982,9 @@ Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
   }
   function ckAct(el) {
     const act = el.dataset.ckact;
-    if (act === "hide") { ck.hide = el.checked; ckSave(); el.closest(".cklist").classList.toggle("hide-done", ck.hide); }
+    // Phones fold the controls under an Options header beside the progress bar, so the pinned panel stays small
+    if (act === "more") { ck.opts = !ck.opts; ckSave(); el.closest(".ck-head").classList.toggle("folded", !ck.opts); el.setAttribute("aria-expanded", String(ck.opts)); ckSepSync(); }
+    else if (act === "hide") { ck.hide = el.checked; ckSave(); el.closest(".cklist").classList.toggle("hide-done", ck.hide); }
     else if (/^(open|close)-(all|done)$/.test(act)) {  // fold or unfold every section, or only the finished ones
       const open = act.startsWith("open"), onlyDone = act.endsWith("done");
       document.querySelectorAll("details.ck-stage").forEach((d) => {
@@ -1136,6 +1116,21 @@ Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
     check: "Search the checklist — e.g. Ferrox Village, trade, TM12",
     docs: "Search the docs — e.g. Frostbite, Battle Frontier, shiny",
   };
+  // Phones: just what each search covers, so it fits the box at 360 px (the examples need the room of a wider screen)
+  const PLACEHOLDER_SHORT = {
+    dex: "Pokémon, dex # or type",
+    moves: "Moves, TMs or types",
+    tutors: "Tutors, towns or types",
+    abilities: "Abilities or what they do",
+    items: "Items or kinds",
+    trainers: "Trainers, places, Pokémon",
+    places: "Places, Pokémon or items",
+    check: "Checklist entries or places",
+    docs: "Doc topics",
+  };
+  const phone = matchMedia("(max-width: 600px)");
+  const placeholder = () => { $("#q").placeholder = (phone.matches ? PLACEHOLDER_SHORT : PLACEHOLDER)[state.view]; };
+  try { phone.addEventListener("change", placeholder); } catch (e) { phone.addListener(placeholder); }  // older Safari
 
   let shownView = null;
   function render(scroll) {
@@ -1143,13 +1138,12 @@ Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
     shownView = state.view;
     const q = norm(state.q);
     const [html, count] = { dex: dexView, moves: movesView, tutors: tutorsView, abilities: abilitiesView, items: itemsView, trainers: trainersView, places: placesView, check: checkView, docs: docsView }[state.view](q);
-    if (scroll) untuck();  // a new view or entry starts with the header showing
     // (the checklist puts its "Also matching" line under its pinned panel, so the panel never moves)
     $("#out").innerHTML = (state.view === "check" ? "" : alsoLine(q, state.view)) + html;
     $("#count").textContent = count;
     if (state.view === "check") { ckCounts(); ckSepSync(); }
     $("#q").value = state.q;
-    $("#q").placeholder = PLACEHOLDER[state.view];
+    placeholder();
     $("#clear").hidden = !$("#q").value;
     $("#back").disabled = depth <= 0;
     $("#fwd").disabled = depth >= top;
