@@ -722,9 +722,12 @@
       // asks for ("After getting first badge", "Pikachu only") is a chip beside it
       const parts = sameNote ? sameNote.split(" · ") : [];
       const isCost = (p) => /^\d+ Pok[eé]Chips?$/i.test(p);
-      const tags = (kind === "Special" ? '<span class="tu-kind k-special">Special</span>' : "") +
-        parts.map((p) => (isCost(p) ? `<span class="tu-kind k-cost">${esc(p)}</span>` : `<span class="mode tu-req">${esc(p)}</span>`)).join("");
-      const head = `<div class="cat-head tutorhead${state.tutor === key ? " on" : ""}"><span class="tu-name">${esc(where)}</span>${tags ? `<span class="tu-tags">${tags}</span>` : ""}${mapBtn}</div>`;
+      const how = (kind === "Special" ? '<span class="tu-kind k-special">Special</span>' : "") +
+        parts.filter(isCost).map((p) => `<span class="tu-kind k-cost">${esc(p)}</span>`).join("");
+      const reqs = parts.filter((p) => !isCost(p)).map((p) => `<span class="mode tu-req">${esc(p)}</span>`).join("");
+      // phones: name, cost / Special and the button on one line, the other requirements under them
+      const head = `<div class="cat-head tutorhead${state.tutor === key ? " on" : ""}"><span class="tu-name">${esc(where)}</span>${
+        how}${reqs ? `<span class="tu-tags">${reqs}</span>` : ""}${mapBtn}</div>`;
       const flags = ts.map(isOpen);
       return head + listOrCards(state.layouts.tutors === "grid", ts.map((_, n) => n), {
         chip: (n) => {
