@@ -425,7 +425,8 @@ def test_tutors_link_to_their_map_markers(data, paths):
     link_tutors(page, maps)
     groups = {f"{t['kind']}|{t['where']}" for t in data["tutors"]}
     assert set(page["tutorMaps"]) == groups  # every Tutors entry has a Show in Interactive Map
-    assert len(page["tutorMaps"]["Regular|Battle Frontier"]) == 4
+    assert [len(page["tutorMaps"][f"Regular|Battle Frontier ({spot})"])
+            for spot in ("top left", "top right", "bottom left", "bottom right")] == [1, 1, 1, 1]
     assert page["tutorMaps"]["Special|Gym Trainee Noam"][0].startswith("tsarvosa-city/person-")
     linked = {mk["tu"] for m in maps for mk in m["markers"] if "tu" in mk}
     assert linked == groups
@@ -433,3 +434,12 @@ def test_tutors_link_to_their_map_markers(data, paths):
 
 def test_steel_beam_needs_meltan_or_genesect(data):
     assert [t["note"] for t in data["tutors"] if t["where"] == "Daimyn City Factory (Outside)"] == ["Must have caught Meltan or Genesect"]
+
+
+def test_battle_frontier_tutors_are_four_entries(data):
+    spots = [t["where"] for t in data["tutors"] if t["where"].startswith("Battle Frontier")]
+    assert [spots.count(f"Battle Frontier ({s})") for s in ("top left", "top right", "bottom left", "bottom right")] == [8, 8, 8, 8]
+    assert spots == sorted(spots, key=["Battle Frontier (top left)", "Battle Frontier (top right)",
+                                       "Battle Frontier (bottom left)", "Battle Frontier (bottom right)"].index)
+    giga = next(t for t in data["tutors"] if data["moves"][t["move"]]["name"] == "Giga Drain")
+    assert giga["where"] == "Battle Frontier (top left)"  # EventScript_Tutors_BattleFrontier1's first move

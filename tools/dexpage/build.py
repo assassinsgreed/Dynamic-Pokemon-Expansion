@@ -136,7 +136,7 @@ def page_data(data: SourceData, roster: list[Entry], evo_links: dict) -> dict:
     locations, held, unmatched = attach_encounters(load_encounters() + form_rows, roster)
     items, item_index, item_by_const, icon_sheet = _items(data, held, evo_links)
     _attach_machine_locations(data, moves)
-    tutors = _attach_tutor_locations(moves)
+    tutors = _attach_tutor_locations(moves, battle_frontier_tutors(data.paths))
     mons = [_mon(data, e, index, evo_links.get(e.key, []), locations.get(e.key, []), held.get(e.key, []),
                  item_index, item_by_const) for e in roster]
     for m, shared in zip(mons, _shared_dex_numbers(roster)):
@@ -542,7 +542,27 @@ def _docs(ability_names: set[str] = frozenset()) -> list[dict]:
 TUTOR_NOTES = {("Daimyn City Factory (Outside)", "Steel Beam"): "Must have caught Meltan or Genesect"}
 
 
-def _attach_tutor_locations(moves: dict) -> list[dict]:
+# The Battle Frontier's four tutors (EventScript_BattleFrontier_SWTutor1-4), by where they stand on the map
+# (marker positions: 1 and 2 on the upper row, 3 and 4 below). Each is its own Tutors entry.
+FRONTIER_TUTOR_SPOTS = {1: "top left", 2: "top right", 3: "bottom left", 4: "bottom right"}
+
+
+def battle_frontier_tutors(paths: Paths) -> dict[str, int]:
+    """Which of the Battle Frontier's four tutors teaches each move (move constant → 1-4), from CFRU's
+    EventScript_Tutors_BattleFrontierN menus: each case jumps to a label that buffers MOVE_X."""
+    text = (paths.cfru / "assembly/overworld_scripts/common/move_tutors.s").read_text(encoding="utf-8")
+    out = {}
+    for n in FRONTIER_TUTOR_SPOTS:
+        menu = re.search(rf"^EventScript_Tutors_BattleFrontier{n}:(.*?)^\s*return", text, re.S | re.M)
+        if not menu:
+            raise ValueError(f"move_tutors.s: no EventScript_Tutors_BattleFrontier{n}")
+        for label in re.findall(r"case \w+, (\w+)", menu.group(1)):
+            if m := re.search(rf"^{label}:\s*bufferattack 0x0 (MOVE_\w+)", text, re.M):
+                out[m.group(1)] = n
+    return out
+
+
+def _attach_tutor_locations(moves: dict, frontier: dict[str, int]) -> list[dict]:
     """Where each tutor move is taught, from the feature list's tutor tables. A row like "Fire Fang, or Flame Burst
     (v1.4+)" names two versions; keep the one the game teaches (a move tutor file or a CFRU special tutor)."""
     by_key = {}
@@ -573,12 +593,20 @@ def _attach_tutor_locations(moves: dict) -> list[dict]:
             print(f"warning: tutor move {t['move']!r} matches no move", file=sys.stderr)
             continue
         where = re.sub(r"\s*\(v[\d.]+\+?\)", "", t["where"])  # "Battle Frontier (v1.4)": everything is current
+        if where == "Battle Frontier":  # four tutors there, each its own entry
+            if const not in frontier:
+                raise ValueError(f"no Battle Frontier tutor teaches {moves[const]['name']} (move_tutors.s)")
+            where = f"Battle Frontier ({FRONTIER_TUTOR_SPOTS[frontier[const]]})"
         if t["kind"] == "Special":
             where = re.sub(r"\s*\(\d+\)$", "", where)  # "Gym Trainee Mason (1..3)" teach one of three each day
         entry = {"where": where, "note": TUTOR_NOTES.get((t["where"], t["move"]), t["note"]), "kind": t["kind"]}
         moves[const].setdefault("tutor", []).append(entry)
         rows.append({"move": const, **entry})
-    return rows
+    # the four Battle Frontier tutors' rows are interleaved in the doc; keep them in one block, top left first
+    spots = [f"Battle Frontier ({spot})" for spot in FRONTIER_TUTOR_SPOTS.values()]
+    first = next((i for i, r in enumerate(rows) if r["where"] in spots), 0)
+    order = {id(r): (first, spots.index(r["where"])) if r["where"] in spots else (i, 0) for i, r in enumerate(rows)}
+    return sorted(rows, key=lambda r: order[id(r)])
 
 
 def _attach_machine_locations(data: SourceData, moves: dict) -> None:
@@ -636,7 +664,7 @@ TUTOR_MARKERS = {
     "EventScript_BruccieVillageNPCHouses_MoveTutor": "Regular|Bruccie Village",
     "EventScript_TsarvosaCity_NPCHouses_MoveTutor": "Regular|Tsarvosa City",
     "EventScript_UteyaVillage_MoveTutor": "Regular|Uteya Village",
-    **{f"EventScript_BattleFrontier_SWTutor{n}": "Regular|Battle Frontier" for n in range(1, 5)},
+    **{f"EventScript_BattleFrontier_SWTutor{n}": f"Regular|Battle Frontier ({spot})" for n, spot in FRONTIER_TUTOR_SPOTS.items()},
     "EventScript_DaimynCityNPCHouses_OldTrainer": "Special|Daimyn City - Ash’s House",
     "EventScript_DaimynFactoryOverworld_ReminiscingOldMan": "Special|Daimyn City Factory (Outside)",
     "EventScript_Route24_House_DragonMaster": "Special|Route 24 Dragon Master’s House",

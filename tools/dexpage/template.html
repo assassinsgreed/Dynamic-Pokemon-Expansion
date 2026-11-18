@@ -272,6 +272,7 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 14px; }
 table.mv { border-collapse: collapse; width: 100%; font-size: 13.5px; table-layout: fixed; }
 table.mv .c-how { width: 128px; } table.mv .c-type { width: 92px; } table.mv .c-cat { width: 56px; }
 table.mv .c-num { width: 56px; text-align: right; }
+table.mv .c-learn { width: 96px; white-space: nowrap; }
 table.mv .c-place { width: 28%; } table.mv .c-mons { width: 84px; text-align: right; }  /* Locations list: "Found by" gets the room */ table.mv .c-tm { width: 64px; text-align: right; }
 table.loc { table-layout: auto; }
 table.mv td { overflow: hidden; text-overflow: ellipsis; }
@@ -333,12 +334,20 @@ table.mv > tbody > tr:not(.expanded):hover > td,
 .listtable tbody tr { cursor: pointer; }
 .listtable td .ii { margin-right: 6px; }
 .chip .type { flex: none; margin-left: 6px; }
-.tutorhead { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-.tutorhead small { font: 500 12.5px var(--font-body); color: var(--muted); text-transform: none; letter-spacing: 0; }
+.tutorhead { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tu-tags { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 5px; text-transform: none; letter-spacing: 0; }
+.tu-kind { font: 600 10.5px/1 var(--font-data); text-transform: uppercase; letter-spacing: .03em; padding: 3px 7px; border-radius: 4px; white-space: nowrap;
+  color: var(--ink); border: 1px solid var(--k); background: color-mix(in srgb, var(--k) 22%, var(--surface)); }
+.tu-kind.k-cost { --k: #e69f00; } .tu-kind.k-special { --k: #0072b2; }  /* Okabe-Ito, beside the checklist's kind colours */
+.tu-req { white-space: normal; line-height: 1.15; }
 .tutorhead .tumap { margin-left: auto; font: 600 12px/1 var(--font-body); text-transform: none; letter-spacing: 0; padding: 5px 9px; border-radius: 6px;
   border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; white-space: nowrap; align-self: center; }
 .tutorhead .tumap:hover { border-color: var(--accent); }
-.tutorhead.on { color: var(--accent); }
+.tutorhead.on .tu-name { color: var(--accent); }
+@media (max-width: 600px) {  /* the button stays beside the title; the note goes under both */
+  .tutorhead { align-items: center; }
+  .tutorhead .tu-tags { order: 2; flex-basis: 100%; }
+}
 .also button { border: 1px solid var(--line); background: var(--surface); padding: 4px 10px; border-radius: 999px; cursor: pointer; color: var(--accent); font-weight: 600; font-size: 13px; }
 
 /* Entries opened in place in the Moves / Tutors / Items / Locations lists */
@@ -758,11 +767,8 @@ body.map-open .sheet { display: none; }  /* the place's pop-up waits behind the 
 #mapview .mv-card .what { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 0 0 2px; }
 #mapview .mv-card .text { margin: 0; font-weight: 600; }
 #mapview .mv-card .acts:empty { display: none; }
-#mapview .mv-card .acts { margin-top: 6px; }
-#mapview .mv-tu, #mapview .mv-list .mv-tu { display: inline; width: auto; border: 0; background: none; padding: 0; color: var(--accent);
-  font: 600 13.5px/1.3 var(--font-body); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; text-align: left; }
-#mapview .mv-tu:hover, #mapview .mv-list .mv-tu:hover { text-decoration-thickness: 2px; background: none; }
-#mapview .mv-list .mv-tu { display: block; margin: 0 0 4px calc(22px + 2.2em + 18px); }
+#mapview .mv-tu { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+#mapview .mv-tu:hover, #mapview .mv-tu:focus-visible { text-decoration-thickness: 2px; }
 #mapview .mv-card .x { position: absolute; right: 8px; top: 8px; width: 30px; height: 30px; border-radius: 8px; border: 0; background: var(--accent-soft); cursor: pointer; font-size: 18px; line-height: 1; }
 </style>
 </head>

@@ -147,6 +147,9 @@ GYM_TRAINEES = {"Noam": "Normal", "Ashley": "Fire", "Chelsea": "Water", "Buddy":
                 "Skylar": "Flying", "Bella": "Poison", "Flash": "Electric", "Terra": "Ground", "Seifa": "Psychic",
                 "Rocco": "Rock", "Janice": "Ice", "Antoinette": "Bug", "Ryu": "Dragon", "Caspar": "Ghost",
                 "Darcy": "Dark", "Mason": "Steel", "Faye": "Fairy"}
+# The Battle Frontier's four tutors (their labels say "SWTutor1-4"), named by where they stand as in build.FRONTIER_TUTOR_SPOTS
+NOTES.update({f"EventScript_BattleFrontier_SWTutor{n}": (f"Tutor {n} ({spot}): move tutor", False, False)
+              for n, spot in {1: "top left", 2: "top right", 3: "bottom left", 4: "bottom right"}.items()})
 NOTES.update({f"EventScript_TsarvosaCity_GymTraineeCafe_{name}":
               (f"Gym Trainee {name} ({kind} type, here on some days): move tutor", False, False)
               for name, kind in GYM_TRAINEES.items()})

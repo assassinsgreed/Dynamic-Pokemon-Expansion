@@ -715,10 +715,16 @@
     const html = groupBy(rows, (t) => t.kind + "|" + t.where).map(([key, ts]) => {
       const [kind, where] = key.split("|");
       const sameNote = ts.every((t) => t.note === ts[0].note) ? ts[0].note : "";
-      // their people on the interactive maps (build.link_tutors); the button opens the first (Battle Frontier has four)
+      // their people on the interactive maps (build.link_tutors); one each (the Battle Frontier's four tutors are four entries)
       const [onMap] = (DEX.tutorMaps || {})[key] || [];
-      const mapBtn = onMap ? `<button class="tumap" type="button" data-tumap="${esc(onMap)}">Show in Interactive Map</button>` : "";
-      const head = `<div class="cat-head tutorhead${state.tutor === key ? " on" : ""}">${esc(where)}${kind === "Special" ? " · special tutor" : ""}${sameNote ? `<small>${esc(sameNote)}</small>` : ""}${mapBtn}</div>`;
+      const mapBtn = onMap ? `<button class="tumap" type="button" data-tumap="${esc(onMap)}">Find in Map</button>` : "";
+      // How a tutor is reached gets a tag in the checklist's style: its PokéChip cost, or Special; anything else it
+      // asks for ("After getting first badge", "Pikachu only") is a chip beside it
+      const parts = sameNote ? sameNote.split(" · ") : [];
+      const isCost = (p) => /^\d+ Pok[eé]Chips?$/i.test(p);
+      const tags = (kind === "Special" ? '<span class="tu-kind k-special">Special</span>' : "") +
+        parts.map((p) => (isCost(p) ? `<span class="tu-kind k-cost">${esc(p)}</span>` : `<span class="mode tu-req">${esc(p)}</span>`)).join("");
+      const head = `<div class="cat-head tutorhead${state.tutor === key ? " on" : ""}"><span class="tu-name">${esc(where)}</span>${tags ? `<span class="tu-tags">${tags}</span>` : ""}${mapBtn}</div>`;
       const flags = ts.map(isOpen);
       return head + listOrCards(state.layouts.tutors === "grid", ts.map((_, n) => n), {
         chip: (n) => {
@@ -731,7 +737,7 @@
             sameNote ? "" : `<td class="note">${esc(t.note)}</td>`}<td class="n">${learners(t)}</td></tr>`;
         },
         isOpen: (n) => flags[n], card: (n) => moveCard(ts[n].move, true), cols: sameNote ? 5 : 6,
-        head: `<th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num hide-sm">Pow</th>${sameNote ? "" : "<th>Requirement</th>"}<th class="c-num">Learn</th>`,
+        head: `<th>Move</th><th class="c-type">Type</th><th class="c-cat">Cat</th><th class="c-num hide-sm">Pow</th>${sameNote ? "" : "<th>Requirement</th>"}<th class="c-num c-learn" title="How many Pokémon can learn it"># Learnable</th>`,
       });
     }).join("");
     return [html, `${rows.length} tutor moves`];
