@@ -659,7 +659,10 @@ body.sheet-open main { overflow: hidden; }
   .list:not(.grid) .mon > summary .sp i { transform: scale(.75); }
   .who .nm { font-size: 16.5px; }
   .detail { padding: 12px 10px; }
-  table.mv .hide-sm { display: none; }
+  /* Shrunk to nothing rather than removed: an opened entry's row spans every column, and removed columns would come
+     back as empty ones that squeeze the Move column ("Acr…") */
+  table.mv .hide-sm { width: 0; padding: 0; font-size: 0; }
+  table.mv .hide-sm > * { display: none; }
   table.mv .c-place { width: auto; }
   table.mv .c-how { width: 72px; } table.mv .c-type { width: 80px; }
   .evcard .how { padding-left: 4px; }
