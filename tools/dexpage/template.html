@@ -335,6 +335,10 @@ table.mv > tbody > tr:not(.expanded):hover > td,
 .chip .type { flex: none; margin-left: 6px; }
 .tutorhead { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .tutorhead small { font: 500 12.5px var(--font-body); color: var(--muted); text-transform: none; letter-spacing: 0; }
+.tutorhead .tumap { margin-left: auto; font: 600 12px/1 var(--font-body); text-transform: none; letter-spacing: 0; padding: 5px 9px; border-radius: 6px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; white-space: nowrap; align-self: center; }
+.tutorhead .tumap:hover { border-color: var(--accent); }
+.tutorhead.on { color: var(--accent); }
 .also button { border: 1px solid var(--line); background: var(--surface); padding: 4px 10px; border-radius: 999px; cursor: pointer; color: var(--accent); font-weight: 600; font-size: 13px; }
 
 /* Entries opened in place in the Moves / Tutors / Items / Locations lists */
@@ -754,6 +758,11 @@ body.map-open .sheet { display: none; }  /* the place's pop-up waits behind the 
 #mapview .mv-card .what { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 0 0 2px; }
 #mapview .mv-card .text { margin: 0; font-weight: 600; }
 #mapview .mv-card .acts:empty { display: none; }
+#mapview .mv-card .acts { margin-top: 6px; }
+#mapview .mv-tu, #mapview .mv-list .mv-tu { display: inline; width: auto; border: 0; background: none; padding: 0; color: var(--accent);
+  font: 600 13.5px/1.3 var(--font-body); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; text-align: left; }
+#mapview .mv-tu:hover, #mapview .mv-list .mv-tu:hover { text-decoration-thickness: 2px; background: none; }
+#mapview .mv-list .mv-tu { display: block; margin: 0 0 4px calc(22px + 2.2em + 18px); }
 #mapview .mv-card .x { position: absolute; right: 8px; top: 8px; width: 30px; height: 30px; border-radius: 8px; border: 0; background: var(--accent-soft); cursor: pointer; font-size: 18px; line-height: 1; }
 </style>
 </head>

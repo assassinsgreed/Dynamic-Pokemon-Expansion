@@ -537,6 +537,11 @@ def _docs(ability_names: set[str] = frozenset()) -> list[dict]:
             for g in load_docs()]
 
 
+# Tutor requirements the feature list gets wrong (the doc is frozen, so fixes live here): (where, move as the doc
+# names it) → the note. Steel Beam: the old man checks Meltan, then Genesect, in either mode (daimyn_factory.s).
+TUTOR_NOTES = {("Daimyn City Factory (Outside)", "Steel Beam"): "Must have caught Meltan or Genesect"}
+
+
 def _attach_tutor_locations(moves: dict) -> list[dict]:
     """Where each tutor move is taught, from the feature list's tutor tables. A row like "Fire Fang, or Flame Burst
     (v1.4+)" names two versions; keep the one the game teaches (a move tutor file or a CFRU special tutor)."""
@@ -570,7 +575,7 @@ def _attach_tutor_locations(moves: dict) -> list[dict]:
         where = re.sub(r"\s*\(v[\d.]+\+?\)", "", t["where"])  # "Battle Frontier (v1.4)": everything is current
         if t["kind"] == "Special":
             where = re.sub(r"\s*\(\d+\)$", "", where)  # "Gym Trainee Mason (1..3)" teach one of three each day
-        entry = {"where": where, "note": t["note"], "kind": t["kind"]}
+        entry = {"where": where, "note": TUTOR_NOTES.get((t["where"], t["move"]), t["note"]), "kind": t["kind"]}
         moves[const].setdefault("tutor", []).append(entry)
         rows.append({"move": const, **entry})
     return rows
@@ -619,6 +624,49 @@ MAP_OF = {"Daimyn Factory Overworld": "Daimyn Factory", "Rt. 12 Rest House": "Ro
 NO_MAP = {"Roaming"}
 
 
+# Tutor NPCs on the interactive maps (by script label) → the Tutors entry for what they teach ("kind|where", as
+# DEX.tutors groups them). Gym Trainees (maps/curation.GYM_TRAINEES) are added in link_tutors.
+TUTOR_MARKERS = {
+    "EventScript_RhodanziTrainerSchool_TerrainTutor": "Regular|Rhodanzi City",
+    "EventScript_FerroxNPCHouses_MoveTutor": "Regular|Ferrox Village",
+    "EventScript_HeleoCity_MoveTutor": "Regular|Heleo City",
+    "EventScript_DaimynCity_MoveTutor": "Regular|Daimyn City",
+    "EventScript_LaplazNPCHouses_Tutor": "Regular|Laplaz Town",
+    "EventScript_EmraldinQuayNPCHouses_Tutor": "Regular|Emraldin Quay",
+    "EventScript_BruccieVillageNPCHouses_MoveTutor": "Regular|Bruccie Village",
+    "EventScript_TsarvosaCity_NPCHouses_MoveTutor": "Regular|Tsarvosa City",
+    "EventScript_UteyaVillage_MoveTutor": "Regular|Uteya Village",
+    **{f"EventScript_BattleFrontier_SWTutor{n}": "Regular|Battle Frontier" for n in range(1, 5)},
+    "EventScript_DaimynCityNPCHouses_OldTrainer": "Special|Daimyn City - Ash’s House",
+    "EventScript_DaimynFactoryOverworld_ReminiscingOldMan": "Special|Daimyn City Factory (Outside)",
+    "EventScript_Route24_House_DragonMaster": "Special|Route 24 Dragon Master’s House",
+}
+
+
+def link_tutors(page: dict, maps: list[dict]) -> None:
+    """Tutor markers link to their Tutors entry (`tu` on the marker), and each Tutors entry to its people on the
+    maps (page["tutorMaps"]: "kind|where" → ["<map slug>/person-<n>", ...]). Fails if either side goes missing."""
+    from .maps.curation import GYM_TRAINEES
+    wanted = dict(TUTOR_MARKERS, **{f"EventScript_TsarvosaCity_GymTraineeCafe_{n}": f"Special|Gym Trainee {n}"
+                                    for n in GYM_TRAINEES})
+    groups = {f"{t['kind']}|{t['where']}" for t in page["tutors"]}
+    found: dict[str, list[str]] = {}
+    for m in maps:
+        for mk in m["markers"]:
+            group = wanted.get(mk.get("lb"))
+            if group:
+                if group not in groups:
+                    raise ValueError(f"build.TUTOR_MARKERS: no Tutors entry {group!r} (tutors.csv)")
+                mk["tu"] = group
+                found.setdefault(group, []).append(f"{m['slug']}/person-{mk['n']}")
+    missing = sorted(set(wanted) - {mk.get("lb") for m in maps for mk in m["markers"]})
+    if missing:
+        raise ValueError(f"build.TUTOR_MARKERS: no map marker for {missing}")
+    for group in sorted(groups - set(found)):
+        print(f"warning: tutors {group!r} have no map marker (build.TUTOR_MARKERS)", file=sys.stderr)
+    page["tutorMaps"] = found
+
+
 def map_index(maps: list[dict]) -> dict:
     """What the page knows about the maps before any is opened: each one's name and link, and the companion places
     filed under another map's name. The pictures themselves go in #mapdata, read on first open."""
@@ -636,6 +684,7 @@ def build(paths: Paths, out: Path) -> None:
     page["recolors"] = recolors  # how app.js draws shiny fronts and regular backs from other cells (sprites.py)
     maps = place_maps(paths)
     page["maps"] = map_index(maps)
+    link_tutors(page, maps)  # before checklist(), which drops the markers' script labels
     page["checklist"] = checklist(page, maps, paths, game_item_names(data))
     have = {place_key(m["name"]) for m in maps}
     places = {l["location"] for m in page["mons"] for l in m["loc"]} | set(page["townMap"]["places"])

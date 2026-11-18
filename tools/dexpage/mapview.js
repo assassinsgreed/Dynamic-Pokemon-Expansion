@@ -59,6 +59,8 @@ const MapView = (() => {
     $("cx").onclick = () => unpin();
     const target = (e) => e.target.closest(".warp, .mk, .door, .edge, .mv-list button");
     root.addEventListener("click", (e) => {
+      const tu = e.target.closest(".mv-tu");  // a tutor's link to the moves they teach (the Tutors tab)
+      if (tu) { opts.onTutor(tu.dataset.tu); return; }
       const t = target(e);
       if (t && t.closest(".mv-list")) { jump(`.mv-maps [data-m="${t.dataset.m}"]`); return; }  // a key row goes straight to its marker
       if (t && t.matches(".warp")) { goWarp(t); return; }
@@ -166,11 +168,14 @@ const MapView = (() => {
         if (!ms.length) return;
         if (p.floors.length > 1) h += `<div class="mv-floorhead">${esc(f.name)}</div>`;
         h += "<ul class='mv-list'>" + ms.map(([m, i]) => `<li><button type="button" data-m="${i}">${shape(m.k)}<span class="num">${m.n}</span><span>${
-          m.pg ? '<span class="pg">Postgame:</span> ' : ""}${esc(m.t)}${m.mo ? ` (${m.mo} only)` : ""}${m.rq ? ` (needs ${esc(m.rq)})` : ""}${m.sd ? '<span class="tag">S/D</span>' : ""}</span></button></li>`).join("") + "</ul>";
+          m.pg ? '<span class="pg">Postgame:</span> ' : ""}${esc(m.t)}${m.mo ? ` (${m.mo} only)` : ""}${m.rq ? ` (needs ${esc(m.rq)})` : ""}${m.sd ? '<span class="tag">S/D</span>' : ""}</span></button>${tutorLink(m)}</li>`).join("") + "</ul>";
       });
     } else h += `<h3>On this map</h3><p class="mv-none">No items or special people here.</p>`;
     $("side").innerHTML = h;
   }
+
+  // Tutors link to their entry on the Tutors tab (build.link_tutors sets `tu`)
+  const tutorLink = (m) => (m.tu ? `<button type="button" class="mv-tu" data-tu="${esc(m.tu)}">See the moves they teach →</button>` : "");
 
   function warpText(e) {
     if (!e.to) return { what: "Warp", text: "Where you arrive from a scripted warp" };
@@ -192,7 +197,7 @@ const MapView = (() => {
     }
     const m = p.markers[d.m];
     return { what: `${m.n} · ${KINDS[m.k].label}${p.floors.length > 1 ? " · " + p.floors[m.f].name : ""}`,
-      text: (m.pg ? "Postgame: " : "") + m.t + (m.mo ? ` (${m.mo} only)` : "") + (m.rq ? ` (needs ${m.rq})` : ""), mark: d.m };
+      text: (m.pg ? "Postgame: " : "") + m.t + (m.mo ? ` (${m.mo} only)` : "") + (m.rq ? ` (needs ${m.rq})` : ""), mark: d.m, tu: tutorLink(m) };
   }
 
   function show(t, pinned) {
@@ -205,7 +210,7 @@ const MapView = (() => {
     if (info.mark !== undefined) root.querySelectorAll(`[data-m="${info.mark}"]`).forEach((el) => el.classList.add("on"));
     $("cwhat").textContent = info.what;
     $("ctext").textContent = info.text;
-    $("cacts").innerHTML = "";
+    $("cacts").innerHTML = info.tu || "";
     $("card").hidden = false;
     drawWire();
   }
@@ -302,6 +307,7 @@ const MapView = (() => {
 
   return {
     // onLink(slug): a way out was clicked; onClose(): the Back button (labelled by backLabel()). The companion turns both into history steps.
+    // onTutor("kind|where"): a tutor's "See the moves they teach" was clicked.
     // onMark(id | null): a marker was selected or let go, so the companion can put its link in the address bar.
     init(o) { opts = o; },
     open(slug, mark) {

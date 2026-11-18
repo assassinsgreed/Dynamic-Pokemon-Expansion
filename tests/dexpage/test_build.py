@@ -415,3 +415,21 @@ def test_every_place_has_an_interactive_map(data, paths):
     have = {norm(m["name"]) for m in place_maps(paths)}
     places = {l["location"] for m in data["mons"] for l in m["loc"]} | set(data["townMap"]["places"])
     assert {p for p in places - NO_MAP if norm(MAP_OF.get(p, p)) not in have} == set()
+
+
+def test_tutors_link_to_their_map_markers(data, paths):
+    from tools.dexpage.build import link_tutors
+    from tools.dexpage.maps.export import place_maps
+    maps = place_maps(paths)
+    page = dict(data)
+    link_tutors(page, maps)
+    groups = {f"{t['kind']}|{t['where']}" for t in data["tutors"]}
+    assert set(page["tutorMaps"]) == groups  # every Tutors entry has a Show in Interactive Map
+    assert len(page["tutorMaps"]["Regular|Battle Frontier"]) == 4
+    assert page["tutorMaps"]["Special|Gym Trainee Noam"][0].startswith("tsarvosa-city/person-")
+    linked = {mk["tu"] for m in maps for mk in m["markers"] if "tu" in mk}
+    assert linked == groups
+
+
+def test_steel_beam_needs_meltan_or_genesect(data):
+    assert [t["note"] for t in data["tutors"] if t["where"] == "Daimyn City Factory (Outside)"] == ["Must have caught Meltan or Genesect"]

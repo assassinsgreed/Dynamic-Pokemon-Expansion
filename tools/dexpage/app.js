@@ -102,7 +102,7 @@
   // ---------------------------------------------------------------- state & navigation
   // state.view: dex | moves | items | places; move/item/place name the open card; open is the expanded Pokémon
   const state = { from: null, view: "dex", q: "", move: null, item: null, place: null, map: null, mark: null, open: null, mode: "", tab: "level", tabFilter: "",
-    doc: null, ability: null, trainer: null, diff: "std",
+    doc: null, ability: null, trainer: null, tutor: null, diff: "std",
     layouts: { dex: "list", moves: "list", tutors: "list", abilities: "list", items: "grid", trainers: "list", places: "grid", check: "list", docs: "list" } };  // list or cards, per view
   try {
     state.mode = localStorage.getItem("dex-mode") || "";
@@ -111,7 +111,7 @@
   } catch (e) {}
   let depth = 0, top = 0;  // position in this page's history, and how far Forward can go
 
-  const snapshot = () => ({ from: state.from, view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, map: state.map, mark: state.mark, doc: state.doc, ability: state.ability, trainer: state.trainer, open: state.open });
+  const snapshot = () => ({ from: state.from, view: state.view, q: state.q, move: state.move, item: state.item, place: state.place, map: state.map, mark: state.mark, doc: state.doc, ability: state.ability, trainer: state.trainer, tutor: state.tutor, open: state.open });
   function hashFor(st) {
     if (st.view === "dex" && st.open !== null) return monSlug(st.open);
     if (st.move) return "move-" + slug(moves[st.move].name);
@@ -121,12 +121,13 @@
     if (st.doc) return "doc-" + slug(st.doc);
     if (st.ability) return "ability-" + slug(st.ability);
     if (st.trainer !== null) return "trainer-" + trainerSlug(st.trainer);
+    if (st.tutor) return "tutor-" + slug(st.tutor.split("|")[1]);
     return { dex: "", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", trainers: "trainers", places: "locations", check: "checklist", docs: "docs" }[st.view];
   }
   const queries = {};  // each tab keeps its own search text
 
   function navigate(change) {
-    const next = Object.assign({ from: null, view: state.view, q: "", move: null, item: null, place: null, map: null, mark: null, doc: null, ability: null, trainer: null, open: null }, change);
+    const next = Object.assign({ from: null, view: state.view, q: "", move: null, item: null, place: null, map: null, mark: null, doc: null, ability: null, trainer: null, tutor: null, open: null }, change);
     // the step being left keeps its scroll position, so Back returns to the same spot (the checklist after a map)
     try { history.replaceState(Object.assign({}, history.state, { scroll: $("main").scrollTop }), ""); } catch (e) {}
     Object.assign(state, next, { tabFilter: "" });
@@ -153,12 +154,15 @@
   const openPlace = (name) => navigate({ view: "places", place: name });
   // Back from a map returns to where it was opened from: the checklist (a history step back, like the header's Back,
   // so the list is where it was) or its place's details; a way out on the map opens the next place's map
+  // (a tutor's Show in Interactive Map works the same way, back to the Tutors tab)
   const closeMap = () => {
-    if (state.from !== "check") navigate({ view: "places", q: state.q, place: state.place });
+    if (state.from !== "check" && state.from !== "tutors") navigate({ view: "places", q: state.q, place: state.place });
     else if (depth > 0) history.back();
-    else navigate({ view: "check" });
+    else navigate({ view: state.from });
   };
-  MapView.init({ onClose: closeMap, backLabel: () => (state.from === "check" ? "Back to checklist" : "Back to place details"), onLink: (slug) => navigate({ view: "places", place: placeOfMap(slug) || null, map: slug }),
+  const BACK_TO = { check: "Back to checklist", tutors: "Back to tutors" };
+  MapView.init({ onClose: closeMap, backLabel: () => BACK_TO[state.from] || "Back to place details", onLink: (slug) => navigate({ view: "places", place: placeOfMap(slug) || null, map: slug }),
+    onTutor: (group) => navigate({ view: "tutors", tutor: group }),  // a tutor on the map → the moves they teach
     onMark: (mark) => { if (state.map) { state.mark = mark; remember(); } } });  // #map-<place>/<marker> links to one marker
 
   // ---------------------------------------------------------------- small pieces
@@ -711,7 +715,10 @@
     const html = groupBy(rows, (t) => t.kind + "|" + t.where).map(([key, ts]) => {
       const [kind, where] = key.split("|");
       const sameNote = ts.every((t) => t.note === ts[0].note) ? ts[0].note : "";
-      const head = `<div class="cat-head tutorhead">${esc(where)}${kind === "Special" ? " · special tutor" : ""}${sameNote ? `<small>${esc(sameNote)}</small>` : ""}</div>`;
+      // their people on the interactive maps (build.link_tutors); the button opens the first (Battle Frontier has four)
+      const [onMap] = (DEX.tutorMaps || {})[key] || [];
+      const mapBtn = onMap ? `<button class="tumap" type="button" data-tumap="${esc(onMap)}">Show in Interactive Map</button>` : "";
+      const head = `<div class="cat-head tutorhead${state.tutor === key ? " on" : ""}">${esc(where)}${kind === "Special" ? " · special tutor" : ""}${sameNote ? `<small>${esc(sameNote)}</small>` : ""}${mapBtn}</div>`;
       const flags = ts.map(isOpen);
       return head + listOrCards(state.layouts.tutors === "grid", ts.map((_, n) => n), {
         chip: (n) => {
@@ -1164,7 +1171,7 @@ Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
       const on = document.querySelector(".mon.on, .chip.on");
       if (on) on.scrollIntoView({ block: "nearest" });
     } else if (scroll) {
-      const el = (state.open !== null && document.querySelector(`.mon[data-i="${state.open}"]`)) || ((state.move || state.item !== null || state.place || state.doc || state.ability || state.trainer !== null) && document.querySelector("tr.on, .chip.on"));
+      const el = (state.open !== null && document.querySelector(`.mon[data-i="${state.open}"]`)) || (state.tutor && document.querySelector(".tutorhead.on")) || ((state.move || state.item !== null || state.place || state.doc || state.ability || state.trainer !== null) && document.querySelector("tr.on, .chip.on"));
       if (el) el.scrollIntoView({ block: "start" }); else $("main").scrollTo({ top: 0 });
     }
   }
@@ -1173,9 +1180,9 @@ Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
   let timer;
   $("#q").addEventListener("input", (e) => {
     clearTimeout(timer);
-    timer = setTimeout(() => { Object.assign(state, { q: e.target.value, open: null, move: null, item: null, place: null, map: null, doc: null, ability: null, trainer: null }); queries[state.view] = state.q; remember(); render(); }, 120);
+    timer = setTimeout(() => { Object.assign(state, { q: e.target.value, open: null, move: null, item: null, place: null, map: null, doc: null, ability: null, trainer: null, tutor: null }); queries[state.view] = state.q; remember(); render(); }, 120);
   });
-  $("#clear").addEventListener("click", () => { Object.assign(state, { q: "", open: null, move: null, item: null, place: null, map: null, doc: null, ability: null, trainer: null }); queries[state.view] = ""; remember(); render(); $("#q").focus(); });
+  $("#clear").addEventListener("click", () => { Object.assign(state, { q: "", open: null, move: null, item: null, place: null, map: null, doc: null, ability: null, trainer: null, tutor: null }); queries[state.view] = ""; remember(); render(); $("#q").focus(); });
   $("#back").addEventListener("click", () => history.back());
   $("#fwd").addEventListener("click", () => history.forward());
   // Switching tabs restores that tab's own search; clicking the current tab again clears it
@@ -1217,6 +1224,8 @@ Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
     if (act) { ckAct(act); return; }
     const onMap = t.closest("[data-ckmap]");
     if (onMap) { navigate({ view: "places", place: placeOfMap(onMap.dataset.ckmap), map: onMap.dataset.ckmap, mark: onMap.dataset.mark, from: "check" }); return; }
+    const tuMap = t.closest("[data-tumap]");
+    if (tuMap) { const [m, mark] = tuMap.dataset.tumap.split("/"); navigate({ view: "places", place: placeOfMap(m), map: m, mark, from: "tutors" }); return; }
     const boss = t.closest("[data-cktr]");
     if (boss) {  // the trainer's entry for the mode the player has chosen (difficulty is the Trainers tab's own setting)
       const ns = boss.dataset.cktr.split(",").map(Number);
@@ -1370,8 +1379,9 @@ Replace your ${ckDone(ckAll)} current ticks with it?`)) return;
   function fromHash() {
     const h = decodeURIComponent(location.hash.slice(1));
     const views = { "": "dex", pokedex: "dex", moves: "moves", tutors: "tutors", abilities: "abilities", items: "items", trainers: "trainers", locations: "places", checklist: "check", docs: "docs" };
-    Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, map: null, mark: null, doc: null, ability: null, trainer: null, open: null });
+    Object.assign(state, { view: "dex", q: "", move: null, item: null, place: null, map: null, mark: null, doc: null, ability: null, trainer: null, tutor: null, open: null });
     if (h in views) state.view = views[h];
+    else if (h.startsWith("tutor-")) { const t = DEX.tutors.find((x) => slug(x.where) === h.slice(6)); Object.assign(state, { view: "tutors", tutor: t ? `${t.kind}|${t.where}` : null }); }
     else if (h.startsWith("trainer-")) { const n = parseInt(h.slice(8), 10); Object.assign(state, { view: "trainers", trainer: n >= 0 && n < entries.length ? n : null }); }
     else if (h.startsWith("move-")) { const k = moveKeys.find((x) => slug(moves[x].name) === h.slice(5)); Object.assign(state, k ? { view: "moves", move: k } : { view: "moves", q: h.slice(5).replace(/-/g, " ") }); }
     else if (h.startsWith("item-")) { const k = items.findIndex((it) => slug(it.name) === h.slice(5)); Object.assign(state, k >= 0 ? { view: "items", item: k } : { view: "items", q: h.slice(5).replace(/-/g, " ") }); }

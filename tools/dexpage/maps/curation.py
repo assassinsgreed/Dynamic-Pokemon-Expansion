@@ -140,3 +140,13 @@ NOTES = {
     "SignScript_ForgottenManseStorage_ApplianceCatalog":
         ("Appliance catalog: changes Rotom into its Fan, Frost, Heat, Mow or Wash form, or back", False, False),
 }
+# The Gym Trainee Cafe (Tsarvosa's Type Trainer House, otherwise unmarked): each trainee stands in their own spot, but
+# InitializeGymTraineesCafe (CFRU scripting.c) shows only 3-5 of the 18 each day. Beaten, they tutor a move of their
+# type (one of three, rolled daily). build.TUTOR_MARKERS links each to its Tutors entry.
+GYM_TRAINEES = {"Noam": "Normal", "Ashley": "Fire", "Chelsea": "Water", "Buddy": "Grass", "Gawain": "Fighting",
+                "Skylar": "Flying", "Bella": "Poison", "Flash": "Electric", "Terra": "Ground", "Seifa": "Psychic",
+                "Rocco": "Rock", "Janice": "Ice", "Antoinette": "Bug", "Ryu": "Dragon", "Caspar": "Ghost",
+                "Darcy": "Dark", "Mason": "Steel", "Faye": "Fairy"}
+NOTES.update({f"EventScript_TsarvosaCity_GymTraineeCafe_{name}":
+              (f"Gym Trainee {name} ({kind} type, here on some days): move tutor", False, False)
+              for name, kind in GYM_TRAINEES.items()})

@@ -208,7 +208,13 @@ Each place card has a **View Interactive Map** button that opens `#map-<slug>`: 
 - Warps: ↑/↓ for stairs between numbered floors (`floor_rank`; BF/Underground count as −1), → for any other warp.
   Clicking a warp scrolls to its other end (both ends light up; a line only if it crosses no other map). Clicking a
   way out opens that place's map. Clicking a key row jumps to its marker; clicking a marker scrolls the key to its
-  row (only where the key scrolls beside the maps, never on phones). No action buttons on the card.
+  row (only where the key scrolls beside the maps, never on phones). No action buttons on the card, except a
+  tutor's "See the moves they teach →" link (also under its key row), which opens its Tutors entry (`#tutor-<where>`).
+- Tutors ↔ maps: `build.TUTOR_MARKERS` (script label → "kind|where" Tutors group; Gym Trainees from
+  `curation.GYM_TRAINEES`, marked via `NOTES` though the cafe map is otherwise `NO_MARKER_MAPS`) sets `tu` on the
+  marker and `DEX.tutorMaps`; each Tutors group head has "Show in Interactive Map" (first marker; map Back reads
+  "← Back to tutors", `from: "tutors"`). The build fails if a label has no marker or names no Tutors group.
+  Requirement fixes the frozen doc gets wrong go in `build.TUTOR_NOTES` (Steel Beam: Meltan or Genesect).
 - Marker links (for Collin to share): `#map-<place>/<kind>-<n>` (`item-2`, `hidden-4`, `person-15`, `wild-1`,
   `statue-3`). Selecting a marker puts its link in the address bar (replaceState); opening one scrolls to the
   marker, selects it and pulses it 6 times (`.ping.long`). Numbers shift if curation adds or removes a marker of that kind.
