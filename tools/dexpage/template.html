@@ -335,6 +335,7 @@ table.mv > tbody > tr:not(.expanded):hover > td,
 .listtable td .ii { margin-right: 6px; }
 .chip .type { flex: none; margin-left: 6px; }
 .tutorhead { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tu-title { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; line-height: 1.3; }
 .tu-tags { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 5px; text-transform: none; letter-spacing: 0; }
 .tu-kind { font: 600 10.5px/1 var(--font-data); text-transform: uppercase; letter-spacing: .03em; padding: 3px 7px; border-radius: 4px; white-space: nowrap;
   color: var(--ink); border: 1px solid var(--k); background: color-mix(in srgb, var(--k) 22%, var(--surface)); }
@@ -344,9 +345,9 @@ table.mv > tbody > tr:not(.expanded):hover > td,
   border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; white-space: nowrap; align-self: center; }
 .tutorhead .tumap:hover { border-color: var(--accent); }
 .tutorhead.on .tu-name { color: var(--accent); }
-@media (max-width: 600px) {  /* name, cost / Special and the button on one line; other requirements under them */
-  .tutorhead { align-items: center; }
-  .tutorhead .tu-tags { order: 2; flex-basis: 100%; }
+@media (max-width: 600px) {  /* name and cost / Special beside the button (a long name wraps beside it); other requirements under them */
+  .tutorhead { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+  .tutorhead .tu-tags { order: 2; grid-column: 1 / -1; }
 }
 .also button { border: 1px solid var(--line); background: var(--surface); padding: 4px 10px; border-radius: 999px; cursor: pointer; color: var(--accent); font-weight: 600; font-size: 13px; }
 

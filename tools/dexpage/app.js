@@ -725,9 +725,9 @@
       const how = (kind === "Special" ? '<span class="tu-kind k-special">Special</span>' : "") +
         parts.filter(isCost).map((p) => `<span class="tu-kind k-cost">${esc(p)}</span>`).join("");
       const reqs = parts.filter((p) => !isCost(p)).map((p) => `<span class="mode tu-req">${esc(p)}</span>`).join("");
-      // phones: name, cost / Special and the button on one line, the other requirements under them
-      const head = `<div class="cat-head tutorhead${state.tutor === key ? " on" : ""}"><span class="tu-name">${esc(where)}</span>${
-        how}${reqs ? `<span class="tu-tags">${reqs}</span>` : ""}${mapBtn}</div>`;
+      // phones: name and cost / Special (wrapping together) beside the button, the other requirements under them
+      const head = `<div class="cat-head tutorhead${state.tutor === key ? " on" : ""}"><span class="tu-title"><span class="tu-name">${esc(where)}</span>${
+        how}</span>${reqs ? `<span class="tu-tags">${reqs}</span>` : ""}${mapBtn}</div>`;
       const flags = ts.map(isOpen);
       return head + listOrCards(state.layouts.tutors === "grid", ts.map((_, n) => n), {
         chip: (n) => {
