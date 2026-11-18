@@ -209,7 +209,8 @@ Each place card has a **View Interactive Map** button that opens `#map-<slug>`: 
   Clicking a warp scrolls to its other end (both ends light up; a line only if it crosses no other map). Clicking a
   way out opens that place's map. Clicking a key row jumps to its marker; clicking a marker scrolls the key to its
   row (only where the key scrolls beside the maps, never on phones). No action buttons on the card; a tutor's
-  "move tutor" text (card and key row) is an underlined link to its Tutors entry (`#tutor-<where>`).
+  "move tutor" reads "See Tutor Moves" (card and key row), a dotted-underline link (as `button.mvname`) to its
+  Tutors entry (`#tutor-<where>`). Names that read badly from a script label go in `curation.NAMES` (roles stay).
 - Tutors ↔ maps: `build.TUTOR_MARKERS` (script label → "kind|where" Tutors group; Gym Trainees from
   `curation.GYM_TRAINEES`, marked via `NOTES` though the cafe map is otherwise `NO_MARKER_MAPS`) sets `tu` on the
   marker and `DEX.tutorMaps`; each Tutors group head has "Find in Map" (beside the title on phones too; map Back reads "← Back to tutors", `from: "tutors"`). The Battle Frontier's four tutors are four entries,

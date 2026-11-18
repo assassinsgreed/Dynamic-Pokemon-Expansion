@@ -59,7 +59,7 @@ const MapView = (() => {
     $("cx").onclick = () => unpin();
     const target = (e) => e.target.closest(".warp, .mk, .door, .edge, .mv-list button");
     root.addEventListener("click", (e) => {
-      const tu = e.target.closest(".mv-tu");  // a tutor's "move tutor" links to the moves they teach (the Tutors tab)
+      const tu = e.target.closest(".mv-tu");  // a tutor's "See Tutor Moves" opens their entry on the Tutors tab
       if (tu) { opts.onTutor(tu.dataset.tu); return; }
       const t = target(e);
       if (t && t.closest(".mv-list")) { jump(`.mv-maps [data-m="${t.dataset.m}"]`); return; }  // a key row goes straight to its marker
@@ -71,7 +71,7 @@ const MapView = (() => {
       if (t && !t.closest(".mv-key")) { show(t, true); if (t.matches(".mk")) revealInKey(t.dataset.m); return; }
       if (!e.target.closest(".mv-card, .mv-bar")) unpin();
     });
-    root.addEventListener("keydown", (e) => {  // the card's "move tutor" link works from the keyboard too
+    root.addEventListener("keydown", (e) => {  // the card's "See Tutor Moves" works from the keyboard too
       if (e.key === "Enter" && e.target.matches(".mv-card .mv-tu")) opts.onTutor(e.target.dataset.tu);
     });
     if (!touch) {
@@ -177,10 +177,10 @@ const MapView = (() => {
     $("side").innerHTML = h;
   }
 
-  // A marker's text as HTML: a tutor's "move tutor" links to their entry on the Tutors tab (build.link_tutors sets `tu`)
+  // A marker's text as HTML: a tutor's "move tutor" becomes "See Tutor Moves", a link to their entry on the Tutors tab (build.link_tutors sets `tu`)
   const markText = (m) => {
     const t = esc(m.t), at = m.tu ? t.lastIndexOf("move tutor") : -1;
-    return at < 0 ? t : `${t.slice(0, at)}<span class="mv-tu" role="link" tabindex="0" data-tu="${esc(m.tu)}">move tutor</span>${t.slice(at + 10)}`;
+    return at < 0 ? t : `${t.slice(0, at)}<span class="mv-tu" role="link" tabindex="0" data-tu="${esc(m.tu)}">See Tutor Moves</span>${t.slice(at + 10)}`;
   };
 
   function warpText(e) {
@@ -314,7 +314,7 @@ const MapView = (() => {
 
   return {
     // onLink(slug): a way out was clicked; onClose(): the Back button (labelled by backLabel()). The companion turns both into history steps.
-    // onTutor("kind|where"): a tutor's "move tutor" link was clicked.
+    // onTutor("kind|where"): a tutor's "See Tutor Moves" was clicked.
     // onMark(id | null): a marker was selected or let go, so the companion can put its link in the address bar.
     init(o) { opts = o; },
     open(slug, mark) {

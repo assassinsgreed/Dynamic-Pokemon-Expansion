@@ -91,6 +91,13 @@ NO_HIDDEN = {((3, 38), 3, 0), ((3, 38), 2, 0), ((3, 41), 1, 0), ((3, 40), 15, 4)
 # Ways out that only show the next map, which the player can't walk into: (place, destination)
 NO_EXIT = {("Route 6", "Daimyn City")}
 
+# A person's name where their script label reads badly (the role after it still comes from the script)
+NAMES = {
+    "EventScript_BattleFrontier_SWBattleItems1": "Battle Items 1", "EventScript_BattleFrontier_SWBattleItems2": "Battle Items 2",
+    "EventScript_BattleFrontier_SWZCrystals": "Z-Crystals", "EventScript_BattleFrontier_SWSpecialItems": "Special Items",
+    "EventScript_BattleFrontier_SWShadyRelicSeller": "Shady Relic Seller",
+}
+
 # What a person or event does, where their script doesn't say it plainly: label → (text, differs by mode, postgame).
 # Objects, signs and step triggers alike.
 NOTES = {

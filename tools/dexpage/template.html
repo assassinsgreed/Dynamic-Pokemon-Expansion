@@ -767,8 +767,9 @@ body.map-open .sheet { display: none; }  /* the place's pop-up waits behind the 
 #mapview .mv-card .what { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 0 0 2px; }
 #mapview .mv-card .text { margin: 0; font-weight: 600; }
 #mapview .mv-card .acts:empty { display: none; }
-#mapview .mv-tu { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
-#mapview .mv-tu:hover, #mapview .mv-tu:focus-visible { text-decoration-thickness: 2px; }
+/* a tutor's "See Tutor Moves": the dotted link underline of names inside cards (button.mvname) */
+#mapview .mv-tu { text-decoration: underline dotted color-mix(in srgb, var(--accent) 70%, transparent); text-decoration-thickness: 1.5px; text-underline-offset: 3px; cursor: pointer; }
+#mapview .mv-tu:hover, #mapview .mv-tu:focus-visible { color: var(--accent); text-decoration: underline solid var(--accent); }
 #mapview .mv-card .x { position: absolute; right: 8px; top: 8px; width: 30px; height: 30px; border-radius: 8px; border: 0; background: var(--accent-soft); cursor: pointer; font-size: 18px; line-height: 1; }
 </style>
 </head>

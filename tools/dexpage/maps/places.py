@@ -480,12 +480,13 @@ class Objects:
             elif label and ((role := self.npc_role(label)) or ob["postgame"]):
                 # Collin: "shop" says nothing a player can't see; it stays in roles so the Checklist can skip shopkeepers
                 ob["roles"], shown = role or "", self.shown_role(role)
-                ob["kind"], ob["text"] = "npc", f"{words(tail)}: {shown}" if shown else words(tail)
+                name = C.NAMES.get(label, words(tail))
+                ob["kind"], ob["text"] = "npc", f"{name}: {shown}" if shown else name
                 if role and re.search(r" \+\d+", role):  # the map key shortens long gift lists; keep the full one too
-                    ob["full"] = f"{words(tail)}: {self.shown_role(self.npc_role(label, full=True))}"
+                    ob["full"] = f"{name}: {self.shown_role(self.npc_role(label, full=True))}"
                 gift, ob["modes"] = self.by_mode(label, r"(?:giveitem|obtainitem)\s+(ITEM_\w+)", self.item_name)
                 if ob["modes"]:
-                    ob["text"] = f"{words(tail)}: gives {gift}"
+                    ob["text"] = f"{name}: gives {gift}"
             elif label:
                 ob["kind"] = "scenery"  # only talks: sprite, no badge
             elif not u16(o + 20):
