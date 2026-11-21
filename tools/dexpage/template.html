@@ -527,6 +527,9 @@ tr.on, .chip.on { scroll-margin-top: 12px; }
   .trow .tp { width: 32px; height: 32px; }
   .trow .tp i { transform: scale(.5); }
   .trow { gap: 6px; }
+  /* a narrow Level column ("Scaling," over "min 1") so the name, mode tag and all six sprites fit beside it */
+  table.mv .tlvcol { width: 84px; }
+  table.mv td.tlvcol { white-space: normal; }
   /* Difficulty gets its own full line under Mode / Layout / count */
   .diffpick { order: 10; flex-basis: 100%; margin-left: 0; }
   .filters .count { order: 11; }  /* the trainer count goes under the difficulty toggles */

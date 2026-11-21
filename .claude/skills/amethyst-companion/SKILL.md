@@ -89,7 +89,8 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
   Download button, not the subtitle; no "go online" hint, since a saved file never updates). Phones: title, then the
   subtitle (lined up under the title text) with "Last updated: …" on its own line and no pipe (the pipe is a CSS
   `::before`), then the link buttons spread out for tapping beside the Download button / offline note; on the Trainers tab
-  the Difficulty toggles sit above the count. Trainer list rows keep the right-aligned Level column on phones, as on desktop.
+  the Difficulty toggles sit above the count. Trainer list rows keep the right-aligned Level column on phones, as on desktop, fixed at 84 px with
+  "Scaling, min 1" wrapping to two lines, so the mode tag and all six sprites fit at 360 px (narrower cut off "Scaling,").
 - Look: Amethyst purple palette (game label art: #b27cfa / #320077), Trozei Jirachi header icon
   (`jirachi-trozei.png`, embedded), type-colour tints, equal-width chips, offline help for PC and phone.
 - Everything must work from the single downloaded file: no network, no CDNs, no fonts.
