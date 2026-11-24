@@ -1,7 +1,9 @@
+import datetime
 import re
 
 import pytest
 
+from tools.dexpage import build
 from tools.dexpage.build import _pack_learners, page_data, render, search_keys
 from tools.dexpage.roster import evolution_links
 from tools.dexpage.sprites import build_sheet
@@ -288,6 +290,15 @@ def test_gym_trainee_tutors_grouped(data):
 
 def test_game_version_tag(html):
     assert re.search(r'class="version"[^>]*>v1.4.3<', html)
+
+
+def test_game_version_skips_unreleased(tmp_path, monkeypatch):
+    log = tmp_path / "Changelog.txt"
+    log.write_text("v2.0.0 - May 14th, 2027\nstuff\nv1.4.3 - Nov 21st, 2026\nv1.4.0 - Sept 25th, 2026\n", encoding="utf-8")
+    monkeypatch.setattr(build, "CHANGELOG", log)
+    assert build.game_version(datetime.date(2026, 11, 24)) == "v1.4.3"
+    assert build.game_version(datetime.date(2027, 5, 14)) == "v2.0.0"
+    assert build.game_version(datetime.date(2026, 10, 1)) == "v1.4.0"
 
 
 def test_docs_in_page(data):

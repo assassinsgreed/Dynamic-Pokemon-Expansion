@@ -1,6 +1,7 @@
 """Turns the roster into the page: one JSON blob + sprite sheet embedded in template.html."""
 
 import base64
+import datetime
 import graphlib
 import hashlib
 import io
@@ -742,12 +743,29 @@ BRAND_ICON = Path(__file__).with_name("jirachi-trozei.png")  # Jirachi's Pokémo
 CHANGELOG = DPE_ROOT.parent / "PokemonShootingStars" / "Changelog.txt"
 
 
-def game_version() -> str:
-    """The newest release in the game's changelog (shown beside the title so players know what the page matches)."""
+def _changelog_date(text: str) -> datetime.date | None:
+    """"May 14th, 2027" / "Sept 25th, 2026" → a date (None if it doesn't read as one)."""
+    m = re.match(r"([A-Za-z]{3})[a-z]*\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})", text.strip())
+    if not m:
+        return None
+    try:
+        return datetime.datetime.strptime(f"{m.group(1)} {m.group(2)} {m.group(3)}", "%b %d %Y").date()
+    except ValueError:
+        return None
+
+
+def game_version(today: datetime.date | None = None) -> str:
+    """The newest released version in the game's changelog (shown beside the title so players know what the page
+    matches). An entry dated after today is a release still being worked on (v2.0.0 - May 14th, 2027 while v1.4.3 is
+    out), so it's skipped."""
     if not CHANGELOG.exists():
         return ""
-    m = re.search(r"^v(\d+(?:\.\d+)+)\s+-", CHANGELOG.read_text(encoding="utf-8", errors="replace"), flags=re.M)
-    return f"v{m.group(1)}" if m else ""
+    today = today or datetime.date.today()
+    for m in re.finditer(r"^v(\d+(?:\.\d+)+)\s+-\s*(.*)$", CHANGELOG.read_text(encoding="utf-8", errors="replace"), flags=re.M):
+        date = _changelog_date(m.group(2))
+        if date is None or date <= today:
+            return f"v{m.group(1)}"
+    return ""
 
 
 CAT_ICON_DIR = Path(__file__).with_name("cat_icons")  # the games' Physical / Special / Status move labels (Bulbapedia archives)

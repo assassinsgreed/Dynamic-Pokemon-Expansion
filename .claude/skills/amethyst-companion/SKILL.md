@@ -106,7 +106,7 @@ Data sources and links are listed in memory `amethyst-encounters-sheet`.
 - Tutor rows like "Fire Fang, or Flame Burst (v1.4+)" resolve to the move the game teaches for that tutor kind
   (move-tutor files for Regular, CFRU special tutors for Special); doc typos fuzzy-match (Breaking Strike → Breaking Swipe).
 - Content describes the **latest release** (version tag from `../PokemonShootingStars/Changelog.txt` beside the
-  title): "A, or B (v1.4+)" means B; "(v1.4)" tags are dropped from place names.
+  title; entries dated after today are unreleased work in progress and skipped): "A, or B (v1.4+)" means B; "(v1.4)" tags are dropped from place names.
 - Docs text is cleaned at build time (`clean_versions` in docs.py): version history is removed, keeping only what
   is true now ("X (v1.3) or Y (v1.4+)" → Y, "Introduced in v1.4" dropped, "Removed from pool" rows dropped); type
   names become Pokédex type chips only in type-only cells or "<type> type" phrases. docs.json keeps the raw doc text.
