@@ -61,6 +61,19 @@ def clean_versions(text: str) -> str:
     return re.sub(r"^(\s*<br>)+|(<br>\s*)+$", "", text).strip()
 
 
+# The doc's wording that only fits the doc itself (the page hides solutions behind click-to-reveal buttons instead
+# of the doc's redaction)
+REWORDS = [
+    ("you can copy and paste the redacted text into a text editor.", "click or tap one to reveal it."),
+]
+
+
+def reword(text: str) -> str:
+    for old, new in REWORDS:
+        text = text.replace(old, new)
+    return text
+
+
 TYPES = ["Normal", "Fire", "Water", "Grass", "Electric", "Ice", "Fighting", "Poison", "Ground", "Flying", "Psychic",
          "Bug", "Rock", "Ghost", "Dragon", "Dark", "Steel", "Fairy"]
 _T = "|".join(TYPES)
@@ -98,7 +111,7 @@ def _cleaned(topic: dict, ability_names: set[str] = frozenset()) -> list[dict]:
     blocks = []
     for b in topic["blocks"]:
         if b["t"] in ("p", "h"):
-            text = type_chips(clean_versions(b["html"]))
+            text = type_chips(clean_versions(reword(b["html"])))
             if text:
                 blocks.append({**b, "html": text})
         elif b["t"] == "list":
@@ -149,9 +162,11 @@ def _block_html(block: dict, images: dict[str, str]) -> str:
                    for cells in ([re.sub(r"<[^>]+>", "", r[i]).strip() for r in rows[1:] if i < len(r) and re.sub(r"<[^>]+>", "", r[i]).strip()]
                                  for i in range(width))]
         cls = lambda i: ' class="n"' if i < width and numeric[i] else ""
-        # Game Modifier passwords are spoilers: each one stays hidden until clicked (app.js toggles .shown)
-        secret = {i for i, c in enumerate(rows[0]) if re.sub(r"<[^>]+>", "", c).strip().lower() == "code"}
-        cell = lambda i, c: (f'<button class="reveal" title="Click to reveal"><span class="hint">Click to reveal</span>'
+        # Spoilers stay hidden until clicked (app.js toggles .shown): Game Modifier passwords and the Uteyan Ruins'
+        # Braille puzzle solutions (sentences, so they wrap in the text font: .long)
+        heads = [re.sub(r"<[^>]+>", "", c).strip().lower() for c in rows[0]]
+        secret = {i: "reveal" if h == "code" else "reveal long" for i, h in enumerate(heads) if h in ("code", "solution")}
+        cell = lambda i, c: (f'<button class="{secret[i]}" title="Click to reveal"><span class="hint">Click to reveal</span>'
                              f'<span class="code">{c}</span></button>' if i in secret and c.strip() else c)
         head = "".join(f"<th{cls(i)}>{c}</th>" for i, c in enumerate(rows[0]))
         body = "".join("<tr>" + "".join(f"<td{cls(i)}>{cell(i, c)}</td>" for i, c in enumerate(r)) + "</tr>" for r in rows[1:])

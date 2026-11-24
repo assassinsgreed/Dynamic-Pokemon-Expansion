@@ -87,3 +87,12 @@ def test_code_column_cells_hidden_until_clicked():
     html = render_topic(topic, images={})
     assert '<td><button class="reveal" title="Click to reveal"><span class="hint">Click to reveal</span><span class="code">OPPOSITEDAY</span></button></td>' in html
     assert "<td></td>" in html  # empty cells stay empty
+
+
+def test_braille_solutions_hidden_until_clicked():
+    from tools.dexpage.docs import load_docs, render_topic
+    topic = next(t for g in load_docs() for t in g["topics"] if t["title"] == "Braille Puzzles")
+    html = render_topic(topic, images={})
+    assert ('<td><button class="reveal long" title="Click to reveal"><span class="hint">Click to reveal</span>'
+            '<span class="code">Push boulders so they line up</span></button></td>') in html
+    assert "redacted" not in html and "click or tap one to reveal it." in html
