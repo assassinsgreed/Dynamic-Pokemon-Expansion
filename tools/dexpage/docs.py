@@ -63,8 +63,18 @@ def clean_versions(text: str) -> str:
 
 # The doc's wording that only fits the doc itself (the page hides solutions behind click-to-reveal buttons instead
 # of the doc's redaction)
+def reveal(text: str, cls: str = "reveal long") -> str:
+    """A spoiler hidden behind a click-to-reveal button (app.js toggles .shown)."""
+    return (f'<button class="{cls}" title="Click to reveal"><span class="hint">Click to reveal</span>'
+            f'<span class="code">{text}</span></button>')
+
+
 REWORDS = [
     ("you can copy and paste the redacted text into a text editor.", "click or tap one to reveal it."),
+    # its footnote ("In v1.1.5, this will be Four stones") is version history the build drops; the game reads Four
+    ("Five* stones", "Four stones"),
+    # the Divergent riddle's footnote gives its answer away
+    ("with a solution of presenting Spiritomb", "with a solution of " + reveal("presenting Spiritomb")),
 ]
 
 
@@ -115,13 +125,13 @@ def _cleaned(topic: dict, ability_names: set[str] = frozenset()) -> list[dict]:
             if text:
                 blocks.append({**b, "html": text})
         elif b["t"] == "list":
-            items = [[lvl, type_chips(clean_versions(i))] for lvl, i in b["items"]]
+            items = [[lvl, type_chips(clean_versions(reword(i)))] for lvl, i in b["items"]]
             items = [i for i in items if i[1]]
             if items:
                 blocks.append({**b, "items": items})
         elif b["t"] == "table":
             rows = [r for r in b["rows"] if not any("removed from pool" in c.lower() for c in r)]  # no longer in the game
-            rows = [[ability_link(type_chips(clean_versions(c), whole_cell=True), ability_names) for c in r] for r in rows]
+            rows = [[ability_link(type_chips(clean_versions(reword(c)), whole_cell=True), ability_names) for c in r] for r in rows]
             if len(rows) > 1:
                 blocks.append({**b, "rows": rows})
         else:
@@ -166,8 +176,7 @@ def _block_html(block: dict, images: dict[str, str]) -> str:
         # Braille puzzle solutions (sentences, so they wrap in the text font: .long)
         heads = [re.sub(r"<[^>]+>", "", c).strip().lower() for c in rows[0]]
         secret = {i: "reveal" if h == "code" else "reveal long" for i, h in enumerate(heads) if h in ("code", "solution")}
-        cell = lambda i, c: (f'<button class="{secret[i]}" title="Click to reveal"><span class="hint">Click to reveal</span>'
-                             f'<span class="code">{c}</span></button>' if i in secret and c.strip() else c)
+        cell = lambda i, c: reveal(c, secret[i]) if i in secret and c.strip() else c
         head = "".join(f"<th{cls(i)}>{c}</th>" for i, c in enumerate(rows[0]))
         body = "".join("<tr>" + "".join(f"<td{cls(i)}>{cell(i, c)}</td>" for i, c in enumerate(r)) + "</tr>" for r in rows[1:])
         return f'<div class="doctable"><table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>'

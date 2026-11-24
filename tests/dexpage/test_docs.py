@@ -95,4 +95,7 @@ def test_braille_solutions_hidden_until_clicked():
     html = render_topic(topic, images={})
     assert ('<td><button class="reveal long" title="Click to reveal"><span class="hint">Click to reveal</span>'
             '<span class="code">Push boulders so they line up</span></button></td>') in html
+    assert "<td>Four stones bow before the rising sun</td>" in html and "Five" not in html
     assert "redacted" not in html and "click or tap one to reveal it." in html
+    assert ('with a solution of <button class="reveal long" title="Click to reveal"><span class="hint">Click to reveal'
+            '</span><span class="code">presenting Spiritomb</span></button>') in html
